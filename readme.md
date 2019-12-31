@@ -10,7 +10,7 @@ This readme highlights portions of the architecture, ideas, and best practices.
     - We may find that subsystems would be better suited with field based controls. 
         - Turret for example, Don't force the drivers to have to overthink where the turret will be
 - Singleton Class approach
-    - For many of the classes, like the subsytems, force the system to use a singelton method. Guard nesscary mmethods with a synchronized keywork.
+    - For many of the classes, like the subsytems, force the system to use a singelton method. Guard nesscary methods with a synchronized keywork.
 - Backplane Approach
     - The general contept is to expose as much logic as possible to the Robot.java class. For example the drive operation is called from Robot.java.
     - The concept behind this is easier thinking at a systems level.
@@ -21,14 +21,26 @@ This readme highlights portions of the architecture, ideas, and best practices.
     - Intialially all this really is used for is to quickly loop through all the subsystems and run a subsystem check.
 - Subsystem Checks
     - All Subsystem classes must inherit the Subsystem class. Within that class is a Subsystem Check Class. 
+    - If we intend on playing deep into playoff matchups, it is likely we will encounter a match with a fast turnaround to the next match. It would be good to have a fast and effective functional that could give us some confidence.
 - RobotState
     - Essentially just a position Tracker for the robot. Record Pose2D at points.
+- Disabled States
+    - Likely not super useful, but we may find the need to perform periodic actions in a disabled state.
+- Path Planning
+    - Found in the Utility Libaries, we inherit 254's path planning logic. Using this logic we can drive waypoints. This library does an excellent job at pushing the robot's capabilites through spines while maintaining accuracy.
 
+### Brainstorming Ideas
+- 'Playbook'
+    - Game permitting, we might find there are tasks that we will need to repeat often. For example, say if we are picking up a scoring object at a feeder station and want to make an immediate drive to a scoring station. A simple look at this would be:
+        - Load Game Object -> Driver triggers playbook -> Robot performs autonomous drive to location -> Trigger Camera or other sensor Feedback -> Score Object
+        - Directional Pad on controller could be a good control to do this.
+- Preset Control
+    - All Manipulators should have a 'state' based focus. With a state based system we should rely on PID Control to reach exact points
 
 
 ### Concepts
 - Physics
-    We adopt some physic concepts that teams like 254 used (which are now included in the WPILIB apparently). Here is an explanation of each.
+    We adopt some physic concepts that teams like 254 used (which are now included in the WPILIB apparently). Here is a brief explanation of each.
     - Kinematics
         - Branch of classical mechanics (physics of motion) that describes the motion of an object without knowing anything about the forces acting on the object.
         - Forward Kinematics
@@ -46,11 +58,11 @@ This readme highlights portions of the architecture, ideas, and best practices.
         - Reflections are pretty simply. Results in flipping the shape across some line. These aren't overly useful in our case. 
         - Each Pose2D contains a Translation2D Object and a Rotation2D Object. Essientally just a rotation vector and a position vector
     - Translation2D
-        - Translation in X and Y. Often times this is essentially used as an X, Y point for the robot. PathSegment.java's constructor shows how this is done.
+        - Translation in X and Y. Often times this is essentially used as an X, Y point for the robot on the field. PathSegment.java's constructor shows how this is done.
     - Rotation2D
-        - Simply a point on the unit circle (cosine and sine). Basically represents a rotation of the robot.
+        - Simply a point on the unit circle (cosine and sine). Basically represents a rotation of the robot. You can think of this like the Robot is in the center of a Unit Circle, with values plugged into Cos, Sin functions to pinpoint the robots rotation.
     - Coordinate Frame
-        - X,Y point on a field, and a direction. In this case, a 
+        - X,Y point on a field, and a direction. In this case a Translation2D object would represent an X,Y position, and a Rotation2D object is the rotation. We will take a Coordinate frame upon robot intialization.
 
 - PID
     - Proportional, Integral, Derivative 
@@ -64,22 +76,22 @@ This readme highlights portions of the architecture, ideas, and best practices.
         - Feedforware control + Feedback control
 
 
+
+
+### Simulator
+WPILib has simulator capability. We should utilize this simulator to simulate controller input early/motor output on the build season to iron out any glaring issues.
+https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/introduction.html
+
+
+
+
 ### Code Housekeeping
 We want our code to execute as efficiently as possible. 
 - Make use of primitives types. Use int and double instead of Integer and Double. The JVM is able to store primitive types in the stack instead of the heap.
 - Use StringBuilder rather than + operator when combining strings
 - Use a leading M on Class Variables `int mClassVariable = 0;`
 - Use a leading k on Constants `kDriveSpeed`
-- Define all constants in COnstants.java, to avoid reusing memory
-
-
-### Simulator
-WPILib has simulator capability. We should utilize this simulator to simulate controller input early on the build season to iron out any glaring issues.
-https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/introduction.html
-
-
-
-
+- Define all constants in Constants.java, to avoid reusing memory on the stack as needed
 
 
 
