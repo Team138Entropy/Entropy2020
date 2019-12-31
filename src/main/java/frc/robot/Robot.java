@@ -8,7 +8,6 @@
 package frc.robot;
 
 import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -48,7 +47,7 @@ public class Robot extends TimedRobot {
 
     //Reset Robot State
     //Wherever the Robot is now is the starting position
-
+    mRobotState.reset();
   }
 
   /*

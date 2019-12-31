@@ -29,7 +29,7 @@ This readme highlights portions of the architecture, ideas, and best practices.
 ### Concepts
 - Physics
     We adopt some physic concepts that teams like 254 used (which are now included in the WPILIB apparently). Here is an explanation of each.
-    -Kinematics
+    - Kinematics
         - Branch of classical mechanics (physics of motion) that describes the motion of an object without knowing anything about the forces acting on the object.
         - Forward Kinematics
             - Convert positions of the robot to overal robot position
@@ -45,11 +45,11 @@ This readme highlights portions of the architecture, ideas, and best practices.
         - Translation is a sliding of a shape. An easy example is sliding a book 5 inches to the left on a bookshelf, this would be a translation. If we were zero'ed, on an x, y coordinate grid, then you could say you were moving the book along the x accesses. 
         - Reflections are pretty simply. Results in flipping the shape across some line. These aren't overly useful in our case. 
         - Each Pose2D contains a Translation2D Object and a Rotation2D Object. Essientally just a rotation vector and a position vector
-    -Translation2D
+    - Translation2D
         - Translation in X and Y. Often times this is essentially used as an X, Y point for the robot. PathSegment.java's constructor shows how this is done.
-    -Rotation2D
+    - Rotation2D
         - Simply a point on the unit circle (cosine and sine). Basically represents a rotation of the robot.
-    -Coordinate Frame
+    - Coordinate Frame
         - X,Y point on a field, and a direction. In this case, a 
 
 - PID
@@ -62,19 +62,19 @@ This readme highlights portions of the architecture, ideas, and best practices.
     - Follow the trajectory
         - FIgure out where you should be right now
         - Feedforware control + Feedback control
-- Forward Kinematics
-    - My left wheel went forward 2 inches, my right wheel went forward 4 inches. I went forward while turning counter-clockwise
-- Inverse Kinematics
-    - I want to turn clockwise 90 degrees. Left wheel must go forward for X inches, Right wheel must go backward for X inches
+
 
 ### Code Housekeeping
 We want our code to execute as efficiently as possible. 
 - Make use of primitives types. Use int and double instead of Integer and Double. The JVM is able to store primitive types in the stack instead of the heap.
 - Use StringBuilder rather than + operator when combining strings
+- Use a leading M on Class Variables `int mClassVariable = 0;`
+- Use a leading k on Constants `kDriveSpeed`
+- Define all constants in COnstants.java, to avoid reusing memory
 
 
 ### Simulator
-WPILib has simulator capability. We should utilize this simulator to simulate controller input
+WPILib has simulator capability. We should utilize this simulator to simulate controller input early on the build season to iron out any glaring issues.
 https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/introduction.html
 
 

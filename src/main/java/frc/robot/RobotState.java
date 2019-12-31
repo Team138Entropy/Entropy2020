@@ -21,6 +21,12 @@ public class RobotState {
         
     }
 
+    //Reset Robot State
+    //Make note of the Starting Position
+    public void reset(){
+
+    }
+
 
 
 }
