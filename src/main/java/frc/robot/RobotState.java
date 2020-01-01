@@ -27,6 +27,14 @@ public class RobotState {
 
     }
 
+    /*
+        Record robot's initial position on field
+        This is encapsulated in a Pose2D object
+    */
+    private void SetIntialFieldToRobot(){
+
+    }
+
 
 
 }

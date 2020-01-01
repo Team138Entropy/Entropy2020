@@ -36,6 +36,8 @@ This readme highlights portions of the architecture, ideas, and best practices.
         - Directional Pad on controller could be a good control to do this.
 - Preset Control
     - All Manipulators should have a 'state' based focus. With a state based system we should rely on PID Control to reach exact points
+- SmartNav
+    
 
 
 ### Concepts

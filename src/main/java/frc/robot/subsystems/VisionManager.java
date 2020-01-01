@@ -17,8 +17,12 @@ import java.util.Map;
 public class VisionManager extends Subsystem {
     private static VisionManager mInstance;
 
-    //private Set<int, RPICamera> mCameras;
-    
+    public synchronized static VisionManager getInstance(){
+        if(mInstance == null){
+            mInstance = new VisionManager();
+        }
+        return mInstance;
+    }
    
 
     //Add Multiple Cameras
@@ -31,23 +35,25 @@ public class VisionManager extends Subsystem {
     private RPICamera mActiveCamera;
 
      private VisionManager(){
+        //Initalize UDP Socket
+        //Intercept all TCP Packets
 
-
-        //Intialize set of Cameras
-        //mCameras = new HashMap<>();
-        //mCameras.put(ActiveCamera.Main, new RPICamera());
-
-        //Default Active Cammera
-        //UpdateActiveCamera(mActiveCameraValue);
+    
     }
 
 
-    public synchronized static VisionManager getInstance(){
-        if(mInstance == null){
-            mInstance = new VisionManager();
+    /*
+        Process every single packet
+    */
+    private void ProcessPacket(){
+        try{
+
+        }catch(Exception e){
+
         }
-        return mInstance;
     }
+
+ 
 
     public void ZeroSensors(){
         
