@@ -90,7 +90,9 @@ https://docs.wpilib.org/en/latest/docs/software/wpilib-tools/robot-simulation/in
 ### Code Housekeeping
 We want our code to execute as efficiently as possible. 
 - Make use of primitives types. Use int and double instead of Integer and Double. The JVM is able to store primitive types in the stack instead of the heap.
-- Use StringBuilder rather than + operator when combining strings
+- Avoid using the "+" operator to concatenate strings *when you need to concatenate the result again* in a *different statement.*
+    - See [This StackOverflow Answer](https://stackoverflow.com/a/4649160)
+    - TL;DR: The compiler will translate concatenations to StringBuilder operations, but in some cases this may not be optimal. 
 - Use a leading M on Class Variables `int mClassVariable = 0;`
 - Use a leading k on Constants `kDriveSpeed`
 - Define all constants in Constants.java, to avoid reusing memory on the stack as needed
