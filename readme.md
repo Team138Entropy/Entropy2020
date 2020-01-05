@@ -93,7 +93,8 @@ We want our code to execute as efficiently as possible.
 - Avoid using the "+" operator to concatenate strings *when you need to concatenate the result again* in a *different statement.*
     - See [This StackOverflow Answer](https://stackoverflow.com/a/4649160)
     - TL;DR: The compiler will translate concatenations to StringBuilder operations, but in some cases this may not be optimal. 
-- Use a leading M on Class Variables `int mClassVariable = 0;`
+- Use a leading 'm' on instance variables `int mInstanceVariable = 0;`
+- Use a leading 's' on static ("class") variables `int sClassVariable = 0;`
 - Use a leading k on Constants `kDriveSpeed`
 - Define all constants in Constants.java, to avoid reusing memory on the stack as needed
 
