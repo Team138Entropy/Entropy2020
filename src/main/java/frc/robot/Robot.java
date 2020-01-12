@@ -11,7 +11,7 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.IO.ControlBoard;
+import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 
@@ -23,7 +23,7 @@ import frc.robot.util.LatchedBoolean;
 public class Robot extends TimedRobot {
 
   //Controller Reference
-  private final ControlBoard mControlBoard = ControlBoard.getInstance();
+  private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
   //Robot State
   private final RobotState mRobotState = RobotState.getInstance();
@@ -34,6 +34,8 @@ public class Robot extends TimedRobot {
   //Subsystems
   private final Drive mDrive = Drive.getInstance();
   private final VisionManager mVisionManager = VisionManager.getInstance();
+
+  //Variables from State
 
 
   //autonomousInit, autonomousPeriodic, disabledInit, 
@@ -106,14 +108,15 @@ public class Robot extends TimedRobot {
   */
   public void RobotLoop(){
     //Check User Inputs
-    double DriveThrottle = mControlBoard.getDriveThrottle();
-    double DriveTurn = mControlBoard.getDriveTurn();
+    double DriveThrottle = mOperatorInterface.getDriveThrottle();
+    double DriveTurn = mOperatorInterface.getDriveTurn();
     boolean AutoDrive = false;
 
 
     //Continue Driving 
     if(AutoDrive == true){
       //AutoSteer Functionality
+      //Used for tracking a ball
     }else{
       //Standard Manual Drive
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
