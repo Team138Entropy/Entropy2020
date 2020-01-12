@@ -34,9 +34,13 @@ public class VisionManager extends Subsystem {
     private ActiveCamera mActiveCameraValue = ActiveCamera.Main;
     private RPICamera mActiveCamera;
 
+
+    private RPICamera mShooterCamera;
+    private RPICamera mIntakeCamera;
+
      private VisionManager(){
-        //Initalize UDP Socket
-        //Intercept all TCP Packets
+        //Start a Socket to listen to UDP Packet
+        //Each thread pass to a processer which 
 
     
     }
