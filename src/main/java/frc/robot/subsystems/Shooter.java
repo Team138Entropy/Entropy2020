@@ -43,9 +43,10 @@ public class Shooter extends Subsystem {
     }
 
     private interface Storage {
-        boolean isOpen();
+        boolean isBallStopOpen();
         boolean isFull();
-        void setOpen(boolean state);
+        void engageBallStop();
+        void releaseBallStop();
     }
 
     // TEMPORARY STUFF ENDS HERE
@@ -93,9 +94,10 @@ public class Shooter extends Subsystem {
             @SuppressWarnings("FieldCanBeLocal")
             private boolean full = false;
 
-            public boolean isOpen() { return open; }
+            public boolean isBallStopOpen() { return open; }
             public boolean isFull() { return full; }
-            public void setOpen(boolean open) { this.open = open; }
+            public void engageBallStop() { open = false; }
+            public void releaseBallStop() { open = true; }
         };
 
         m_spinUpTimer = new Timer();
@@ -117,7 +119,7 @@ public class Shooter extends Subsystem {
 
         // Check if we're done firing yet
         if (m_firing && m_fireTimer.get() >= FIRE_DURATION_SECONDS) {
-            m_storage.setOpen(false);
+            m_storage.engageBallStop();
             m_firing = false;
             m_fireTimer.stop();
             m_fireTimer.reset();
@@ -141,7 +143,7 @@ public class Shooter extends Subsystem {
 
                 m_firing = true;
                 m_fireTimer.start();
-                m_storage.setOpen(true);
+                m_storage.releaseBallStop();
                 --m_buffer;
             }
         } else {
