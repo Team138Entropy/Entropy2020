@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
   //Subsystems
   private final Drive mDrive = Drive.getInstance();
   private final VisionManager mVisionManager = VisionManager.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
 
   //Variables from State
 
@@ -122,7 +123,7 @@ public class Robot extends TimedRobot {
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
     }
 
-
+    mShooter.periodic();
   }
 
 
