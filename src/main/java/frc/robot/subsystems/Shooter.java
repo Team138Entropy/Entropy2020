@@ -13,6 +13,7 @@ public class Shooter extends Subsystem {
     // TODO: Integrate with other subsystems for real
     // TEMPORARY STUFF BEGINS HERE
     private static final int ROLLER_PORT = 0;
+    private static final int MAX_CAPACITY = 5;
 
     // TODO: Tune these values
     private static final double ROLLER_SPEED = 0.5;
@@ -43,7 +44,7 @@ public class Shooter extends Subsystem {
 
     private interface Storage {
         boolean isOpen();
-        int getBalls();
+        boolean isFull();
         void setOpen(boolean state);
     }
 
@@ -90,10 +91,10 @@ public class Shooter extends Subsystem {
             private boolean open = false;
 
             @SuppressWarnings("FieldCanBeLocal")
-            private int balls = 0;
+            private boolean full = false;
 
             public boolean isOpen() { return open; }
-            public int getBalls() { return balls; }
+            public boolean isFull() { return full; }
             public void setOpen(boolean open) { this.open = open; }
         };
 
@@ -166,7 +167,7 @@ public class Shooter extends Subsystem {
      */
     public void fireAuto() {
         resetBuffer();
-        for (int i = 0; i < m_storage.getBalls(); ++i) {
+        for (int i = 0; i < MAX_CAPACITY; ++i) {
             fireSingle();
         }
     }
