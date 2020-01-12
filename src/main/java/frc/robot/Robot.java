@@ -7,10 +7,18 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import frc.robot.Config.Key;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
@@ -21,6 +29,17 @@ import frc.robot.util.LatchedBoolean;
  * update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
+  static Potentiometer pot = new AnalogPotentiometer(0, 2.7027, 0);
+  public static final PotPID potHandler = new PotPID(pot);
+  static NetworkTable table;
+  private double initialYaw = 0.0;
+  
+  static Logger robotLogger = new Logger("robot");
+  static Logger visionLogger = new Logger("vision");
+  static Logger potLogger = new Logger("pot");
+  
+  public static WPI_TalonSRX rotatorTalon = new WPI_TalonSRX(1);
+  private double previousYaw = 0;
 
   //Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -50,6 +69,10 @@ public class Robot extends TimedRobot {
     //Reset Robot State
     //Wherever the Robot is now is the starting position
     mRobotState.reset();
+
+    // prepare the network table
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    table = inst.getTable("SmartDashboard");
   }
 
   /*
@@ -71,7 +94,9 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
   }
 
+  @Override
   public void teleopPeriodic() {
+    System.out.println("teleop");
     try{
       RobotLoop();
     }catch(Exception e){
@@ -107,22 +132,57 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop(){
-    //Check User Inputs
-    double DriveThrottle = mOperatorInterface.getDriveThrottle();
-    double DriveTurn = mOperatorInterface.getDriveTurn();
-    boolean AutoDrive = false;
+    System.out.println("robotloop");
+    if(Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)){
+      boolean tapeDetected = table.getEntry("tapeDetected").getBoolean(false);
+      double thisYaw = table.getEntry("tapeYaw").getDouble(0.0);
+
+      if(initialYaw == 0){
+          initialYaw = thisYaw;
+      }
+
+      // thisYaw = thisYaw - initialYaw;
+      //70 is the maximum, -70 is the minimum
 
 
-    //Continue Driving 
-    if(AutoDrive == true){
-      //AutoSteer Functionality
-      //Used for tracking a ball
+      //7 is our "deadband"
+      //TODO: add to config
+      if(Math.abs(thisYaw) > 10 && (thisYaw < -20 || thisYaw > 0) && tapeDetected){
+        potHandler.enable();
+        previousYaw = thisYaw;
+
+        double setPoint = (thisYaw + 90) / 180;
+        potLogger.verbose("targeting set point " + Double.toString(setPoint) + " from pot " + Robot.pot.get() + " at " + thisYaw);
+        potHandler.setSetpoint(setPoint);
+
+        visionLogger.verbose("thisYaw " + thisYaw + " tapeDetected " + tapeDetected);
+      }else{
+        potHandler.disable();
+        visionLogger.debug("Not getting any output " + Double.toString(thisYaw) + " " + tapeDetected + " at the POT " + pot.get());
+        rotatorTalon.set(ControlMode.PercentOutput, 0f);
+      }
     }else{
-      //Standard Manual Drive
-      mDrive.setDrive(DriveThrottle, DriveTurn, false);
+
+      visionLogger.debug("Not enabled");
+      potHandler.setSetpoint(0.12);
+
+      if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
+        //Check User Inputs
+        double DriveThrottle = mOperatorInterface.getDriveThrottle();
+        double DriveTurn = mOperatorInterface.getDriveTurn();
+        boolean AutoDrive = false;
+
+
+        //Continue Driving 
+        if(AutoDrive == true){
+          //AutoSteer Functionality
+          //Used for tracking a ball
+        }else{
+          //Standard Manual Drive
+          mDrive.setDrive(DriveThrottle, DriveTurn, false);
+        }
+      }
     }
-
-
   }
 
 
