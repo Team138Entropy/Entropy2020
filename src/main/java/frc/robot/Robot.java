@@ -43,32 +43,38 @@ public class Robot extends TimedRobot {
   //teleopInit, teleopPeriodic, testInit, testPeriodic
 
   public void robotInit() {
+    System.out.println("robot init _ 1");
     
     //Zero all nesscary sensors on Robot
     ZeroSensors();
 
     //Reset Robot State
     //Wherever the Robot is now is the starting position
+    System.out.println("RobotState!");
     mRobotState.reset();
+    System.out.println("Robot State Reset");
   }
 
   /*
     Called on bootup, Zero all Sensors
   */
   private void ZeroSensors(){
+    System.out.println("Zero");
     mSubsystemManager.ZeroSensors();
+    System.out.println("Done Zero");
   }
 
 
   public void autonomousInit(){
-
+    System.out.println("Auto Init Called");
   }
 
   public void autonomousPeriodic(){
-
+    System.out.println("Auto Periodic");
   }
 
   public void teleopInit() {
+    System.out.println("Teleop Init!");
   }
 
   public void teleopPeriodic() {
