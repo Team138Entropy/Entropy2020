@@ -813,8 +813,6 @@ def findBalls(frame):
 def ProcessFrame(frame, tape):
 	if(tape == True):
         #Tape Process!
-
-
         #APPLY A BLUE TO BLUR THE LINES
 		frame = FilterHSVTape(frame) #Filter Frame for HSV Tape
 		frame = findTapeTargets(frame)
@@ -822,18 +820,10 @@ def ProcessFrame(frame, tape):
         #Ball Tracker!
 		original_frame = frame.copy()
 		frame = MaskBall(frame) #Filter and Mask by HSV Values
-
-		int = random.randint(1, 100)
-		cv2.imwrite("inter" + str(int) + '.jpg', frame)
-
-
-		#Debug Code
-		val = random.randint(1, 100)
-
-
-
 		Targets = findBalls(frame)
 
+
+		'''
 		#Debug Drawing Code
 		for Targ in Targets:
 			original_frame = cv2.circle(original_frame, (Targ['x'], Targ['y']), Targ['radius'], (255, 0, 0), 2)
@@ -852,6 +842,7 @@ def ProcessFrame(frame, tape):
 			original_frame = cv2.putText(original_frame, str(Targ['aspectratio']), org, font, fontScale, color, thickness, cv2.LINE_AA)
 
 		cv2.imwrite("of1" + str(val) +  ".jpg", original_frame)
+		'''
 
 
 
