@@ -48,10 +48,10 @@ public class Robot extends TimedRobot {
 
   
   static Potentiometer pot;
-  public static final PotPID potHandler = new PotPID(pot);
+  public static PotPID potHandler;
   static NetworkTable table;
   private double initialYaw = 0.0;
-  private static double targetPos = 0.25;
+  private static double targetPos = 50;
 
   static Logger robotLogger = new Logger("robot"); 
   static Logger visionLogger = new Logger("vision");
@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
 
     pot = new AnalogPotentiometer(Config.getInstance().getInt(Key.ROBOT__POT__LOCATION), Config.getInstance().getFloat(Key.ROBOT__POT__RANGE), Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
     rotatorTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
+    potHandler = new PotPID(pot);
   }
 
   /*
@@ -131,7 +132,7 @@ public class Robot extends TimedRobot {
   }
   @Override
   public void disabledPeriodic(){
-
+    robotLogger.info("pot " + Robot.pot.get());
   }
 
 
@@ -177,11 +178,11 @@ public class Robot extends TimedRobot {
           rotatorTalon.set(ControlMode.PercentOutput, 0f);
         }
       }else{
-        visionLogger.verbose("Not enabled " + targetPos);
+        // visionLogger.verbose("Not enabled " + targetPos);
         potHandler.enable();
         potHandler.setSetpoint(targetPos);
-        if(OperatorInterface.getInstance().getTurretAdjustLeft()) targetPos -= .025;
-        if(OperatorInterface.getInstance().getTurretAdjustRight()) targetPos += .025;
+        if(OperatorInterface.getInstance().getTurretAdjustLeft()) targetPos -= 2.5;
+        if(OperatorInterface.getInstance().getTurretAdjustRight()) targetPos += 2.5;
       }
     }else{
       
