@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -29,17 +31,6 @@ import frc.robot.util.LatchedBoolean;
  * update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
-  static Potentiometer pot = new AnalogPotentiometer(0, 2.7027, 0);
-  public static final PotPID potHandler = new PotPID(pot);
-  static NetworkTable table;
-  private double initialYaw = 0.0;
-  
-  static Logger robotLogger = new Logger("robot");
-  static Logger visionLogger = new Logger("vision");
-  static Logger potLogger = new Logger("pot");
-  
-  public static WPI_TalonSRX rotatorTalon = new WPI_TalonSRX(1);
-  private double previousYaw = 0;
 
   //Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -51,16 +42,28 @@ public class Robot extends TimedRobot {
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
   //Subsystems
-  private final Drive mDrive = Drive.getInstance();
   private final VisionManager mVisionManager = VisionManager.getInstance();
 
   //Variables from State
 
+  
+  static Potentiometer pot;
+  public static final PotPID potHandler = new PotPID(pot);
+  static NetworkTable table;
+  private double initialYaw = 0.0;
+  private static double targetPos = 0.25;
+
+  static Logger robotLogger = new Logger("robot"); 
+  static Logger visionLogger = new Logger("vision");
+  static Logger potLogger = new Logger("pot");
+
+  public static WPI_TalonSRX rotatorTalon;
+  private double previousYaw = 0;
 
   //autonomousInit, autonomousPeriodic, disabledInit, 
   //disabledPeriodic, loopFunc, robotInit, robotPeriodic, 
   //teleopInit, teleopPeriodic, testInit, testPeriodic
-
+  @Override
   public void robotInit() {
     
     //Zero all nesscary sensors on Robot
@@ -70,9 +73,13 @@ public class Robot extends TimedRobot {
     //Wherever the Robot is now is the starting position
     mRobotState.reset();
 
+    
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     table = inst.getTable("SmartDashboard");
+
+    pot = new AnalogPotentiometer(Config.getInstance().getInt(Key.ROBOT__POT__LOCATION), Config.getInstance().getFloat(Key.ROBOT__POT__RANGE), Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
+    rotatorTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
   }
 
   /*
@@ -82,28 +89,27 @@ public class Robot extends TimedRobot {
     mSubsystemManager.ZeroSensors();
   }
 
-
+  @Override
   public void autonomousInit(){
-
   }
-
+  @Override
   public void autonomousPeriodic(){
-
+    rotatorTalon.set(ControlMode.PercentOutput, 0.05f);
   }
 
+  @Override
   public void teleopInit() {
   }
 
   @Override
   public void teleopPeriodic() {
-    System.out.println("teleop");
     try{
       RobotLoop();
     }catch(Exception e){
       System.out.println("RobotLoop Exception");
     }
   }
-
+  @Override
   public void testInit() {
     System.out.println("Entropy 138: Test Init");
 
@@ -113,16 +119,17 @@ public class Robot extends TimedRobot {
 
 
   }
-
+  @Override
   public void testPeriodic(){
 
   }
 
-
+  @Override
   public void disabledInit() {
-
+    potHandler.disable();
+    Config.getInstance().reload();
   }
-
+  @Override
   public void disabledPeriodic(){
 
   }
@@ -132,56 +139,65 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop(){
-    System.out.println("robotloop");
-    if(Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)){
-      boolean tapeDetected = table.getEntry("tapeDetected").getBoolean(false);
-      double thisYaw = table.getEntry("tapeYaw").getDouble(0.0);
 
-      if(initialYaw == 0){
-          initialYaw = thisYaw;
-      }
+    float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
+    float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
 
-      // thisYaw = thisYaw - initialYaw;
-      //70 is the maximum, -70 is the minimum
+    boolean allowMovement = (pot.get() < potMax && pot.get() > potMin) || true;
+    potLogger.debug("allow movement " + allowMovement);
+    
+    if(allowMovement){
+      if(Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)){
 
 
-      //7 is our "deadband"
-      //TODO: add to config
-      if(Math.abs(thisYaw) > 10 && (thisYaw < -20 || thisYaw > 0) && tapeDetected){
-        potHandler.enable();
-        previousYaw = thisYaw;
+        boolean tapeDetected = table.getEntry("tapeDetected").getBoolean(false);
+        double thisYaw = table.getEntry("tapeYaw").getDouble(0.0);
 
-        double setPoint = (thisYaw + 90) / 180;
-        potLogger.verbose("targeting set point " + Double.toString(setPoint) + " from pot " + Robot.pot.get() + " at " + thisYaw);
-        potHandler.setSetpoint(setPoint);
+        if(initialYaw == 0){
+            initialYaw = thisYaw;
+        }
 
-        visionLogger.verbose("thisYaw " + thisYaw + " tapeDetected " + tapeDetected);
+        // thisYaw = thisYaw - initialYaw;
+        //70 is the maximum, -70 is the minimum
+        //7 is our "deadband"
+        //TODO: add to config
+        if(Math.abs(thisYaw) > 10 && (thisYaw < -20 || thisYaw > 0) && tapeDetected){
+          potHandler.enable();
+          previousYaw = thisYaw;
+
+          double setPoint = (thisYaw + 90) / 180;
+          potLogger.verbose("targeting set point " + Double.toString(setPoint) + " from pot " + Robot.pot.get() + " at " + thisYaw);
+          potHandler.setSetpoint(setPoint);  
+          
+          
+          visionLogger.verbose("thisYaw " + thisYaw + " tapeDetected " + tapeDetected);
+        }else{
+          potHandler.disable();
+          visionLogger.debug("Not getting any output " + Double.toString(thisYaw) + " " + tapeDetected + " at the POT " + pot.get());
+          rotatorTalon.set(ControlMode.PercentOutput, 0f);
+        }
       }else{
-        potHandler.disable();
-        visionLogger.debug("Not getting any output " + Double.toString(thisYaw) + " " + tapeDetected + " at the POT " + pot.get());
-        rotatorTalon.set(ControlMode.PercentOutput, 0f);
+        visionLogger.verbose("Not enabled " + targetPos);
+        potHandler.enable();
+        potHandler.setSetpoint(targetPos);
+        if(OperatorInterface.getInstance().getTurretAdjustLeft()) targetPos -= .025;
+        if(OperatorInterface.getInstance().getTurretAdjustRight()) targetPos += .025;
       }
     }else{
+      
+    }
 
-      visionLogger.debug("Not enabled");
-      potHandler.setSetpoint(0.12);
-
-      if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
-        //Check User Inputs
-        double DriveThrottle = mOperatorInterface.getDriveThrottle();
-        double DriveTurn = mOperatorInterface.getDriveTurn();
-        boolean AutoDrive = false;
-
-
-        //Continue Driving 
-        if(AutoDrive == true){
-          //AutoSteer Functionality
-          //Used for tracking a ball
-        }else{
-          //Standard Manual Drive
-          mDrive.setDrive(DriveThrottle, DriveTurn, false);
-        }
-      }
+      
+    if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
+      //Check User Inputs
+      double DriveThrottle = mOperatorInterface.getDriveThrottle();
+      double DriveTurn = mOperatorInterface.getDriveTurn();
+      boolean AutoDrive = false;
+    }else{
+      //Check User Inputs
+      double DriveThrottle = mOperatorInterface.getDriveThrottle();
+      double DriveTurn = mOperatorInterface.getDriveTurn();
+      boolean AutoDrive = false;
     }
   }
 
@@ -190,50 +206,50 @@ public class Robot extends TimedRobot {
 
   private volatile boolean m_exit;
 
-  @SuppressWarnings("PMD.CyclomaticComplexity")
-  @Override
-  public void startCompetition() {
-    robotInit();
+  // @SuppressWarnings("PMD.CyclomaticComplexity")
+  // @Override
+  // public void startCompetition() {
+  //   robotInit();
 
-    // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
+  //   // Tell the DS that the robot is ready to be enabled
+  //   HAL.observeUserProgramStarting();
 
-    while (!Thread.currentThread().isInterrupted() && !m_exit) {
-      if (isDisabled()) {
-        m_ds.InDisabled(true);
-        //disabled();
-        m_ds.InDisabled(false);
-        while (isDisabled()) {
-          m_ds.waitForData();
-        }
-      } else if (isAutonomous()) {
-        m_ds.InAutonomous(true);
-        //autonomous();
-        m_ds.InAutonomous(false);
-        while (isAutonomous() && !isDisabled()) {
-          m_ds.waitForData();
-        }
-      } else if (isTest()) {
-        LiveWindow.setEnabled(true);
-        Shuffleboard.enableActuatorWidgets();
-        m_ds.InTest(true);
-        //test();
-        m_ds.InTest(false);
-        while (isTest() && isEnabled()) {
-          m_ds.waitForData();
-        }
-        LiveWindow.setEnabled(false);
-        Shuffleboard.disableActuatorWidgets();
-      } else {
-        m_ds.InOperatorControl(true);
-        //teleop();
-        m_ds.InOperatorControl(false);
-        while (isOperatorControl() && !isDisabled()) {
-          m_ds.waitForData();
-        }
-      }
-    }
-  }
+  //   while (!Thread.currentThread().isInterrupted() && !m_exit) {
+  //     if (isDisabled()) {
+  //       m_ds.InDisabled(true);
+  //       //disabled();
+  //       m_ds.InDisabled(false);
+  //       while (isDisabled()) {
+  //         m_ds.waitForData();
+  //       }
+  //     } else if (isAutonomous()) {
+  //       m_ds.InAutonomous(true);
+  //       //autonomous();
+  //       m_ds.InAutonomous(false);
+  //       while (isAutonomous() && !isDisabled()) {
+  //         m_ds.waitForData();
+  //       }
+  //     } else if (isTest()) {
+  //       LiveWindow.setEnabled(true);
+  //       Shuffleboard.enableActuatorWidgets();
+  //       m_ds.InTest(true);
+  //       //test();
+  //       m_ds.InTest(false);
+  //       while (isTest() && isEnabled()) {
+  //         m_ds.waitForData();
+  //       }
+  //       LiveWindow.setEnabled(false);
+  //       Shuffleboard.disableActuatorWidgets();
+  //     } else {
+  //       m_ds.InOperatorControl(true);
+  //       //teleop();
+  //       m_ds.InOperatorControl(false);
+  //       while (isOperatorControl() && !isDisabled()) {
+  //         m_ds.waitForData();
+  //       }
+  //     }
+  //   }
+  // }
 
   @Override
   public void endCompetition() {

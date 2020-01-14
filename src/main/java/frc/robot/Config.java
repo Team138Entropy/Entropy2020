@@ -10,11 +10,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 // System Constants
 	// public static double commandLoopIterationSeconds = 0.020;
-		
+
 	// public static boolean practiceBot = false;
 
 	// public final static double CloseLoopJoystickDeadband = 0.2;
-	
+
 	// This is our encoder constant for distance (in METERS) per  encoder pulse
 	// 6" Wheels, 15:45 chain drive; 256 encoder counts per drive sprocket rotation
 	// public final static double MetersPerPulse = Math.PI*6*.0254*15/45/256;
@@ -27,11 +27,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 	// TEST ONLY
 	// public final static int LeftDriveEncoderPolarity = -1;
 	// public final static int RightDriveEncoderPolarity = 1;
-	
+
 	// 2019 Drive Train constants
 	// public final static double FullSpeed = 0.75;
 	// public final static double ClimbSpeed = 0.75;
-	
+
 	// Dashboard
 	// public static final long DASHBOARD_INTERVAL = 50; // In milliseconds
 // }
@@ -45,8 +45,16 @@ public class Config{
 		OI__VISION__PID__P,
 		OI__VISION__PID__I,
 		OI__VISION__PID__D,
-		
-		ROBOT__HAS_DRIVETRAIN
+
+		ROBOT__HAS_DRIVETRAIN,
+
+		ROBOT__POT__LOCATION,
+		ROBOT__POT__RANGE,
+		ROBOT__POT__OFFSET,
+
+		ROBOT__TURRET__TALON_LOCATION,
+
+		OI__VISION__PID__MAX_SPEED
 	}
 
 	static Config instance;
@@ -95,4 +103,4 @@ public class Config{
 	public boolean getBoolean(Key key){
 		return cfg.getBoolean(key.name());
 	}
-}
+} 

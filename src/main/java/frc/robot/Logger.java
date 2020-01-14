@@ -86,7 +86,7 @@ public class Logger {
     public void err(String message){
         logLevel(SupportedLevels.ERROR, message);
     }
-    
+
     /**
      * Logs at the level ERROR
      * @param message The message to log
@@ -94,7 +94,7 @@ public class Logger {
     public void error(String message){
         logLevel(SupportedLevels.ERROR, message);
     }
-    
+
     /**
      * Logs at the level WARN
      * @param message The message to log

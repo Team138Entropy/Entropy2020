@@ -64,7 +64,7 @@ public class ConfigFile {
         String value = props.getProperty(key);
         if(value == null){
             value = defaultProps.getProperty(key);
- 
+
             if(value == null){
                 throw new RuntimeException("Did not find value in config file or in " + key);
             }else{
@@ -73,7 +73,7 @@ public class ConfigFile {
         }
         return value;
     }
-    
+
     public String getString(String key){
         return getProp(key);
     }

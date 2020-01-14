@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import frc.robot.Config;
+import frc.robot.Logger;
 import frc.robot.Robot;
 import frc.robot.Config.Key;
 
@@ -19,6 +20,7 @@ import frc.robot.Config.Key;
  * Add your docs here.
  */
 public class PotPID extends PIDSubsystem {
+  Logger robotLogger = new Logger("robot");
   /**
    * Add your docs here.
    */
@@ -41,17 +43,19 @@ public class PotPID extends PIDSubsystem {
 
   @Override
   protected double returnPIDInput() {
-    // Return your input value for the PID loop
-    // e.g. a sensor, like a potentiometer:
+    // gets the POT value, rounded to 2 decimal places
+
+    // TODO: is this even needed?
     double potValue = Double.parseDouble(String.format("%.2f", this.pot.get()));
-    System.out.println("pot value " + potValue);
+    robotLogger.verbose("pot value " + potValue);
     return potValue;
   }
 
   @Override
   protected void usePIDOutput(double output) {
-    output = Math.min(output, 0.5d) / 2;
-    System.out.println("pid out " + output);
+    // limit the output to prevent the motor from going too fast
+    output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
+    robotLogger.verbose("pid out " + output);
     Robot.rotatorTalon.set(ControlMode.PercentOutput, output);
   }
 }
