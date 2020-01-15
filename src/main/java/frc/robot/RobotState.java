@@ -73,5 +73,15 @@ public class RobotState {
     }
 
 
+    /**
+     * Return the Robot's Position on the field at a certain time.
+     * Linearly interpolates between shared frames
+     * @param timestamp
+     * @return
+     */
+    public synchronized Pose2d getFieldToVehicle(double timestamp){
+        return Field_To_Vehicle_Map.getInterpolated(new InterpolatingDouble(timestamp));
+    }
+
 
 }
