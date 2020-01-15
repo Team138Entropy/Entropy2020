@@ -58,11 +58,6 @@ Ball_HSV_Upper = np.array([62,255,255])
 rat_low = 1.5
 rat_high = 10
 
-#Camera parameters
-#camFOV , 56 is red dot and more zoommed in, blue dot is 75 and wider angle
-camFOV=numpy.array([56,75])
-
-
 hsv_threshold_hue = [13, 62]
 hsv_threshold_saturation = [55, 255]
 hsv_threshold_value = [87, 255]
@@ -492,6 +487,7 @@ def findTape(contours, image, centerX, centerY):
 					cy = int(M["m01"] / M["m00"])
 					distCY = 540-cy
 					print(calculateDistance138(distCY))
+					print(calculateDistanceMethod2(w))
 				else:
 					cx, cy = 0, 0
 				if(len(biggestCnts) < 13):
@@ -636,11 +632,26 @@ def calculateDistance138(targetHeightPixels):
     #Current res is 640x480, up to 75FPS or 320x240 up to 187 FPS both (4:3)
     #FOV is 53.5
     targHeightInch = 27.5
-    imageWidthPixels = 720
+    imageWidthPixels = 480
     camerafov = math.tan(75/2)
     myDist = (targHeightInch*imageWidthPixels)/(2*targetHeightPixels*camerafov)
     return myDist
 
+def calculateDistanceMethod2(targPixelWidth):
+	#d = Tft*FOVpixel/(2*Tpixel*tanΘ)
+
+	FOV = 75
+	#8 feet, 2.25 inches, actual height of center goal is 96.25, I think the centroid of the tape is ~87.75 inches
+	#tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
+	targetHeightActual = 96.25
+	camPixelWidth = 480
+	#target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
+	Tft = 3.27
+	#theta = 1/2 FOV,
+	tanFOV = math.tan(FOV/2)
+ 
+	distEst = Tft*camPixelWidth/(2*targPixelWidth*tanFOV)
+	return(distEst) 
 
 
 def calculateDistance(heightOfCamera, heightOfTarget, pitch):
