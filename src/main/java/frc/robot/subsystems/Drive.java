@@ -3,8 +3,6 @@ import frc.robot.util.*;
 import frc.robot.Kinematics;
 import frc.robot.Constants;
 import frc.robot.util.geometry.*;
-import frc.robot.util.drivers.LazySparkMax;
-import frc.robot.util.drivers.SparkMaxFactory;
 
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -20,7 +18,7 @@ public class Drive extends Subsystem {
     private WPI_TalonSRX  mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
     
     //Gear Shifting Solenoid
-    private final Solenoid mShifter;
+    //private final Solenoid mShifter;
 
     //Drive is plummed to default to high gear
     private boolean mHighGear = true;
@@ -74,7 +72,7 @@ public class Drive extends Subsystem {
 
 
         //Shifter Solenoid
-        mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
+        //mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
        
         mLeftMaster = new WPI_TalonSRX(Constants.kLeftDriveMasterId);
        // configureSpark(mLeftMaster, true, true);
@@ -134,11 +132,6 @@ public class Drive extends Subsystem {
         
     }
 
-    private void configureSpark(LazySparkMax sparkMax, boolean left, boolean master) {
-        sparkMax.setInverted(!left);
-        sparkMax.enableVoltageCompensation(12.0);
-        sparkMax.setClosedLoopRampRate(Constants.kDriveVoltageRampRate);
-    }
 
     /**
      * Configure talons for open loop control
