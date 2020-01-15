@@ -17,7 +17,7 @@
 
 
 '''
-import random
+
 import json
 import time
 import sys
@@ -42,8 +42,8 @@ centerX = (Camera_Image_Width / 2) - .5
 
 
 #Aspect Ratio
-HorizontalAspect = 3
-VerticalAspect = 2
+HorizontalAspect = 4
+VerticalAspect = 3
 DiagonalAspect = math.hypot(HorizontalAspect, VerticalAspect)
 
 #Upper and Lower HSV Threshold Limits
@@ -54,13 +54,14 @@ Tape_HSV_Upper = np.array([108, 255, 255]) #Hue, Saturation, Value
 Ball_HSV_Lower = np.array([13,67,188])
 Ball_HSV_Upper = np.array([62,255,255])
 
+#ratio values - detects feeder station. Doing and not when doing ratio checks will ignore them
+rat_low = 1.5
+rat_high = 10
 
+#Camera parameters
+#camFOV , 56 is red dot and more zoommed in, blue dot is 75 and wider angle
+camFOV=numpy.array([56,75])
 
-'''
-hsv_threshold_hue = [43.70503597122302, 137.57575757575756]
-hsv_threshold_saturation = [32.10431654676259, 255.0]
-hsv_threshold_value = [43.57014388489208, 186.31313131313132]
-'''
 
 hsv_threshold_hue = [13, 62]
 hsv_threshold_saturation = [55, 255]
@@ -475,8 +476,15 @@ def findTape(contours, image, centerX, centerY):
 			cntArea = cv2.contourArea(cnt)
 			# calculate area of convex hull
 			hullArea = cv2.contourArea(hull)
+			
+			x, y, w, h = cv2.boundingRect(cnt)
+			ratio = float(w) / h	
 			# Filters contours based off of size
-			if (checkContours(cntArea, hullArea)):
+			if (checkContours(cntArea, hullArea, ratio)):
+       			#Next three lines are for debugging the contouring
+                #contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3) 
+				#cv2.imwrite("drawncontours.jpg", contimage)
+				#time.sleep(1)
 				### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
 				# Gets the centeroids of contour
 				if M["m00"] != 0:
@@ -600,14 +608,14 @@ def findTape(contours, image, centerX, centerY):
 
 	cv2.line(image, (round(centerX), screenHeight), (round(centerX), 0), (255, 255, 255), 2)
 
-	cv2.imwrite("latest.jpg", image);
+	#cv2.imwrite("latest.jpg", image);
 	return image
 
 
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
-def checkContours(cntSize, hullSize):
-	return cntSize > (image_width / 6)
+def checkContours(cntSize, hullSize, aspRatio):
+	return cntSize > (image_width / 6) and not (aspRatio < rat_low or aspRatio > rat_high)
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
 def checkBall(cntSize, cntAspectRatio):
@@ -625,7 +633,7 @@ def translateRotation(rotation, width, height):
 
 #distance = (targetHeightInches * ImageWidthPixels) / (2 * targetHeightPixels * tan(cameraHorizontalAngle/2);
 def calculateDistance138(targetHeightPixels):
-    #Current res is 720 x 540
+    #Current res is 640x480, up to 75FPS or 320x240 up to 187 FPS both (4:3)
     #FOV is 53.5
     targHeightInch = 27.5
     imageWidthPixels = 720
