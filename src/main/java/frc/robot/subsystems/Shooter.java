@@ -16,7 +16,7 @@ public class Shooter extends Subsystem {
     private static final int MAX_CAPACITY = 5;
 
     // TODO: Tune these values
-    private static final double ROLLER_SPEED = 0.5;
+    private static final double ROLLER_SPEED = 1;
     private static final double SPINUP_DELAY_SECONDS = 0.5;
     private static final double FIRE_DURATION_SECONDS = 0.5;
 
@@ -42,11 +42,9 @@ public class Shooter extends Subsystem {
         TurretPosition calcTargetPosition();
     }
 
-    private interface Storage {
-        boolean isBallStopOpen();
-        boolean isFull();
-        void engageBallStop();
-        void releaseBallStop();
+    @FunctionalInterface
+    private interface Intake {
+        void shoveABallIntoTheThing();
     }
 
     // TEMPORARY STUFF ENDS HERE
@@ -56,18 +54,23 @@ public class Shooter extends Subsystem {
     private WPI_TalonSRX m_roller;
     private Turret m_turret;
     private Vision m_vision;
-    private Storage m_storage;
+    private Intake m_intake;
 
 
     // State variables
-    private boolean m_ready = false;
-    private boolean m_spinningUp = false;
-    private boolean m_firing = false;
+    private enum State {
+        IDLE,
+        FULL_SPEED,
+        SPINNING_UP,
+        FIRING
+    }
+
+    private State state;
     private int m_buffer = 0;
     private Timer m_spinUpTimer;
     private Timer m_fireTimer;
 
-    public static Shooter getInstance() {
+    public static synchronized Shooter getInstance() {
         if (instance == null)
             instance = new Shooter();
         return instance;
@@ -88,19 +91,10 @@ public class Shooter extends Subsystem {
             System.out.println("Getting dummy vision target");
             return new TurretPosition(0, 0);
         };
-        m_storage = new Storage() {
-            private boolean open = false;
-
-            @SuppressWarnings("FieldCanBeLocal")
-            private boolean full = false;
-
-            public boolean isBallStopOpen() { return open; }
-            public boolean isFull() { return full; }
-            public void engageBallStop() { open = false; }
-            public void releaseBallStop() { open = true; }
-        };
+        m_intake = () -> System.out.println("Shoving a ball into the thing");
 
         m_spinUpTimer = new Timer();
+        m_fireTimer = new Timer();
     }
 
     /**
@@ -110,17 +104,15 @@ public class Shooter extends Subsystem {
     public void periodic() {
 
         // Check if we're done spinning up yet
-        if (m_spinningUp && m_spinUpTimer.get() >= SPINUP_DELAY_SECONDS) {
-            m_spinningUp = false;
+        if (state == State.SPINNING_UP && m_spinUpTimer.get() >= SPINUP_DELAY_SECONDS) {
+            state = State.FULL_SPEED;
             m_spinUpTimer.stop();
             m_spinUpTimer.reset();
-            m_ready = true;
         }
 
         // Check if we're done firing yet
-        if (m_firing && m_fireTimer.get() >= FIRE_DURATION_SECONDS) {
-            m_storage.engageBallStop();
-            m_firing = false;
+        if (state == State.FIRING && m_fireTimer.get() >= FIRE_DURATION_SECONDS) {
+            state = State.IDLE;
             m_fireTimer.stop();
             m_fireTimer.reset();
         }
@@ -129,26 +121,21 @@ public class Shooter extends Subsystem {
         if (m_buffer > 0) {
             
             // If we haven't started spinning up yet
-            if (!m_spinningUp) {
+            if (state != State.SPINNING_UP) {
                 start();
                 m_spinUpTimer.reset();
                 m_spinUpTimer.start();
             }
 
-            if (m_ready) {
-                // Log a warning if we get into a weird state. This should never happen.
-                // TODO: Use Max's logging system
-                if (m_spinningUp)
-                    System.err.println("WARNING: Shooter: Both the ready and spinning up flags are set! This shouldn't be possible!");
-
-                m_firing = true;
+            if (state == State.FULL_SPEED) {
+                state = State.FIRING;
+                m_intake.shoveABallIntoTheThing();
                 m_fireTimer.start();
-                m_storage.releaseBallStop();
-                --m_buffer;
+                m_buffer--;
             }
         } else {
             // Handle the case where the buffer was reset while we were doing something
-            if (m_spinningUp || m_ready) {
+            if (state == State.SPINNING_UP || state == State.FULL_SPEED) {
                 stop();
                 m_spinUpTimer.stop();
                 m_spinUpTimer.reset();
@@ -160,7 +147,7 @@ public class Shooter extends Subsystem {
      * Buffers another fire operation.
      */
     public void fireSingle() {
-        ++m_buffer;
+        m_buffer++;
     }
 
     /**
@@ -169,7 +156,7 @@ public class Shooter extends Subsystem {
      */
     public void fireAuto() {
         resetBuffer();
-        for (int i = 0; i < MAX_CAPACITY; ++i) {
+        for (int i = 0; i < MAX_CAPACITY; i++) {
             fireSingle();
         }
     }
