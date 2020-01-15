@@ -113,6 +113,7 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop(){
+    //Driver Controls
     //Check User Inputs
     double DriveThrottle = mOperatorInterface.getDriveThrottle();
     double DriveTurn = mOperatorInterface.getDriveTurn();
@@ -128,6 +129,36 @@ public class Robot extends TimedRobot {
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
     }
 
+    //Climb
+    if (mOperatorInterface.getClimb()) {
+      //climb!
+    }
+
+    //Quickturn
+    if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+      //Quickturn!
+    }
+
+    //Operator Controls
+    if (mOperatorInterface.getTurretManual() != -1) {
+      //manual turret aim
+    }
+
+    //Camera Swap
+    if (mOperatorInterface.getCameraSwap()) {
+      //Swap Camera!
+    }
+
+    //Shoot
+    if (mOperatorInterface.getShoot()) {
+      //Shoot!
+    }
+
+    //Load chamber
+    //NOTE: This may or may not be necessary depending on how our sensor pack turns out
+    if (mOperatorInterface.getLoadChamber()) {
+      //Load chamber!
+    }
 
   }
 
