@@ -158,7 +158,7 @@ public class Robot extends TimedRobot {
         if(OperatorInterface.getInstance().getTurretAdjustRight()) targetPos += 2.5;
       }
     }else{
-      
+      // don't do anything if we're about to break our robot
     }
 
       
