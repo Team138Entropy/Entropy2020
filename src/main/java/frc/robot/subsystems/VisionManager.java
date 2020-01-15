@@ -162,8 +162,15 @@ public class VisionManager extends Subsystem {
         try{
             String PacketResult = PacketReciever.getPacket();
             try {
+
+                //Pass packet to an action
                 CurrentPacket = (JSONObject) parser.parse(PacketResult); 
-                System.out.println("Proccessed Packet!");
+                
+
+                
+
+
+
             } catch (ParseException e) {
                 System.out.println("Error: Cannot parse recieved UDP json data: " + e.toString());
                 e.printStackTrace();
