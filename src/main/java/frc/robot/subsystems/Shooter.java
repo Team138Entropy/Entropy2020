@@ -44,7 +44,7 @@ public class Shooter extends Subsystem {
 
     @FunctionalInterface
     private interface Intake {
-        void shoveABallIntoTheThing();
+        void shoveANodeIntoTheThing();
     }
 
     // TEMPORARY STUFF ENDS HERE
@@ -129,7 +129,7 @@ public class Shooter extends Subsystem {
 
             if (state == State.FULL_SPEED) {
                 state = State.FIRING;
-                m_intake.shoveABallIntoTheThing();
+                m_intake.shoveANodeIntoTheThing();
                 m_fireTimer.start();
                 m_buffer--;
             }
