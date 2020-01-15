@@ -149,34 +149,7 @@ public class Robot extends TimedRobot {
     
     if(allowMovement){
       if(Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)){
-
-
-        boolean tapeDetected = table.getEntry("tapeDetected").getBoolean(false);
-        double thisYaw = table.getEntry("tapeYaw").getDouble(0.0);
-
-        if(initialYaw == 0){
-            initialYaw = thisYaw;
-        }
-
-        // thisYaw = thisYaw - initialYaw;
-        //70 is the maximum, -70 is the minimum
-        //7 is our "deadband"
-        //TODO: add to config
-        if(Math.abs(thisYaw) > 10 && (thisYaw < -20 || thisYaw > 0) && tapeDetected){
-          potHandler.enable();
-          previousYaw = thisYaw;
-
-          double setPoint = (thisYaw + 90) / 180;
-          potLogger.verbose("targeting set point " + Double.toString(setPoint) + " from pot " + Robot.pot.get() + " at " + thisYaw);
-          potHandler.setSetpoint(setPoint);  
-          
-          
-          visionLogger.verbose("thisYaw " + thisYaw + " tapeDetected " + tapeDetected);
-        }else{
-          potHandler.disable();
-          visionLogger.debug("Not getting any output " + Double.toString(thisYaw) + " " + tapeDetected + " at the POT " + pot.get());
-          rotatorTalon.set(ControlMode.PercentOutput, 0f);
-        }
+        // vision goes here
       }else{
         // visionLogger.verbose("Not enabled " + targetPos);
         potHandler.enable();
