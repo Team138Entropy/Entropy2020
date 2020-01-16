@@ -15,6 +15,7 @@ import static frc.robot.util.Util.kEpsilon;
 public class Rotation2d implements IRotation2d<Rotation2d> {
     protected static final Rotation2d kIdentity = new Rotation2d();
 
+    //Return a blank identity
     public static Rotation2d identity() {
         return kIdentity;
     }
