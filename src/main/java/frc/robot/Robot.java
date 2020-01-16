@@ -170,11 +170,8 @@ public class Robot extends TimedRobot {
       double DriveThrottle = mOperatorInterface.getDriveThrottle();
       double DriveTurn = mOperatorInterface.getDriveTurn();
       boolean AutoDrive = false;
+      mDrive.setDrive(DriveThrottle, DriveTurn, false);
     }else{
-      //Check User Inputs
-      double DriveThrottle = mOperatorInterface.getDriveThrottle();
-      double DriveTurn = mOperatorInterface.getDriveTurn();
-      boolean AutoDrive = false;
     }
   }
 
