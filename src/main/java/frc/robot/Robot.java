@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
   //Subsystems
   private final Drive mDrive = Drive.getInstance();
   private final VisionManager mVisionManager = VisionManager.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
 
   //Variables from State
 
@@ -119,7 +120,6 @@ public class Robot extends TimedRobot {
     double DriveTurn = mOperatorInterface.getDriveTurn();
     boolean AutoDrive = false;
 
-
     //Continue Driving 
     if(AutoDrive == true){
       //AutoSteer Functionality
@@ -160,6 +160,7 @@ public class Robot extends TimedRobot {
       //Load chamber!
     }
 
+    mShooter.periodic();
   }
 
 }
