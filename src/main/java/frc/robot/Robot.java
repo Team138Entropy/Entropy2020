@@ -32,7 +32,7 @@ import frc.robot.util.LatchedBoolean;
  */
 public class Robot extends TimedRobot {
 
-  private final Drive mDrive = Drive.getInstance();
+  private Drive mDrive;
 
 
   //Controller Reference
@@ -84,6 +84,10 @@ public class Robot extends TimedRobot {
     mPot = new AnalogPotentiometer(Config.getInstance().getInt(Key.ROBOT__POT__LOCATION), Config.getInstance().getFloat(Key.ROBOT__POT__RANGE), Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
     sRotatorTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
     mPotHandler = new PotPID(mPot);
+
+    if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
+      mDrive = Drive.getInstance();
+    }
   }
 
   /*
