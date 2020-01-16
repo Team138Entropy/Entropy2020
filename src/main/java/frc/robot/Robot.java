@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
 
   //Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
 
   //Variables from State
 
@@ -68,14 +69,15 @@ public class Robot extends TimedRobot {
   //teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
+    System.out.println("robot init _ 1");
     
     //Zero all nesscary sensors on Robot
     ZeroSensors();
 
     //Reset Robot State
     //Wherever the Robot is now is the starting position
+    System.out.println("Robot State Reset");
     mRobotState.reset();
-
     
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
@@ -94,19 +96,24 @@ public class Robot extends TimedRobot {
     Called on bootup, Zero all Sensors
   */
   private void ZeroSensors(){
+    System.out.println("Zero");
     mSubsystemManager.ZeroSensors();
+    System.out.println("Done Zero");
   }
 
   @Override
   public void autonomousInit(){
+    System.out.println("Auto Init Called");
   }
   @Override
   public void autonomousPeriodic(){
     sRotatorTalon.set(ControlMode.PercentOutput, 0.05f);
+    System.out.println("Auto Periodic");
   }
 
   @Override
   public void teleopInit() {
+    System.out.println("Teleop Init!");
   }
 
   @Override
@@ -147,7 +154,6 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop(){
-
     float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
     float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
 
@@ -168,23 +174,50 @@ public class Robot extends TimedRobot {
       // don't do anything if we're about to break our robot
     }
 
-      
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
       //Check User Inputs
       double DriveThrottle = mOperatorInterface.getDriveThrottle();
       double DriveTurn = mOperatorInterface.getDriveTurn();
       boolean AutoDrive = false;
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
+
+      
+      //Climb
+      if (mOperatorInterface.getClimb()) {
+        //climb!
+      }
+
+      //Quickturn
+      if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+        //Quickturn!
+      }
     }else{
     }
+
+    //Operator Controls
+    if (mOperatorInterface.getTurretManual() != -1) {
+      //manual turret aim
+    }
+
+    //Camera Swap
+    if (mOperatorInterface.getCameraSwap()) {
+      //Swap Camera!
+    }
+
+    //Shoot
+    if (mOperatorInterface.getShoot()) {
+      //Shoot!
+    }
+    //Load chamber
+    //NOTE: This may or may not be necessary depending on how our sensor pack turns out
+    if (mOperatorInterface.getLoadChamber()) {
+      //Load chamber!
+    }
+
+    mShooter.periodic();
   }
 
-
-
-
-  private volatile boolean m_exit;
-
-  // @SuppressWarnings("PMD.CyclomaticComplexity")
+   // @SuppressWarnings("PMD.CyclomaticComplexity")
   // @Override
   // public void startCompetition() {
   //   robotInit();
@@ -228,9 +261,4 @@ public class Robot extends TimedRobot {
   //     }
   //   }
   // }
-
-  @Override
-  public void endCompetition() {
-    m_exit = true;
-  }
 }

@@ -28,6 +28,7 @@ public class OperatorInterface  {
         OperatorController = new XboxController(Constants.OperatorControllerPort);
     }
 
+    //Driver
 
     public double getDriveThrottle() {
         return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
@@ -37,6 +38,13 @@ public class OperatorInterface  {
         return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
     }
 
+    public boolean getClimb() {
+        return DriverController.getButton(XboxController.Button.Y);
+    }
+
+    public boolean getQuickturn() {
+        return DriverController.getButton(XboxController.Button.RB);
+    }
 
     //Returns if we are in low gear, sets to low gear as well
     public boolean CheckLowGear(boolean previous){
@@ -68,12 +76,30 @@ public class OperatorInterface  {
     }
 
     
+    //Operator
+
     public double getOperatorThrottle() {
         return OperatorController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
     }
 
     public double getOperatorTurn() {
         return OperatorController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
+    }
+
+    public int getTurretManual() {
+        return OperatorController.getDPad();
+    }
+
+    public boolean getCameraSwap() {
+        return OperatorController.getButton(XboxController.Button.Y);
+    }
+
+    public boolean getShoot() {
+        return OperatorController.getButton(XboxController.Button.X);
+    }
+
+    public boolean getLoadChamber() {
+        return OperatorController.getButton(XboxController.Button.A);
     }
 
     public void setOperatorRumble(boolean toggle){
