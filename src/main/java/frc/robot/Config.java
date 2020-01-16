@@ -66,7 +66,7 @@ public class Config{
 	public void reload(){
 		this.cfg.reload();
 
-        // double-check that each key is there
+        // check that each key is there
         for(Key key : Key.values()){
 			try{
 				Config.getInstance().getString(key);
