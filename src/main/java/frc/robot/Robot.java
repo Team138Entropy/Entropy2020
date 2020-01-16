@@ -32,6 +32,9 @@ import frc.robot.util.LatchedBoolean;
  */
 public class Robot extends TimedRobot {
 
+  private final Drive mDrive = Drive.getInstance();
+
+
   //Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
