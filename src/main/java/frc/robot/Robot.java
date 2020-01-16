@@ -144,7 +144,7 @@ public class Robot extends TimedRobot {
     float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
     float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
 
-    boolean allowMovement = (pot.get() < potMax && pot.get() > potMin) || true;
+    boolean allowMovement = (pot.get() < potMax && pot.get() > potMin);
     potLogger.debug("allow movement " + allowMovement);
     
     if(allowMovement){
