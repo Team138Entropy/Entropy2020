@@ -77,7 +77,7 @@ public class Config{
         }
 	}
 
-	public static Config getInstance(){
+	public static synchronized Config getInstance(){
 		if(instance == null){
 			instance = new Config();
 		}
