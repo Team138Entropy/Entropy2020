@@ -57,7 +57,7 @@ public class Config{
 		OI__VISION__PID__MAX_SPEED
 	}
 
-	static Config instance;
+	private static Config sInstance;
 	public ConfigFile cfg;
 	private Config(){
 		this.cfg = new ConfigFile();
@@ -78,10 +78,10 @@ public class Config{
 	}
 
 	public static synchronized Config getInstance(){
-		if(instance == null){
-			instance = new Config();
+		if(sInstance == null){
+			sInstance = new Config();
 		}
-		return instance;
+		return sInstance;
 	}
 
 	public String getString(Key key){

@@ -24,11 +24,11 @@ public class PotPID extends PIDSubsystem {
   /**
    * Add your docs here.
    */
-  Potentiometer pot;
+  Potentiometer mPot;
   public PotPID(Potentiometer pot) {
     // Intert a subsystem name and PID values here
     super("PotPID", Config.getInstance().getDouble(Key.OI__VISION__PID__P), Config.getInstance().getDouble(Key.OI__VISION__PID__I), Config.getInstance().getDouble(Key.OI__VISION__PID__D));
-    this.pot = pot;
+    this.mPot = pot;
     // Use these to get going:
     // setSetpoint() - Sets where the PID controller should move the system
     // to
@@ -46,7 +46,7 @@ public class PotPID extends PIDSubsystem {
     // gets the POT value, rounded to 2 decimal places
 
     // TODO: is this even needed?
-    double potValue = Double.parseDouble(String.format("%.2f", this.pot.get()));
+    double potValue = Double.parseDouble(String.format("%.2f", this.mPot.get()));
     robotLogger.verbose("pot value " + potValue);
     return potValue;
   }
@@ -56,6 +56,6 @@ public class PotPID extends PIDSubsystem {
     // limit the output to prevent the motor from going too fast
     output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
     robotLogger.verbose("pid out " + output);
-    Robot.rotatorTalon.set(ControlMode.PercentOutput, output);
+    Robot.sRotatorTalon.set(ControlMode.PercentOutput, output);
   }
 }

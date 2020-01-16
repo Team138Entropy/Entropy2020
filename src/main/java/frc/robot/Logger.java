@@ -34,13 +34,13 @@ public class Logger {
         SILLY
     };
 
-    String logPath;
+    String mLogPath;
     /**
      * Initiates the logger with the path of logPath.
      * @param logPath
      */
     public Logger(String logPath){
-        this.logPath = logPath;
+        this.mLogPath = logPath;
     }
 
 
@@ -61,7 +61,7 @@ public class Logger {
      * @param message The message to log
      */
     public void logLevel(SupportedLevels level, String message){
-        String minLevel = Config.getInstance().cfg.getString("LOG__" + logPath.toUpperCase());
+        String minLevel = Config.getInstance().cfg.getString("LOG__" + mLogPath.toUpperCase());
 
         // if logging is enabled at all for this logger,
         // and the level is recognized,
@@ -70,11 +70,11 @@ public class Logger {
         if(minLevel != null && minLevel != "OFF" && Arrays.asList(SupportedLevels.values()).indexOf(level) <= Arrays.asList(SupportedLevels.values()).indexOf(SupportedLevels.valueOf(minLevel))){
             // if the level we're logging at is WARN or ERR, then log to STDERR, otherwise log to STDOUT
             if(level == SupportedLevels.ERROR){
-                DriverStation.reportError(getLogMsg(logPath, level, message), Thread.currentThread().getStackTrace());
+                DriverStation.reportError(getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
             }else if(level == SupportedLevels.WARN){
-                DriverStation.reportWarning(getLogMsg(logPath, level, message), Thread.currentThread().getStackTrace());
+                DriverStation.reportWarning(getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
             }else{
-                System.out.println(getLogMsg(logPath, level, message));
+                System.out.println(getLogMsg(mLogPath, level, message));
             }
         }
     }

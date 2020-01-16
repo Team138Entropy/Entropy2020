@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.Filesystem;
  * This class should only be instantiated once.
  */
 public class ConfigFile {
-    Properties props;
-    Properties defaultProps;
+    Properties mProps;
+    Properties mDefaultProps;
 
     /**
      * Reads the configuration file.
@@ -34,10 +34,10 @@ public class ConfigFile {
     public void reload(){
         // load the config
         try (InputStream input = new FileInputStream(Filesystem.getDeployDirectory() + "/config.properties")){
-            props = new Properties();
+            mProps = new Properties();
 
             // load the properties file
-            props.load(input);
+            mProps.load(input);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -45,10 +45,10 @@ public class ConfigFile {
 
         // load the default config
         try (InputStream input = new FileInputStream(Filesystem.getDeployDirectory() + "/defaultconfig.properties")){
-            defaultProps = new Properties();
+            mDefaultProps = new Properties();
 
             // load the properties file
-            defaultProps.load(input);
+            mDefaultProps.load(input);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -61,9 +61,9 @@ public class ConfigFile {
      * @return The value of the property as a String.
      */
     public String getProp(String key){
-        String value = props.getProperty(key);
+        String value = mProps.getProperty(key);
         if(value == null){
-            value = defaultProps.getProperty(key);
+            value = mDefaultProps.getProperty(key);
 
             if(value == null){
                 throw new RuntimeException("Did not find value in config file or in " + key);
