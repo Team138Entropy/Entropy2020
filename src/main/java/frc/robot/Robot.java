@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
+import frc.robot.util.geometry.*;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class. If you change the name
@@ -42,17 +45,15 @@ public class Robot extends TimedRobot {
   //disabledPeriodic, loopFunc, robotInit, robotPeriodic, 
   //teleopInit, teleopPeriodic, testInit, testPeriodic
 
-  public void robotInit() {
-    System.out.println("robot init _ 1");
-    
+  public void robotInit() {    
     //Zero all nesscary sensors on Robot
     ZeroSensors();
 
-    //Reset Robot State
-    //Wherever the Robot is now is the starting position
-    System.out.println("RobotState!");
-    mRobotState.reset();
-    System.out.println("Robot State Reset");
+    //Reset Robot State - Note starting position of the Robot
+    //This starting Rotation, X, Y is now the Zero Point
+    mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity(), Rotation2d.identity());
+
+
   }
 
   /*

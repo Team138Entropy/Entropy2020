@@ -201,7 +201,27 @@ public class Drive extends Subsystem {
     public void CheckSubsystems(){
 
     }
+
+
+    public synchronized double getLeftEncoderDistance(){
+        return 0.0;
+    }
+
+    public synchronized double getRightEncoderDistance(){
+        return 0.0;
+    }
+
+    public synchronized Rotation2d getRotation(){
+        return null;
+    }
+
+    public double getLeftLinearVelocity() {
+        return 0;
+    }
     
+    public double getRightLinearVelocity(){
+        return 0;
+    }
 
   
 
