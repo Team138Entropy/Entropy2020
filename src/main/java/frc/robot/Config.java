@@ -47,6 +47,7 @@ public class Config{
 		OI__VISION__PID__D,
 
 		ROBOT__HAS_DRIVETRAIN,
+		ROBOT__HAS_TURRET,
 
 		ROBOT__POT__LOCATION,
 		ROBOT__POT__RANGE,
