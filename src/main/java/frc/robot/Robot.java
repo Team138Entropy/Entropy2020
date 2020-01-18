@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
@@ -104,6 +105,22 @@ public class Robot extends TimedRobot {
     System.out.println("Done Zero");
   }
 
+  private void updateSmartDashboard(){
+    //TODO: set this up for real
+    SmartDashboard.putString("BallCounter", "BallValue" + " / 5");
+    //TODO: change this to the real boolean
+    SmartDashboard.putBoolean("ShooterFull", false);
+    //TODO: decide if this is necessary and hook it up
+    SmartDashboard.putBoolean("ShooterLoaded", false);
+    //TODO: hook this up
+    SmartDashboard.putBoolean("ShooterSpunUp", false);
+    //TODO: also, finally, hook this up.
+    SmartDashboard.putBoolean("TargetLocked", false);
+
+    //TODO: cameras will go here eventually
+
+  }
+  
   @Override
   public void autonomousInit(){
     System.out.println("Auto Init Called");
@@ -111,6 +128,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic(){
     System.out.println("Auto Periodic");
+    updateSmartDashboard();
   }
 
   @Override
@@ -199,9 +217,50 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop(){
+    updateSmartDashboard();
+
+    //Check User Inputs
+    double DriveThrottle = mOperatorInterface.getDriveThrottle();
+    double DriveTurn = mOperatorInterface.getDriveTurn();
+    boolean AutoDrive = false;
+
+    //Continue Driving 
+    if(AutoDrive == true){
+      //AutoSteer Functionality
+      //Used for tracking a ball
+    }else{
+      //Standard Manual Drive
+      mDrive.setDrive(DriveThrottle, DriveTurn, false);
+    }
     turretLoop();
 
     driveTrainLoop();
+
+    //Climb
+    if (mOperatorInterface.getClimb()) {
+      //climb!
+    }
+
+    //Quickturn
+    if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+      //Quickturn!
+    }
+
+    //Operator Controls
+    if (mOperatorInterface.getTurretManual() != -1) {
+      //manual turret aim
+    }
+
+    //Camera Swap
+    if (mOperatorInterface.getCameraSwap()) {
+      //Swap Camera!
+    }
+
+    //Shoot
+    if (mOperatorInterface.getShoot()) {
+      //Shoot!
+    }
+
     //Load chamber
     //NOTE: This may or may not be necessary depending on how our sensor pack turns out
     if (mOperatorInterface.getLoadChamber()) {

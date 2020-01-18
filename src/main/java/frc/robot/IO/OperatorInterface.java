@@ -64,7 +64,7 @@ public class OperatorInterface  {
         DriverController.setRumble(LowGear);
         return LowGear;
     }
-
+    
     public boolean getTurretAdjustLeft(){
         return OperatorController.getButton(XboxController.Button.A);
     }
@@ -72,7 +72,6 @@ public class OperatorInterface  {
     public boolean getTurretAdjustRight(){
         return OperatorController.getButton(XboxController.Button.B);
     }
-
     
     //Operator
 
