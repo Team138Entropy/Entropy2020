@@ -61,14 +61,14 @@ public class Robot extends TimedRobot {
   //teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
-    System.out.println("robot init _ 1");
+    mRobotLogger.log("robot init _ 1");
     
     //Zero all nesscary sensors on Robot
     ZeroSensors();
 
     //Reset Robot State
     //Wherever the Robot is now is the starting position
-    System.out.println("Robot State Reset");
+    mRobotLogger.log("Robot State Reset");
     mRobotState.reset();
     
     // prepare the network table
@@ -89,9 +89,9 @@ public class Robot extends TimedRobot {
     Called on bootup, Zero all Sensors
   */
   private void ZeroSensors(){
-    System.out.println("Zero");
+    mRobotLogger.log("Zeroing sensors...");
     mSubsystemManager.ZeroSensors();
-    System.out.println("Done Zero");
+    mRobotLogger.log("Zeroed sensors");
   }
 
   private void updateSmartDashboard(){
@@ -112,17 +112,17 @@ public class Robot extends TimedRobot {
   
   @Override
   public void autonomousInit(){
-    System.out.println("Auto Init Called");
+    mRobotLogger.log("Auto Init Called");
   }
   @Override
   public void autonomousPeriodic(){
-    System.out.println("Auto Periodic");
+    mRobotLogger.log("Auto Periodic");
     updateSmartDashboard();
   }
 
   @Override
   public void teleopInit() {
-    System.out.println("Teleop Init!");
+    mRobotLogger.log("Teleop Init!");
   }
 
   @Override
@@ -130,16 +130,18 @@ public class Robot extends TimedRobot {
     try{
       RobotLoop();
     }catch(Exception e){
-      System.out.println("RobotLoop Exception");
+      mRobotLogger.log("RobotLoop Exception");
 
       // print the exception to the system error
       e.printStackTrace(System.err);
     }
   }
+
   @Override
   public void testInit() {
-    System.out.println("Entropy 138: Test Init");
+    mRobotLogger.log("Entropy 138: Test Init");
   }
+
   @Override
   public void testPeriodic(){
   }
@@ -189,7 +191,7 @@ public class Robot extends TimedRobot {
     turretLoop();
 
     driveTrainLoop();
-    
+
     mShooter.periodic();
 
     //Climb

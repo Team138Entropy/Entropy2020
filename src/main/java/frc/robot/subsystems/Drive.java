@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 import frc.robot.util.*;
 import frc.robot.Kinematics;
+import frc.robot.Logger;
 import frc.robot.Constants;
 import frc.robot.util.geometry.*;
 
@@ -33,6 +34,7 @@ public class Drive extends Subsystem {
     private DriveControlState mDriveControlState;
 
     private PeriodicIO mPeriodicIO;
+    private Logger mDriveLogger;
 
     public static class PeriodicIO {
         // INPUTS
@@ -69,7 +71,7 @@ public class Drive extends Subsystem {
 
 
     private Drive(){
-
+        mDriveLogger = new Logger("drive");
 
         //Shifter Solenoid
         //mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
@@ -139,8 +141,7 @@ public class Drive extends Subsystem {
     public synchronized void setOpenLoop(DriveSignal signal) {
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
             //setBrakeMode(true);
-            System.out.println("switching to open loop");
-            System.out.println(signal);
+            mDriveLogger.verbose("switching to open loop " + signal);
             mDriveControlState = DriveControlState.OPEN_LOOP;
         }
 
