@@ -20,16 +20,20 @@ import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 
 /**
- * Add your docs here.
+ * This Turret class extends WPILIB's PID subsystem via @Overriding methods
+ * use enable(), disable() and setSetpoint() to control the PID.
+ * loop() should be run every tick
  */
 public class Turret extends PIDSubsystem {
   private Logger mTurretLogger;
   private WPI_TalonSRX mTurretTalon;
   private Potentiometer mPot;
+
+  // the target position (on a scale from 0 to 100)
   private double mManualTargetPos = 50;
 
   /**
-   * Add your docs here.
+   * Set up our talon, logger and potentiometer
    */
   public Turret() {
     // Intert a subsystem name and PID values 
@@ -45,6 +49,10 @@ public class Turret extends PIDSubsystem {
     // setDefaultCommand(new MySpecialCommand());
   }
 
+  /**
+   * Gets the PID value
+   * @return the PID value
+   */
   @Override
   protected double returnPIDInput() {
     // gets the POT value, rounded to 2 decimal places
@@ -55,6 +63,9 @@ public class Turret extends PIDSubsystem {
     return potValue;
   }
 
+  /**
+   * @param output The motor output from the PID to control the motor.
+   */
   @Override
   protected void usePIDOutput(double output) {
     // limit the output to prevent the motor from going too fast
@@ -63,10 +74,16 @@ public class Turret extends PIDSubsystem {
     mTurretTalon.set(ControlMode.PercentOutput, output);
   }
 
+  /**
+   * @return the raw POT value
+   */
   public double getPotValue(){
     return mPot.get();
   }
   
+  /**
+   * Run this every tick.
+   */
   public void loop(){
     float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
     float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
