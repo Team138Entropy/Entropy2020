@@ -1,4 +1,4 @@
-package frc.robot.IO;
+package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.IO.XboxController.Axis;
 import frc.robot.IO.XboxController.Button;
