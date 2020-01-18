@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
@@ -65,6 +66,21 @@ public class Robot extends TimedRobot {
     System.out.println("Done Zero");
   }
 
+  private void updateSmartDashboard(){
+    //TODO: set this up for real
+    SmartDashboard.putString("BallCounter", "BallValue" + " / 5");
+    //TODO: change this to the real boolean
+    SmartDashboard.putBoolean("ShooterFull", false);
+    //TODO: decide if this is necessary and hook it up
+    SmartDashboard.putBoolean("ShooterLoaded", false);
+    //TODO: hook this up
+    SmartDashboard.putBoolean("ShooterSpunUp", false);
+    //TODO: also, finally, hook this up.
+    SmartDashboard.putBoolean("TargetLocked", false);
+
+    //TODO: cameras will go here eventually
+
+  }
 
   public void autonomousInit(){
     System.out.println("Auto Init Called");
@@ -72,6 +88,7 @@ public class Robot extends TimedRobot {
 
   public void autonomousPeriodic(){
     System.out.println("Auto Periodic");
+    updateSmartDashboard();
   }
 
   public void teleopInit() {
@@ -114,6 +131,8 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop(){
+    updateSmartDashboard();
+
     //Check User Inputs
     double DriveThrottle = mOperatorInterface.getDriveThrottle();
     double DriveTurn = mOperatorInterface.getDriveTurn();
