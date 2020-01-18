@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
   //Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
+  private final Intake mIntake = Intake.getInstance();
 
   //Variables from State
 
