@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
   //Variables from State
 
   
-  Turret turretInstance;
+  private Turret mTurret;
   static NetworkTable mTable;
 
   Logger mRobotLogger = new Logger("robot");
@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
 
     //TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      turretInstance = new Turret();
+      mTurret = new Turret();
     }
 
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
@@ -156,20 +156,20 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      turretInstance.disable();
+      mTurret.disable();
     }
     Config.getInstance().reload();
   }
   @Override
   public void disabledPeriodic(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      mRobotLogger.verbose("got pot value of " + turretInstance.getPotValue());
+      mRobotLogger.verbose("got pot value of " + mTurret.getPotValue());
     }
   }
 
   public void turretLoop(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      turretInstance.loop();
+      mTurret.loop();
     }
   }
 
