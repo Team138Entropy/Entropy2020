@@ -10,5 +10,18 @@ package frc.robot.subsystems;
 /**
  * Add your docs here.
  */
-public class Intake {
+public class Intake extends Subsystem{
+
+    private static Intake sInstance;
+    
+    public static synchronized Intake getInstance() {
+        if (sInstance == null) {
+            sInstance = new Intake();
+        }
+        return sInstance;
+    }
+
+    private Intake() {
+
+    }
 }
