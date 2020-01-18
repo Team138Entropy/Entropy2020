@@ -234,6 +234,32 @@ public class Robot extends TimedRobot {
     turretLoop();
 
     driveTrainLoop();
+
+    //Climb
+    if (mOperatorInterface.getClimb()) {
+      //climb!
+    }
+
+    //Quickturn
+    if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+      //Quickturn!
+    }
+
+    //Operator Controls
+    if (mOperatorInterface.getTurretManual() != -1) {
+      //manual turret aim
+    }
+
+    //Camera Swap
+    if (mOperatorInterface.getCameraSwap()) {
+      //Swap Camera!
+    }
+
+    //Shoot
+    if (mOperatorInterface.getShoot()) {
+      //Shoot!
+    }
+
     //Load chamber
     //NOTE: This may or may not be necessary depending on how our sensor pack turns out
     if (mOperatorInterface.getLoadChamber()) {
