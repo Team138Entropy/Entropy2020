@@ -1,9 +1,8 @@
 package frc.robot;
 
-
 /*
     Robote state tracks the robot throughout the match
-    
+
 
 */
 public class RobotState {
@@ -17,24 +16,15 @@ public class RobotState {
         return mInstance;
     }
 
-    private RobotState(){
-        
-    }
+    private RobotState() {}
 
-    //Reset Robot State
-    //Make note of the Starting Position
-    public void reset(){
-
-    }
+    // Reset Robot State
+    // Make note of the Starting Position
+    public void reset() {}
 
     /*
         Record robot's initial position on field
         This is encapsulated in a Pose2D object
     */
-    private void SetIntialFieldToRobot(){
-
-    }
-
-
-
+    private void SetIntialFieldToRobot() {}
 }
