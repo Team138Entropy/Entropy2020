@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import frc.robot.Config.Key;
-import frc.robot.IO.OperatorInterface;
+import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 
