@@ -15,3 +15,5 @@ jobs:
         java-version: 1.11
     - name: Build with Gradle
       run: ./gradlew build --info
+    - name: Lint with Google Java
+      uses: axel-op/googlejavaformat-action@v2.0.0
