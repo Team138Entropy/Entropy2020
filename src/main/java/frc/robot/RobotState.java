@@ -58,7 +58,7 @@ public class RobotState {
 
     private Twist2d vehicle_velocity_predicted;
     private Twist2d vehicle_velocity_measured;
-    private MovingAverageTwist2d vehicle_velocity_measured_filtered;
+    //private MovingAverageTwist2d vehicle_velocity_measured_filtered;
 
 
 
@@ -70,7 +70,7 @@ public class RobotState {
     //Constructor for Robot State
     //Called upon RobotState startup, reset everything
     private RobotState(){
-        reset(0.0, Pose2d.identity(), Rotation2d.identity());
+        //reset(0.0, Pose2d.identity(), Rotation2d.identity());
     }
 
     //Variables Related to the Update

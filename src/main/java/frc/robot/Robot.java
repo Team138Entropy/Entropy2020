@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
 
     //Reset Robot State - Note starting position of the Robot
     //This starting Rotation, X, Y is now the Zero Point
-    mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity(), Rotation2d.identity());
+    //mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity(), Rotation2d.identity());
 
 
   }
@@ -59,10 +59,8 @@ public class Robot extends TimedRobot {
   /*
     Called on bootup, Zero all Sensors
   */
-  private void ZeroSensors(){
-    System.out.println("Zero");
+  private void ZeroSensors(){    
     mSubsystemManager.ZeroSensors();
-    System.out.println("Done Zero");
   }
 
 
