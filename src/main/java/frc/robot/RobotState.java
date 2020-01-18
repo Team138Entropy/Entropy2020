@@ -5,6 +5,8 @@ import frc.robot.util.InterpolatingDouble;
 import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.subsystems.Drive;
 import frc.robot.Kinematics;
+import frc.robot.vision.TargetInfo;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.util.*;
 
@@ -62,8 +64,11 @@ public class RobotState {
 
 
 
+    
 
 
+    // Reference to Drive Train
+    // Used for polling encoders/gyro
     private Drive mDrive = Drive.getInstance();
 
 
@@ -141,7 +146,12 @@ public class RobotState {
         Record robot's initial position on field
         This is encapsulated in a Pose2D object
     */
-    private void SetIntialFieldToRobot(){
+    private synchronized void SetIntialFieldToRobot(){
+
+    }
+
+
+    public synchronized void AddVisionObservation(TargetInfo ti){
 
     }
 

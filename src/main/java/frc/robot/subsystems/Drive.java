@@ -154,11 +154,16 @@ public class Drive extends Subsystem {
 
 
     public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
-                    wheel = wheel * -1; //invert wheel
-/*
-        if(throttle >= 0){
+        wheel = wheel * -1; //invert wheel
+        if(throttle >= .17){
+            throttle = .17;
         }
-        */
+
+        if(throttle <= -.17){
+            throttle = -.17;
+        }
+        
+        
 
         if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
             throttle = 0.0;

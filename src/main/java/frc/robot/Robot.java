@@ -65,11 +65,9 @@ public class Robot extends TimedRobot {
 
 
   public void autonomousInit(){
-    System.out.println("Auto Init Called");
   }
 
   public void autonomousPeriodic(){
-    System.out.println("Auto Periodic");
   }
 
   public void teleopInit() {
