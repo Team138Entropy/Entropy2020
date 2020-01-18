@@ -150,7 +150,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic(){
-    mRobotLogger.log(Config.getInstance().getString(Key.TEST));
   }
 
 
