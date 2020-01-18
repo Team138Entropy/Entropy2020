@@ -155,11 +155,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-
-  /*  
-    Called constantly, houses the main functionality of robot
-  */
-  public void RobotLoop(){
+  public void turretLoop(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
       float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
       float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
@@ -182,7 +178,9 @@ public class Robot extends TimedRobot {
         // don't do anything if we're about to break our robot
       }
     }
+  }
 
+  public void driveTrainLoop(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
       //Check User Inputs
       double DriveThrottle = mOperatorInterface.getDriveThrottle();
@@ -201,6 +199,15 @@ public class Robot extends TimedRobot {
         //Quickturn!
       }
     }
+  }
+
+  /*  
+    Called constantly, houses the main functionality of robot
+  */
+  public void RobotLoop(){
+    turretLoop();
+
+    driveTrainLoop();
 
     //Operator Controls
     if (mOperatorInterface.getTurretManual() != -1) {
