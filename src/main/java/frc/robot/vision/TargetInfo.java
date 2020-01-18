@@ -87,6 +87,13 @@ package frc.robot.vision;
         this.yaw = yaw;
     }
 
+    //Returns if we this target is a high goal target
+    public boolean IsHighGoal(){
+        if(TargetType == 0){
+            return true;
+        }
+        return false;
+    }
 
 
  }

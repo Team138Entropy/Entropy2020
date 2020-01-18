@@ -151,7 +151,17 @@ public class RobotState {
     }
 
 
+    //Vision Manager Passes a new Target Info to the Robot State
     public synchronized void AddVisionObservation(TargetInfo ti){
+        double timestamp = Timer.getFPGATimestamp();
+
+        //Proceed based on target type
+        if(ti.IsHighGoal() == true){
+            //High Goal!
+        }else{
+            //Ball
+        }
+        
 
     }
 
