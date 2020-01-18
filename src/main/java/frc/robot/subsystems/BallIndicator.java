@@ -18,17 +18,50 @@ public class BallIndicator {
     //Number of LEDs on strip
     private int ledCount;
 
-    private enum State {
+    public enum State {
         EMPTY, LOADING, FULL, ACQUIRED
     }
 
     //LED class for keeping track of LED state
     private class LED {
 
-        State ledState;
+        private int ledNumber;
+        private State ledState;
+        private boolean isOn;
+        private double flashStartTime;
 
         LED(State state) {
-            this.ledState = state;
+            ledState = state;
+        }
+
+        //Updates a light's output
+        private void updateLight() {
+            switch (ledState) {
+                case EMPTY:
+                    addressableLED.stop();
+                    isOn = false;
+                    break;
+
+                case LOADING:
+                    ledBuffer.setRGB(ledNumber, 255, 255, 0);
+                    addressableLED.start();
+                    isOn = true;
+                    flash();
+                    break;
+
+                case FULL:
+                    ledBuffer.setRGB(ledNumber, 0, 200, 0);
+                    addressableLED.start();
+                    isOn = true;
+                    break;
+
+                case ACQUIRED:
+                    ledBuffer.setRGB(ledNumber, 0, 200, 0);
+                    addressableLED.start();
+                    isOn = true;
+                    flashStart();
+                    break;
+            }
         }
     }
     
@@ -66,45 +99,22 @@ public class BallIndicator {
     //Updates each light's output
     private void updateStrip() {
         for (int n = 0; n < ledCount; n++) {
-            updateLight(n);
-        }
-    }
-
-    //Updates a light's output
-    private void updateLight(int ledNumber) {
-        switch (ledStrip[ledNumber].ledState) {
-            case EMPTY:
-                addressableLED.stop();
-                break;
-
-            case LOADING:
-                ledBuffer.setRGB(ledNumber, 255, 255, 0);
-                addressableLED.start();
-                flash();
-                break;
-
-            case FULL:
-                ledBuffer.setRGB(ledNumber, 0, 200, 0);
-                addressableLED.start();
-                break;
-
-            case ACQUIRED:
-                ledBuffer.setRGB(ledNumber, 0, 200, 0);
-                addressableLED.start();
-                flash();
-                break;
+            ledStrip[n].updateLight();
         }
     }
 
     //
-    private void flash() {
-        flashTimer = new Timer();
-        boolean b = checkTimer();
-
+    private void flashStart() {
+        if (flashTimer == null) {
+            flashTimer = new Timer();
+        }
         flashTimer.start();
+    }
 
-        do { 
-        } while (!b);
+    private void flash() {
+        if (checkTimer() == true) {
+
+        }
     }
 
     private boolean checkTimer() {
