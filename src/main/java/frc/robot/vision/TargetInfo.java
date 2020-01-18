@@ -17,13 +17,17 @@ package frc.robot.vision;
     protected double x = 0;
     protected double y = 0;
     protected double z = 0;
+    private double yaw = 0;
+    private int CameraID = 0;
 
     private int TargetType = 0;
 
     //Distance in Feet Currently
     private double distance = 0;
 
+    public TargetInfo(){
 
+    }
         
     public TargetInfo(int CameraID, int TargetType, int x, int y, double distance){
         this.TargetType = TargetType;
@@ -58,6 +62,30 @@ package frc.robot.vision;
         TargetType = 0;
     }
 
+
+    public void SetDistance(double dis){
+        this.distance = dis;
+    }
+
+    public void SetX(double x){
+        this.x = x;
+    }
+
+    public void SetY(double y){
+        this.y = y;
+    }
+
+    public void SetTargetID(int id){
+        this.TargetType = id;
+    } 
+
+    public void SetCameraID(int id){
+        this.CameraID = id;
+    }
+
+    public void SetYaw(double yaw){
+        this.yaw = yaw;
+    }
 
 
 

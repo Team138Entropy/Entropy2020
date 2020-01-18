@@ -8,6 +8,10 @@ import java.util.HashMap;
 import java.util.Map; 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,6 +19,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import frc.robot.RobotState;
+import frc.robot.vision.TargetInfo;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -96,9 +101,17 @@ public class VisionManager extends Subsystem {
 
     private UDPReciever PacketReciever;
     private JSONParser parser;
-    private JSONObject CurrentPacket;
+
+    //Lock that protects the parser and allows one user at a time
+    private final Object ParserLock = new Object();
 
 
+    //Reference to RobotState
+    private RobotState mRobotState = RobotState.getInstance();
+
+    //Exector Thread
+    //Packets are processed in this thread!
+    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
    
     //Thread protected booleans
     //DO NOT access these variables without locks 
@@ -155,7 +168,44 @@ public class VisionManager extends Subsystem {
     }
 
 
+    private void ParsePacket(String packet){
+        try{
+            JSONObject CurrentPacket;
 
+            //Appears the Parser Object isn't thread safe
+            //Make sure the parse function is only called one at a time
+            synchronized(ParserLock){
+                CurrentPacket = (JSONObject) parser.parse(packet);
+            }
+
+            //Attempt to form target info object
+            //is possible this fails! 
+            TargetInfo ti = new TargetInfo();
+            try{
+                ti.SetX(((Number)CurrentPacket.get("x")).doubleValue());
+                ti.SetY(((Number)CurrentPacket.get("y")).doubleValue());
+                ti.SetDistance(((Number)CurrentPacket.get("dis")).doubleValue());
+                ti.SetYaw(((Number)CurrentPacket.get("yaw")).doubleValue());
+                //ti.SetCameraID(((Number)CurrentPacket.get("id")).intValue());
+                ti.SetTargetID(((Number)CurrentPacket.get("targid")).intValue());
+
+                //If we made it to this point we had all the required keys!
+                //Now we need to update RobotState with our new values!
+                mRobotState.AddVisionObservation(ti);
+                                
+            }catch(Exception Targ){
+                //Exception Thrown when Trying to retrieve values from json object
+                CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
+            }
+
+        }catch(ParseException pe){
+            //Exception with the Parser
+            System.out.println("Parser Exception: " + pe.getMessage());
+        }catch(Exception e){
+            //Other Exception
+            System.out.println("Parse Packet Exception: " + e.getMessage());
+        }
+    }
 
 
     /*
@@ -166,15 +216,13 @@ public class VisionManager extends Subsystem {
             String PacketResult = PacketReciever.getPacket();
             try {
 
-                //Pass packet to an action
-                CurrentPacket = (JSONObject) parser.parse(PacketResult); 
+                //Pass call to a Runnable Object
+                //this will execute in parallel
+                executor.execute(new Runnable() { public void run() { 
+                    ParsePacket(PacketResult);     
+                }});
                 
-
-                
-
-
-
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 System.out.println("Error: Cannot parse recieved UDP json data: " + e.toString());
                 e.printStackTrace();
             }
