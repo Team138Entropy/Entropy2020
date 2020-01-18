@@ -66,12 +66,10 @@ public class OperatorInterface  {
     }
 
     public boolean getTurretAdjustLeft(){
-        // System.out.println(OperatorController.getButton(XboxController.Button.A));
         return OperatorController.getButton(XboxController.Button.A);
     }
 
     public boolean getTurretAdjustRight(){
-        // System.out.println(OperatorController.getButton(XboxController.Button.B));
         return OperatorController.getButton(XboxController.Button.B);
     }
 
