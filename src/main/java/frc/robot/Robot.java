@@ -131,6 +131,9 @@ public class Robot extends TimedRobot {
       RobotLoop();
     }catch(Exception e){
       System.out.println("RobotLoop Exception");
+
+      // print the exception to the system error
+      e.printStackTrace(System.err);
     }
   }
   @Override
@@ -170,12 +173,6 @@ public class Robot extends TimedRobot {
       boolean AutoDrive = false;
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
 
-      
-      //Climb
-      if (mOperatorInterface.getClimb()) {
-        //climb!
-      }
-
       //Quickturn
       if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
         //Quickturn!
@@ -189,31 +186,15 @@ public class Robot extends TimedRobot {
   public void RobotLoop(){
     updateSmartDashboard();
 
-    //Check User Inputs
-    double DriveThrottle = mOperatorInterface.getDriveThrottle();
-    double DriveTurn = mOperatorInterface.getDriveTurn();
-    boolean AutoDrive = false;
-
-    //Continue Driving 
-    if(AutoDrive == true){
-      //AutoSteer Functionality
-      //Used for tracking a ball
-    }else{
-      //Standard Manual Drive
-      mDrive.setDrive(DriveThrottle, DriveTurn, false);
-    }
     turretLoop();
 
     driveTrainLoop();
+    
+    mShooter.periodic();
 
     //Climb
     if (mOperatorInterface.getClimb()) {
       //climb!
-    }
-
-    //Quickturn
-    if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
-      //Quickturn!
     }
 
     //Operator Controls
@@ -237,6 +218,5 @@ public class Robot extends TimedRobot {
       //Load chamber!
     }
 
-    mShooter.periodic();
   }
 }

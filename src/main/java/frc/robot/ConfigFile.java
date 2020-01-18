@@ -66,7 +66,7 @@ public class ConfigFile {
             value = mDefaultProps.getProperty(key);
 
             if(value == null){
-                throw new RuntimeException("Did not find value in config file or in " + key);
+                throw new RuntimeException("Did not find the key " + key + " in config file or backup config file ");
             }else{
                 DriverStation.reportError("\n\n======================================\nKEY " + key + " WAS NOT FOUND IN MAIN CONFIG BUT WAS FOUND IN DEFAULT FILE\nPlease add it to the file.\nYou might have unexpected issues.\n======================================\n\n", Thread.currentThread().getStackTrace());
             }
