@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
 
     //TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      mTurret = new Turret();
+      mTurret = Turret.getInstance();
     }
 
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){

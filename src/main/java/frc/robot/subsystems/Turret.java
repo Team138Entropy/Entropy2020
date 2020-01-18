@@ -13,11 +13,13 @@ import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 
 /**
- * This Turret class extends WPILIB's PID subsystem via @Overriding methods
+ * This Turret singleton extends WPILIB's PID subsystem via @Overriding methods
  * use enable(), disable() and setSetpoint() to control the PID.
  * loop() should be run every tick
  */
 public class Turret extends PIDSubsystem {
+  private static Turret sInstance;
+
   private Logger mTurretLogger;
   private WPI_TalonSRX mTurretTalon;
   private Potentiometer mPot;
@@ -25,10 +27,18 @@ public class Turret extends PIDSubsystem {
   // the target position (on a scale from 0 to 100)
   private double mManualTargetPos = 50;
 
+  public static Turret getInstance(){
+    if(sInstance == null){
+      sInstance = new Turret();
+    }
+
+    return sInstance;
+  }
+
   /**
    * Set up our talon, logger and potentiometer
    */
-  public Turret() {
+  private Turret() {
     // Intert a subsystem name and PID values 
     super("Turret", Config.getInstance().getDouble(Key.OI__VISION__PID__P), Config.getInstance().getDouble(Key.OI__VISION__PID__I), Config.getInstance().getDouble(Key.OI__VISION__PID__D));
     mTurretLogger = new Logger("turret");
