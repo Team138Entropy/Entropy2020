@@ -23,6 +23,8 @@ public class Constants {
     public static final double kDriveWheelDiameterInches = 3.938;
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kDriveWheelTrackRadiusWidthMeters = kDriveWheelTrackWidthInches / 2.0 * 0.0254;
+
+    // Based on how this is used, I'm pretty sure this is a corrective factor
     public static final double kTrackScrubFactor = 1.0469745223;
     public static final double kDriveVoltageRampRate = 0.0;
     public static final int kDriveCurrentThrottledLimit = 30; // amps

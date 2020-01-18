@@ -1,5 +1,7 @@
 package frc.robot.IO;
 import frc.robot.Constants;
+import frc.robot.IO.XboxController.Axis;
+import frc.robot.IO.XboxController.Button;
 
 //Main Control Class
 //Contains instances of the Driver and Operator Controller
@@ -61,6 +63,14 @@ public class OperatorInterface  {
         //if lowgear value has checked
         DriverController.setRumble(LowGear);
         return LowGear;
+    }
+    
+  public boolean getTurretAdjustLeft(){
+        return OperatorController.getButton(XboxController.Button.A);
+    }
+
+    public boolean getTurretAdjustRight(){
+        return OperatorController.getButton(XboxController.Button.B);
     }
     
     //Operator

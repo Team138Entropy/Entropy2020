@@ -58,7 +58,7 @@ public class Shooter extends Subsystem {
 
 
     // State variables
-    private enum State {
+    public enum State {
         IDLE,
         FULL_SPEED,
         SPINNING_UP,
@@ -74,6 +74,10 @@ public class Shooter extends Subsystem {
         if (instance == null)
             instance = new Shooter();
         return instance;
+    }
+
+    public State getState() {
+        return state;
     }
 
     private Shooter() {
