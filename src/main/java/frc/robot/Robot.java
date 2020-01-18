@@ -22,145 +22,145 @@ import frc.robot.util.LatchedBoolean;
  */
 public class Robot extends TimedRobot {
 
-  //Controller Reference
-  private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
+    //Controller Reference
+    private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
-  //Robot State
-  private final RobotState mRobotState = RobotState.getInstance();
+    //Robot State
+    private final RobotState mRobotState = RobotState.getInstance();
 
-  //Subsystem Manager
-  private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
+    //Subsystem Manager
+    private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-  //Subsystems
-  private final Drive mDrive = Drive.getInstance();
-  private final VisionManager mVisionManager = VisionManager.getInstance();
-  private final Shooter mShooter = Shooter.getInstance();
+    //Subsystems
+    private final Drive mDrive = Drive.getInstance();
+    private final VisionManager mVisionManager = VisionManager.getInstance();
+    private final Shooter mShooter = Shooter.getInstance();
 
-  //Variables from State
-
-
-  //autonomousInit, autonomousPeriodic, disabledInit, 
-  //disabledPeriodic, loopFunc, robotInit, robotPeriodic, 
-  //teleopInit, teleopPeriodic, testInit, testPeriodic
-
-  public void robotInit() {
-    System.out.println("robot init _ 1");
-    
-    //Zero all nesscary sensors on Robot
-    ZeroSensors();
-
-    //Reset Robot State
-    //Wherever the Robot is now is the starting position
-    System.out.println("RobotState!");
-    mRobotState.reset();
-    System.out.println("Robot State Reset");
-  }
-
-  /*
-    Called on bootup, Zero all Sensors
-  */
-  private void ZeroSensors(){
-    System.out.println("Zero");
-    mSubsystemManager.ZeroSensors();
-    System.out.println("Done Zero");
-  }
+    //Variables from State
 
 
-  public void autonomousInit(){
-    System.out.println("Auto Init Called");
-  }
+    //autonomousInit, autonomousPeriodic, disabledInit,
+    //disabledPeriodic, loopFunc, robotInit, robotPeriodic,
+    //teleopInit, teleopPeriodic, testInit, testPeriodic
 
-  public void autonomousPeriodic(){
-    System.out.println("Auto Periodic");
-  }
+    public void robotInit() {
+        System.out.println("robot init _ 1");
 
-  public void teleopInit() {
-    System.out.println("Teleop Init!");
-  }
+        //Zero all nesscary sensors on Robot
+        ZeroSensors();
 
-  public void teleopPeriodic() {
-    try{
-      RobotLoop();
-    }catch(Exception e){
-      System.out.println("RobotLoop Exception");
-    }
-  }
-
-  public void testInit() {
-    System.out.println("Entropy 138: Test Init");
-
-    //Test all Subsystems
-    System.out.println("Running Subsystem Checks");
-    mSubsystemManager.CheckSubsystems();
-
-
-  }
-
-  public void testPeriodic(){
-
-  }
-
-
-  public void disabledInit() {
-
-  }
-
-  public void disabledPeriodic(){
-
-  }
-
-
-  /*  
-    Called constantly, houses the main functionality of robot
-  */
-  public void RobotLoop(){
-    //Driver Controls
-    //Check User Inputs
-    double DriveThrottle = mOperatorInterface.getDriveThrottle();
-    double DriveTurn = mOperatorInterface.getDriveTurn();
-    boolean AutoDrive = false;
-
-    //Continue Driving 
-    if(AutoDrive == true){
-      //AutoSteer Functionality
-      //Used for tracking a ball
-    }else{
-      //Standard Manual Drive
-      mDrive.setDrive(DriveThrottle, DriveTurn, false);
+        //Reset Robot State
+        //Wherever the Robot is now is the starting position
+        System.out.println("RobotState!");
+        mRobotState.reset();
+        System.out.println("Robot State Reset");
     }
 
-    //Climb
-    if (mOperatorInterface.getClimb()) {
-      //climb!
+    /*
+      Called on bootup, Zero all Sensors
+    */
+    private void ZeroSensors(){
+        System.out.println("Zero");
+        mSubsystemManager.ZeroSensors();
+        System.out.println("Done Zero");
     }
 
-    //Quickturn
-    if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
-      //Quickturn!
+
+    public void autonomousInit(){
+        System.out.println("Auto Init Called");
     }
 
-    //Operator Controls
-    if (mOperatorInterface.getTurretManual() != -1) {
-      //manual turret aim
+    public void autonomousPeriodic(){
+        System.out.println("Auto Periodic");
     }
 
-    //Camera Swap
-    if (mOperatorInterface.getCameraSwap()) {
-      //Swap Camera!
+    public void teleopInit() {
+        System.out.println("Teleop Init!");
     }
 
-    //Shoot
-    if (mOperatorInterface.getShoot()) {
-      //Shoot!
+    public void teleopPeriodic() {
+        try{
+            RobotLoop();
+        }catch(Exception e){
+            System.out.println("RobotLoop Exception");
+        }
     }
 
-    //Load chamber
-    //NOTE: This may or may not be necessary depending on how our sensor pack turns out
-    if (mOperatorInterface.getLoadChamber()) {
-      //Load chamber!
+    public void testInit() {
+        System.out.println("Entropy 138: Test Init");
+
+        //Test all Subsystems
+        System.out.println("Running Subsystem Checks");
+        mSubsystemManager.CheckSubsystems();
+
+
     }
 
-    mShooter.periodic();
-  }
+    public void testPeriodic(){
+
+    }
+
+
+    public void disabledInit() {
+
+    }
+
+    public void disabledPeriodic(){
+
+    }
+
+
+    /*
+      Called constantly, houses the main functionality of robot
+    */
+    public void RobotLoop(){
+        //Driver Controls
+        //Check User Inputs
+        double DriveThrottle = mOperatorInterface.getDriveThrottle();
+        double DriveTurn = mOperatorInterface.getDriveTurn();
+        boolean AutoDrive = false;
+
+        //Continue Driving
+        if(AutoDrive == true){
+            //AutoSteer Functionality
+            //Used for tracking a ball
+        }else{
+            //Standard Manual Drive
+            mDrive.setDrive(DriveThrottle, DriveTurn, false);
+        }
+
+        //Climb
+        if (mOperatorInterface.getClimb()) {
+            //climb!
+        }
+
+        //Quickturn
+        if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+            //Quickturn!
+        }
+
+        //Operator Controls
+        if (mOperatorInterface.getTurretManual() != -1) {
+            //manual turret aim
+        }
+
+        //Camera Swap
+        if (mOperatorInterface.getCameraSwap()) {
+            //Swap Camera!
+        }
+
+        //Shoot
+        if (mOperatorInterface.getShoot()) {
+            //Shoot!
+        }
+
+        //Load chamber
+        //NOTE: This may or may not be necessary depending on how our sensor pack turns out
+        if (mOperatorInterface.getLoadChamber()) {
+            //Load chamber!
+        }
+
+        mShooter.periodic();
+    }
 
 }
