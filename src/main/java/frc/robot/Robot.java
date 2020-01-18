@@ -113,6 +113,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit(){
     mRobotLogger.log("Auto Init Called");
+
+    Config.getInstance().reload();
   }
   @Override
   public void autonomousPeriodic(){
@@ -123,6 +125,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
+
+    Config.getInstance().reload();
   }
 
   @Override
@@ -140,10 +144,13 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
+
+    Config.getInstance().reload();
   }
 
   @Override
   public void testPeriodic(){
+    mRobotLogger.log(Config.getInstance().getString(Key.TEST));
   }
 
 
