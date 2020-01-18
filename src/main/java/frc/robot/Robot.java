@@ -129,17 +129,11 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     System.out.println("Entropy 138: Test Init");
-
-    //Test all Subsystems
-    System.out.println("Running Subsystem Checks");
-    mSubsystemManager.CheckSubsystems();
-
-
   }
   @Override
   public void testPeriodic(){
-
   }
+
 
   @Override
   public void disabledInit() {
@@ -208,21 +202,6 @@ public class Robot extends TimedRobot {
     turretLoop();
 
     driveTrainLoop();
-
-    //Operator Controls
-    if (mOperatorInterface.getTurretManual() != -1) {
-      //manual turret aim
-    }
-
-    //Camera Swap
-    if (mOperatorInterface.getCameraSwap()) {
-      //Swap Camera!
-    }
-
-    //Shoot
-    if (mOperatorInterface.getShoot()) {
-      //Shoot!
-    }
     //Load chamber
     //NOTE: This may or may not be necessary depending on how our sensor pack turns out
     if (mOperatorInterface.getLoadChamber()) {

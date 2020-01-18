@@ -160,11 +160,15 @@ public class Drive extends Subsystem {
         }
         */
 
+        // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
+        // If we're not pushing forward on the throttle, automatically enable quickturn so that we don't have to
+        // explicitly enable it before turning.
         if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
             throttle = 0.0;
             quickTurn = true;
         }
 
+        // This is just a convoluted way to do a deadband.
         if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
             wheel = 0.0;
         }
@@ -180,8 +184,15 @@ public class Drive extends Subsystem {
         }
 
         wheel *= kWheelGain;
+
+        // We pass 0 for dy because we use a differential drive and can't strafe.
+        // The wheel here is a constant curvature rather than an actual heading. This is what makes the drive cheesy.
         DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
+
+        // Either the bigger of the two drive signals or 1, whichever is bigger.
         double scaling_factor = Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
+
+
         setOpenLoop(new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
     }
 
@@ -201,4 +212,10 @@ public class Drive extends Subsystem {
     public void CheckSubsystems(){
 
     }
+    
+
+  
+
+
+
 }
