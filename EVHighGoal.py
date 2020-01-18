@@ -517,6 +517,7 @@ def findTape(contours, image, centerX, centerY):
 
                     # Calculates yaw of contour (horizontal position in degrees)
                     yaw = calculateYaw(cx, centerX, H_FOCAL_LENGTH)
+                    sendValues[2] = yaw
                     # Calculates yaw of contour (horizontal position in degrees)
                     pitch = calculatePitch(cy, centerY, V_FOCAL_LENGTH)
 
@@ -592,7 +593,7 @@ def findTape(contours, image, centerX, centerY):
         #Sorts targets based on x coords to break any angle tie
         targets.sort(key=lambda x: math.fabs(x[0]))
         finalTarget = min(targets, key=lambda x: math.fabs(x[1]))
-        sendValues[2] = finalTarget
+        print("finaltarget is:" , finalTarget)
         # Puts the yaw on screen
         #Draws yaw of target + line where center of target is
         cv2.putText(image, "Yaw: " + str(finalTarget[1]), (40, 40), cv2.FONT_HERSHEY_COMPLEX, .6,
@@ -812,10 +813,15 @@ def ProcessFrame(frame, tape):
         highGoal['x'] = processedValues[0] 
         highGoal['y'] = processedValues[1]
         highGoal['yaw'] = processedValues[2]
+        if processedValues[3] != None:
+            processedValues[3] = abs(round(processedValues[3], 2))
         highGoal['dis'] = processedValues[3]
         highGoal['targid'] = 0
         
         print("Highgoal values: ", highGoal)
+        
+        if processedValues[3] != None:
+            PacketQueue.put_nowait(highGoal)
   
   
         #Tape Process!
