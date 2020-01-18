@@ -51,15 +51,15 @@ public class Robot extends TimedRobot {
   //Variables from State
 
   
-  static Potentiometer mPot;
-  public static PotPID mPotHandler;
+  static Potentiometer sPot;
+  static PotPID sPotHandler;
   static NetworkTable mTable;
   private double mInitialYaw = 0.0;
   private static double targetPos = 50;
 
-  static Logger sRobotLogger = new Logger("robot"); 
-  static Logger sVisionLogger = new Logger("vision");
-  static Logger sPotLogger = new Logger("pot");
+  Logger mRobotLogger = new Logger("robot"); 
+  Logger mVisionLogger = new Logger("vision");
+  Logger mPotLogger = new Logger("pot");
 
   public static WPI_TalonSRX sRotatorTalon;
   private double mPreviousYaw = 0;
@@ -85,9 +85,9 @@ public class Robot extends TimedRobot {
 
     //TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      mPot = new AnalogPotentiometer(Config.getInstance().getInt(Key.ROBOT__POT__LOCATION), Config.getInstance().getFloat(Key.ROBOT__POT__RANGE), Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
+      sPot = new AnalogPotentiometer(Config.getInstance().getInt(Key.ROBOT__POT__LOCATION), Config.getInstance().getFloat(Key.ROBOT__POT__RANGE), Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
       sRotatorTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
-      mPotHandler = new PotPID(mPot);
+      sPotHandler = new PotPID(sPot);
     }
 
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
@@ -144,14 +144,14 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      mPotHandler.disable();
+      sPotHandler.disable();
     }
     Config.getInstance().reload();
   }
   @Override
   public void disabledPeriodic(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      sRobotLogger.verbose("pot " + Robot.mPot.get());
+      mRobotLogger.verbose("pot " + Robot.sPot.get());
     }
   }
 
@@ -164,16 +164,16 @@ public class Robot extends TimedRobot {
       float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
       float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
 
-      boolean allowMovement = (mPot.get() < potMax && mPot.get() > potMin);
-      sPotLogger.debug("allow movement " + allowMovement + " because we got " + mPot.get() + " inside of " + potMin + " to " + potMax);
+      boolean allowMovement = (sPot.get() < potMax && sPot.get() > potMin);
+      mPotLogger.debug("allow movement " + allowMovement + " because we got " + sPot.get() + " inside of " + potMin + " to " + potMax);
       
       if(allowMovement){
         if(Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)){
           // vision goes here
         }else{
           // visionLogger.verbose("Not enabled " + targetPos);
-          mPotHandler.enable();
-          mPotHandler.setSetpoint(targetPos);
+          sPotHandler.enable();
+          sPotHandler.setSetpoint(targetPos);
           if(OperatorInterface.getInstance().getTurretAdjustLeft()) targetPos -= 2.5;
           if(OperatorInterface.getInstance().getTurretAdjustRight()) targetPos += 2.5;
           targetPos = Math.min(Math.max(targetPos, potMin), potMax);
