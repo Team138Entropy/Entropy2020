@@ -22,7 +22,6 @@ public class Intake extends Subsystem{
     }
 
     private Intake() {
-
     }
     
     @Override
