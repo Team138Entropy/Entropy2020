@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import frc.robot.RobotState;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -146,13 +147,15 @@ public class VisionManager extends Subsystem {
 
             }
         });
+
+        //Set Name and Start Thread!
         listenerThread.setName("VisionListenerThread");
-        listenerThread.setPriority(Thread.MIN_PRIORITY+2); //Sure, this seems like a reasonable priority!
+        listenerThread.setPriority(Thread.MIN_PRIORITY+2); 
         listenerThread.start();
-
-
-    
     }
+
+
+
 
 
     /*
