@@ -14,8 +14,6 @@
 
 '''
 {"controls":[{"default":"1","id":"1","max":"1","min":"0","name":"connect_verbose","step":"1","type":"2","value":"1"},{"default":"0","id":"2","max":"0","min":"0","name":"","step":"0","type":"0","value":""},{"default":"50","id":"3","max":"100","min":"0","name":"raw_brightness","step":"1","type":"2","value":"50"},{"default":"50","id":"4","max":"100","min":"0","name":"brightness","step":"1","type":"2","value":"50"},{"default":"0","id":"5","max":"100","min":"-100","name":"raw_contrast","step":"1","type":"2","value":"0"},{"default":"50","id":"6","max":"100","min":"0","name":"contrast","step":"1","type":"2","value":"50"},{"default":"0","id":"7","max":"100","min":"-100","name":"raw_saturation","step":"1","type":"2","value":"0"},{"default":"50","id":"8","max":"100","min":"0","name":"saturation","step":"1","type":"2","value":"50"},{"default":"1000","id":"9","max":"7999","min":"1","name":"red_balance","step":"1","type":"2","value":"1000"},{"default":"1000","id":"10","max":"7999","min":"1","name":"blue_balance","step":"1","type":"2","value":"1000"},{"default":"0","id":"11","max":"1","min":"0","name":"horizontal_flip","step":"1","type":"1","value":"0"},{"default":"0","id":"12","max":"1","min":"0","name":"vertical_flip","step":"1","type":"1","value":"0"},{"default":"1","id":"13","max":"3","menu":{"0":"Disabled","1":"50 Hz","2":"60 Hz","3":"Auto"},"min":"0","name":"power_line_frequency","step":"1","type":"8","value":"1"},{"default":"0","id":"14","max":"100","min":"-100","name":"raw_sharpness","step":"1","type":"2","value":"0"},{"default":"50","id":"15","max":"100","min":"0","name":"sharpness","step":"1","type":"2","value":"50"},{"default":"0","id":"16","max":"15","menu":{"0":"None","1":"Black & White","2":"Sepia","3":"Negative","4":"Emboss","5":"Sketch","6":"Sky Blue","7":"Grass Green","8":"Skin Whiten","9":"Vivid","10":"Aqua","11":"Art Freeze","12":"Silhouette","13":"Solarization","14":"Antique","15":"Set Cb/Cr"},"min":"0","name":"color_effects","step":"1","type":"8","value":"0"},{"default":"0","id":"17","max":"360","min":"0","name":"rotate","step":"90","type":"2","value":"0"},{"default":"32896","id":"18","max":"65535","min":"0","name":"color_effects_cbcr","step":"1","type":"2","value":"32896"},{"default":"0","id":"19","max":"1","menu":{"0":"Variable Bitrate","1":"Constant Bitrate"},"min":"0","name":"video_bitrate_mode","step":"1","type":"8","value":"0"},{"default":"10000000","id":"20","max":"25000000","min":"25000","name":"video_bitrate","step":"25000","type":"2","value":"10000000"},{"default":"0","id":"21","max":"1","min":"0","name":"repeat_sequence_header","step":"1","type":"1","value":"0"},{"default":"60","id":"22","max":"2147483647","min":"0","name":"h264_i_frame_period","step":"1","type":"2","value":"60"},{"default":"11","id":"23","max":"11","menu":{"0":"1","1":"1b","2":"1.1","3":"1.2","4":"1.3","5":"2","6":"2.1","7":"2.2","8":"3","9":"3.1","10":"3.2","11":"4"},"min":"0","name":"h264_level","step":"1","type":"8","value":"11"},{"default":"4","id":"24","max":"4","menu":{"0":"Baseline","1":"Constrained Baseline","2":"Main","3":"","4":"High"},"min":"0","name":"h264_profile","step":"1","type":"8","value":"4"},{"default":"0","id":"25","max":"3","menu":{"0":"Auto Mode","1":"Manual Mode","2":"","3":""},"min":"0","name":"auto_exposure","step":"1","type":"8","value":"1"},{"default":"1000","id":"26","max":"10000","min":"1","name":"exposure_time_absolute","step":"1","type":"2","value":"6"},{"default":"0","id":"27","max":"1","min":"0","name":"exposure_dynamic_framerate","step":"1","type":"1","value":"0"},{"default":"12","id":"28","max":"24","menu":{"0":"-4000","1":"-3667","2":"-3333","3":"-3000","4":"-2667","5":"-2333","6":"-2000","7":"-1667","8":"-1333","9":"-1000","10":"-667","11":"-333","12":"0","13":"333","14":"667","15":"1000","16":"1333","17":"1667","18":"2000","19":"2333","20":"2667","21":"3000","22":"3333","23":"3667","24":"4000"},"min":"0","name":"auto_exposure_bias","step":"1","type":"8","value":"12"},{"default":"1","id":"29","max":"10","menu":{"0":"Manual","1":"Auto","2":"Incandescent","3":"Fluorescent","4":"Fluorescent H","5":"Horizon","6":"Daylight","7":"Flash","8":"Cloudy","9":"Shade","10":"Greyworld"},"min":"0","name":"white_balance_auto_preset","step":"1","type":"8","value":"1"},{"default":"0","id":"30","max":"1","min":"0","name":"image_stabilization","step":"1","type":"1","value":"0"},{"default":"0","id":"31","max":"4","menu":{"0":"0","1":"100000","2":"200000","3":"400000","4":"800000"},"min":"0","name":"iso_sensitivity","step":"1","type":"8","value":"0"},{"default":"1","id":"32","max":"1","menu":{"0":"Manual","1":"Auto"},"min":"0","name":"iso_sensitivity_auto","step":"1","type":"8","value":"1"},{"default":"0","id":"33","max":"2","menu":{"0":"Average","1":"Center Weighted","2":"Spot"},"min":"0","name":"exposure_metering_mode","step":"1","type":"8","value":"0"},{"default":"0","id":"34","max":"13","menu":{"0":"None","1":"","2":"","3":"","4":"","5":"","6":"","7":"","8":"Night","9":"","10":"","11":"Sports","12":"","13":""},"min":"0","name":"scene_mode","step":"1","type":"8","value":"0"},{"default":"30","id":"35","max":"100","min":"1","name":"compression_quality","step":"1","type":"2","value":"30"},{"default":"0","id":"36","max":"100","min":"0","name":"exposure_auto","step":"1","type":"2","value":"0"},{"default":"0","id":"37","max":"100","min":"0","name":"exposure_absolute","step":"1","type":"2","value":"0"}],"modes":[]}
-
-
 '''
 
 import json
@@ -47,8 +45,8 @@ VerticalAspect = 3
 DiagonalAspect = math.hypot(HorizontalAspect, VerticalAspect)
 
 #Upper and Lower HSV Threshold Limits
-Tape_HSV_Lower = np.array([57, 115, 85]) #Hue, Saturation, Value
-Tape_HSV_Upper = np.array([108, 255, 255]) #Hue, Saturation, Value
+Tape_HSV_Lower = np.array([39, 181, 135]) #Hue, Saturation, Value
+Tape_HSV_Upper = np.array([68, 255, 255]) #Hue, Saturation, Value
 
 #Ball HSV Values
 Ball_HSV_Lower = np.array([13,67,188])
@@ -58,9 +56,9 @@ Ball_HSV_Upper = np.array([62,255,255])
 rat_low = 1.5
 rat_high = 10
 
-hsv_threshold_hue = [13, 62]
-hsv_threshold_saturation = [55, 255]
-hsv_threshold_value = [87, 255]
+hsv_threshold_hue = [32, 78]
+hsv_threshold_saturation = [96, 255]
+hsv_threshold_value = [53, 255]
 
 # import the necessary packages
 import datetime
@@ -300,7 +298,6 @@ def threshold_video(lower_color, upper_color, blur):
 
 # Finds the tape targets from the masked image and displays them on original stream + network tales
 def findTargets(frame, mask):
-
 	#print("FIND TARGETS")
 	# Finds contours
 	_, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
@@ -486,7 +483,6 @@ def findTape(contours, image, centerX, centerY):
 					cx = int(M["m10"] / M["m00"])
 					cy = int(M["m01"] / M["m00"])
 					distCY = 540-cy
-					print(calculateDistance138(distCY))
 					print(calculateDistanceMethod2(w))
 				else:
 					cx, cy = 0, 0
@@ -626,55 +622,24 @@ def translateRotation(rotation, width, height):
 	rotation *= -1
 	return round(rotation)
 
-
-#distance = (targetHeightInches * ImageWidthPixels) / (2 * targetHeightPixels * tan(cameraHorizontalAngle/2);
-def calculateDistance138(targetHeightPixels):
-    #Current res is 640x480, up to 75FPS or 320x240 up to 187 FPS both (4:3)
-    #FOV is 53.5
-    targHeightInch = 27.5
-    imageWidthPixels = 480
-    camerafov = math.tan(75/2)
-    myDist = (targHeightInch*imageWidthPixels)/(2*targetHeightPixels*camerafov)
-    return myDist
-
 def calculateDistanceMethod2(targPixelWidth):
 	#d = Tft*FOVpixel/(2*Tpixel*tanΘ)
 
 	FOV = 75
 	#8 feet, 2.25 inches, actual height of center goal is 96.25, I think the centroid of the tape is ~87.75 inches
 	#tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
-	targetHeightActual = 96.25
-	camPixelWidth = 480
+	targetHeightActual = 17
+	camPixelWidth = 640
 	#target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
 	Tft = 3.27
 	#theta = 1/2 FOV,
 	tanFOV = math.tan(FOV/2)
  
 	distEst = Tft*camPixelWidth/(2*targPixelWidth*tanFOV)
-	return(distEst) 
-
-
-def calculateDistance(heightOfCamera, heightOfTarget, pitch):
-	heightOfTargetFromCamera = heightOfTarget - heightOfCamera
-
-	# Uses trig and pitch to find distance to target
-	'''
-	d = distance
-	h = height between camera and target
-	a = angle = pitch
-	tan a = h/d (opposite over adjacent)
-	d = h / tan a
-						 .
-						/|
-					   / |
-					  /  |h
-					 /a  |
-			  camera -----
-					   d
-	'''
-	distance = math.fabs(heightOfTargetFromCamera / math.tan(math.radians(pitch)))
-
-	return distance
+	#Unsure as to what measurement distEst is producing in the above line, but multiplying it by .32 will return your distance in feet
+	distEstFeet = distEst*.32
+	#distEstInches = distEstFeet *.32*12
+	return(distEstFeet) 
 
 
 # Uses trig and focal length of camera to find yaw.
@@ -821,7 +786,6 @@ def findBalls(frame):
 			#print("Found Ball!")
 			#print(FoundBall)(
 			PacketQueue.put_nowait(FoundBall)
-
 	return FoundBalls
 
 
@@ -831,10 +795,12 @@ def findBalls(frame):
 #boolean to whether we want ball tracking or tape tracking
 def ProcessFrame(frame, tape):
 	if(tape == True):
+		threshold = threshold_video(lower_green, upper_green, frame)
+		processedFrame = findTargets(frame, threshold)
         #Tape Process!
         #APPLY A BLUE TO BLUR THE LINES
-		frame = FilterHSVTape(frame) #Filter Frame for HSV Tape
-		frame = findTapeTargets(frame)
+#		frame = FilterHSVTape(frame) #Filter Frame for HSV Tape
+#		frame = findTapeTargets(frame)
 	else:
         #Ball Tracker!
 		original_frame = frame.copy()
@@ -864,9 +830,9 @@ def ProcessFrame(frame, tape):
 		'''
 
 
+		someprint = print("end of process frame")
 
-
-		return original_frame
+		return processedFrame
 
 # Link to further explanation: https://docs.google.com/presentation/d/1ediRsI-oR3-kwawFJZ34_ZTlQS2SDBLjZasjzZ-eXbQ/pub?start=false&loop=false&slide=id.g12c083cffa_0_298
 def calculatePitch(pixelY, centerY, vFocalLength):
@@ -1054,7 +1020,7 @@ if __name__ == "__main__":
 		# in the source image.  If there is an error notify the output.
 		timestamp, img = cap.read()
 
-		Tape = False
+		Tape = True
 		frame = ProcessFrame(img, Tape)
 
 
