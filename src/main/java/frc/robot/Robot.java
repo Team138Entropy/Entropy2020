@@ -231,6 +231,7 @@ public class Robot extends TimedRobot {
     }else{
       //Standard Manual Drive
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
+    }
     turretLoop();
 
     driveTrainLoop();
