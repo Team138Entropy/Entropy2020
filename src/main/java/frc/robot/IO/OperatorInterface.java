@@ -65,7 +65,7 @@ public class OperatorInterface  {
         return LowGear;
     }
     
-  public boolean getTurretAdjustLeft(){
+    public boolean getTurretAdjustLeft(){
         return OperatorController.getButton(XboxController.Button.A);
     }
 
