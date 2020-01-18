@@ -110,9 +110,6 @@ public class Robot extends TimedRobot {
   }
   @Override
   public void autonomousPeriodic(){
-    if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      sRotatorTalon.set(ControlMode.PercentOutput, 0.05f);
-    }
     System.out.println("Auto Periodic");
   }
 
@@ -203,7 +200,6 @@ public class Robot extends TimedRobot {
       if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
         //Quickturn!
       }
-    }else{
     }
 
     //Operator Controls
