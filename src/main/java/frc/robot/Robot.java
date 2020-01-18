@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
   static PotPID sPotHandler;
   static NetworkTable mTable;
   private double mInitialYaw = 0.0;
-  private static double targetPos = 50;
+  private static double sTargetPos = 50;
 
   Logger mRobotLogger = new Logger("robot"); 
   Logger mVisionLogger = new Logger("vision");
@@ -173,10 +173,10 @@ public class Robot extends TimedRobot {
         }else{
           // visionLogger.verbose("Not enabled " + targetPos);
           sPotHandler.enable();
-          sPotHandler.setSetpoint(targetPos);
-          if(OperatorInterface.getInstance().getTurretAdjustLeft()) targetPos -= 2.5;
-          if(OperatorInterface.getInstance().getTurretAdjustRight()) targetPos += 2.5;
-          targetPos = Math.min(Math.max(targetPos, potMin), potMax);
+          sPotHandler.setSetpoint(sTargetPos);
+          if(OperatorInterface.getInstance().getTurretAdjustLeft()) sTargetPos -= 2.5;
+          if(OperatorInterface.getInstance().getTurretAdjustRight()) sTargetPos += 2.5;
+          sTargetPos = Math.min(Math.max(sTargetPos, potMin), potMax);
         }
       }else{
         // don't do anything if we're about to break our robot
