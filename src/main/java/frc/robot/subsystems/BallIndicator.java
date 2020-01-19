@@ -4,25 +4,27 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 
-
 public class BallIndicator {
     private static BallIndicator instance;
 
-    //Needed for making the LED work
+    // Needed for making the LED work
     private AddressableLED addressableLED;
     private AddressableLEDBuffer ledBuffer;
 
-    //The PWM port
+    // The PWM port
     private int port;
 
-    //Number of LEDs on strip
+    // Number of LEDs on strip
     private int ledCount;
 
     public enum State {
-        EMPTY, LOADING, FULL, ACQUIRED
+        EMPTY,
+        LOADING,
+        FULL,
+        ACQUIRED
     }
 
-    //LED class for keeping track of LED state
+    // LED class for keeping track of LED state
     private class LED {
 
         private int ledNumber;
@@ -34,7 +36,7 @@ public class BallIndicator {
             ledState = state;
         }
 
-        //Updates a light's output
+        // Updates a light's output
         private void updateLight() {
             switch (ledState) {
                 case EMPTY:
@@ -64,19 +66,25 @@ public class BallIndicator {
             }
         }
     }
-    
-    //Array to put LEDs in to keep track of LED states
+
+    // Array to put LEDs in to keep track of LED states
     private LED[] ledStrip;
 
-    //For flashing
+    // For flashing
     private Timer flashTimer;
 
     private BallIndicator() {
-        ledStrip = new LED[] {new LED(State.EMPTY), new LED(State.EMPTY), new LED(State.EMPTY), new LED(State.EMPTY), 
-        new LED(State.EMPTY)};
+        ledStrip =
+                new LED[] {
+                    new LED(State.EMPTY),
+                    new LED(State.EMPTY),
+                    new LED(State.EMPTY),
+                    new LED(State.EMPTY),
+                    new LED(State.EMPTY)
+                };
         addressableLED = new AddressableLED(port);
         ledBuffer = new AddressableLEDBuffer(ledCount);
-        
+
         addressableLED.setLength(ledCount);
         addressableLED.setData(ledBuffer);
     }
@@ -88,7 +96,7 @@ public class BallIndicator {
         return instance;
     }
 
-    //Updates the strip state
+    // Updates the strip state
     void setStripState(State[] newState) {
         for (int n = 0; n < ledCount; n++) {
             ledStrip[n].ledState = newState[n];
@@ -96,7 +104,7 @@ public class BallIndicator {
         updateStrip();
     }
 
-    //Updates each light's output
+    // Updates each light's output
     private void updateStrip() {
         for (int n = 0; n < ledCount; n++) {
             ledStrip[n].updateLight();
@@ -112,9 +120,7 @@ public class BallIndicator {
     }
 
     private void flash() {
-        if (checkTimer() == true) {
-
-        }
+        if (checkTimer() == true) {}
     }
 
     private boolean checkTimer() {

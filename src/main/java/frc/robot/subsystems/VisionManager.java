@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 /*
    Manages all vision tracking cameras
    UDP Packets will be streamed back from tracking camera(s) for speed
