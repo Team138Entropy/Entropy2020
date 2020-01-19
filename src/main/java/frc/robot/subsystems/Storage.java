@@ -39,16 +39,16 @@ public class Storage extends Subsystem {
         EventWatcherThread.getInstance().addEvent((new BallStored()));
     }
 
-    public boolean isBallDetected(){
-        //TODO implement
+    public boolean isBallDetected() {
+        // TODO implement
         return false;
     }
 
     public boolean isBallStored() {
-        //TODO implement
+        // TODO implement
         return false;
     }
-    
+
     public void start() {
         mRoller.set(ControlMode.PercentOutput, ROLLER_SPEED);
     }

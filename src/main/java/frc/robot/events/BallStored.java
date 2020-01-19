@@ -6,7 +6,6 @@ import frc.robot.subsystems.Storage;
 
 public class BallStored implements Event {
 
-
     public boolean check() {
         return (Storage.getInstance().isBallStored());
     }
@@ -15,6 +14,4 @@ public class BallStored implements Event {
         System.out.println("Ball Stored");
         return new StopRoller();
     }
-
-    
 }
