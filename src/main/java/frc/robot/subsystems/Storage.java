@@ -58,14 +58,6 @@ public class Storage extends Subsystem {
         mRoller.set(ControlMode.PercentOutput, 0);
     }
 
-<<<<<<< HEAD
-=======
-    public boolean isBallDetected() {
-        // todo implement
-        return false;
-    }
-
->>>>>>> 11c1f32d456abbd929f07b3d92d209d6333585be
     @Override
     public void ZeroSensors() {}
 
