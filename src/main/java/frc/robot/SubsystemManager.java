@@ -7,6 +7,7 @@ import java.util.List;
 
 
 public class SubsystemManager {
+    Logger mSubsystemLogger;
     public static SubsystemManager mInstance = null;
 
     private List<Subsystem> mSubsystems;
@@ -19,6 +20,7 @@ public class SubsystemManager {
     }
 
     private SubsystemManager(){
+        mSubsystemLogger = new Logger("subsystem");
         mSubsystems = new ArrayList<>();
     }
 
@@ -37,7 +39,7 @@ public class SubsystemManager {
             try{
                 mSubsystems.get(i).ZeroSensors();
             }catch(Exception e){
-                System.out.println("Sensor Zero Exception: " + e.getMessage());
+                mSubsystemLogger.verbose("Sensor Zero Exception: " + e.getMessage());
             }
         }
     }
@@ -50,7 +52,7 @@ public class SubsystemManager {
             try{    
                 mSubsystems.get(i).CheckSubsystems();
             }catch(Exception e){
-                System.out.println("Subsystem Check Exception: " + e.getMessage());
+                mSubsystemLogger.verbose("Subsystem Check Exception: " + e.getMessage());
             }
         }
     }

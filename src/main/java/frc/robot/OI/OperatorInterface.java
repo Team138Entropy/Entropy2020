@@ -1,7 +1,7 @@
-package frc.robot.IO;
+package frc.robot.OI;
 import frc.robot.Constants;
-import frc.robot.IO.XboxController.Axis;
-import frc.robot.IO.XboxController.Button;
+import frc.robot.OI.XboxController.Axis;
+import frc.robot.OI.XboxController.Button;
 
 //Main Control Class
 //Contains instances of the Driver and Operator Controller

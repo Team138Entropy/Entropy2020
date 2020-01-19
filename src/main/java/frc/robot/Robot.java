@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import frc.robot.Config.Key;
-import frc.robot.IO.OperatorInterface;
+import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 
@@ -52,32 +52,24 @@ public class Robot extends TimedRobot {
   //Variables from State
 
   
-  static Potentiometer sPot;
-  static PotPID sPotHandler;
+  private Turret mTurret;
   static NetworkTable mTable;
-  private double mInitialYaw = 0.0;
-  private static double sTargetPos = 50;
 
-  Logger mRobotLogger = new Logger("robot"); 
-  Logger mVisionLogger = new Logger("vision");
-  Logger mPotLogger = new Logger("pot");
-
-  public static WPI_TalonSRX sRotatorTalon;
-  private double mPreviousYaw = 0;
+  Logger mRobotLogger = new Logger("robot");
 
   //autonomousInit, autonomousPeriodic, disabledInit, 
   //disabledPeriodic, loopFunc, robotInit, robotPeriodic, 
   //teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
-    System.out.println("robot init _ 1");
+    mRobotLogger.log("robot init _ 1");
     
     //Zero all nesscary sensors on Robot
     ZeroSensors();
 
     //Reset Robot State
     //Wherever the Robot is now is the starting position
-    System.out.println("Robot State Reset");
+    mRobotLogger.log("Robot State Reset");
     mRobotState.reset();
     
     // prepare the network table
@@ -86,9 +78,7 @@ public class Robot extends TimedRobot {
 
     //TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      sPot = new AnalogPotentiometer(Config.getInstance().getInt(Key.ROBOT__POT__LOCATION), Config.getInstance().getFloat(Key.ROBOT__POT__RANGE), Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
-      sRotatorTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
-      sPotHandler = new PotPID(sPot);
+      mTurret = Turret.getInstance();
     }
 
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)){
@@ -100,9 +90,9 @@ public class Robot extends TimedRobot {
     Called on bootup, Zero all Sensors
   */
   private void ZeroSensors(){
-    System.out.println("Zero");
+    mRobotLogger.log("Zeroing sensors...");
     mSubsystemManager.ZeroSensors();
-    System.out.println("Done Zero");
+    mRobotLogger.log("Zeroed sensors");
   }
 
   private void updateSmartDashboard(){
@@ -123,17 +113,21 @@ public class Robot extends TimedRobot {
   
   @Override
   public void autonomousInit(){
-    System.out.println("Auto Init Called");
+    mRobotLogger.log("Auto Init Called");
+
+    Config.getInstance().reload();
   }
   @Override
   public void autonomousPeriodic(){
-    System.out.println("Auto Periodic");
+    mRobotLogger.log("Auto Periodic");
     updateSmartDashboard();
   }
 
   @Override
   public void teleopInit() {
-    System.out.println("Teleop Init!");
+    mRobotLogger.log("Teleop Init!");
+
+    Config.getInstance().reload();
   }
 
   @Override
@@ -141,13 +135,20 @@ public class Robot extends TimedRobot {
     try{
       RobotLoop();
     }catch(Exception e){
-      System.out.println("RobotLoop Exception");
+      mRobotLogger.log("RobotLoop Exception");
+
+      // print the exception to the system error
+      e.printStackTrace(System.err);
     }
   }
+
   @Override
   public void testInit() {
-    System.out.println("Entropy 138: Test Init");
+    mRobotLogger.log("Entropy 138: Test Init");
+
+    Config.getInstance().reload();
   }
+
   @Override
   public void testPeriodic(){
   }
@@ -156,39 +157,20 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      sPotHandler.disable();
+      mTurret.disable();
     }
     Config.getInstance().reload();
   }
   @Override
   public void disabledPeriodic(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      mRobotLogger.verbose("pot " + Robot.sPot.get());
+      mRobotLogger.verbose("got pot value of " + mTurret.getPotValue());
     }
   }
 
   public void turretLoop(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
-      float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
-      float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
-
-      boolean allowMovement = (sPot.get() < potMax && sPot.get() > potMin);
-      mPotLogger.debug("allow movement " + allowMovement + " because we got " + sPot.get() + " inside of " + potMin + " to " + potMax);
-      
-      if(allowMovement){
-        if(Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)){
-          // vision goes here
-        }else{
-          // visionLogger.verbose("Not enabled " + targetPos);
-          sPotHandler.enable();
-          sPotHandler.setSetpoint(sTargetPos);
-          if(OperatorInterface.getInstance().getTurretAdjustLeft()) sTargetPos -= 2.5;
-          if(OperatorInterface.getInstance().getTurretAdjustRight()) sTargetPos += 2.5;
-          sTargetPos = Math.min(Math.max(sTargetPos, potMin), potMax);
-        }
-      }else{
-        // don't do anything if we're about to break our robot
-      }
+      mTurret.loop();
     }
   }
 
@@ -199,12 +181,6 @@ public class Robot extends TimedRobot {
       double DriveTurn = mOperatorInterface.getDriveTurn();
       boolean AutoDrive = false;
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
-
-      
-      //Climb
-      if (mOperatorInterface.getClimb()) {
-        //climb!
-      }
 
       //Quickturn
       if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
@@ -219,31 +195,15 @@ public class Robot extends TimedRobot {
   public void RobotLoop(){
     updateSmartDashboard();
 
-    //Check User Inputs
-    double DriveThrottle = mOperatorInterface.getDriveThrottle();
-    double DriveTurn = mOperatorInterface.getDriveTurn();
-    boolean AutoDrive = false;
-
-    //Continue Driving 
-    if(AutoDrive == true){
-      //AutoSteer Functionality
-      //Used for tracking a ball
-    }else{
-      //Standard Manual Drive
-      mDrive.setDrive(DriveThrottle, DriveTurn, false);
-    }
     turretLoop();
 
     driveTrainLoop();
 
+    mShooter.periodic();
+
     //Climb
     if (mOperatorInterface.getClimb()) {
       //climb!
-    }
-
-    //Quickturn
-    if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
-      //Quickturn!
     }
 
     //Operator Controls
@@ -267,6 +227,5 @@ public class Robot extends TimedRobot {
       //Load chamber!
     }
 
-    mShooter.periodic();
   }
 }
