@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Shooter.State;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
@@ -90,12 +88,13 @@ public class Robot extends TimedRobot {
         SmartDashboard.putBoolean("ShooterFull", false);
         // TODO: decide if this is necessary and hook it up
         SmartDashboard.putBoolean("ShooterLoaded", false);
-        SmartDashboard.putBoolean("ShooterSpunUp", mShooter.getState().equals(Shooter.State.FULL_SPEED));
+        SmartDashboard.putBoolean(
+                "ShooterSpunUp", mShooter.getState().equals(Shooter.State.FULL_SPEED));
         // TODO: also, finally, hook this up.
         SmartDashboard.putBoolean("TargetLocked", false);
         // TODO: haha that was a joke this is the real last one
         SmartDashboard.putNumber("ElevateTrim", 0.0f);
-        
+
         // TODO: cameras will go here eventually
     }
 
