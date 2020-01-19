@@ -1,13 +1,10 @@
 package frc.robot.events;
 
 import edu.wpi.first.wpilibj.command.Scheduler;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-/**
- * Singleton thread for monitoring things.
- */
+/** Singleton thread for monitoring things. */
 public class EventWatcherThread extends Thread {
 
     private ArrayList<Event> queue = new ArrayList<>();
@@ -31,12 +28,12 @@ public class EventWatcherThread extends Thread {
 
                 // Add the event to the cache if it wasn't already there
                 if (!lastStateCache.containsKey(e)) {
-                  lastStateCache.put(e, savedState);
+                    lastStateCache.put(e, savedState);
                 }
 
                 // Add the command to the scheduler only if the state of the event changed
                 if (savedState && !lastStateCache.get(e)) {
-                  Scheduler.getInstance().add(e.getCommand());
+                    Scheduler.getInstance().add(e.getCommand());
                 }
 
                 lastStateCache.replace(e, savedState);

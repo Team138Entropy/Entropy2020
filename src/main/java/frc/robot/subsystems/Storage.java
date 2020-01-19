@@ -13,20 +13,18 @@ import frc.robot.events.BallDetected;
 import frc.robot.events.BallStored;
 import frc.robot.events.EventWatcherThread;
 
-/**
- * Add your docs here.
- */
-public class Storage extends Subsystem{
+/** Add your docs here. */
+public class Storage extends Subsystem {
 
     private static final int ROLLER_PORT = 1;
 
     // TODO: Tune these values
     private static final double ROLLER_SPEED = 1;
-   
+
     private WPI_TalonSRX mRoller;
 
     private static Storage sInstance;
-    
+
     public static synchronized Storage getInstance() {
         if (sInstance == null) {
             sInstance = new Storage();
@@ -55,13 +53,19 @@ public class Storage extends Subsystem{
         mRoller.set(ControlMode.PercentOutput, ROLLER_SPEED);
     }
 
-    /**
-     * Stops the roller.
-     */
+    /** Stops the roller. */
     public void stop() {
         mRoller.set(ControlMode.PercentOutput, 0);
     }
 
+<<<<<<< HEAD
+=======
+    public boolean isBallDetected() {
+        // todo implement
+        return false;
+    }
+
+>>>>>>> 11c1f32d456abbd929f07b3d92d209d6333585be
     @Override
     public void ZeroSensors() {}
 
