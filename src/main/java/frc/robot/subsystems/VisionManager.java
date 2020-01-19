@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 /*
    Manages all vision tracking cameras
    UDP Packets will be streamed back from tracking camera(s) for speed
@@ -8,52 +7,52 @@ package frc.robot.subsystems;
 
 */
 public class VisionManager extends Subsystem {
-    private static VisionManager mInstance;
+  private static VisionManager mInstance;
 
-    public static synchronized VisionManager getInstance() {
-        if (mInstance == null) {
-            mInstance = new VisionManager();
-        }
-        return mInstance;
+  public static synchronized VisionManager getInstance() {
+    if (mInstance == null) {
+      mInstance = new VisionManager();
     }
+    return mInstance;
+  }
 
-    // Add Multiple Cameras
-    enum ActiveCamera {
-        Main
+  // Add Multiple Cameras
+  enum ActiveCamera {
+    Main
+  }
+
+  // Default to the Main Cammera
+  private ActiveCamera mActiveCameraValue = ActiveCamera.Main;
+  private RPICamera mActiveCamera;
+
+  private RPICamera mShooterCamera;
+  private RPICamera mIntakeCamera;
+
+  private VisionManager() {
+    // Start a Socket to listen to UDP Packet
+    // Each thread pass to a processer which
+
+  }
+
+  /*
+      Process every single packet
+  */
+  private void ProcessPacket() {
+    try {
+
+    } catch (Exception e) {
+
     }
+  }
 
-    // Default to the Main Cammera
-    private ActiveCamera mActiveCameraValue = ActiveCamera.Main;
-    private RPICamera mActiveCamera;
+  public void ZeroSensors() {}
 
-    private RPICamera mShooterCamera;
-    private RPICamera mIntakeCamera;
+  public void UpdateActiveCamera(int value) {
+    // mActiveCamera = mCameras.get(value);
+  }
 
-    private VisionManager() {
-        // Start a Socket to listen to UDP Packet
-        // Each thread pass to a processer which
-
-    }
-
-    /*
-        Process every single packet
-    */
-    private void ProcessPacket() {
-        try {
-
-        } catch (Exception e) {
-
-        }
-    }
-
-    public void ZeroSensors() {}
-
-    public void UpdateActiveCamera(int value) {
-        // mActiveCamera = mCameras.get(value);
-    }
-
-    /*
-        Test all Sensors in the Subsystem
-    */
-    public void CheckSubsystems() {}
+  /*
+      Test all Sensors in the Subsystem
+  */
+  public void CheckSubsystems() {}
 }

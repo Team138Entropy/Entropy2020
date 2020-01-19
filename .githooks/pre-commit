@@ -1,0 +1,18 @@
+#!/bin/sh
+
+PYTHON='python3'
+PIP='pip3'
+
+$PIP install -r .githooks/requirements.txt
+
+if ! $PYTHON .githooks/install_formatter.py; then
+  >&2 echo "Error installing formatter"
+  exit 1
+fi
+
+if ! $PYTHON .githooks/run_formatter.py; then
+  >&2 echo "Error running formatter"
+  exit 1
+else
+  echo "Code formatted"
+fi

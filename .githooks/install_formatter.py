@@ -20,8 +20,6 @@ if not os.path.exists(f"{dl_path}/{file_name}"):
         res = requests.get(url, stream=True)
         length = res.headers.get("content-length")
 
-        print(res)
-
         if length is None:
             f.write(res.content)
         else:
@@ -29,7 +27,8 @@ if not os.path.exists(f"{dl_path}/{file_name}"):
             for data in res.iter_content(chunk_size=4096):
                 dl += len(data)
                 f.write(data)
-                exit(0) # Success!
+            print("Formatter successfully installed")
+            exit(0)
 elif not os.path.isfile(f"{dl_path}/{file_name}"):
     sys.stderr.write(f"Error: {file_name} already exists but is not a regular file.")
     sys.stderr.flush()
