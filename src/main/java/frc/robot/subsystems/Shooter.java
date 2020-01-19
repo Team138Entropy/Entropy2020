@@ -104,8 +104,8 @@ public class Shooter extends Subsystem {
     }
 
     /**
-     * Call this in the robot loop.
-     * TODO: Consider replacing this home-grown timing system with WPILib's scheduler.
+     * Call this in the robot loop. TODO: Consider replacing this home-grown timing system with
+     * WPILib's scheduler.
      */
     public void periodic() {
 
