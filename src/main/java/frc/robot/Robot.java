@@ -7,13 +7,13 @@
 
 package frc.robot;
 
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
+import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 
 /**
@@ -60,6 +60,9 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Robot State Reset");
     mRobotState.reset();
     
+
+    EventWatcherThread.getInstance().start();
+
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
