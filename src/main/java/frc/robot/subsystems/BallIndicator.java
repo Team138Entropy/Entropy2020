@@ -71,6 +71,7 @@ public class BallIndicator {
                     break;
             }
         }
+
         private void toggle() {
             if (isOn == true) {
                 isOn = false;
@@ -79,7 +80,7 @@ public class BallIndicator {
             }
         }
     }
-    
+
     // Number of LEDs on strip
     private int length;
 
@@ -93,13 +94,12 @@ public class BallIndicator {
         ledStrip = new LED[this.length];
         addressableLED = new AddressableLED(port);
         ledBuffer = new AddressableLEDBuffer(this.length);
-        
+
         addressableLED.setLength(this.length);
         addressableLED.setData(ledBuffer);
         for (int n = 0; n < this.length; n++) {
             ledStrip[n] = new LED(n, State.EMPTY, false);
         }
-        
     }
 
     public static BallIndicator getInstance() {
@@ -127,7 +127,8 @@ public class BallIndicator {
     public void checkTimer() {
         if (stripTimer.get() >= 250) {
             for (int n = 0; n < length; n++) {
-                if (ledStrip[n].ledState == State.LOADING || ledStrip[n].ledState == State.ACQUIRED) {
+                if (ledStrip[n].ledState == State.LOADING
+                        || ledStrip[n].ledState == State.ACQUIRED) {
                     ledStrip[n].toggle();
                 }
             }
