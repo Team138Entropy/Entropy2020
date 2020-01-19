@@ -4,7 +4,8 @@ import static frc.robot.util.Util.epsilonEquals;
 import static frc.robot.util.motion.MotionUtil.kEpsilon;
 
 /**
- * A MotionSegment is a movement from a start MotionState to an end MotionState with a constant acceleration.
+ * A MotionSegment is a movement from a start MotionState to an end MotionState with a constant
+ * acceleration.
  */
 public class MotionSegment {
     protected MotionState mStart;
@@ -17,24 +18,32 @@ public class MotionSegment {
 
     /**
      * Verifies that:
-     * <p>
-     * 1. All segments have a constant acceleration.
-     * <p>
-     * 2. All segments have monotonic position (sign of velocity doesn't change).
-     * <p>
-     * 3. The time, position, velocity, and acceleration of the profile are consistent.
+     *
+     * <p>1. All segments have a constant acceleration.
+     *
+     * <p>2. All segments have monotonic position (sign of velocity doesn't change).
+     *
+     * <p>3. The time, position, velocity, and acceleration of the profile are consistent.
      */
     public boolean isValid() {
         if (!epsilonEquals(start().acc(), end().acc(), kEpsilon)) {
             // Acceleration is not constant within the segment.
             System.err.println(
-                    "Segment acceleration not constant! Start acc: " + start().acc() + ", End acc: " + end().acc());
+                    "Segment acceleration not constant! Start acc: "
+                            + start().acc()
+                            + ", End acc: "
+                            + end().acc());
             return false;
         }
-        if (Math.signum(start().vel()) * Math.signum(end().vel()) < 0.0 && !epsilonEquals(start().vel(), 0.0, kEpsilon)
+        if (Math.signum(start().vel()) * Math.signum(end().vel()) < 0.0
+                && !epsilonEquals(start().vel(), 0.0, kEpsilon)
                 && !epsilonEquals(end().vel(), 0.0, kEpsilon)) {
             // Velocity direction reverses within the segment.
-            System.err.println("Segment velocity reverses! Start vel: " + start().vel() + ", End vel: " + end().vel());
+            System.err.println(
+                    "Segment velocity reverses! Start vel: "
+                            + start().vel()
+                            + ", End vel: "
+                            + end().vel());
             return false;
         }
         if (!start().extrapolate(end().t()).equals(end())) {
@@ -54,7 +63,8 @@ public class MotionSegment {
     }
 
     public boolean containsPos(double pos) {
-        return pos >= start().pos() && pos <= end().pos() || pos <= start().pos() && pos >= end().pos();
+        return pos >= start().pos() && pos <= end().pos()
+                || pos <= start().pos() && pos >= end().pos();
     }
 
     public MotionState start() {

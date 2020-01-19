@@ -1,6 +1,5 @@
 package frc.robot.util.paths;
 
-
 import frc.robot.util.geometry.Pose2d;
 import frc.robot.util.geometry.Twist2d;
 import frc.robot.util.motion.MotionProfileConstraints;
@@ -10,9 +9,10 @@ import frc.robot.util.motion.MotionState;
 import frc.robot.util.motion.ProfileFollower;
 
 /**
- * A PathFollower follows a predefined path using a combination of feedforward and feedback control. It uses an
- * AdaptivePurePursuitController to choose a reference pose and generate a steering command (curvature), and then a
- * ProfileFollower to generate a profile (displacement and velocity) command.
+ * A PathFollower follows a predefined path using a combination of feedforward and feedback control.
+ * It uses an AdaptivePurePursuitController to choose a reference pose and generate a steering
+ * command (curvature), and then a ProfileFollower to generate a profile (displacement and velocity)
+ * command.
  */
 public class PathFollower {
     private static final double kReallyBigNumber = 1E6;
@@ -54,10 +54,20 @@ public class PathFollower {
         public final double goal_vel_tolerance;
         public final double stop_steering_distance;
 
-        public Parameters(Lookahead lookahead, double inertia_gain, double profile_kp, double profile_ki,
-                          double profile_kv, double profile_kffv, double profile_kffa, double profile_ks, double profile_max_abs_vel,
-                          double profile_max_abs_acc, double goal_pos_tolerance, double goal_vel_tolerance,
-                          double stop_steering_distance) {
+        public Parameters(
+                Lookahead lookahead,
+                double inertia_gain,
+                double profile_kp,
+                double profile_ki,
+                double profile_kv,
+                double profile_kffv,
+                double profile_kffa,
+                double profile_ks,
+                double profile_max_abs_vel,
+                double profile_max_abs_acc,
+                double goal_pos_tolerance,
+                double goal_vel_tolerance,
+                double stop_steering_distance) {
             this.lookahead = lookahead;
             this.inertia_gain = inertia_gain;
             this.profile_kp = profile_kp;
@@ -90,16 +100,22 @@ public class PathFollower {
     double mCrossTrackError = 0.0;
     double mAlongTrackError = 0.0;
 
-    /**
-     * Create a new PathFollower for a given path.
-     */
+    /** Create a new PathFollower for a given path. */
     public PathFollower(Path path, boolean reversed, Parameters parameters) {
-        mSteeringController = new AdaptivePurePursuitController(path, reversed, parameters.lookahead);
+        mSteeringController =
+                new AdaptivePurePursuitController(path, reversed, parameters.lookahead);
         mLastSteeringDelta = Twist2d.identity();
-        mVelocityController = new ProfileFollower(parameters.profile_kp, parameters.profile_ki, parameters.profile_kv,
-                parameters.profile_kffv, parameters.profile_kffa, parameters.profile_ks);
+        mVelocityController =
+                new ProfileFollower(
+                        parameters.profile_kp,
+                        parameters.profile_ki,
+                        parameters.profile_kv,
+                        parameters.profile_kffv,
+                        parameters.profile_kffa,
+                        parameters.profile_ks);
         mVelocityController.setConstraints(
-                new MotionProfileConstraints(parameters.profile_max_abs_vel, parameters.profile_max_abs_acc));
+                new MotionProfileConstraints(
+                        parameters.profile_max_abs_vel, parameters.profile_max_abs_acc));
         mMaxProfileVel = parameters.profile_max_abs_vel;
         mMaxProfileAcc = parameters.profile_max_abs_acc;
         mGoalPosTolerance = parameters.goal_pos_tolerance;
@@ -111,15 +127,17 @@ public class PathFollower {
     /**
      * Get new velocity commands to follow the path.
      *
-     * @param t            The current timestamp
-     * @param pose         The current robot pose
+     * @param t The current timestamp
+     * @param pose The current robot pose
      * @param displacement The current robot displacement (total distance driven).
-     * @param velocity     The current robot velocity.
+     * @param velocity The current robot velocity.
      * @return The velocity command to apply
      */
-    public synchronized Twist2d update(double t, Pose2d pose, double displacement, double velocity) {
+    public synchronized Twist2d update(
+            double t, Pose2d pose, double displacement, double velocity) {
         if (!mSteeringController.isFinished()) {
-            final AdaptivePurePursuitController.Command steering_command = mSteeringController.update(pose);
+            final AdaptivePurePursuitController.Command steering_command =
+                    mSteeringController.update(pose);
             mDebugOutput.lookahead_point_x = steering_command.lookahead_point.x();
             mDebugOutput.lookahead_point_y = steering_command.lookahead_point.y();
             mDebugOutput.lookahead_point_velocity = steering_command.end_velocity;
@@ -129,10 +147,14 @@ public class PathFollower {
             mCrossTrackError = steering_command.cross_track_error;
             mLastSteeringDelta = steering_command.delta;
             mVelocityController.setGoalAndConstraints(
-                    new MotionProfileGoal(displacement + steering_command.delta.dx,
-                            Math.abs(steering_command.end_velocity), CompletionBehavior.VIOLATE_MAX_ACCEL,
-                            mGoalPosTolerance, mGoalVelTolerance),
-                    new MotionProfileConstraints(Math.min(mMaxProfileVel, steering_command.max_velocity),
+                    new MotionProfileGoal(
+                            displacement + steering_command.delta.dx,
+                            Math.abs(steering_command.end_velocity),
+                            CompletionBehavior.VIOLATE_MAX_ACCEL,
+                            mGoalPosTolerance,
+                            mGoalVelTolerance),
+                    new MotionProfileConstraints(
+                            Math.min(mMaxProfileVel, steering_command.max_velocity),
                             mMaxProfileAcc));
 
             if (steering_command.remaining_path_length < mStopSteeringDistance) {
@@ -140,14 +162,18 @@ public class PathFollower {
             }
         }
 
-        final double velocity_command = mVelocityController.update(new MotionState(t, displacement, velocity, 0.0), t);
+        final double velocity_command =
+                mVelocityController.update(new MotionState(t, displacement, velocity, 0.0), t);
         mAlongTrackError = mVelocityController.getPosError();
         final double curvature = mLastSteeringDelta.dtheta / mLastSteeringDelta.dx;
         double dtheta = mLastSteeringDelta.dtheta;
         if (!Double.isNaN(curvature) && Math.abs(curvature) < kReallyBigNumber) {
             // Regenerate angular velocity command from adjusted curvature.
             final double abs_velocity_setpoint = Math.abs(mVelocityController.getSetpoint().vel());
-            dtheta = mLastSteeringDelta.dx * curvature * (1.0 + mInertiaGain * abs_velocity_setpoint);
+            dtheta =
+                    mLastSteeringDelta.dx
+                            * curvature
+                            * (1.0 + mInertiaGain * abs_velocity_setpoint);
         }
         final double scale = velocity_command / mLastSteeringDelta.dx;
         final Twist2d rv = new Twist2d(mLastSteeringDelta.dx * scale, 0.0, dtheta * scale);
@@ -183,8 +209,10 @@ public class PathFollower {
     }
 
     public boolean isFinished() {
-        return (mSteeringController.isFinished() && mVelocityController.isFinishedProfile()
-                && mVelocityController.onTarget()) || overrideFinished;
+        return (mSteeringController.isFinished()
+                        && mVelocityController.isFinishedProfile()
+                        && mVelocityController.onTarget())
+                || overrideFinished;
     }
 
     public void forceFinish() {

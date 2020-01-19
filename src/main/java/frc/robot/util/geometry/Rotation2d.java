@@ -1,16 +1,14 @@
 package frc.robot.util.geometry;
 
-import frc.robot.util.Util;
-
-import java.text.DecimalFormat;
-
 import static frc.robot.util.Util.kEpsilon;
 
+import frc.robot.util.Util;
+import java.text.DecimalFormat;
+
 /**
- * A rotation in a 2d coordinate frame represented a point on the unit circle
- * (cosine and sine).
- * <p>
- * Inspired by Sophus (https://github.com/strasdat/Sophus/tree/master/sophus)
+ * A rotation in a 2d coordinate frame represented a point on the unit circle (cosine and sine).
+ *
+ * <p>Inspired by Sophus (https://github.com/strasdat/Sophus/tree/master/sophus)
  */
 public class Rotation2d implements IRotation2d<Rotation2d> {
     protected static final Rotation2d kIdentity = new Rotation2d();
@@ -109,17 +107,17 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
     }
 
     /**
-     * We can rotate this Rotation2d by adding together the effects of it and
-     * another rotation.
+     * We can rotate this Rotation2d by adding together the effects of it and another rotation.
      *
-     * @param other The other rotation. See:
-     *              https://en.wikipedia.org/wiki/Rotation_matrix
+     * @param other The other rotation. See: https://en.wikipedia.org/wiki/Rotation_matrix
      * @return This rotation rotated by other.
      */
     public Rotation2d rotateBy(final Rotation2d other) {
         if (hasTrig() && other.hasTrig()) {
-            return new Rotation2d(cos_angle_ * other.cos_angle_ - sin_angle_ * other.sin_angle_,
-                    cos_angle_ * other.sin_angle_ + sin_angle_ * other.cos_angle_, true);
+            return new Rotation2d(
+                    cos_angle_ * other.cos_angle_ - sin_angle_ * other.sin_angle_,
+                    cos_angle_ * other.sin_angle_ + sin_angle_ * other.cos_angle_,
+                    true);
         } else {
             return fromRadians(getRadians() + other.getRadians());
         }
@@ -151,7 +149,8 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
             return Util.epsilonEquals(radians_, other.radians_)
                     || Util.epsilonEquals(radians_, WrapRadians(other.radians_ + Math.PI));
         } else if (hasTrig() && other.hasTrig()) {
-            return Util.epsilonEquals(sin_angle_, other.sin_angle_) && Util.epsilonEquals(cos_angle_, other.cos_angle_);
+            return Util.epsilonEquals(sin_angle_, other.sin_angle_)
+                    && Util.epsilonEquals(cos_angle_, other.cos_angle_);
         } else {
             // Use public, checked version.
             return Util.epsilonEquals(getRadians(), other.getRadians())
@@ -168,8 +167,7 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
         final double k2Pi = 2.0 * Math.PI;
         radians = radians % k2Pi;
         radians = (radians + k2Pi) % k2Pi;
-        if (radians > Math.PI)
-            radians -= k2Pi;
+        if (radians > Math.PI) radians -= k2Pi;
         return radians;
     }
 

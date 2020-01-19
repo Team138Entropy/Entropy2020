@@ -1,19 +1,17 @@
 package frc.robot.util.paths;
 
-import frc.robot.util.paths.Path;
-import frc.robot.util.paths.PathSegment;
 import frc.robot.util.geometry.Pose2d;
 import frc.robot.util.geometry.Rotation2d;
 import frc.robot.util.geometry.Translation2d;
-
 import java.util.List;
 
 /**
- * Class used to convert a list of Waypoints into a Path object consisting of arc and line PathSegments
+ * Class used to convert a list of Waypoints into a Path object consisting of arc and line
+ * PathSegments
  *
  * @see Waypoint
- * @see Path
- * @see PathSegment
+ * @see frc.robot.util.paths.Path
+ * @see frc.robot.util.paths.PathSegment
  */
 public class PathBuilder {
     private static final double kEpsilon = 1E-9;
@@ -21,8 +19,7 @@ public class PathBuilder {
 
     public static Path buildPathFromWaypoints(List<Waypoint> w) {
         Path p = new Path();
-        if (w.size() < 2)
-            throw new Error("Path must contain at least 2 waypoints");
+        if (w.size() < 2) throw new Error("Path must contain at least 2 waypoints");
         int i = 0;
         if (w.size() > 2) {
             do {
@@ -38,15 +35,14 @@ public class PathBuilder {
     }
 
     private static Waypoint getPoint(List<Waypoint> w, int i) {
-        if (i > w.size())
-            return w.get(w.size() - 1);
+        if (i > w.size()) return w.get(w.size() - 1);
         return w.get(i);
     }
 
     /**
-     * A waypoint along a path. Contains a position, radius (for creating curved paths), and speed. The information from
-     * these waypoints is used by the PathBuilder class to generate Paths. Waypoints also contain an optional marker
-     * that is used by the WaitForPathMarkerAction.
+     * A waypoint along a path. Contains a position, radius (for creating curved paths), and speed.
+     * The information from these waypoints is used by the PathBuilder class to generate Paths.
+     * Waypoints also contain an optional marker that is used by the WaitForPathMarkerAction.
      *
      * @see PathBuilder
      * @see WaitForPathMarkerAction
@@ -82,7 +78,8 @@ public class PathBuilder {
     }
 
     /**
-     * A Line object is formed by two Waypoints. Contains a start and end position, slope, and speed.
+     * A Line object is formed by two Waypoints. Contains a start and end position, slope, and
+     * speed.
      */
     static class Line {
         Waypoint a;
@@ -105,19 +102,34 @@ public class PathBuilder {
             double pathLength = new Translation2d(end, start).norm();
             if (pathLength > kEpsilon) {
                 if (b.marker != null) {
-                    p.addSegment(new PathSegment(start.x(), start.y(), end.x(), end.y(), b.speed,
-                            p.getLastMotionState(), endSpeed, b.marker));
+                    p.addSegment(
+                            new PathSegment(
+                                    start.x(),
+                                    start.y(),
+                                    end.x(),
+                                    end.y(),
+                                    b.speed,
+                                    p.getLastMotionState(),
+                                    endSpeed,
+                                    b.marker));
                 } else {
-                    p.addSegment(new PathSegment(start.x(), start.y(), end.x(), end.y(), b.speed,
-                            p.getLastMotionState(), endSpeed));
+                    p.addSegment(
+                            new PathSegment(
+                                    start.x(),
+                                    start.y(),
+                                    end.x(),
+                                    end.y(),
+                                    b.speed,
+                                    p.getLastMotionState(),
+                                    endSpeed));
                 }
             }
-
         }
     }
 
     /**
-     * An Arc object is formed by two Lines that share a common Waypoint. Contains a center position, radius, and speed.
+     * An Arc object is formed by two Lines that share a common Waypoint. Contains a center
+     * position, radius, and speed.
      */
     static class Arc {
         Line a;
@@ -141,8 +153,17 @@ public class PathBuilder {
         private void addToPath(Path p) {
             a.addToPath(p, speed);
             if (radius > kEpsilon && radius < kReallyBigNumber) {
-                p.addSegment(new PathSegment(a.end.x(), a.end.y(), b.start.x(), b.start.y(), center.x(), center.y(),
-                        speed, p.getLastMotionState(), b.speed));
+                p.addSegment(
+                        new PathSegment(
+                                a.end.x(),
+                                a.end.y(),
+                                b.start.x(),
+                                b.start.y(),
+                                center.x(),
+                                center.y(),
+                                speed,
+                                p.getLastMotionState(),
+                                b.speed));
             }
         }
 
