@@ -15,15 +15,9 @@ class PIDRoller extends Subsystem {
         pidController = new PIDController(p, i, d);
     }
 
-
+    @Override
+    public void ZeroSensors() {}
 
     @Override
-    public void ZeroSensors() {
-
-    }
-
-    @Override
-    public void CheckSubsystems() {
-
-    }
+    public void CheckSubsystems() {}
 }
