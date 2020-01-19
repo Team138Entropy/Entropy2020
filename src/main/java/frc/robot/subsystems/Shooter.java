@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Timer;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.Timer;
 
-/**
- * Singleton that represents the shooter mechanism.
- */
+/** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
 
     // TODO: Integrate with other subsystems for real
@@ -28,8 +25,13 @@ public class Shooter extends Subsystem {
             m_elevation = elevation;
         }
 
-        public double getAzimuth() { return m_azimuth; }
-        public double getElevation() { return m_elevation; }
+        public double getAzimuth() {
+            return m_azimuth;
+        }
+
+        public double getElevation() {
+            return m_elevation;
+        }
     }
 
     @FunctionalInterface
@@ -56,7 +58,6 @@ public class Shooter extends Subsystem {
     private Vision m_vision;
     private Intake m_intake;
 
-
     // State variables
     public enum State {
         IDLE,
@@ -71,8 +72,7 @@ public class Shooter extends Subsystem {
     private Timer m_fireTimer;
 
     public static synchronized Shooter getInstance() {
-        if (instance == null)
-            instance = new Shooter();
+        if (instance == null) instance = new Shooter();
         return instance;
     }
 
@@ -84,17 +84,19 @@ public class Shooter extends Subsystem {
         m_roller = new WPI_TalonSRX(ROLLER_PORT);
 
         // TODO: Replace these with real subsystems
-        m_turret = position -> System.out.println(
-            "Setting dummy turret position to ("
-            + position.getAzimuth()
-            + ", "
-            + position.getElevation()
-            + ")"
-        );
-        m_vision = () -> {
-            System.out.println("Getting dummy vision target");
-            return new TurretPosition(0, 0);
-        };
+        m_turret =
+                position ->
+                        System.out.println(
+                                "Setting dummy turret position to ("
+                                        + position.getAzimuth()
+                                        + ", "
+                                        + position.getElevation()
+                                        + ")");
+        m_vision =
+                () -> {
+                    System.out.println("Getting dummy vision target");
+                    return new TurretPosition(0, 0);
+                };
         m_intake = () -> System.out.println("Shoving a ball into the thing");
 
         m_spinUpTimer = new Timer();
@@ -102,8 +104,8 @@ public class Shooter extends Subsystem {
     }
 
     /**
-     * Call this in the robot loop.
-     * TODO: Consider replacing this home-grown timing system with WPILib's scheduler.
+     * Call this in the robot loop. TODO: Consider replacing this home-grown timing system with
+     * WPILib's scheduler.
      */
     public void periodic() {
 
@@ -123,7 +125,7 @@ public class Shooter extends Subsystem {
 
         // Handle buffered fire operations
         if (m_buffer > 0) {
-            
+
             // If we haven't started spinning up yet
             if (state != State.SPINNING_UP) {
                 start();
@@ -147,16 +149,14 @@ public class Shooter extends Subsystem {
         }
     }
 
-    /**
-     * Buffers another fire operation.
-     */
+    /** Buffers another fire operation. */
     public void fireSingle() {
         m_buffer++;
     }
 
     /**
-     * Equivalent to calling {@link #resetBuffer()} and then calling {@link #fireSingle()} a number of times equal to
-     * the number of balls in the storage mechanism.
+     * Equivalent to calling {@link #resetBuffer()} and then calling {@link #fireSingle()} a number
+     * of times equal to the number of balls in the storage mechanism.
      */
     public void fireAuto() {
         resetBuffer();
@@ -166,37 +166,29 @@ public class Shooter extends Subsystem {
     }
 
     /**
-     * Resets the firing buffer. Has the effect of cancelling any buffered fire operations, including automatic
-     * fire.
+     * Resets the firing buffer. Has the effect of cancelling any buffered fire operations,
+     * including automatic fire.
      */
     public void resetBuffer() {
         m_buffer = 0;
     }
 
-    /**
-     * The same as {@link #resetBuffer()}. Exists to make calling code more declarative.
-     */
+    /** The same as {@link #resetBuffer()}. Exists to make calling code more declarative. */
     public void stopFiring() {
         resetBuffer();
     }
 
-    /**
-     * Tells the turret to move to where the vision system says we should be.
-     */
+    /** Tells the turret to move to where the vision system says we should be. */
     public void target() {
         m_turret.set(m_vision.calcTargetPosition());
     }
 
-    /**
-     * Starts the roller.
-     */
+    /** Starts the roller. */
     private void start() {
         m_roller.set(ControlMode.PercentOutput, ROLLER_SPEED);
     }
 
-    /**
-     * Stops the roller.
-     */
+    /** Stops the roller. */
     private void stop() {
         m_roller.set(ControlMode.PercentOutput, 0);
     }

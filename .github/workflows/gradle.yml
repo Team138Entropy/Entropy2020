@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
@@ -24,3 +24,5 @@ jobs:
       run: ./gradlew build --info
     - name: Lint with Google Java
       uses: axel-op/googlejavaformat-action@v2.0.0
+      with:
+        args: --replace -a 
