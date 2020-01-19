@@ -1,34 +1,30 @@
 package frc.robot.OI;
+
 import frc.robot.Constants;
-import frc.robot.OI.XboxController.Axis;
-import frc.robot.OI.XboxController.Button;
 
-//Main Control Class
-//Contains instances of the Driver and Operator Controller
+// Main Control Class
+// Contains instances of the Driver and Operator Controller
 
-public class OperatorInterface  {
+public class OperatorInterface {
     private static OperatorInterface mInstance;
 
-
-    //Instances of the Driver and Operator Controller
+    // Instances of the Driver and Operator Controller
     private final XboxController DriverController;
     private final XboxController OperatorController;
 
-    
-
-    public synchronized  static OperatorInterface getInstance(){
-        if(mInstance == null){
+    public static synchronized OperatorInterface getInstance() {
+        if (mInstance == null) {
             mInstance = new OperatorInterface();
         }
         return mInstance;
     }
 
-    private OperatorInterface(){
+    private OperatorInterface() {
         DriverController = new XboxController(Constants.DriverControllerPort);
         OperatorController = new XboxController(Constants.OperatorControllerPort);
     }
 
-    //Driver
+    // Driver
 
     public double getDriveThrottle() {
         return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
@@ -46,34 +42,34 @@ public class OperatorInterface  {
         return DriverController.getButton(XboxController.Button.RB);
     }
 
-    //Returns if we are in low gear, sets to low gear as well
-    public boolean CheckLowGear(boolean previous){
+    // Returns if we are in low gear, sets to low gear as well
+    public boolean CheckLowGear(boolean previous) {
         boolean LowGear = previous;
-        //Check if Low Gear is Toggled
-        if(DriverController.getButton(XboxController.Button.START)){
-            if(LowGear == false){
-            System.out.println("Y PRESSED ON");
+        // Check if Low Gear is Toggled
+        if (DriverController.getButton(XboxController.Button.START)) {
+            if (LowGear == false) {
+                System.out.println("Y PRESSED ON");
 
-            }else{
+            } else {
                 System.out.println("Y PRESSED OFF");
             }
             LowGear = !LowGear;
         }
 
-        //if lowgear value has checked
+        // if lowgear value has checked
         DriverController.setRumble(LowGear);
         return LowGear;
     }
-    
-    public boolean getTurretAdjustLeft(){
+
+    public boolean getTurretAdjustLeft() {
         return OperatorController.getButton(XboxController.Button.A);
     }
 
-    public boolean getTurretAdjustRight(){
+    public boolean getTurretAdjustRight() {
         return OperatorController.getButton(XboxController.Button.B);
     }
-    
-    //Operator
+
+    // Operator
 
     public double getOperatorThrottle() {
         return OperatorController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
@@ -99,13 +95,11 @@ public class OperatorInterface  {
         return OperatorController.getButton(XboxController.Button.A);
     }
 
-    public void setOperatorRumble(boolean toggle){
+    public void setOperatorRumble(boolean toggle) {
         OperatorController.setRumble(toggle);
     }
 
-    public void setDriverRumble(boolean toggle){
+    public void setDriverRumble(boolean toggle) {
         DriverController.setRumble(toggle);
     }
-
-
 }

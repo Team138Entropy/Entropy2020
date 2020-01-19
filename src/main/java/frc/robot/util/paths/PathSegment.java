@@ -1,15 +1,12 @@
 package frc.robot.util.paths;
 
-import frc.robot.util.geometry.Translation2d;
+import frc.robot.Constants;
 import frc.robot.util.geometry.Rotation2d;
+import frc.robot.util.geometry.Translation2d;
 import frc.robot.util.motion.*;
 import java.util.Optional;
-import frc.robot.Constants;
 
-/**
- * Class representing a segment of the robot's autonomous path.
- */
-
+/** Class representing a segment of the robot's autonomous path. */
 public class PathSegment {
     private Translation2d start;
     private Translation2d end;
@@ -25,14 +22,20 @@ public class PathSegment {
     /**
      * Constructor for a linear segment
      *
-     * @param x1       start x
-     * @param y1       start y
-     * @param x2       end x
-     * @param y2       end y
+     * @param x1 start x
+     * @param y1 start y
+     * @param x2 end x
+     * @param y2 end y
      * @param maxSpeed maximum speed allowed on the segment
      */
-    public PathSegment(double x1, double y1, double x2, double y2, double maxSpeed, MotionState startState,
-                       double endSpeed) {
+    public PathSegment(
+            double x1,
+            double y1,
+            double x2,
+            double y2,
+            double maxSpeed,
+            MotionState startState,
+            double endSpeed) {
         this.start = new Translation2d(x1, y1);
         this.end = new Translation2d(x2, y2);
 
@@ -44,8 +47,15 @@ public class PathSegment {
         createMotionProfiler(startState, endSpeed);
     }
 
-    public PathSegment(double x1, double y1, double x2, double y2, double maxSpeed, MotionState startState,
-                       double endSpeed, String marker) {
+    public PathSegment(
+            double x1,
+            double y1,
+            double x2,
+            double y2,
+            double maxSpeed,
+            MotionState startState,
+            double endSpeed,
+            String marker) {
         this.start = new Translation2d(x1, y1);
         this.end = new Translation2d(x2, y2);
 
@@ -61,16 +71,24 @@ public class PathSegment {
     /**
      * Constructor for an arc segment
      *
-     * @param x1       start x
-     * @param y1       start y
-     * @param x2       end x
-     * @param y2       end y
-     * @param cx       center x
-     * @param cy       center y
+     * @param x1 start x
+     * @param y1 start y
+     * @param x2 end x
+     * @param y2 end y
+     * @param cx center x
+     * @param cy center y
      * @param maxSpeed maximum speed allowed on the segment
      */
-    public PathSegment(double x1, double y1, double x2, double y2, double cx, double cy, double maxSpeed,
-                       MotionState startState, double endSpeed) {
+    public PathSegment(
+            double x1,
+            double y1,
+            double x2,
+            double y2,
+            double cx,
+            double cy,
+            double maxSpeed,
+            MotionState startState,
+            double endSpeed) {
         this.start = new Translation2d(x1, y1);
         this.end = new Translation2d(x2, y2);
         this.center = new Translation2d(cx, cy);
@@ -84,8 +102,17 @@ public class PathSegment {
         createMotionProfiler(startState, endSpeed);
     }
 
-    public PathSegment(double x1, double y1, double x2, double y2, double cx, double cy, double maxSpeed,
-                       MotionState startState, double endSpeed, String marker) {
+    public PathSegment(
+            double x1,
+            double y1,
+            double x2,
+            double y2,
+            double cx,
+            double cy,
+            double maxSpeed,
+            MotionState startState,
+            double endSpeed,
+            String marker) {
         this.start = new Translation2d(x1, y1);
         this.end = new Translation2d(x2, y2);
         this.center = new Translation2d(cx, cy);
@@ -100,38 +127,31 @@ public class PathSegment {
         createMotionProfiler(startState, endSpeed);
     }
 
-    /**
-     * @return max speed of the segment
-     */
+    /** @return max speed of the segment */
     public double getMaxSpeed() {
         return maxSpeed;
     }
 
     public void createMotionProfiler(MotionState start_state, double end_speed) {
-        MotionProfileConstraints motionConstraints = new MotionProfileConstraints(maxSpeed,
-                Constants.kPathFollowingMaxAccel);
+        MotionProfileConstraints motionConstraints =
+                new MotionProfileConstraints(maxSpeed, Constants.kPathFollowingMaxAccel);
         MotionProfileGoal goal_state = new MotionProfileGoal(getLength(), end_speed);
-        speedController = MotionProfileGenerator.generateProfile(motionConstraints, goal_state, start_state);
+        speedController =
+                MotionProfileGenerator.generateProfile(motionConstraints, goal_state, start_state);
         // System.out.println(speedController);
     }
 
-    /**
-     * @return starting point of the segment
-     */
+    /** @return starting point of the segment */
     public Translation2d getStart() {
         return start;
     }
 
-    /**
-     * @return end point of the segment
-     */
+    /** @return end point of the segment */
     public Translation2d getEnd() {
         return end;
     }
 
-    /**
-     * @return the total length of the segment
-     */
+    /** @return the total length of the segment */
     public double getLength() {
         if (isLine) {
             return deltaStart.norm();
@@ -141,7 +161,8 @@ public class PathSegment {
     }
 
     /**
-     * Set whether or not to extrapolate the lookahead point. Should only be true for the last segment in the path
+     * Set whether or not to extrapolate the lookahead point. Should only be true for the last
+     * segment in the path
      *
      * @param val
      */
@@ -158,15 +179,19 @@ public class PathSegment {
     public Translation2d getClosestPoint(Translation2d position) {
         if (isLine) {
             Translation2d delta = new Translation2d(start, end);
-            double u = ((position.x() - start.x()) * delta.x() + (position.y() - start.y()) * delta.y())
-                    / (delta.x() * delta.x() + delta.y() * delta.y());
+            double u =
+                    ((position.x() - start.x()) * delta.x()
+                                    + (position.y() - start.y()) * delta.y())
+                            / (delta.x() * delta.x() + delta.y() * delta.y());
             if (u >= 0 && u <= 1)
                 return new Translation2d(start.x() + u * delta.x(), start.y() + u * delta.y());
             return (u < 0) ? start : end;
         } else {
             Translation2d deltaPosition = new Translation2d(center, position);
             deltaPosition = deltaPosition.scale(deltaStart.norm() / deltaPosition.norm());
-            if (Translation2d.cross(deltaPosition, deltaStart) * Translation2d.cross(deltaPosition, deltaEnd) < 0) {
+            if (Translation2d.cross(deltaPosition, deltaStart)
+                            * Translation2d.cross(deltaPosition, deltaEnd)
+                    < 0) {
                 return center.translateBy(deltaPosition);
             } else {
                 Translation2d startDist = new Translation2d(position, start);
@@ -177,7 +202,8 @@ public class PathSegment {
     }
 
     /**
-     * Calculates the point on the segment <code>dist</code> distance from the starting point along the segment.
+     * Calculates the point on the segment <code>dist</code> distance from the starting point along
+     * the segment.
      *
      * @param dist distance from the starting point
      * @return point on the segment <code>dist</code> distance from the starting point
@@ -190,8 +216,9 @@ public class PathSegment {
         if (isLine) {
             return start.translateBy(deltaStart.scale(dist / length));
         } else {
-            double deltaAngle = Translation2d.getAngle(deltaStart, deltaEnd).getRadians()
-                    * ((Translation2d.cross(deltaStart, deltaEnd) >= 0) ? 1 : -1);
+            double deltaAngle =
+                    Translation2d.getAngle(deltaStart, deltaEnd).getRadians()
+                            * ((Translation2d.cross(deltaStart, deltaEnd) >= 0) ? 1 : -1);
             deltaAngle *= dist / length;
             Translation2d t = deltaStart.rotateBy(Rotation2d.fromRadians(deltaAngle));
             return center.translateBy(t);
@@ -219,7 +246,6 @@ public class PathSegment {
         Translation2d pathPosition = getClosestPoint(robotPosition);
         double remainingDist = getRemainingDistance(pathPosition);
         return getLength() - remainingDist;
-
     }
 
     public double getSpeedByDistance(double dist) {
@@ -255,11 +281,25 @@ public class PathSegment {
 
     public String toString() {
         if (isLine) {
-            return "(" + "start: " + start + ", end: " + end + ", speed: " + maxSpeed // + ", profile: " +
+            return "("
+                    + "start: "
+                    + start
+                    + ", end: "
+                    + end
+                    + ", speed: "
+                    + maxSpeed // + ", profile: " +
                     // speedController
                     + ")";
         } else {
-            return "(" + "start: " + start + ", end: " + end + ", center: " + center + ", speed: " + maxSpeed
+            return "("
+                    + "start: "
+                    + start
+                    + ", end: "
+                    + end
+                    + ", center: "
+                    + center
+                    + ", speed: "
+                    + maxSpeed
                     + ")"; // + ", profile: " + speedController + ")";
         }
     }

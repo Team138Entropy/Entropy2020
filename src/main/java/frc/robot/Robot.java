@@ -8,32 +8,21 @@
 package frc.robot;
 
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
-import frc.robot.util.LatchedBoolean;
 
 /**
- * The VM is configured to automatically run this class. If you change the name
- * of this class or the package after creating this project, you must also
- * update the build.gradle file in the project.
+ * The VM is configured to automatically run this class. If you change the name of this class or the
+ * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
 
   private Drive mDrive;
-
 
   //Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -51,7 +40,6 @@ public class Robot extends TimedRobot {
 
   //Variables from State
 
-  
   private Turret mTurret;
   static NetworkTable mTable;
 
@@ -117,6 +105,7 @@ public class Robot extends TimedRobot {
 
     Config.getInstance().reload();
   }
+
   @Override
   public void autonomousPeriodic(){
     mRobotLogger.log("Auto Periodic");
@@ -150,9 +139,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic(){
-  }
-
+    public void testPeriodic() {}
 
   @Override
   public void disabledInit() {
@@ -161,6 +148,7 @@ public class Robot extends TimedRobot {
     }
     Config.getInstance().reload();
   }
+
   @Override
   public void disabledPeriodic(){
     if(Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)){
@@ -226,6 +214,5 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getLoadChamber()) {
       //Load chamber!
     }
-
   }
 }
