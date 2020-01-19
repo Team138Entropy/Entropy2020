@@ -5,7 +5,7 @@ public class DriveSignal {
     private final double mRightMotor;
     private final boolean mBrakeMode;
 
-     public DriveSignal(double left, double right) {
+    public DriveSignal(double left, double right) {
         this(left, right, false);
     }
 
@@ -22,8 +22,9 @@ public class DriveSignal {
     public static final DriveSignal NEUTRAL = new DriveSignal(0, 0);
     public static final DriveSignal BRAKE = new DriveSignal(0, 0, true);
 
-    public void PrintLog(){
-        //System.out.println("Left: " + String.valueOf(mLeftMotor) + "   Right: " + String.valueOf(mRightMotor));
+    public void PrintLog() {
+        // System.out.println("Left: " + String.valueOf(mLeftMotor) + "   Right: " +
+        // String.valueOf(mRightMotor));
     }
 
     public double getLeft() {
@@ -42,7 +43,4 @@ public class DriveSignal {
     public String toString() {
         return "L: " + mLeftMotor + ", R: " + mRightMotor + (mBrakeMode ? ", BRAKE" : "");
     }
-
-
-
 }

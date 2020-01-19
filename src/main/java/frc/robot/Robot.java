@@ -8,176 +8,210 @@
 package frc.robot;
 
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.IO.OperatorInterface;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Config.Key;
+import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
-import frc.robot.util.LatchedBoolean;
 
 /**
- * The VM is configured to automatically run this class. If you change the name
- * of this class or the package after creating this project, you must also
- * update the build.gradle file in the project.
+ * The VM is configured to automatically run this class. If you change the name of this class or the
+ * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
 
-  //Controller Reference
-  private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
+    private Drive mDrive;
 
-  //Robot State
-  private final RobotState mRobotState = RobotState.getInstance();
+    // Controller Reference
+    private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
-  //Subsystem Manager
-  private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
+    // Robot State
+    private final RobotState mRobotState = RobotState.getInstance();
 
-  //Subsystems
-  private final Drive mDrive = Drive.getInstance();
-  private final VisionManager mVisionManager = VisionManager.getInstance();
+    // Subsystem Manager
+    private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-  //Variables from State
+    // Subsystems
+    private final VisionManager mVisionManager = VisionManager.getInstance();
+    private final Shooter mShooter = Shooter.getInstance();
 
+    // Variables from State
 
-  //autonomousInit, autonomousPeriodic, disabledInit, 
-  //disabledPeriodic, loopFunc, robotInit, robotPeriodic, 
-  //teleopInit, teleopPeriodic, testInit, testPeriodic
+    private Turret mTurret;
+    static NetworkTable mTable;
 
-  public void robotInit() {
-    
-    //Zero all nesscary sensors on Robot
-    ZeroSensors();
+    Logger mRobotLogger = new Logger("robot");
 
-    //Reset Robot State
-    //Wherever the Robot is now is the starting position
-    mRobotState.reset();
-  }
+    // autonomousInit, autonomousPeriodic, disabledInit,
+    // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
+    // teleopInit, teleopPeriodic, testInit, testPeriodic
+    @Override
+    public void robotInit() {
+        mRobotLogger.log("robot init _ 1");
 
-  /*
-    Called on bootup, Zero all Sensors
-  */
-  private void ZeroSensors(){
-    mSubsystemManager.ZeroSensors();
-  }
+        // Zero all nesscary sensors on Robot
+        ZeroSensors();
 
+        // Reset Robot State
+        // Wherever the Robot is now is the starting position
+        mRobotLogger.log("Robot State Reset");
+        mRobotState.reset();
 
-  public void autonomousInit(){
+        // prepare the network table
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        mTable = inst.getTable("SmartDashboard");
 
-  }
+        // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
+        if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
+            mTurret = Turret.getInstance();
+        }
 
-  public void autonomousPeriodic(){
-
-  }
-
-  public void teleopInit() {
-  }
-
-  public void teleopPeriodic() {
-    try{
-      RobotLoop();
-    }catch(Exception e){
-      System.out.println("RobotLoop Exception");
-    }
-  }
-
-  public void testInit() {
-    System.out.println("Entropy 138: Test Init");
-
-    //Test all Subsystems
-    System.out.println("Running Subsystem Checks");
-    mSubsystemManager.CheckSubsystems();
-
-
-  }
-
-  public void testPeriodic(){
-
-  }
-
-
-  public void disabledInit() {
-
-  }
-
-  public void disabledPeriodic(){
-
-  }
-
-
-  /*  
-    Called constantly, houses the main functionality of robot
-  */
-  public void RobotLoop(){
-    //Check User Inputs
-    double DriveThrottle = mOperatorInterface.getDriveThrottle();
-    double DriveTurn = mOperatorInterface.getDriveTurn();
-    boolean AutoDrive = false;
-
-
-    //Continue Driving 
-    if(AutoDrive == true){
-      //AutoSteer Functionality
-      //Used for tracking a ball
-    }else{
-      //Standard Manual Drive
-      mDrive.setDrive(DriveThrottle, DriveTurn, false);
+        if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
+            mDrive = Drive.getInstance();
+        }
     }
 
-
-  }
-
-
-
-
-  private volatile boolean m_exit;
-
-  @SuppressWarnings("PMD.CyclomaticComplexity")
-  @Override
-  public void startCompetition() {
-    robotInit();
-
-    // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
-
-    while (!Thread.currentThread().isInterrupted() && !m_exit) {
-      if (isDisabled()) {
-        m_ds.InDisabled(true);
-        //disabled();
-        m_ds.InDisabled(false);
-        while (isDisabled()) {
-          m_ds.waitForData();
-        }
-      } else if (isAutonomous()) {
-        m_ds.InAutonomous(true);
-        //autonomous();
-        m_ds.InAutonomous(false);
-        while (isAutonomous() && !isDisabled()) {
-          m_ds.waitForData();
-        }
-      } else if (isTest()) {
-        LiveWindow.setEnabled(true);
-        Shuffleboard.enableActuatorWidgets();
-        m_ds.InTest(true);
-        //test();
-        m_ds.InTest(false);
-        while (isTest() && isEnabled()) {
-          m_ds.waitForData();
-        }
-        LiveWindow.setEnabled(false);
-        Shuffleboard.disableActuatorWidgets();
-      } else {
-        m_ds.InOperatorControl(true);
-        //teleop();
-        m_ds.InOperatorControl(false);
-        while (isOperatorControl() && !isDisabled()) {
-          m_ds.waitForData();
-        }
-      }
+    /*
+      Called on bootup, Zero all Sensors
+    */
+    private void ZeroSensors() {
+        mRobotLogger.log("Zeroing sensors...");
+        mSubsystemManager.ZeroSensors();
+        mRobotLogger.log("Zeroed sensors");
     }
-  }
 
-  @Override
-  public void endCompetition() {
-    m_exit = true;
-  }
+    private void updateSmartDashboard() {
+        // TODO: set this up for real
+        SmartDashboard.putString("BallCounter", "BallValue" + " / 5");
+        // TODO: change this to the real boolean
+        SmartDashboard.putBoolean("ShooterFull", false);
+        // TODO: decide if this is necessary and hook it up
+        SmartDashboard.putBoolean("ShooterLoaded", false);
+        // TODO: hook this up
+        SmartDashboard.putBoolean("ShooterSpunUp", false);
+        // TODO: also, finally, hook this up.
+        SmartDashboard.putBoolean("TargetLocked", false);
+
+        // TODO: cameras will go here eventually
+
+    }
+
+    @Override
+    public void autonomousInit() {
+        mRobotLogger.log("Auto Init Called");
+
+        Config.getInstance().reload();
+    }
+
+    @Override
+    public void autonomousPeriodic() {
+        mRobotLogger.log("Auto Periodic");
+        updateSmartDashboard();
+    }
+
+    @Override
+    public void teleopInit() {
+        mRobotLogger.log("Teleop Init!");
+
+        Config.getInstance().reload();
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        try {
+            RobotLoop();
+        } catch (Exception e) {
+            mRobotLogger.log("RobotLoop Exception");
+
+            // print the exception to the system error
+            e.printStackTrace(System.err);
+        }
+    }
+
+    @Override
+    public void testInit() {
+        mRobotLogger.log("Entropy 138: Test Init");
+
+        Config.getInstance().reload();
+    }
+
+    @Override
+    public void testPeriodic() {}
+
+    @Override
+    public void disabledInit() {
+        if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
+            mTurret.disable();
+        }
+        Config.getInstance().reload();
+    }
+
+    @Override
+    public void disabledPeriodic() {
+        if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
+            mRobotLogger.verbose("got pot value of " + mTurret.getPotValue());
+        }
+    }
+
+    public void turretLoop() {
+        if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
+            mTurret.loop();
+        }
+    }
+
+    public void driveTrainLoop() {
+        if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
+            // Check User Inputs
+            double DriveThrottle = mOperatorInterface.getDriveThrottle();
+            double DriveTurn = mOperatorInterface.getDriveTurn();
+            boolean AutoDrive = false;
+            mDrive.setDrive(DriveThrottle, DriveTurn, false);
+
+            // Quickturn
+            if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+                // Quickturn!
+            }
+        }
+    }
+
+    /*
+      Called constantly, houses the main functionality of robot
+    */
+    public void RobotLoop() {
+        updateSmartDashboard();
+
+        turretLoop();
+
+        driveTrainLoop();
+
+        mShooter.periodic();
+
+        // Climb
+        if (mOperatorInterface.getClimb()) {
+            // climb!
+        }
+
+        // Operator Controls
+        if (mOperatorInterface.getTurretManual() != -1) {
+            // manual turret aim
+        }
+
+        // Camera Swap
+        if (mOperatorInterface.getCameraSwap()) {
+            // Swap Camera!
+        }
+
+        // Shoot
+        if (mOperatorInterface.getShoot()) {
+            // Shoot!
+        }
+
+        // Load chamber
+        // NOTE: This may or may not be necessary depending on how our sensor pack turns out
+        if (mOperatorInterface.getLoadChamber()) {
+            // Load chamber!
+        }
+    }
 }

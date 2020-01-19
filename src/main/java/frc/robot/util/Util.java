@@ -1,23 +1,18 @@
 package frc.robot.util;
-import java.util.List;
+
 import frc.robot.util.geometry.*;
-/**
- * Contains basic functions that are used often.
- */
+import java.util.List;
+
+/** Contains basic functions that are used often. */
 public class Util {
     public static final double kEpsilon = 1e-12;
 
     public static double kEpsilonMotion = 1e-6;
 
-
-    /**
-     * Prevent this class from being instantiated.
-     */
+    /** Prevent this class from being instantiated. */
     private Util() {}
 
-    /**
-     * Limits the given input to the given magnitude.
-     */
+    /** Limits the given input to the given magnitude. */
     public static double limit(double v, double maxMagnitude) {
         return limit(v, -maxMagnitude, maxMagnitude);
     }
@@ -30,9 +25,7 @@ public class Util {
         return inRange(v, -maxMagnitude, maxMagnitude);
     }
 
-    /**
-     * Checks if the given input is within the range (min, max), both exclusive.
-     */
+    /** Checks if the given input is within the range (min, max), both exclusive. */
     public static boolean inRange(double v, double min, double max) {
         return v > min && v < max;
     }

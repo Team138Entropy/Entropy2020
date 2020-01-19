@@ -1,21 +1,19 @@
 package frc.robot.util.paths;
 
-
+import frc.robot.Constants;
 import frc.robot.util.geometry.Translation2d;
 import frc.robot.util.motion.MotionState;
-import frc.robot.Constants;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 /**
  * Class representing the robot's autonomous path.
- * <p>
- * Field Coordinate System: Uses a right hand coordinate system. Positive x is right, positive y is up, and the origin
- * is at the bottom left corner of the field. For angles, 0 degrees is facing right (1, 0) and angles increase as you
- * turn counter clockwise.
+ *
+ * <p>Field Coordinate System: Uses a right hand coordinate system. Positive x is right, positive y
+ * is up, and the origin is at the bottom left corner of the field. For angles, 0 degrees is facing
+ * right (1, 0) and angles increase as you turn counter clockwise.
  */
-
 public class Path {
     List<PathSegment> segments;
     PathSegment prevSegment;
@@ -43,9 +41,7 @@ public class Path {
         segments.add(segment);
     }
 
-    /**
-     * @return the last MotionState in the path
-     */
+    /** @return the last MotionState in the path */
     public MotionState getLastMotionState() {
         if (segments.size() > 0) {
             MotionState endState = segments.get(segments.size() - 1).getEndState();
@@ -66,9 +62,7 @@ public class Path {
         return currentSegment.getRemainingDistance(currentSegment.getClosestPoint(robotPos));
     }
 
-    /**
-     * @return the length of the current segment
-     */
+    /** @return the length of the current segment */
     public double getSegmentLength() {
         PathSegment currentSegment = segments.get(0);
         return currentSegment.getLength();
@@ -99,8 +93,10 @@ public class Path {
         rv.closest_point = currentSegment.getClosestPoint(robot);
         rv.closest_point_distance = new Translation2d(robot, rv.closest_point).norm();
         // if (segments.size() > 1) { // Check next segment to see if it is closer.
-        //     final Translation2d next_segment_closest_point = segments.get(1).getClosestPoint(robot);
-        //     final double next_segment_closest_point_distance = new Translation2d(robot, next_segment_closest_point).norm();
+        //     final Translation2d next_segment_closest_point =
+        // segments.get(1).getClosestPoint(robot);
+        //     final double next_segment_closest_point_distance = new Translation2d(robot,
+        // next_segment_closest_point).norm();
         //     if (next_segment_closest_point_distance < rv.closest_point_distance) {
         //         rv.closest_point = next_segment_closest_point;
         //         rv.closest_point_distance = next_segment_closest_point_distance;
@@ -113,9 +109,11 @@ public class Path {
         for (int i = 1; i < segments.size(); ++i) {
             rv.remaining_path_distance += segments.get(i).getLength();
         }
-        rv.closest_point_speed = currentSegment
-                .getSpeedByDistance(currentSegment.getLength() - rv.remaining_segment_distance);
-        double lookahead_distance = lookahead.getLookaheadForSpeed(rv.closest_point_speed) + rv.closest_point_distance;
+        rv.closest_point_speed =
+                currentSegment.getSpeedByDistance(
+                        currentSegment.getLength() - rv.remaining_segment_distance);
+        double lookahead_distance =
+                lookahead.getLookaheadForSpeed(rv.closest_point_speed) + rv.closest_point_distance;
         if (rv.remaining_segment_distance < lookahead_distance && segments.size() > 1) {
             lookahead_distance -= rv.remaining_segment_distance;
             for (int i = 1; i < segments.size(); ++i) {
@@ -149,14 +147,16 @@ public class Path {
     }
 
     /**
-     * Checks if the robot has finished traveling along the current segment then removes it from the path if it has
+     * Checks if the robot has finished traveling along the current segment then removes it from the
+     * path if it has
      *
      * @param robotPos robot position
      */
     public void checkSegmentDone(Translation2d robotPos) {
         PathSegment currentSegment = segments.get(0);
-        double remainingDist = currentSegment.getRemainingDistance(currentSegment.getClosestPoint(robotPos));
-        final double kSegmentCompletionTolerance = 0.1;  // inches
+        double remainingDist =
+                currentSegment.getRemainingDistance(currentSegment.getClosestPoint(robotPos));
+        final double kSegmentCompletionTolerance = 0.1; // inches
         if (remainingDist < kSegmentCompletionTolerance) {
             removeCurrentSegment();
         }
@@ -165,21 +165,20 @@ public class Path {
     public void removeCurrentSegment() {
         prevSegment = segments.remove(0);
         String marker = prevSegment.getMarker();
-        if (marker != null)
-            mMarkersCrossed.add(marker);
+        if (marker != null) mMarkersCrossed.add(marker);
     }
 
-    /**
-     * Ensures that all speeds in the path are attainable and robot can slow down in time
-     */
+    /** Ensures that all speeds in the path are attainable and robot can slow down in time */
     public void verifySpeeds() {
         double maxStartSpeed = 0.0;
         double[] startSpeeds = new double[segments.size() + 1];
         startSpeeds[segments.size()] = 0.0;
         for (int i = segments.size() - 1; i >= 0; i--) {
             PathSegment segment = segments.get(i);
-            maxStartSpeed += Math
-                    .sqrt(maxStartSpeed * maxStartSpeed + 2 * Constants.kPathFollowingMaxAccel * segment.getLength());
+            maxStartSpeed +=
+                    Math.sqrt(
+                            maxStartSpeed * maxStartSpeed
+                                    + 2 * Constants.kPathFollowingMaxAccel * segment.getLength());
             startSpeeds[i] = segment.getStartState().vel();
             // System.out.println(maxStartSpeed + ", " + startSpeeds[i]);
             if (startSpeeds[i] > maxStartSpeed) {
@@ -191,7 +190,8 @@ public class Path {
         for (int i = 0; i < segments.size(); i++) {
             PathSegment segment = segments.get(i);
             double endSpeed = startSpeeds[i + 1];
-            MotionState startState = (i > 0) ? segments.get(i - 1).getEndState() : new MotionState(0, 0, 0, 0);
+            MotionState startState =
+                    (i > 0) ? segments.get(i - 1).getEndState() : new MotionState(0, 0, 0, 0);
             startState = new MotionState(0, 0, startState.vel(), startState.vel());
             segment.createMotionProfiler(startState, endSpeed);
         }

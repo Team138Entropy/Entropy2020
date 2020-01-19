@@ -1,6 +1,6 @@
 package frc.robot.util.geometry;
-import frc.robot.util.Util;
 
+import frc.robot.util.Util;
 import java.text.DecimalFormat;
 
 public class Displacement1d implements State<Displacement1d> {

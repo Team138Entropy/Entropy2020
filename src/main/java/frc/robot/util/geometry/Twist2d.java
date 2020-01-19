@@ -1,14 +1,14 @@
 package frc.robot.util.geometry;
 
 import frc.robot.util.Util;
-
 import java.text.DecimalFormat;
 
 /**
- * A movement along an arc at constant curvature and velocity. We can use ideas from "differential calculus" to create
- * new RigidTransform2d's from a Twist2d and visa versa.
- * <p>
- * A Twist can be used to represent a difference between two poses, a velocity, an acceleration, etc.
+ * A movement along an arc at constant curvature and velocity. We can use ideas from "differential
+ * calculus" to create new RigidTransform2d's from a Twist2d and visa versa.
+ *
+ * <p>A Twist can be used to represent a difference between two poses, a velocity, an acceleration,
+ * etc.
  */
 public class Twist2d {
     protected static final Twist2d kIdentity = new Twist2d(0.0, 0.0, 0.0);
@@ -33,20 +33,24 @@ public class Twist2d {
 
     public double norm() {
         // Common case of dy == 0
-        if (dy == 0.0)
-            return Math.abs(dx);
+        if (dy == 0.0) return Math.abs(dx);
         return Math.hypot(dx, dy);
     }
 
     public double curvature() {
-        if (Math.abs(dtheta) < Util.kEpsilon && norm() < Util.kEpsilon)
-            return 0.0;
+        if (Math.abs(dtheta) < Util.kEpsilon && norm() < Util.kEpsilon) return 0.0;
         return dtheta / norm();
     }
 
     @Override
     public String toString() {
         final DecimalFormat fmt = new DecimalFormat("#0.000");
-        return "(" + fmt.format(dx) + "," + fmt.format(dy) + "," + fmt.format(Math.toDegrees(dtheta)) + " deg)";
+        return "("
+                + fmt.format(dx)
+                + ","
+                + fmt.format(dy)
+                + ","
+                + fmt.format(Math.toDegrees(dtheta))
+                + " deg)";
     }
 }
