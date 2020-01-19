@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 
-
 public class BallIndicator {
     private static BallIndicator instance;
 
@@ -19,7 +18,10 @@ public class BallIndicator {
     private Timer stripTimer;
 
     public enum State {
-        EMPTY, LOADING, FULL, ACQUIRED
+        EMPTY,
+        LOADING,
+        FULL,
+        ACQUIRED
     }
 
     // LED class for keeping track of LED states
