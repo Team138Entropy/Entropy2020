@@ -7,52 +7,52 @@ package frc.robot.subsystems;
 
 */
 public class VisionManager extends Subsystem {
-  private static VisionManager mInstance;
+    private static VisionManager mInstance;
 
-  public static synchronized VisionManager getInstance() {
-    if (mInstance == null) {
-      mInstance = new VisionManager();
+    public static synchronized VisionManager getInstance() {
+        if (mInstance == null) {
+            mInstance = new VisionManager();
+        }
+        return mInstance;
     }
-    return mInstance;
-  }
 
-  // Add Multiple Cameras
-  enum ActiveCamera {
-    Main
-  }
+    // Add Multiple Cameras
+    enum ActiveCamera {
+        Main
+    }
 
-  // Default to the Main Cammera
-  private ActiveCamera mActiveCameraValue = ActiveCamera.Main;
-  private RPICamera mActiveCamera;
+    // Default to the Main Cammera
+    private ActiveCamera mActiveCameraValue = ActiveCamera.Main;
+    private RPICamera mActiveCamera;
 
-  private RPICamera mShooterCamera;
-  private RPICamera mIntakeCamera;
+    private RPICamera mShooterCamera;
+    private RPICamera mIntakeCamera;
 
-  private VisionManager() {
-    // Start a Socket to listen to UDP Packet
-    // Each thread pass to a processer which
-
-  }
-
-  /*
-      Process every single packet
-  */
-  private void ProcessPacket() {
-    try {
-
-    } catch (Exception e) {
+    private VisionManager() {
+        // Start a Socket to listen to UDP Packet
+        // Each thread pass to a processer which
 
     }
-  }
 
-  public void ZeroSensors() {}
+    /*
+        Process every single packet
+    */
+    private void ProcessPacket() {
+        try {
 
-  public void UpdateActiveCamera(int value) {
-    // mActiveCamera = mCameras.get(value);
-  }
+        } catch (Exception e) {
 
-  /*
-      Test all Sensors in the Subsystem
-  */
-  public void CheckSubsystems() {}
+        }
+    }
+
+    public void ZeroSensors() {}
+
+    public void UpdateActiveCamera(int value) {
+        // mActiveCamera = mCameras.get(value);
+    }
+
+    /*
+        Test all Sensors in the Subsystem
+    */
+    public void CheckSubsystems() {}
 }
