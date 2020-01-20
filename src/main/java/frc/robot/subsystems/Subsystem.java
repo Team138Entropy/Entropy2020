@@ -9,11 +9,11 @@ the constructor will automatically add to the subsystem manager
 */
 public abstract class Subsystem {
 
-  public Subsystem() {
-    SubsystemManager.getInstance().RegisterSubsystem(this);
-  }
+    public Subsystem() {
+        SubsystemManager.getInstance().RegisterSubsystem(this);
+    }
 
-  public abstract void ZeroSensors();
+    public abstract void ZeroSensors();
 
-  public abstract void CheckSubsystems();
+    public abstract void CheckSubsystems();
 }
