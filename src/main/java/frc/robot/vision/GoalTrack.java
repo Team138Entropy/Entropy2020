@@ -6,6 +6,7 @@ import frc.robot.util.geometry.Pose2d;
 import frc.robot.util.geometry.Rotation2d;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Used to keep track of all goals detected by vision system.
@@ -15,6 +16,24 @@ import java.util.Map;
  * 
  */
  public class GoalTrack {
+    TreeMap<Double, Pose2d> mObservedPositions = new TreeMap<>();
+
+    Pose2d mSmoothedPosition = null;
+
+    //Indentiferier of the goal track
+    int mTrackID;
+
+    /**
+     * Make a new Goal Track
+     * Stemmed from timestamp & goal's coodinerates
+     */
+    /*
+    public static synchronized GoalTrack makeNewTrack(int id, double timestamp, Pose2d GoalPose){
+        GoalTrack gt = new GoalTrack();
+    }
+    */
+
+
 
 
  }
