@@ -3,6 +3,10 @@
 A baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
 This readme highlights portions of the architecture, ideas, and best practices.
 
+### Code Formatting
+We have a git hook that will format your code according to Google's style guide whenever you commit. To enable it, you will need to run
+`gradlew installGitHooks`.
+
 ### Architecture Highlights
 - Multithreading Support
     - RoboRio has a 2 Core Processor and supports paralization. A good example of this is utilizing a secondary thread for vision communication.
