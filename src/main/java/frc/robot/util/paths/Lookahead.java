@@ -1,7 +1,5 @@
 package frc.robot.util.paths;
-/**
- * A utility class for interpolating lookahead distance based on current speed.
- */
+/** A utility class for interpolating lookahead distance based on current speed. */
 public class Lookahead {
     public final double min_distance;
     public final double max_distance;
@@ -22,6 +20,8 @@ public class Lookahead {
 
     public double getLookaheadForSpeed(double speed) {
         double lookahead = delta_distance * (speed - min_speed) / delta_speed + min_distance;
-        return Double.isNaN(lookahead) ? min_distance : Math.max(min_distance, Math.min(max_distance, lookahead));
+        return Double.isNaN(lookahead)
+                ? min_distance
+                : Math.max(min_distance, Math.min(max_distance, lookahead));
     }
 }

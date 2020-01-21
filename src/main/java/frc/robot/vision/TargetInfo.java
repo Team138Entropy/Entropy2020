@@ -1,18 +1,11 @@
 package frc.robot.vision;
 
-
 /**
- *  Container Class for Targets detected by the division system
- *  Contains a center point in 3D Space
+ * Container Class for Targets detected by the division system Contains a center point in 3D Space
  *
- *  On the field there are 3 Types of Targets,
- *  0 - High Goal
- *  1 - Feeder Station
- *  2 - Ball
- *  
+ * <p>On the field there are 3 Types of Targets, 0 - High Goal 1 - Feeder Station 2 - Ball
  */
-
- public class TargetInfo {
+public class TargetInfo {
 
     protected double x = 0;
     protected double y = 0;
@@ -22,78 +15,71 @@ package frc.robot.vision;
 
     private int TargetType = 0;
 
-    //Distance in Feet Currently
+    // Distance in Feet Currently
     private double distance = 0;
 
-    public TargetInfo(){
+    public TargetInfo() {}
 
-    }
-        
-    public TargetInfo(int CameraID, int TargetType, int x, int y, double distance){
+    public TargetInfo(int CameraID, int TargetType, int x, int y, double distance) {
         this.TargetType = TargetType;
         this.x = x;
         this.y = y;
         this.distance = distance;
-
     }
 
-    public double getX(){
+    public double getX() {
         return x;
     }
 
-    public double getY(){
+    public double getY() {
         return y;
     }
 
-    public double getZ(){
+    public double getZ() {
         return z;
     }
 
-
-    public void SetBallTarget(){
+    public void SetBallTarget() {
         TargetType = 2;
     }
 
-    public void SetFeederStationTarget(){
+    public void SetFeederStationTarget() {
         TargetType = 1;
     }
 
-    public void SetHighgoalTarget(){
+    public void SetHighgoalTarget() {
         TargetType = 0;
     }
 
-
-    public void SetDistance(double dis){
+    public void SetDistance(double dis) {
         this.distance = dis;
     }
 
-    public void SetX(double x){
+    public void SetX(double x) {
         this.x = x;
     }
 
-    public void SetY(double y){
+    public void SetY(double y) {
         this.y = y;
     }
 
-    public void SetTargetID(int id){
+    public void SetTargetID(int id) {
         this.TargetType = id;
-    } 
+    }
 
-    public void SetCameraID(int id){
+    public void SetCameraID(int id) {
         this.CameraID = id;
     }
 
-    public void SetYaw(double yaw){
+    public void SetYaw(double yaw) {
         this.yaw = yaw;
     }
 
-    //Returns if we this target is a high goal target
-    public boolean IsHighGoal(){
-        if(TargetType == 0){
+    // Returns if we this target is a high goal target
+    public boolean IsHighGoal() {
+        if (TargetType == 0) {
             return true;
         }
         return false;
     }
-
-
- }
+}

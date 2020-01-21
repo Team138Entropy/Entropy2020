@@ -3,7 +3,8 @@ package frc.robot.util.geometry;
 import frc.robot.util.Util;
 import java.text.DecimalFormat;
 
-public class Pose2dWithCurvature implements IPose2d<Pose2dWithCurvature>, ICurvature<Pose2dWithCurvature> {
+public class Pose2dWithCurvature
+        implements IPose2d<Pose2dWithCurvature>, ICurvature<Pose2dWithCurvature> {
     protected static final Pose2dWithCurvature kIdentity = new Pose2dWithCurvature();
 
     public static Pose2dWithCurvature identity() {
@@ -32,13 +33,18 @@ public class Pose2dWithCurvature implements IPose2d<Pose2dWithCurvature>, ICurva
         dcurvature_ds_ = dcurvature_ds;
     }
 
-    public Pose2dWithCurvature(final Translation2d translation, final Rotation2d rotation, double curvature) {
+    public Pose2dWithCurvature(
+            final Translation2d translation, final Rotation2d rotation, double curvature) {
         pose_ = new Pose2d(translation, rotation);
         curvature_ = curvature;
         dcurvature_ds_ = 0.0;
     }
 
-    public Pose2dWithCurvature(final Translation2d translation, final Rotation2d rotation, double curvature, double dcurvature_ds) {
+    public Pose2dWithCurvature(
+            final Translation2d translation,
+            final Rotation2d rotation,
+            double curvature,
+            double dcurvature_ds) {
         pose_ = new Pose2d(translation, rotation);
         curvature_ = curvature;
         dcurvature_ds_ = dcurvature_ds;
@@ -51,12 +57,14 @@ public class Pose2dWithCurvature implements IPose2d<Pose2dWithCurvature>, ICurva
 
     @Override
     public Pose2dWithCurvature transformBy(Pose2d transform) {
-        return new Pose2dWithCurvature(getPose().transformBy(transform), getCurvature(), getDCurvatureDs());
+        return new Pose2dWithCurvature(
+                getPose().transformBy(transform), getCurvature(), getDCurvatureDs());
     }
 
     @Override
     public Pose2dWithCurvature mirror() {
-        return new Pose2dWithCurvature(getPose().mirror().getPose(), -getCurvature(), -getDCurvatureDs());
+        return new Pose2dWithCurvature(
+                getPose().mirror().getPose(), -getCurvature(), -getDCurvatureDs());
     }
 
     @Override
@@ -81,7 +89,8 @@ public class Pose2dWithCurvature implements IPose2d<Pose2dWithCurvature>, ICurva
 
     @Override
     public Pose2dWithCurvature interpolate(final Pose2dWithCurvature other, double x) {
-        return new Pose2dWithCurvature(getPose().interpolate(other.getPose(), x),
+        return new Pose2dWithCurvature(
+                getPose().interpolate(other.getPose(), x),
                 Util.interpolate(getCurvature(), other.getCurvature(), x),
                 Util.interpolate(getDCurvatureDs(), other.getDCurvatureDs(), x));
     }
@@ -98,18 +107,28 @@ public class Pose2dWithCurvature implements IPose2d<Pose2dWithCurvature>, ICurva
         }
 
         Pose2dWithCurvature p2dwc = (Pose2dWithCurvature) other;
-        return getPose().equals(p2dwc.getPose()) && Util.epsilonEquals(getCurvature(), p2dwc.getCurvature()) && Util.epsilonEquals(getDCurvatureDs(), p2dwc.getDCurvatureDs());
+        return getPose().equals(p2dwc.getPose())
+                && Util.epsilonEquals(getCurvature(), p2dwc.getCurvature())
+                && Util.epsilonEquals(getDCurvatureDs(), p2dwc.getDCurvatureDs());
     }
 
     @Override
     public String toString() {
         final DecimalFormat fmt = new DecimalFormat("#0.000");
-        return getPose().toString() + ", curvature: " + fmt.format(getCurvature()) + ", dcurvature_ds: " + fmt.format(getDCurvatureDs());
+        return getPose().toString()
+                + ", curvature: "
+                + fmt.format(getCurvature())
+                + ", dcurvature_ds: "
+                + fmt.format(getDCurvatureDs());
     }
 
     @Override
     public String toCSV() {
         final DecimalFormat fmt = new DecimalFormat("#0.000");
-        return getPose().toCSV() + "," + fmt.format(getCurvature()) + "," + fmt.format(getDCurvatureDs());
+        return getPose().toCSV()
+                + ","
+                + fmt.format(getCurvature())
+                + ","
+                + fmt.format(getDCurvatureDs());
     }
 }

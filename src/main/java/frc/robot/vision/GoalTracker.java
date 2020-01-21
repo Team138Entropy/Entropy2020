@@ -1,25 +1,15 @@
 package frc.robot.vision;
 
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import frc.robot.Constants;
 import frc.robot.util.geometry.Pose2d;
 
-
 /**
- * Partially adapted from 254. 
- * Used in the event that multiple goals are detected to judge all goals based on:
- * timestamp, stability,  continuation of previous goals (if a goal was detected earlier)
- * helps smooth out vibration from camera 
- * 
+ * Partially adapted from 254. Used in the event that multiple goals are detected to judge all goals
+ * based on: timestamp, stability, continuation of previous goals (if a goal was detected earlier)
+ * helps smooth out vibration from camera
  */
+public class GoalTracker {
 
-
- public class GoalTracker {
-    
     public static class TrackReport {
 
         // Transform from the field frame to the vision target
@@ -31,12 +21,7 @@ import frc.robot.util.geometry.Pose2d;
         // Percentage of the goal tracking time during which this goal has been observed
         // range from 0 -> 1
 
-        //Track Report ID
+        // Track Report ID
         public int id;
-
     }
-
-
-
-
- }
+}
