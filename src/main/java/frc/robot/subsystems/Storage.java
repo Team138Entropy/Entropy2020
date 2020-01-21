@@ -9,11 +9,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.events.BallDetected;
 import frc.robot.events.BallStored;
 import frc.robot.events.EventWatcherThread;
-import edu.wpi.first.wpilibj.AnalogInput;
-
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
@@ -29,16 +28,16 @@ public class Storage extends Subsystem {
     public static final int INTAKE_SENSOR_NO_BALL_THRESHOLD = 100;
     public static final int FULL_SENSOR_BALL_THRESHOLD = 375;
     public static final int FULL_SENSOR_NO_BALL_THRESHOLD = 100;
-    public static final int BALLS_EJECTED_DEBOUNCE_THRESHOLD = 25; // Half a second based on 20 ms per loop
+    public static final int BALLS_EJECTED_DEBOUNCE_THRESHOLD =
+            25; // Half a second based on 20 ms per loop
 
     private WPI_TalonSRX mRoller;
     private AnalogInput mIntakeSensor;
     private AnalogInput mStorageFullSensor;
-    
+
     private boolean mStoringBall = false;
     private boolean mEjectingBall = false;
     private int mBallsEjectedDebounce = 0;
-
 
     private static Storage sInstance;
 
@@ -61,13 +60,13 @@ public class Storage extends Subsystem {
         if (mEjectingBall) {
             if (isNoLongerFull()) {
                 mBallsEjectedDebounce++;
-                
-                // Stop ejecting after the full sensor reports no balls for the debounce threshold period
+
+                // Stop ejecting after the full sensor reports no balls for the debounce threshold
+                // period
                 if (mBallsEjectedDebounce > BALLS_EJECTED_DEBOUNCE_THRESHOLD) {
                     stop();
                 }
-            }
-            else {
+            } else {
                 mBallsEjectedDebounce = 0;
             }
         }
@@ -78,7 +77,7 @@ public class Storage extends Subsystem {
     }
 
     public boolean isBallStored() {
-        return  mStoringBall && mIntakeSensor.getValue() < INTAKE_SENSOR_NO_BALL_THRESHOLD;
+        return mStoringBall && mIntakeSensor.getValue() < INTAKE_SENSOR_NO_BALL_THRESHOLD;
     }
 
     public boolean isFull() {
@@ -86,8 +85,7 @@ public class Storage extends Subsystem {
     }
 
     public boolean isNoLongerFull() {
-        return  mEjectingBall && mStorageFullSensor.getValue() < FULL_SENSOR_NO_BALL_THRESHOLD;
-
+        return mEjectingBall && mStorageFullSensor.getValue() < FULL_SENSOR_NO_BALL_THRESHOLD;
     }
 
     public void storeBall() {

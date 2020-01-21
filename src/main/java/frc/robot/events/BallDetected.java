@@ -1,7 +1,7 @@
 package frc.robot.events;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.robot.commands.StartBallStorage;;
+import frc.robot.commands.StartBallStorage;
 import frc.robot.subsystems.Storage;
 
 public class BallDetected implements Event {
