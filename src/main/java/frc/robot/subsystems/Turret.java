@@ -3,7 +3,10 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller;
+import edu.wpi.first.wpilibj.controller.PIDController;
+/*import edu.wpi.first.wpilibj.command.PIDSubsystem;*/
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;   
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -34,12 +37,13 @@ public class Turret extends PIDSubsystem {
 
     /** Set up our talon, logger and potentiometer */
     private Turret() {
-        // Intert a subsystem name and PID values
-        super(
-                "Turret",
-                Config.getInstance().getDouble(Key.OI__VISION__PID__P),
-                Config.getInstance().getDouble(Key.OI__VISION__PID__I),
-                Config.getInstance().getDouble(Key.OI__VISION__PID__D));
+
+        // Set PID values
+        super(new PIDController(Config.getInstance().getDouble(Key.OI__VISION__PID__P),
+        Config.getInstance().getDouble(Key.OI__VISION__PID__I),
+        Config.getInstance().getDouble(Key.OI__VISION__PID__D)),
+            0 // Initial position
+            );
         mTurretLogger = new Logger("turret");
         mTurretTalon =
                 new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
@@ -50,19 +54,13 @@ public class Turret extends PIDSubsystem {
                         Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
     }
 
-    @Override
-    public void initDefaultCommand() {
-        // Set the default command for a subsystem here.
-        // setDefaultCommand(new MySpecialCommand());
-    }
-
     /**
      * Gets the PID value
      *
      * @return the PID value
      */
     @Override
-    protected double returnPIDInput() {
+    protected double getMeasurement() {
         // gets the POT value, rounded to 2 decimal places
 
         // TODO: is this even needed?
@@ -73,7 +71,7 @@ public class Turret extends PIDSubsystem {
 
     /** @param output The motor output from the PID to control the motor. */
     @Override
-    protected void usePIDOutput(double output) {
+    protected void useOutput(double output, double unused) {
         // limit the output to prevent the motor from going too fast
         output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
         mTurretLogger.verbose("pid out " + output);
