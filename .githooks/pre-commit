@@ -13,8 +13,6 @@ downloadJar() {
 }
 
 runFormatter() {
-
-
     java -jar $JARFILE --replace src/**/*.java
 }
 
