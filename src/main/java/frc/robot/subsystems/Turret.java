@@ -4,8 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;   
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Logger;
@@ -37,11 +37,13 @@ public class Turret extends PIDSubsystem {
     private Turret() {
 
         // Set PID values
-        super(new PIDController(Config.getInstance().getDouble(Key.OI__VISION__PID__P),
-        Config.getInstance().getDouble(Key.OI__VISION__PID__I),
-        Config.getInstance().getDouble(Key.OI__VISION__PID__D)),
-            0 // Initial position
-            );
+        super(
+                new PIDController(
+                        Config.getInstance().getDouble(Key.OI__VISION__PID__P),
+                        Config.getInstance().getDouble(Key.OI__VISION__PID__I),
+                        Config.getInstance().getDouble(Key.OI__VISION__PID__D)),
+                0 // Initial position
+                );
         mTurretLogger = new Logger("turret");
         mTurretTalon =
                 new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
