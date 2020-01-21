@@ -1,7 +1,7 @@
 package frc.robot.events;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.robot.commands.StopRoller;
+import frc.robot.commands.StopBallStorage;;
 import frc.robot.subsystems.Storage;
 
 public class BallStored implements Event {
@@ -12,6 +12,6 @@ public class BallStored implements Event {
 
     public Command getCommand() {
         System.out.println("Ball Stored");
-        return new StopRoller();
+        return new StopBallStorage();
     }
 }

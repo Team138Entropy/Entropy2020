@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
     private final VisionManager mVisionManager = VisionManager.getInstance();
     private final Shooter mShooter = Shooter.getInstance();
     private final Intake mIntake = Intake.getInstance();
+    private final Storage mStorage = Storage.getInstance();
 
     // Variables from State
 
@@ -190,6 +191,7 @@ public class Robot extends TimedRobot {
         driveTrainLoop();
 
         mShooter.periodic();
+        mStorage.periodic();
 
         // Climb
         if (mOperatorInterface.getClimb()) {
