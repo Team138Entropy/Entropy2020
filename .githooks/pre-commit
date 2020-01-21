@@ -1,18 +1,33 @@
-#!/bin/sh
+#!/bin/bash
 
-PYTHON='python3'
-PIP='pip3'
+URL="https://github.com/google/google-java-format/releases/download/google-java-format-1.7/google-java-format-1.7-all-deps.jar"
+JARFILE=".format/google-java-format.jar"
 
-$PIP install -r .githooks/requirements.txt
-
-if ! $PYTHON .githooks/install_formatter.py; then
-  >&2 echo "Error installing formatter"
-  exit 1
+if ! shopt -q globstar; then
+    shopt -s globstar
 fi
 
-if ! $PYTHON .githooks/run_formatter.py; then
-  >&2 echo "Error running formatter"
-  exit 1
+downloadJar() {
+    echo "Downloading formatter"
+    curl --create-dirs -L -o $JARFILE $URL
+}
+
+runFormatter() {
+
+
+    java -jar $JARFILE --replace src/**/*.java
+}
+
+if [ -d $JARFILE ]; then
+    echo >&2 "Error: $JARFILE already exists but is a directory."
+    exit 1
+elif [ -f $JARFILE ]; then
+    echo "$JARFILE found"
 else
-  echo "Code formatted"
+    if ! downloadJar; then
+        echo >&2 "Error downloading formatter"
+        exit 1
+    fi
 fi
+
+runFormatter
