@@ -23,8 +23,8 @@ elif [ -f $JARFILE ]; then
     echo "$JARFILE found"
 else
     if ! downloadJar; then
-        echo >&2 "Error downloading formatter"
-        exit 1
+        echo >&2 "Error downloading formatter, skipping format"
+        exit 0
     fi
 fi
 
