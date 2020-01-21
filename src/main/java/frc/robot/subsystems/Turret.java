@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import frc.robot.Config;
-import frc.robot.Constants;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.OperatorInterface;
 
@@ -126,7 +126,7 @@ public class Turret extends PIDSubsystem {
         }
     }
 
-    public void setCameraLight (boolean on) {
+    public void setCameraLight(boolean on) {
         if (on) {
             cameraLight.set(Relay.Value.kOn);
         } else {
