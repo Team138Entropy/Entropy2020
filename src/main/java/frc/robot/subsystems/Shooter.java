@@ -66,7 +66,7 @@ public class Shooter extends Subsystem {
     FIRING
   }
 
-  private State state;
+  private State state = State.IDLE;
   private int m_buffer = 0;
   private Timer m_spinUpTimer;
   private Timer m_fireTimer;
@@ -102,7 +102,7 @@ public class Shooter extends Subsystem {
     m_spinUpTimer = new Timer();
     m_fireTimer = new Timer();
 
-    state = State.IDLE;
+    state;
   }
 
   /**
