@@ -5,15 +5,15 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class RPICamera {
 
-    private NetworkTable mNetworkTable;
+  private NetworkTable mNetworkTable;
 
-    public RPICamera(String CameraName) {
-        mNetworkTable = NetworkTableInstance.getDefault().getTable(CameraName);
+  public RPICamera(String CameraName) {
+    mNetworkTable = NetworkTableInstance.getDefault().getTable(CameraName);
 
-        // Spawn Thread to periodically update values
+    // Spawn Thread to periodically update values
 
-    }
+  }
 
-    // Run in a seperate thread that peridically
-    public void QueryValues() {}
+  // Run in a seperate thread that peridically
+  public void QueryValues() {}
 }
