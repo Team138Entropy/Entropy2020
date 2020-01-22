@@ -101,6 +101,8 @@ public class Shooter extends Subsystem {
 
     m_spinUpTimer = new Timer();
     m_fireTimer = new Timer();
+    
+    state = State.IDLE;
   }
 
   /**
