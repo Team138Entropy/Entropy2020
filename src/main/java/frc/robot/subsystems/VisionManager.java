@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-
 import frc.robot.RobotState;
 import frc.robot.vision.TargetInfo;
 import java.io.IOException;

@@ -1,6 +1,5 @@
 package frc.robot.vision;
 
-
 import frc.robot.util.geometry.Pose2d;
 
 /**

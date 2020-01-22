@@ -7,11 +7,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.geometry.*;
-import edu.wpi.first.wpilibj.Relay;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
