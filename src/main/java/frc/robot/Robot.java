@@ -67,10 +67,6 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Robot State Reset");
     mRobotState.reset();
 
-    // prepare the network table
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    mTable = inst.getTable("SmartDashboard");
-
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
       mTurret = Turret.getInstance();
