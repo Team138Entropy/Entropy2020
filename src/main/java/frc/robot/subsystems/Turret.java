@@ -3,8 +3,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Logger;
@@ -34,12 +35,13 @@ public class Turret extends PIDSubsystem {
 
   /** Set up our talon, logger and potentiometer */
   private Turret() {
-    // Intert a subsystem name and PID values
+
+    // Set PID values
     super(
-        "Turret",
-        Config.getInstance().getDouble(Key.OI__VISION__PID__P),
-        Config.getInstance().getDouble(Key.OI__VISION__PID__I),
-        Config.getInstance().getDouble(Key.OI__VISION__PID__D));
+        new PIDController(
+            Config.getInstance().getDouble(Key.OI__VISION__PID__P),
+            Config.getInstance().getDouble(Key.OI__VISION__PID__I),
+            Config.getInstance().getDouble(Key.OI__VISION__PID__D)));
     mTurretLogger = new Logger("turret");
     mTurretTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
     mPot =
@@ -49,19 +51,13 @@ public class Turret extends PIDSubsystem {
             Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
   }
 
-  @Override
-  public void initDefaultCommand() {
-    // Set the default command for a subsystem here.
-    // setDefaultCommand(new MySpecialCommand());
-  }
-
   /**
    * Gets the PID value
    *
    * @return the PID value
    */
   @Override
-  protected double returnPIDInput() {
+  protected double getMeasurement() {
     // gets the POT value, rounded to 2 decimal places
 
     // TODO: is this even needed?
@@ -72,7 +68,7 @@ public class Turret extends PIDSubsystem {
 
   /** @param output The motor output from the PID to control the motor. */
   @Override
-  protected void usePIDOutput(double output) {
+  protected void useOutput(double output, double unused) {
     // limit the output to prevent the motor from going too fast
     output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
     mTurretLogger.verbose("pid out " + output);
@@ -93,7 +89,7 @@ public class Turret extends PIDSubsystem {
     float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
 
     boolean allowMovement = (mPot.get() < potMax && mPot.get() > potMin);
-    mTurretLogger.debug(
+    mTurretLogger.silly(
         "allow movement "
             + allowMovement
             + " because we got "
@@ -104,19 +100,29 @@ public class Turret extends PIDSubsystem {
             + potMax);
 
     if (allowMovement) {
+      if (!this.isEnabled()) enable();
       if (Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)) {
         // vision goes here
       } else {
-        // visionLogger.verbose("Not enabled " + targetPos);
-        enable();
         setSetpoint(mManualTargetPos);
         if (OperatorInterface.getInstance().getTurretAdjustLeft()) mManualTargetPos -= 2.5;
         if (OperatorInterface.getInstance().getTurretAdjustRight()) mManualTargetPos += 2.5;
+
         mManualTargetPos = Math.min(Math.max(mManualTargetPos, potMin), potMax);
+        mTurretLogger.debug(
+            mManualTargetPos
+                + " "
+                + OperatorInterface.getInstance().getTurretAdjustLeft()
+                + " : "
+                + OperatorInterface.getInstance().getTurretAdjustRight());
       }
     } else {
+      if (this.isEnabled()) disable();
       mTurretLogger.verbose("movement blocked");
       OperatorInterface.getInstance().setOperatorRumble(true);
     }
+
+    // run the PIDSubsystem system's loop
+    this.periodic();
   }
 }
