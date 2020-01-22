@@ -196,7 +196,7 @@ public class Robot extends TimedRobot {
     driveTrainLoop();
 
     mShooter.periodic();
-    
+
     mStorage.periodic();
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
@@ -207,8 +207,7 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getClimb()) {
       // climb!
     }
-    
-    
+
     if (mOperatorInterface.getShoot()) {
       // Shoot!
     }
@@ -218,12 +217,11 @@ public class Robot extends TimedRobot {
       // manual turret aim
     }
 
-  
     // Camera Swap
     if (mOperatorInterface.getCameraSwap()) {
       // Swap Camera!
     }
-  
+
     // Shoot
     if (mOperatorInterface.getShoot()) {
       // Shoot!
