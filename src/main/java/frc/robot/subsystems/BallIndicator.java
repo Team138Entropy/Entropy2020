@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 
-
-/** Tracks the state of each LED on a strip. No ball = off, loading = flashing 
- * yellow, full = flashing green, acquired = solid green.
+/**
+ * Tracks the state of each LED on a strip. No ball = off, loading = flashing yellow, full =
+ * flashing green, acquired = solid green.
  */
 public class BallIndicator {
     private static BallIndicator instance;
@@ -18,7 +17,7 @@ public class BallIndicator {
     private AddressableLEDBuffer ledBuffer;
 
     /* For coordinating flashing across all lights in the strip */
-    private Timer stripTimer; 
+    private Timer stripTimer;
 
     public enum State {
         EMPTY,
@@ -43,13 +42,13 @@ public class BallIndicator {
         private void updateLight() {
             switch (ledState) {
 
-                /* LED off */
+                    /* LED off */
                 case EMPTY:
                     addressableLED.stop();
                     isOn = false;
                     break;
 
-                /* Flashing yelllow */
+                    /* Flashing yelllow */
                 case LOADING:
                     if (isOn == true) {
                         ledBuffer.setRGB(ledNumber, 255, 255, 0);
@@ -59,7 +58,7 @@ public class BallIndicator {
                     }
                     break;
 
-                /* Flashing green */
+                    /* Flashing green */
                 case FULL:
                     if (isOn == true) {
                         ledBuffer.setRGB(ledNumber, 255, 255, 0);
@@ -69,7 +68,7 @@ public class BallIndicator {
                     }
                     break;
 
-                /* Solid green */
+                    /* Solid green */
                 case ACQUIRED:
                     ledBuffer.setRGB(ledNumber, 0, 200, 0);
                     addressableLED.start();
