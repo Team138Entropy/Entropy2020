@@ -1,7 +1,11 @@
 # Entropy 2020
 
-A baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
+This is a baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
 This readme highlights portions of the architecture, ideas, and best practices.
+
+### Code Formatting
+We have a git hook that will format your code according to Google's style guide whenever you commit. To enable it, you will need to run
+`update-hooks.bat` on Windows or `gradlew installGitHooks` on GNU/Linux and macOS.
 
 ### Architecture Highlights
 - Multithreading Support
@@ -97,13 +101,5 @@ We want our code to execute as efficiently as possible.
 - Use a leading 's' on static ("class") variables `int sClassVariable = 0;`
 - Use a leading k on Constants `kDriveSpeed`
 - Define all constants in Constants.java, to avoid reusing memory on the stack as needed
-
-
-
-
-
-
-
-
 
 
