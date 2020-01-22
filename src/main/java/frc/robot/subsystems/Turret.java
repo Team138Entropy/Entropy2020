@@ -41,8 +41,7 @@ public class Turret extends PIDSubsystem {
         new PIDController(
             Config.getInstance().getDouble(Key.OI__VISION__PID__P),
             Config.getInstance().getDouble(Key.OI__VISION__PID__I),
-            Config.getInstance().getDouble(Key.OI__VISION__PID__D))
-        );
+            Config.getInstance().getDouble(Key.OI__VISION__PID__D)));
     mTurretLogger = new Logger("turret");
     mTurretTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
     mPot =
@@ -101,7 +100,7 @@ public class Turret extends PIDSubsystem {
             + potMax);
 
     if (allowMovement) {
-      if(!this.isEnabled()) enable();
+      if (!this.isEnabled()) enable();
       if (Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)) {
         // vision goes here
       } else {
@@ -110,10 +109,15 @@ public class Turret extends PIDSubsystem {
         if (OperatorInterface.getInstance().getTurretAdjustRight()) mManualTargetPos += 2.5;
 
         mManualTargetPos = Math.min(Math.max(mManualTargetPos, potMin), potMax);
-        mTurretLogger.debug(mManualTargetPos + " " + OperatorInterface.getInstance().getTurretAdjustLeft() + " : " + OperatorInterface.getInstance().getTurretAdjustRight());
+        mTurretLogger.debug(
+            mManualTargetPos
+                + " "
+                + OperatorInterface.getInstance().getTurretAdjustLeft()
+                + " : "
+                + OperatorInterface.getInstance().getTurretAdjustRight());
       }
     } else {
-      if(this.isEnabled()) disable();
+      if (this.isEnabled()) disable();
       mTurretLogger.verbose("movement blocked");
       OperatorInterface.getInstance().setOperatorRumble(true);
     }
