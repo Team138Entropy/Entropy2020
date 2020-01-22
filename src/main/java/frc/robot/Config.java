@@ -20,6 +20,7 @@ public class Config {
 
     ROBOT__HAS_DRIVETRAIN,
     ROBOT__HAS_TURRET,
+    ROBOT__HAS_LEDS,
 
     ROBOT__POT__LOCATION,
     ROBOT__POT__RANGE,
