@@ -32,6 +32,8 @@ public class Robot extends TimedRobot {
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
+  private BallIndicator mBallIndicator;
+
   // Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
@@ -69,6 +71,10 @@ public class Robot extends TimedRobot {
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       mDrive = Drive.getInstance();
+    }
+
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
+      mBallIndicator = BallIndicator.getInstance();
     }
   }
 
@@ -187,6 +193,10 @@ public class Robot extends TimedRobot {
     driveTrainLoop();
 
     mShooter.periodic();
+
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
+      mBallIndicator.checkTimer();
+    }
 
     // Climb
     if (mOperatorInterface.getClimb()) {
