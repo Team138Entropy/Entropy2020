@@ -40,10 +40,6 @@ public class Robot extends TimedRobot {
   private final Storage mStorage = Storage.getInstance();
   private BallIndicator mBallIndicator;
 
-  // Subsystems
-  private final VisionManager mVisionManager = VisionManager.getInstance();
-  private final Shooter mShooter = Shooter.getInstance();
-
   // Variables from State
 
   private Turret mTurret;
