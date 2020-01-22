@@ -1,0 +1,31 @@
+#!/bin/bash
+
+URL="https://github.com/google/google-java-format/releases/download/google-java-format-1.7/google-java-format-1.7-all-deps.jar"
+JARFILE=".format/google-java-format.jar"
+
+if ! shopt -q globstar; then
+    shopt -s globstar
+fi
+
+downloadJar() {
+    echo "Downloading formatter"
+    curl --create-dirs -L -o $JARFILE $URL
+}
+
+runFormatter() {
+    java -jar $JARFILE --replace src/**/*.java
+}
+
+if [ -d $JARFILE ]; then
+    echo >&2 "Error: $JARFILE already exists but is a directory."
+    exit 1
+elif [ -f $JARFILE ]; then
+    echo "$JARFILE found"
+else
+    if ! downloadJar; then
+        echo >&2 "Error downloading formatter, skipping format"
+        exit 0
+    fi
+fi
+
+runFormatter
