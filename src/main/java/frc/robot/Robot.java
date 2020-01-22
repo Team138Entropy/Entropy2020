@@ -187,6 +187,8 @@ public class Robot extends TimedRobot {
 
         mShooter.periodic();
 
+        BallIndicator.getInstance().checkTimer();
+        
         // Climb
         if (mOperatorInterface.getClimb()) {
             // climb!
