@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.geometry.*;
+import edu.wpi.first.wpilibj.Relay;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
@@ -30,7 +31,7 @@ public class Robot extends TimedRobot {
     // Subsystems
     private final Drive mDrive = Drive.getInstance();
     private final VisionManager mVisionManager = VisionManager.getInstance();
-
+    public Relay visionLight = new Relay(0);
     // Variables from State
 
     // autonomousInit, autonomousPeriodic, disabledInit,
@@ -40,6 +41,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         // Zero all nesscary sensors on Robot
         ZeroSensors();
+        visionLight.set(Relay.Value.kForward);
 
         // Reset Robot State - Note starting position of the Robot
         // This starting Rotation, X, Y is now the Zero Point
