@@ -1,21 +1,24 @@
 package frc.robot.subsystems;
 
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 
+
+/** Tracks the state of each LED on a strip. No ball = off, loading = flashing 
+ * yellow, full = flashing green, acquired = solid green.
+ */
 public class BallIndicator {
     private static BallIndicator instance;
+    private int port; // The PWM port number
 
-    // The PWM port number
-    private int port;
-
-    // Needed for making the LED work
+    /* Needed to make the LED work */
     private AddressableLED addressableLED;
     private AddressableLEDBuffer ledBuffer;
 
-    // For coordinating flashing across all lights in strip
-    private Timer stripTimer;
+    /* For coordinating flashing across all lights in the strip */
+    private Timer stripTimer; 
 
     public enum State {
         EMPTY,
@@ -24,47 +27,50 @@ public class BallIndicator {
         ACQUIRED
     }
 
-    // LED class for keeping track of LED states
+    /* For keeping track of LED states */
     private class LED {
-
-        // LED's position in the strip
-        private int ledNumber;
+        private int ledNumber; // The LED's position in the strip
         private State ledState;
         private boolean isOn;
 
-        LED(int number, State state, boolean isOn) {
+        private LED(int number, State state) {
             ledNumber = number;
             ledState = state;
-            this.isOn = isOn;
+            isOn = false;
         }
 
-        // Updates a light's output
+        /* Updates a LED's output */
         private void updateLight() {
             switch (ledState) {
+
+                /* LED off */
                 case EMPTY:
                     addressableLED.stop();
                     isOn = false;
                     break;
 
+                /* Flashing yelllow */
                 case LOADING:
-
-                    // Sets the LED to yellow
-                    ledBuffer.setRGB(ledNumber, 255, 255, 0);
-                    addressableLED.start();
-                    isOn = true;
+                    if (isOn == true) {
+                        ledBuffer.setRGB(ledNumber, 255, 255, 0);
+                        addressableLED.start();
+                    } else {
+                        addressableLED.stop();
+                    }
                     break;
 
+                /* Flashing green */
                 case FULL:
-
-                    // Sets the LED to green
-                    ledBuffer.setRGB(ledNumber, 0, 200, 0);
-                    addressableLED.start();
-                    isOn = true;
+                    if (isOn == true) {
+                        ledBuffer.setRGB(ledNumber, 255, 255, 0);
+                        addressableLED.start();
+                    } else {
+                        addressableLED.stop();
+                    }
                     break;
 
+                /* Solid green */
                 case ACQUIRED:
-
-                    // Sets the LED to green
                     ledBuffer.setRGB(ledNumber, 0, 200, 0);
                     addressableLED.start();
                     isOn = true;
@@ -78,27 +84,25 @@ public class BallIndicator {
             } else if (isOn == false) {
                 isOn = true;
             }
+            updateLight();
         }
     }
 
-    // Number of LEDs on strip
-    private int length;
-
-    // For keeping track of individual LED states
-    private LED[] ledStrip;
+    private int length; // Number of LEDs on strip
+    private LED[] ledStrip; // For keeping track of individual LED states
 
     private BallIndicator(int port, int length) {
-        stripTimer = new Timer();
         this.port = port;
         this.length = length;
+        stripTimer = new Timer();
         ledStrip = new LED[this.length];
-        addressableLED = new AddressableLED(port);
+        addressableLED = new AddressableLED(this.port);
         ledBuffer = new AddressableLEDBuffer(this.length);
 
         addressableLED.setLength(this.length);
         addressableLED.setData(ledBuffer);
         for (int n = 0; n < this.length; n++) {
-            ledStrip[n] = new LED(n, State.EMPTY, false);
+            ledStrip[n] = new LED(n, State.EMPTY);
         }
     }
 
@@ -109,7 +113,7 @@ public class BallIndicator {
         return instance;
     }
 
-    // Updates the strip's state variables
+    /* Updates the strip's state variables */
     void setStripState(State[] newState) {
         for (int n = 0; n < length; n++) {
             ledStrip[n].ledState = newState[n];
@@ -117,13 +121,14 @@ public class BallIndicator {
         updateStrip();
     }
 
-    // Updates each light's output
+    /* Updates each light's output */
     private void updateStrip() {
         for (int n = 0; n < length; n++) {
             ledStrip[n].updateLight();
         }
     }
 
+    /* Run every robot loop. Checks whether to toggle the flashing LEDs */
     public void checkTimer() {
         if (stripTimer.get() >= 250) {
             for (int n = 0; n < length; n++) {
