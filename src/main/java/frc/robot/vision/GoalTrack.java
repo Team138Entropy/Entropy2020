@@ -1,11 +1,6 @@
 package frc.robot.vision;
 
-
-import frc.robot.Constants;
 import frc.robot.util.geometry.Pose2d;
-import frc.robot.util.geometry.Rotation2d;
-
-import java.util.Map;
 import java.util.TreeMap;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -20,13 +15,13 @@ import edu.wpi.first.wpilibj.Timer;
  * function calls will be made to create, destroy, update goal track
  * 
  */
- public class GoalTrack {
+public class GoalTrack {
     TreeMap<Double, Pose2d> mObservedPositions = new TreeMap<>();
 
     //Smoothed Pose Position
     Pose2d mSmoothedPosition = null;
 
-    //Indentiferier of the goal track
+    // Indentiferier of the goal track
     int mTrackID;
 
     /**
@@ -47,6 +42,7 @@ import edu.wpi.first.wpilibj.Timer;
         PruneTracksByTime();
     }
 
+}
 
     /**
      * Try to update the track with a new observation

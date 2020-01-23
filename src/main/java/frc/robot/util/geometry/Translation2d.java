@@ -1,12 +1,9 @@
 package frc.robot.util.geometry;
 
 import frc.robot.util.Util;
-
 import java.text.DecimalFormat;
 
-/**
- * A translation in a 2d coordinate frame. Translations are simply shifts in an (x, y) plane.
- */
+/** A translation in a 2d coordinate frame. Translations are simply shifts in an (x, y) plane. */
 public class Translation2d implements ITranslation2d<Translation2d> {
     protected static final Translation2d kIdentity = new Translation2d();
 
@@ -75,7 +72,9 @@ public class Translation2d implements ITranslation2d<Translation2d> {
      * @return This translation rotated by rotation.
      */
     public Translation2d rotateBy(final Rotation2d rotation) {
-        return new Translation2d(x_ * rotation.cos() - y_ * rotation.sin(), x_ * rotation.sin() + y_ * rotation.cos());
+        return new Translation2d(
+                x_ * rotation.cos() - y_ * rotation.sin(),
+                x_ * rotation.sin() + y_ * rotation.cos());
     }
 
     public Rotation2d direction() {
@@ -110,7 +109,8 @@ public class Translation2d implements ITranslation2d<Translation2d> {
     }
 
     public boolean epsilonEquals(final Translation2d other, double epsilon) {
-        return Util.epsilonEquals(x(), other.x(), epsilon) && Util.epsilonEquals(y(), other.y(), epsilon);
+        return Util.epsilonEquals(x(), other.x(), epsilon)
+                && Util.epsilonEquals(y(), other.y(), epsilon);
     }
 
     @Override

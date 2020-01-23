@@ -8,12 +8,12 @@ import frc.robot.util.geometry.Twist2d;
 /**
  * Implements an adaptive pure pursuit controller. See:
  * https://www.ri.cmu.edu/pub_files/pub1/kelly_alonzo_1994_4/kelly_alonzo_1994_4.pdf
- * <p>
- * Basically, we find a spot on the path we'd like to follow and calculate the arc necessary to make us land on that
- * spot. The target spot is a specified distance ahead of us, and we look further ahead the greater our tracking error.
- * We also return the maximum speed we'd like to be going when we reach the target spot.
+ *
+ * <p>Basically, we find a spot on the path we'd like to follow and calculate the arc necessary to
+ * make us land on that spot. The target spot is a specified distance ahead of us, and we look
+ * further ahead the greater our tracking error. We also return the maximum speed we'd like to be
+ * going when we reach the target spot.
  */
-
 public class AdaptivePurePursuitController {
     private static final double kReallyBigNumber = 1E6;
 
@@ -27,8 +27,13 @@ public class AdaptivePurePursuitController {
 
         public Command() {}
 
-        public Command(Twist2d delta, double cross_track_error, double max_velocity, double end_velocity,
-                       Translation2d lookahead_point, double remaining_path_length) {
+        public Command(
+                Twist2d delta,
+                double cross_track_error,
+                double max_velocity,
+                double end_velocity,
+                Translation2d lookahead_point,
+                double remaining_path_length) {
             this.delta = delta;
             this.cross_track_error = cross_track_error;
             this.max_velocity = max_velocity;
@@ -57,15 +62,23 @@ public class AdaptivePurePursuitController {
      */
     public Command update(Pose2d pose) {
         if (mReversed) {
-            pose = new Pose2d(pose.getTranslation(),
-                    pose.getRotation().rotateBy(Rotation2d.fromRadians(Math.PI)));
+            pose =
+                    new Pose2d(
+                            pose.getTranslation(),
+                            pose.getRotation().rotateBy(Rotation2d.fromRadians(Math.PI)));
         }
 
-        final Path.TargetPointReport report = mPath.getTargetPoint(pose.getTranslation(), mLookahead);
+        final Path.TargetPointReport report =
+                mPath.getTargetPoint(pose.getTranslation(), mLookahead);
         if (isFinished()) {
             // Stop.
-            return new Command(Twist2d.identity(), report.closest_point_distance, report.max_speed, 0.0,
-                    report.lookahead_point, report.remaining_path_distance);
+            return new Command(
+                    Twist2d.identity(),
+                    report.closest_point_distance,
+                    report.max_speed,
+                    0.0,
+                    report.lookahead_point,
+                    report.remaining_path_distance);
         }
 
         final Arc arc = new Arc(pose, report.lookahead_point);
@@ -82,10 +95,17 @@ public class AdaptivePurePursuitController {
         }
 
         return new Command(
-                new Twist2d(scale_factor * arc.length, 0.0,
-                        arc.length * getDirection(pose, report.lookahead_point) * Math.abs(scale_factor) / arc.radius),
-                report.closest_point_distance, report.max_speed,
-                report.lookahead_point_speed * Math.signum(scale_factor), report.lookahead_point,
+                new Twist2d(
+                        scale_factor * arc.length,
+                        0.0,
+                        arc.length
+                                * getDirection(pose, report.lookahead_point)
+                                * Math.abs(scale_factor)
+                                / arc.radius),
+                report.closest_point_distance,
+                report.max_speed,
+                report.lookahead_point_speed * Math.signum(scale_factor),
+                report.lookahead_point,
                 report.remaining_path_distance);
     }
 
@@ -108,16 +128,21 @@ public class AdaptivePurePursuitController {
     /**
      * Gives the center of the circle joining the lookahead point and robot pose
      *
-     * @param pose  robot pose
+     * @param pose robot pose
      * @param point lookahead point
      * @return center of the circle joining the lookahead point and robot pose
      */
     public static Translation2d getCenter(Pose2d pose, Translation2d point) {
         final Translation2d poseToPointHalfway = pose.getTranslation().interpolate(point, 0.5);
-        final Rotation2d normal = pose.getTranslation().inverse().translateBy(poseToPointHalfway).direction().normal();
+        final Rotation2d normal =
+                pose.getTranslation()
+                        .inverse()
+                        .translateBy(poseToPointHalfway)
+                        .direction()
+                        .normal();
         final Pose2d perpendicularBisector = new Pose2d(poseToPointHalfway, normal);
-        final Pose2d normalFromPose = new Pose2d(pose.getTranslation(),
-                pose.getRotation().normal());
+        final Pose2d normalFromPose =
+                new Pose2d(pose.getTranslation(), pose.getRotation().normal());
         if (normalFromPose.isColinear(perpendicularBisector.normal())) {
             // Special case: center is poseToPointHalfway.
             return poseToPointHalfway;
@@ -128,7 +153,7 @@ public class AdaptivePurePursuitController {
     /**
      * Gives the radius of the circle joining the lookahead point and robot pose
      *
-     * @param pose  robot pose
+     * @param pose robot pose
      * @param point lookahead point
      * @return radius of the circle joining the lookahead point and robot pose
      */
@@ -138,9 +163,10 @@ public class AdaptivePurePursuitController {
     }
 
     /**
-     * Gives the length of the arc joining the lookahead point and robot pose (assuming forward motion).
+     * Gives the length of the arc joining the lookahead point and robot pose (assuming forward
+     * motion).
      *
-     * @param pose  robot pose
+     * @param pose robot pose
      * @param point lookahead point
      * @return the length of the arc joining the lookahead point and robot pose
      */
@@ -150,17 +176,26 @@ public class AdaptivePurePursuitController {
         return getLength(pose, point, center, radius);
     }
 
-    public static double getLength(Pose2d pose, Translation2d point, Translation2d center, double radius) {
+    public static double getLength(
+            Pose2d pose, Translation2d point, Translation2d center, double radius) {
         if (radius < kReallyBigNumber) {
             final Translation2d centerToPoint = new Translation2d(center, point);
             final Translation2d centerToPose = new Translation2d(center, pose.getTranslation());
-            // If the point is behind pose, we want the opposite of this angle. To determine if the point is behind,
-            // check the sign of the cross-product between the normal vector and the vector from pose to point.
-            final boolean behind = Math.signum(
-                    Translation2d.cross(pose.getRotation().normal().toTranslation(),
-                            new Translation2d(pose.getTranslation(), point))) > 0.0;
+            // If the point is behind pose, we want the opposite of this angle. To determine if the
+            // point is behind,
+            // check the sign of the cross-product between the normal vector and the vector from
+            // pose to point.
+            final boolean behind =
+                    Math.signum(
+                                    Translation2d.cross(
+                                            pose.getRotation().normal().toTranslation(),
+                                            new Translation2d(pose.getTranslation(), point)))
+                            > 0.0;
             final Rotation2d angle = Translation2d.getAngle(centerToPose, centerToPoint);
-            return radius * (behind ? 2.0 * Math.PI - Math.abs(angle.getRadians()) : Math.abs(angle.getRadians()));
+            return radius
+                    * (behind
+                            ? 2.0 * Math.PI - Math.abs(angle.getRadians())
+                            : Math.abs(angle.getRadians()));
         } else {
             return new Translation2d(pose.getTranslation(), point).norm();
         }
@@ -169,7 +204,7 @@ public class AdaptivePurePursuitController {
     /**
      * Gives the direction the robot should turn to stay on the path
      *
-     * @param pose  robot pose
+     * @param pose robot pose
      * @param point lookahead point
      * @return the direction the robot should turn: -1 is left, +1 is right
      */
@@ -180,9 +215,7 @@ public class AdaptivePurePursuitController {
         return (cross < 0) ? -1 : 1; // if robot < pose turn left
     }
 
-    /**
-     * @return has the robot reached the end of the path
-     */
+    /** @return has the robot reached the end of the path */
     public boolean isFinished() {
         return mAtEndOfPath;
     }
