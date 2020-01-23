@@ -30,12 +30,12 @@ public class BallIndicator {
   private class LED {
     private int mLedNumber; // The LED's number on the strip
     private State mLedState;
-    private boolean mIsOn;
+    private boolean mEnableLED;
 
     private LED(int number, State state) {
       mLedNumber = number;
       mLedState = state;
-      mIsOn = false;
+      mEnableLED = false;
     }
 
     /* Updates a LED's output */
@@ -45,12 +45,12 @@ public class BallIndicator {
         /* LED off */
         case EMPTY:
           mAddressableLED.stop();
-          mIsOn = false;
+          mEnableLED = false;
           break;
 
         /* Flashing yelllow */
         case LOADING:
-          if (mIsOn == true) {
+          if (mEnableLED == true) {
             mLedBuffer.setRGB(mLedNumber, 255, 255, 0);
             mAddressableLED.start();
           } else {
@@ -60,7 +60,7 @@ public class BallIndicator {
 
         /* Flashing green */
         case FULL:
-          if (mIsOn == true) {
+          if (mEnableLED == true) {
             mLedBuffer.setRGB(mLedNumber, 255, 255, 0);
             mAddressableLED.start();
           } else {
@@ -72,13 +72,13 @@ public class BallIndicator {
         case ACQUIRED:
           mLedBuffer.setRGB(mLedNumber, 0, 200, 0);
           mAddressableLED.start();
-          mIsOn = true;
+          mEnableLED = true;
           break;
       }
     }
 
     private void toggle() {
-      mIsOn = !mIsOn;
+      mEnableLED = !mEnableLED;
       updateLight();
     }
   }
