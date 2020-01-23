@@ -135,6 +135,7 @@ public class BallIndicator {
           ledStrip[n].toggle();
         }
       }
+      stripTimer.reset();
     }
   }
 }
