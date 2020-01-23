@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
+import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 
 /**
@@ -32,7 +33,10 @@ public class Robot extends TimedRobot {
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-  private BallIndicator mBallIndicator;
+  // Subsystems
+  private final VisionManager mVisionManager = VisionManager.getInstance();
+  private final Shooter mShooter = Shooter.getInstance();
+  private final Intake mIntake = Intake.getInstance();
 
   // Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
@@ -55,6 +59,11 @@ public class Robot extends TimedRobot {
     // Zero all nesscary sensors on Robot
     ZeroSensors();
 
+    EventWatcherThread.getInstance().start();
+
+    // prepare the network table
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    mTable = inst.getTable("SmartDashboard");
     // Reset Robot State
     // Wherever the Robot is now is the starting position
     mRobotLogger.log("Robot State Reset");
@@ -91,7 +100,7 @@ public class Robot extends TimedRobot {
     // TODO: set this up for real
     SmartDashboard.putString("BallCounter", "BallValue" + " / 5");
     // TODO: change this to the real boolean
-    SmartDashboard.putBoolean("ShooterFull", false);
+    SmartDashboard.putBoolean("ShooterFull", mStorage);
     // TODO: decide if this is necessary and hook it up
     SmartDashboard.putBoolean("ShooterLoaded", false);
     SmartDashboard.putBoolean(
