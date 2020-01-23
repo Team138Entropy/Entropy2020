@@ -13,31 +13,37 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.events.BallDetected;
 import frc.robot.events.BallStored;
 import frc.robot.events.EventWatcherThread;
+import edu.wpi.first.wpilibj.Timer;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
     private static final int ROLLER_PORT = 1;
     private static final int INTAKE_SENSOR_PORT = 1;
-    private static final int STORAGE_FULL_SENSOR_PORT = 2;
+
+    private static final int STORAGE_CAPICTY = 5;
 
     // TODO: Tune these values
     private static final double STORE_SPEED = 1;
     private static final double EJECT_SPEED = 1;
     public static final int INTAKE_SENSOR_BALL_THRESHOLD = 375;
     public static final int INTAKE_SENSOR_NO_BALL_THRESHOLD = 100;
-    public static final int FULL_SENSOR_BALL_THRESHOLD = 375;
-    public static final int FULL_SENSOR_NO_BALL_THRESHOLD = 100;
-    public static final int BALLS_EJECTED_DEBOUNCE_THRESHOLD =
-            25; // Half a second based on 20 ms per loop
+    public static final int EJECT_DELAY_SECONDS = 5;
 
     private WPI_TalonSRX mRoller;
     private AnalogInput mIntakeSensor;
-    private AnalogInput mStorageFullSensor;
+    private Timer mEjectTimer;
 
-    private boolean mStoringBall = false;
-    private boolean mEjectingBall = false;
-    private int mBallsEjectedDebounce = 0;
+    private int mBallCount = 0;
+
+    // State variables
+    public enum State {
+        IDLE,
+        STORING,
+        EJECTING
+    }
+
+    private State mState = State.IDLE;
 
     private static Storage sInstance;
 
@@ -51,24 +57,18 @@ public class Storage extends Subsystem {
     private Storage() {
         mRoller = new WPI_TalonSRX(ROLLER_PORT);
         mIntakeSensor = new AnalogInput(INTAKE_SENSOR_PORT);
-        mStorageFullSensor = new AnalogInput(STORAGE_FULL_SENSOR_PORT);
         EventWatcherThread.getInstance().addEvent(new BallDetected());
         EventWatcherThread.getInstance().addEvent((new BallStored()));
+        mEjectTimer = new Timer();
     }
 
-    public void periodic() {
-        if (mEjectingBall) {
-            if (isNoLongerFull()) {
-                mBallsEjectedDebounce++;
 
-                // Stop ejecting after the full sensor reports no balls for the debounce threshold
-                // period
-                if (mBallsEjectedDebounce > BALLS_EJECTED_DEBOUNCE_THRESHOLD) {
-                    stop();
-                }
-            } else {
-                mBallsEjectedDebounce = 0;
-            }
+    public void periodic() {
+        // Check if we're done ejecting
+        if (mState == State.EJECTING && mEjectTimer.get() >= EJECT_DELAY_SECONDS) {
+            mEjectTimer.stop();
+            mEjectTimer.reset();
+            stop();
         }
     }
 
@@ -77,32 +77,32 @@ public class Storage extends Subsystem {
     }
 
     public boolean isBallStored() {
-        return mStoringBall && mIntakeSensor.getValue() < INTAKE_SENSOR_NO_BALL_THRESHOLD;
+        return (mState == State.STORING) && (mIntakeSensor.getValue() < INTAKE_SENSOR_NO_BALL_THRESHOLD);
+    }
+
+    public boolean isEmpty() {
+        return mBallCount == 0;
     }
 
     public boolean isFull() {
-        return mStorageFullSensor.getValue() > FULL_SENSOR_BALL_THRESHOLD;
-    }
-
-    public boolean isNoLongerFull() {
-        return mEjectingBall && mStorageFullSensor.getValue() < FULL_SENSOR_NO_BALL_THRESHOLD;
+        return mBallCount == STORAGE_CAPICTY;
     }
 
     public void storeBall() {
-        mStoringBall = true;
+        mState = State.STORING;
         mRoller.set(ControlMode.PercentOutput, STORE_SPEED);
     }
 
     /** Stops the roller. */
     public void stop() {
-        mStoringBall = false;
-        mEjectingBall = false;
+        mState = State.IDLE;
         mRoller.set(ControlMode.PercentOutput, 0);
     }
 
     public void ejectBalls() {
-        mEjectingBall = true;
-        mBallsEjectedDebounce = 0;
+        mState = State.EJECTING;
+        mEjectTimer.reset();
+        mEjectTimer.start();
         mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
     }
 
