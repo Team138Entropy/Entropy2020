@@ -39,6 +39,9 @@ public class Storage extends Subsystem {
   private boolean mEjectingBall = false;
   private int mBallsEjectedDebounce = 0;
 
+  // TODO: Hook this up with Autonomous starting with balls
+  private int ballsStored = 0;
+
   private static Storage sInstance;
 
   public static synchronized Storage getInstance() {
@@ -104,6 +107,18 @@ public class Storage extends Subsystem {
     mEjectingBall = true;
     mBallsEjectedDebounce = 0;
     mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
+  }
+
+  public void increaseBallCount() {
+    ballsStored++;
+  }
+
+  public void decreaseBallCount() {
+    ballsStored--;
+  }
+
+  public int getBallCount() {
+    return ballsStored;
   }
 
   @Override

@@ -135,6 +135,7 @@ public class Shooter extends Subsystem {
 
       if (state == State.FULL_SPEED) {
         state = State.FIRING;
+        Storage.getInstance().decreaseBallCount();
         m_intake.shoveANodeIntoTheThing();
         m_fireTimer.start();
         m_buffer--;

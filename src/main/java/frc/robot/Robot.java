@@ -92,7 +92,7 @@ public class Robot extends TimedRobot {
 
   private void updateSmartDashboard() {
     // TODO: set this up for real
-    SmartDashboard.putString("BallCounter", "BallValue" + " / 5");
+    SmartDashboard.putString("BallCounter", mStorage.getBallCount() + " / 5");
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     // TODO: decide if this is necessary and hook it up
     SmartDashboard.putBoolean("ShooterLoaded", false);

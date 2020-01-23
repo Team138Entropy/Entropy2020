@@ -12,6 +12,7 @@ public class BallStored implements Event {
 
   public Command getCommand() {
     System.out.println("Ball Stored");
+    Storage.getInstance().increaseBallCount();
     return new StopBallStorage();
   }
 }
