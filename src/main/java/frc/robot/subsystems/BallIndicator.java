@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj.Timer;
  * flashing green, acquired = solid green.
  */
 public class BallIndicator {
-  private static BallIndicator instance;
-  private int port; // The PWM port number
+  private static BallIndicator sInstance;
+  private int mPort; // The PWM port number
 
   /* Needed to make the LED work */
-  private AddressableLED addressableLED;
-  private AddressableLEDBuffer ledBuffer;
+  private AddressableLED mAddressableLED;
+  private AddressableLEDBuffer mLedBuffer;
 
   /* For coordinating flashing across all lights in the strip */
-  private Timer stripTimer;
+  private Timer mStripTimer;
 
   public enum State {
     EMPTY,
@@ -28,114 +28,110 @@ public class BallIndicator {
 
   /* For keeping track of LED states */
   private class LED {
-    private int ledNumber; // The LED's position in the strip
-    private State ledState;
-    private boolean isOn;
+    private int mLedNumber; // The LED's number on the strip
+    private State mLedState;
+    private boolean mIsOn;
 
     private LED(int number, State state) {
-      ledNumber = number;
-      ledState = state;
-      isOn = false;
+      mLedNumber = number;
+      mLedState = state;
+      mIsOn = false;
     }
 
     /* Updates a LED's output */
     private void updateLight() {
-      switch (ledState) {
+      switch (mLedState) {
 
-          /* LED off */
+        /* LED off */
         case EMPTY:
-          addressableLED.stop();
-          isOn = false;
+          mAddressableLED.stop();
+          mIsOn = false;
           break;
 
-          /* Flashing yelllow */
+        /* Flashing yelllow */
         case LOADING:
-          if (isOn == true) {
-            ledBuffer.setRGB(ledNumber, 255, 255, 0);
-            addressableLED.start();
+          if (mIsOn == true) {
+            mLedBuffer.setRGB(mLedNumber, 255, 255, 0);
+            mAddressableLED.start();
           } else {
-            addressableLED.stop();
+            mAddressableLED.stop();
           }
           break;
 
-          /* Flashing green */
+        /* Flashing green */
         case FULL:
-          if (isOn == true) {
-            ledBuffer.setRGB(ledNumber, 255, 255, 0);
-            addressableLED.start();
+          if (mIsOn == true) {
+            mLedBuffer.setRGB(mLedNumber, 255, 255, 0);
+            mAddressableLED.start();
           } else {
-            addressableLED.stop();
+            mAddressableLED.stop();
           }
           break;
 
-          /* Solid green */
+        /* Solid green */
         case ACQUIRED:
-          ledBuffer.setRGB(ledNumber, 0, 200, 0);
-          addressableLED.start();
-          isOn = true;
+          mLedBuffer.setRGB(mLedNumber, 0, 200, 0);
+          mAddressableLED.start();
+          mIsOn = true;
           break;
       }
     }
 
     private void toggle() {
-      if (isOn == true) {
-        isOn = false;
-      } else if (isOn == false) {
-        isOn = true;
-      }
+      mIsOn = !mIsOn;
       updateLight();
     }
   }
 
-  private int length; // Number of LEDs on strip
-  private LED[] ledStrip; // For keeping track of individual LED states
+  private int mLength; // Number of LEDs on strip
+  private LED[] mLedStrip; // For keeping track of individual LED states
 
   private BallIndicator(int port, int length) {
-    this.port = port;
-    this.length = length;
-    stripTimer = new Timer();
-    ledStrip = new LED[this.length];
-    addressableLED = new AddressableLED(this.port);
-    ledBuffer = new AddressableLEDBuffer(this.length);
+    this.mPort = port;
+    this.mLength = length;
+    mStripTimer = new Timer();
+    mLedStrip = new LED[this.mLength];
+    mAddressableLED = new AddressableLED(this.mPort);
+    mLedBuffer = new AddressableLEDBuffer(this.mLength);
 
-    addressableLED.setLength(this.length);
-    addressableLED.setData(ledBuffer);
-    for (int n = 0; n < this.length; n++) {
-      ledStrip[n] = new LED(n, State.EMPTY);
+    mAddressableLED.setLength(this.mLength);
+    mAddressableLED.setData(mLedBuffer);
+    for (int n = 0; n < this.mLength; n++) {
+      mLedStrip[n] = new LED(n, State.EMPTY);
     }
   }
 
   public static BallIndicator getInstance() {
-    if (instance == null) {
-      instance = new BallIndicator(0, 5);
+    if (sInstance == null) {
+      sInstance = new BallIndicator(0, 5);
     }
-    return instance;
+    return sInstance;
   }
 
   /* Updates the strip's state variables */
   void setStripState(State[] newState) {
-    for (int n = 0; n < length; n++) {
-      ledStrip[n].ledState = newState[n];
+    for (int n = 0; n < mLength; n++) {
+      mLedStrip[n].mLedState = newState[n];
     }
     updateStrip();
   }
 
   /* Updates each light's output */
   private void updateStrip() {
-    for (int n = 0; n < length; n++) {
-      ledStrip[n].updateLight();
+    for (int n = 0; n < mLength; n++) {
+      mLedStrip[n].updateLight();
     }
   }
 
   /* Run every robot loop. Checks whether to toggle the flashing LEDs */
   public void checkTimer() {
-    if (stripTimer.get() >= 250) {
-      for (int n = 0; n < length; n++) {
-        if (ledStrip[n].ledState == State.LOADING || ledStrip[n].ledState == State.ACQUIRED) {
-          ledStrip[n].toggle();
+    if (mStripTimer.get() >= 250) {
+      for (int n = 0; n < mLength; n++) {
+        if (mLedStrip[n].mLedState == State.LOADING || mLedStrip[n].mLedState == State.FULL) {
+          mLedStrip[n].toggle();
         }
       }
-      stripTimer.reset();
+      mStripTimer.reset();
     }
   }
 }
