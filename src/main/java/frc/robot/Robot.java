@@ -37,10 +37,8 @@ public class Robot extends TimedRobot {
   private final VisionManager mVisionManager = VisionManager.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
   private final Intake mIntake = Intake.getInstance();
-
-  // Subsystems
-  private final VisionManager mVisionManager = VisionManager.getInstance();
-  private final Shooter mShooter = Shooter.getInstance();
+  private final Storage mStorage = Storage.getInstance();
+  private BallIndicator mBallIndicator;
 
   // Variables from State
 
@@ -69,10 +67,6 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Robot State Reset");
     mRobotState.reset();
 
-    // prepare the network table
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    mTable = inst.getTable("SmartDashboard");
-
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
       mTurret = Turret.getInstance();
@@ -99,8 +93,7 @@ public class Robot extends TimedRobot {
   private void updateSmartDashboard() {
     // TODO: set this up for real
     SmartDashboard.putString("BallCounter", "BallValue" + " / 5");
-    // TODO: change this to the real boolean
-    SmartDashboard.putBoolean("ShooterFull", mStorage);
+    SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     // TODO: decide if this is necessary and hook it up
     SmartDashboard.putBoolean("ShooterLoaded", false);
     SmartDashboard.putBoolean(
@@ -203,6 +196,8 @@ public class Robot extends TimedRobot {
 
     mShooter.periodic();
 
+    mStorage.periodic();
+
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator.checkTimer();
     }
@@ -210,6 +205,10 @@ public class Robot extends TimedRobot {
     // Climb
     if (mOperatorInterface.getClimb()) {
       // climb!
+    }
+
+    if (mOperatorInterface.getShoot()) {
+      // Shoot!
     }
 
     // Operator Controls
