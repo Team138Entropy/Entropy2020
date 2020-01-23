@@ -42,13 +42,13 @@ public class BallIndicator {
     private void updateLight() {
       switch (mLedState) {
 
-        /* LED off */
+          /* LED off */
         case EMPTY:
           mAddressableLED.stop();
           mIsOn = false;
           break;
 
-        /* Flashing yelllow */
+          /* Flashing yelllow */
         case LOADING:
           if (mIsOn == true) {
             mLedBuffer.setRGB(mLedNumber, 255, 255, 0);
@@ -58,7 +58,7 @@ public class BallIndicator {
           }
           break;
 
-        /* Flashing green */
+          /* Flashing green */
         case FULL:
           if (mIsOn == true) {
             mLedBuffer.setRGB(mLedNumber, 255, 255, 0);
@@ -68,7 +68,7 @@ public class BallIndicator {
           }
           break;
 
-        /* Solid green */
+          /* Solid green */
         case ACQUIRED:
           mLedBuffer.setRGB(mLedNumber, 0, 200, 0);
           mAddressableLED.start();
