@@ -3,11 +3,13 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import frc.robot.Config;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.OperatorInterface;
 
@@ -21,6 +23,8 @@ public class Turret extends PIDSubsystem {
   private Logger mTurretLogger;
   private WPI_TalonSRX mTurretTalon;
   private Potentiometer mPot;
+
+  private Relay cameraLight = new Relay(Constants.kCameraRingId);
 
   // the target position (on a scale from 0 to 100)
   private double mManualTargetPos = 50;
@@ -121,8 +125,11 @@ public class Turret extends PIDSubsystem {
       mTurretLogger.verbose("movement blocked");
       OperatorInterface.getInstance().setOperatorRumble(true);
     }
-
     // run the PIDSubsystem system's loop
     this.periodic();
+  }
+
+  public void setCameraLight(boolean on) {
+    cameraLight.set(on ? Relay.Value.kOn : Relay.Value.kOff);
   }
 }
