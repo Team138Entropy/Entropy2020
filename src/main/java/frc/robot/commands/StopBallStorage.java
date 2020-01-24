@@ -5,9 +5,9 @@ import frc.robot.subsystems.Storage;
 
 public class StopBallStorage extends InstantCommand {
 
-    public StopBallStorage() {}
+  public StopBallStorage() {}
 
-    public void execute() {
-        Storage.getInstance().stop();
-    }
+  public void execute() {
+    Storage.getInstance().stop();
+  }
 }

@@ -6,25 +6,25 @@ package frc.robot;
 
 */
 public class RobotState {
-    private static RobotState mInstance;
+  private static RobotState mInstance;
 
-    public static RobotState getInstance() {
-        if (mInstance == null) {
-            mInstance = new RobotState();
-        }
-
-        return mInstance;
+  public static RobotState getInstance() {
+    if (mInstance == null) {
+      mInstance = new RobotState();
     }
 
-    private RobotState() {}
+    return mInstance;
+  }
 
-    // Reset Robot State
-    // Make note of the Starting Position
-    public void reset() {}
+  private RobotState() {}
 
-    /*
-        Record robot's initial position on field
-        This is encapsulated in a Pose2D object
-    */
-    private void SetIntialFieldToRobot() {}
+  // Reset Robot State
+  // Make note of the Starting Position
+  public void reset() {}
+
+  /*
+      Record robot's initial position on field
+      This is encapsulated in a Pose2D object
+  */
+  private void SetIntialFieldToRobot() {}
 }

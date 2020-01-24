@@ -6,12 +6,12 @@ import frc.robot.subsystems.Storage;
 
 public class BallDetected implements Event {
 
-    public boolean check() {
-        return (Storage.getInstance().isBallDetected());
-    }
+  public boolean check() {
+    return (Storage.getInstance().isBallDetected());
+  }
 
-    public Command getCommand() {
-        System.out.println("Ball Detected");
-        return new StartBallStorage();
-    }
+  public Command getCommand() {
+    System.out.println("Ball Detected");
+    return new StartBallStorage();
+  }
 }

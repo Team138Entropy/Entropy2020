@@ -25,4 +25,4 @@ jobs:
     - name: Lint with Google Java
       uses: axel-op/googlejavaformat-action@v2.0.0
       with:
-        args: --replace -a 
+        args: --replace
