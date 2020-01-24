@@ -6,7 +6,7 @@ This readme highlights portions of the architecture, ideas, and best practices.
 
 ### Code Formatting
 We have a git hook that will format your code according to Google's style guide whenever you commit. To enable it, you will need to run
-`update-hooks.bat` on Windows or `gradlew installGitHooks` on GNU/Linux and macOS.
+`update-hooks.bat` on Windows or `gradlew installGitHooks` on Linux and macOS.
 
 ### Architecture Highlights
 - Multithreading Support
