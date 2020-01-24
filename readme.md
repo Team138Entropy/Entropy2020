@@ -3,6 +3,7 @@
 A baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
 This readme highlights portions of the architecture, ideas, and best practices.
 
+
 ### Architecture Highlights
 - Multithreading Support
     - RoboRio has a 2 Core Processor and supports paralization. A good example of this is utilizing a secondary thread for vision communication.
