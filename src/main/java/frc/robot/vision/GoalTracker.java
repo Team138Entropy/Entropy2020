@@ -1,6 +1,10 @@
 package frc.robot.vision;
-
+import frc.robot.Constants;
 import frc.robot.util.geometry.Pose2d;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Partially adapted from 254. Used in the event that multiple goals are detected to judge all goals
@@ -33,7 +37,7 @@ public class GoalTracker {
         }
 
     }
-}
+
 
 
     /**
@@ -72,12 +76,12 @@ public class GoalTracker {
 
         double score(TrackReport report){
             double stability_score = mStabilityWeight * report.stability;
+            double age_score = mAgeWeight
+                    * Math.max(0, (Constants.kMaxGoalTrackAge - (mCurrentTimestamp - report.latest_timestamp))
+                            / Constants.kMaxGoalTrackAge);
+            double switching_score = (report.id == mLastTrackID ? mSwitchingWeight : 0);
 
-            double age_score = mAgeWeight * Math.max(0, ())
-
-            double switching_score = 0;
-            
-            //compile the scores together.. this is the score!
+            //Compile all of these fields together! this is our score!
             return stability_score + age_score + switching_score;
         }
 
