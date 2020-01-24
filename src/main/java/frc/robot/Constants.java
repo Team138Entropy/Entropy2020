@@ -16,7 +16,7 @@ public class Constants {
   public static final int kPCMId = 1;
   public static final int kShifterSolenoidId = 7;
 
-    // PWM
+  // PWM
   public static final int cameraRingId = 0;
 
   // Drive Constants
@@ -25,7 +25,7 @@ public class Constants {
   public static final double kDriveWheelDiameterInches = 3.938;
   public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
   public static final double kDriveWheelTrackRadiusWidthMeters =
-            kDriveWheelTrackWidthInches / 2.0 * 0.0254;
+      kDriveWheelTrackWidthInches / 2.0 * 0.0254;
 
   // Based on how this is used, I'm pretty sure this is a corrective factor
   public static final double kTrackScrubFactor = 1.0469745223;

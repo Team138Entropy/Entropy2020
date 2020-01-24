@@ -130,13 +130,11 @@ public class Turret extends PIDSubsystem {
     this.periodic();
   }
 
-  
-
   public void setCameraLight(boolean on) {
     if (on) {
-        cameraLight.set(Relay.Value.kOn);
+      cameraLight.set(Relay.Value.kOn);
     } else {
-        cameraLight.set(Relay.Value.kOff);
+      cameraLight.set(Relay.Value.kOff);
     }
   }
 }
