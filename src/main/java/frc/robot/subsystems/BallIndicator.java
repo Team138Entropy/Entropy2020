@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
  * Tracks the state of each LED on a strip. No ball = off, loading = flashing yellow, full =
  * flashing green, acquired = solid green.
  */
-public class BallIndicator {
+public class BallIndicator extends Subsystem {
   private static BallIndicator sInstance;
   private int mPort; // The PWM port number
 
@@ -134,4 +134,8 @@ public class BallIndicator {
       mStripTimer.reset();
     }
   }
+  
+  public void ZeroSensors() {}
+
+  public void CheckSubsystems() {}
 }
