@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
@@ -37,6 +38,8 @@ public class Robot extends TimedRobot {
   // Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
+
+  private final Compressor mCompressor = new Compressor();
 
   // Variables from State
 
@@ -76,6 +79,14 @@ public class Robot extends TimedRobot {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator = BallIndicator.getInstance();
     }
+  }
+
+  /*
+    Returns true if the pressure switch reads "low", an undefined value we have no control over.
+    Cool!
+  */
+  public boolean getLowPSI() {
+    return mCompressor.getPressureSwitchValue();
   }
 
   /*
