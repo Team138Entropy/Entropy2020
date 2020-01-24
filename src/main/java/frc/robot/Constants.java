@@ -42,4 +42,7 @@ public class Constants {
     public static final double kTrackSwitchingWeight = 100.0;
     public static final double kCameraFrameRate = 90.0; //fps
 
+    //Field Related Constants
+    public static final double kHighGoalHeight = 100; //placeholder... inches!
+
 }

@@ -286,18 +286,6 @@ def threshold_video(lower_color, upper_color, blur):
 	global hsv_threshold_hue
 	global hsv_threshold_saturation
 	global hsv_threshold_value
-
-	'''
-	# Convert BGR to HSV
-	hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
-
-
-	print(type(lower_color))
-	print(type(upper_color))
-	# hold the HSV image to get only red colors
-	mask = cv2.inRange(hsv, lower_color, upper_color)
-	'''
-
 	out = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
 	mask = cv2.inRange(out, (hsv_threshold_hue[0], hsv_threshold_saturation[0], hsv_threshold_value[0]),  (hsv_threshold_hue[1], hsv_threshold_saturation[1], hsv_threshold_value[1]))
 
@@ -309,7 +297,6 @@ def threshold_video(lower_color, upper_color, blur):
 vals_to_send = np.array([None] * 4)
 # Finds the tape targets from the masked image and displays them on original stream + network tales
 def findTargets(frame, mask, value_array):
-	#print("FIND TARGETS")
 	# Finds contours
 	_, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
 	# Take each frame
@@ -321,13 +308,11 @@ def findTargets(frame, mask, value_array):
 	# Copies frame and stores it in image
 	image = frame.copy()
 	# Processes the contours, takes in (contours, output_image, (centerOfImage)
-
-
 	if len(contours) != 0:
 		value_array = findTape(contours, image, centerX, centerY)
 	else:
-		# pushes that it deosn't see vision target to network tables
-		networkTable.putBoolean("tapeDetected", False)
+		#No Contours!
+		pass
 
 
 	# Shows the contours overlayed on the original video
@@ -513,10 +498,6 @@ def findTape(contours, image, centerX, centerY):
 						starttime = time.time()					
 						print(starttime)
 						
-
-					
-					
-
 					sendValues[0] = cx
 					sendValues[1] = cy
 					sendValues[3] = myDistFeet
@@ -1030,18 +1011,6 @@ if __name__ == "__main__":
 	if not readConfig():
 		sys.exit(1)
 
-	# start NetworkTables
-	ntinst = NetworkTablesInstance.getDefault()
-	#Name of network table - this is how it communicates with robot. IMPORTANT
-	networkTable = NetworkTables.getTable('SmartDashboard')
-
-	if server:
-		print("Setting up NetworkTables server")
-		ntinst.startServer()
-	else:
-		print("Setting up NetworkTables client for team {}".format(team))
-		ntinst.startClientTeam(team)
-
 
 	# start cameras
 	cameras = []
@@ -1062,11 +1031,10 @@ if __name__ == "__main__":
 	# (optional) Setup a CvSource. This will send images back to the Dashboard
 	# Allocating new images is very expensive, always try to preallocate
 	img = np.zeros(shape=(image_height, image_width, 3), dtype=np.uint8)
-	#Start thread outputing stream
-	streamViewer = VideoShow(image_width,image_height, cameraServer, frame=img, name="SmartDashboard").start()
+
 	#cap.autoExpose=True;
 	tape = False
-	fps = FPS().start()
+	#fps = FPS().start()
 	#TOTAL_FRAMES = 200;
 	# loop forever
 	while True:
@@ -1080,6 +1048,6 @@ if __name__ == "__main__":
 
 	#Doesn't do anything at the moment. You can easily get this working by indenting these three lines
 	# and setting while loop to: while fps._numFrames < TOTAL_FRAMES
-	fps.stop()
+	#fps.stop()
 	print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 	print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))

@@ -6,6 +6,7 @@ import frc.robot.util.InterpolatingDouble;
 import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.TargetInfo;
+import frc.robot.vision.GoalTracker;
 import java.util.*;
 
 /*
@@ -56,17 +57,18 @@ public class RobotState {
 
     private Twist2d vehicle_velocity_predicted;
     private Twist2d vehicle_velocity_measured;
-    // private MovingAverageTwist2d vehicle_velocity_measured_filtered;
+    private MovingAverageTwist2d vehicle_velocity_measured_filtered;
 
     // Reference to Drive Train
     // Used for polling encoders/gyro
     private Drive mDrive = Drive.getInstance();
 
-    // Constructor for Robot State
-    // Called upon RobotState startup, reset everything
-    private RobotState() {
-        // reset(0.0, Pose2d.identity(), Rotation2d.identity());
-    }
+    //Goal Trackers - Specific Goal Tracking Objects
+    private GoalTracker vision_highgoal = new GoalTracker();
+    private GoalTracker vision_ball = new GoalTracker();
+
+    private List<Translation2d> mCameraToHighGoal = new ArrayList<>();
+    private List<Translation2d> mCameraToBall = new ArrayList<>();
 
     // Variables Related to the Update
     // These variables are the back
@@ -74,6 +76,42 @@ public class RobotState {
     private double update_right_encoder_prev_distance = 0.0;
     private double update_prev_timestamp = -1.0;
     private Rotation2d update_prev_heading = null;
+
+    // Constructor for Robot State
+    // Called upon RobotState startup, reset everything
+    private RobotState() {
+        // At the time of this call, this is our zero point!
+        zero(0.0, Pose2d.identity(), Rotation2d.identity());
+    }
+
+    //Zero out the robot's state
+    //when this called this is our new starting point
+    //The Pose2D will be the initial x, y of the robot.. along with the rotation (which is all 0 since this is our starting point)
+    //The Rotation will be the Turret's rotation relative to the robot (which is 0 since we are 'zeroing')
+    public synchronized void zero(double time, Pose2d Initial_Robot_Pose, Rotation2d Initial_Turret_Rotation){
+        //We haven't moved!
+        DistanceDriven = 0;
+
+        //Create our TreeMaps. These allow time based lookups
+        //buffer will only hold a certain amount of points
+        Field_To_Vehicle_Map = new InterpolatingTreeMap<>(kObservationBufferSize);
+        Vehicle_To_Turret_Map = new InterpolatingTreeMap<>(kObservationBufferSize);
+
+        //Store Intial Values
+        Field_To_Vehicle_Map.put(new InterpolatingDouble(time), Initial_Robot_Pose);
+        Vehicle_To_Turret_Map.put(new InterpolatingDouble(time), Initial_Turret_Rotation);
+
+        //Velocity predicition values
+        vehicle_velocity_measured = Twist2d.identity();
+        vehicle_velocity_predicted = Twist2d.identity();
+        vehicle_velocity_measured_filtered = new MovingAverageTwist2d(25); //maximum of 25 values
+    }
+
+    //Zero out everything...
+    public synchronized void reset(){
+        zero(Timer.getFPGATimestamp(), Pose2d.identity(), Rotation2d.identity());
+    }
+
 
     // Update Robot State
     public void update(double timestamp) {
@@ -122,32 +160,51 @@ public class RobotState {
         update_prev_timestamp = timestamp;
     }
 
-    // Reset Robot State
-    // Make note of the Starting Position
-    public void reset() {
-        DistanceDriven = 0;
-    }
+
 
     public synchronized void ResetDriveDistance() {
         DistanceDriven = 0;
     }
 
-    /*
-        Record robot's initial position on field
-        This is encapsulated in a Pose2D object
-    */
-    private synchronized void SetIntialFieldToRobot() {}
 
     // Vision Manager Passes a new Target Info to the Robot State
     public synchronized void AddVisionObservation(TargetInfo ti) {
         double timestamp = Timer.getFPGATimestamp();
+        Translation2d translation;
 
         // Proceed based on target type
         if (ti.IsHighGoal() == true) {
             // High Goal!
+            translation = getCameraToVisionTargetPose(true, ti);
         } else {
             // Ball
+            translation = getCameraToVisionTargetPose(false, ti);
+
         }
+    }
+
+    //Returns a translation of the robot 
+    //returns null if there is no intersection with the goal.. no shot!
+    private Translation2d getCameraToVisionTargetPose(boolean TurretCamera, TargetInfo ti){
+
+        //Compensate for camera pitch!
+        Translation2d xz_plane_translation = new Translation2d(ti.getX(), ti.getZ()).rotateBy(Rotation2d.identity());
+
+        double x = xz_plane_translation.x();
+        double y = ti.getY();
+        double z = xz_plane_translation.y();
+
+        // find intersection with the goal
+        //if we do have an intersection with the goal, return our translation.. if we don't return null
+        //double differential_height = source.getLensHeight() - (high ? Constants.kPortTargetHeight : Constants.kHatchTargetHeight);
+        double differential_height = Constants.kHighGoalHeight;
+        if ((z < 0.0) == (differential_height > 0.0)) {
+            double scaling = differential_height / -z;
+            double distance = Math.hypot(x, y) * scaling;
+            Rotation2d angle = new Rotation2d(x, y, true);
+            return new Translation2d(distance * angle.cos(), distance * angle.sin());
+        }
+        return null;
     }
 
     /**
@@ -189,9 +246,13 @@ public class RobotState {
         return Field_To_Vehicle_Map.lastEntry();
     }
 
+
+    // 
     public synchronized void addObservations(
             double timestamp,
             Twist2d displacement,
             Twist2d measured_velocity,
-            Twist2d predicted_velocity) {}
+            Twist2d predicted_velocity) {
+
+    }
 }

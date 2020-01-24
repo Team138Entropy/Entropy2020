@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
+import frc.robot.util.LatchedBoolean;
 import frc.robot.util.geometry.*;
 
 /**
@@ -32,7 +33,10 @@ public class Robot extends TimedRobot {
     private final Drive mDrive = Drive.getInstance();
     private final VisionManager mVisionManager = VisionManager.getInstance();
     public Relay visionLight = new Relay(0);
-    // Variables from State
+    
+    // Control Variables
+    private LatchedBoolean AutoAim = new LatchedBoolean();
+
 
     // autonomousInit, autonomousPeriodic, disabledInit,
     // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
@@ -93,6 +97,9 @@ public class Robot extends TimedRobot {
         // Check User Inputs
         double DriveThrottle = mOperatorInterface.getDriveThrottle();
         double DriveTurn = mOperatorInterface.getDriveTurn();
+        boolean WantsLowGear = false;
+        boolean WantsHarvestMode = false;
+        boolean WantsAutoAim = false;
         boolean AutoDrive = false;
 
         // Continue Driving
