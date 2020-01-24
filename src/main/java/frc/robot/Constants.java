@@ -1,6 +1,7 @@
 package frc.robot;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
+@Deprecated
 public class Constants {
   // Controller Ports
   public static final int OperatorControllerPort = 1;
