@@ -24,8 +24,7 @@ public class Turret extends PIDSubsystem {
   private WPI_TalonSRX mTurretTalon;
   private Potentiometer mPot;
 
-  // TODO: this
-  private Relay cameraLight = new Relay(Constants.cameraRingId);
+  private Relay cameraLight = new Relay(Constants.kCameraRingId);
 
   // the target position (on a scale from 0 to 100)
   private double mManualTargetPos = 50;
@@ -131,10 +130,6 @@ public class Turret extends PIDSubsystem {
   }
 
   public void setCameraLight(boolean on) {
-    if (on) {
-      cameraLight.set(Relay.Value.kOn);
-    } else {
-      cameraLight.set(Relay.Value.kOff);
-    }
+    cameraLight.set(on ? Relay.Value.kOn : Relay.Value.kOff);
   }
 }
