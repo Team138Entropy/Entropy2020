@@ -134,7 +134,7 @@ public class BallIndicator extends Subsystem {
       mStripTimer.reset();
     }
   }
-  
+
   public void ZeroSensors() {}
 
   public void CheckSubsystems() {}
