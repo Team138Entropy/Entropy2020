@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
@@ -187,9 +186,7 @@ public class Drive extends Subsystem {
       Before gears are switched, it would be a good idea to check
       psi to ensure we can properly drive the piston
   */
-  public synchronized void SwitchGears(boolean HighGear) {
-    
-  }
+  public synchronized void SwitchGears(boolean HighGear) {}
 
   /*
       Test all Sensors in the Subsystem
