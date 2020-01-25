@@ -41,9 +41,6 @@ HorizontalAspect = 4
 VerticalAspect = 3
 DiagonalAspect = math.hypot(HorizontalAspect, VerticalAspect)
 
-# Upper and Lower HSV Threshold Limits
-Tape_HSV_Lower = np.array([39, 181, 135])  # Hue, Saturation, Value
-Tape_HSV_Upper = np.array([68, 255, 255])  # Hue, Saturation, Value
 
 # Ball HSV Values
 Ball_HSV_Lower = np.array([13, 67, 188])
@@ -56,8 +53,6 @@ rat_high = 10
 hsv_threshold_hue = [13, 69]
 hsv_threshold_saturation = [138, 255]
 hsv_threshold_value = [76, 255]
-
-track_prev_values = [0] * 10
 
 # List will go in order [x of target position, y of target position, yaw, distance, ]
 sendValues = np.array([None] * 4)
@@ -467,11 +462,12 @@ def findTape(contours, image, centerX, centerY):
 
                     if abs(myDistFeet-mean(distanceHoldValues)) > 1.5:
                         outlierCount = outlierCount + 1
+                        myDistFeet = None
 
                     else:
+                        outlierCount = 0
                         distanceHoldValues.pop()
                         distanceHoldValues.push(myDistFeet)
-
 
                     ######
 
@@ -624,12 +620,6 @@ def grab_contours(cnts):
     return cnts
 
 
-# Filter out the Tape HSV
-def FilterHSVTape(frame):
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    return cv2.inRange(frame, Tape_HSV_Lower, Tape_HSV_Upper)
-
-
 # Perform a Mask on the ball
 # use a range of colors around the ball color to account for lighting
 def MaskBall(frame):
@@ -735,7 +725,6 @@ def ProcessFrame(frame, tape):
 
     # Tape Process!
     # APPLY A BLUE TO BLUR THE LINES
-    #		frame = FilterHSVTape(frame) #Filter Frame for HSV Tape
     else:
         # Ball Tracker!
         original_frame = frame.copy()
