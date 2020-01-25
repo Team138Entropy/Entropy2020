@@ -15,7 +15,7 @@ import java.util.Properties;
  */
 public class ConfigFile {
   Properties mProps;
-  Properties mDefaultProps;
+  // Properties mDefaultProps;
 
   /** Reads the configuration file. */
   public ConfigFile() {
@@ -40,16 +40,16 @@ public class ConfigFile {
     }
 
     // load the default config
-    try (InputStream input =
-        new FileInputStream(Filesystem.getDeployDirectory() + "/defaultconfig.properties")) {
-      mDefaultProps = new Properties();
+    // try (InputStream input =
+    //     new FileInputStream(Filesystem.getDeployDirectory() + "/defaultconfig.properties")) {
+    //   mDefaultProps = new Properties();
 
-      // load the properties file
-      mDefaultProps.load(input);
+    //   // load the properties file
+    //   mDefaultProps.load(input);
 
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
+    // } catch (IOException ex) {
+    //   ex.printStackTrace();
+    // }
   }
 
   /**
@@ -59,20 +59,20 @@ public class ConfigFile {
    */
   public String getProp(String key) {
     String value = mProps.getProperty(key);
-    if (value == null) {
-      value = mDefaultProps.getProperty(key);
+    // if (value == null) {
+    //   value = mDefaultProps.getProperty(key);
 
-      if (value == null) {
-        throw new RuntimeException(
-            "Did not find the key " + key + " in config file or backup config file ");
-      } else {
-        DriverStation.reportError(
-            "\n\n======================================\nKEY "
-                + key
-                + " WAS NOT FOUND IN MAIN CONFIG BUT WAS FOUND IN DEFAULT FILE\nPlease add it to the file.\nYou might have unexpected issues.\n======================================\n\n",
-            Thread.currentThread().getStackTrace());
-      }
-    }
+    //   if (value == null) {
+    //     throw new RuntimeException(
+    //         "Did not find the key " + key + " in config file or backup config file ");
+    //   } else {
+    //     DriverStation.reportError(
+    //         "\n\n======================================\nKEY "
+    //             + key
+    //             + " WAS NOT FOUND IN MAIN CONFIG BUT WAS FOUND IN DEFAULT FILE\nPlease add it to the file.\nYou might have unexpected issues.\n======================================\n\n",
+    //         Thread.currentThread().getStackTrace());
+    //   }
+    // }
     return value;
   }
 
