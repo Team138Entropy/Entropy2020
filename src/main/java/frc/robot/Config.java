@@ -119,10 +119,10 @@ public class Config {
       return value;
     } else { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
-      "Key "
-          + key.name()
-          + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-      new RuntimeException().getStackTrace());
+          "Key "
+              + key.name()
+              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+          new RuntimeException().getStackTrace());
       return (String) key.value;
     }
   }
@@ -139,10 +139,10 @@ public class Config {
       return value;
     } else { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
-      "Key "
-          + key.name()
-          + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-      new RuntimeException().getStackTrace());
+          "Key "
+              + key.name()
+              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+          new RuntimeException().getStackTrace());
       return (Float) key.value;
     }
   }
@@ -159,10 +159,10 @@ public class Config {
       return value;
     } else { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
-      "Key "
-          + key.name()
-          + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-      new RuntimeException().getStackTrace());
+          "Key "
+              + key.name()
+              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+          new RuntimeException().getStackTrace());
       return (Double) key.value;
     }
   }
@@ -179,10 +179,10 @@ public class Config {
       return value;
     } else { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
-      "Key "
-          + key.name()
-          + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-      new RuntimeException().getStackTrace());
+          "Key "
+              + key.name()
+              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+          new RuntimeException().getStackTrace());
       return (Integer) key.value;
     }
   }
@@ -199,10 +199,10 @@ public class Config {
       return value;
     } else { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
-      "Key "
-          + key.name()
-          + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-      new RuntimeException().getStackTrace());
+          "Key "
+              + key.name()
+              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+          new RuntimeException().getStackTrace());
       return (Boolean) key.value;
     }
   }
