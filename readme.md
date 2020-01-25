@@ -1,5 +1,6 @@
 # Entropy 2020
 
+
 This is a baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
 This readme highlights portions of the architecture, ideas, and best practices.
 
@@ -78,7 +79,7 @@ We have a git hook that will format your code according to Google's style guide 
     - Find a path
     - FInd a trajectory
     - Follow the trajectory
-        - FIgure out where you should be right now
+        - Figure out where you should be right now
         - Feedforware control + Feedback control
 
 
