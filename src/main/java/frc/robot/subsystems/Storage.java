@@ -72,12 +72,12 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallDetected() {
-    return mIntakeSensor.getValue() > INTAKE_SENSOR_BALL_THRESHOLD;
+    return mIntakeSensor.getValue() >= INTAKE_SENSOR_BALL_THRESHOLD;
   }
 
   public boolean isBallStored() {
     return (mState == State.STORING)
-        && (mIntakeSensor.getValue() < INTAKE_SENSOR_NO_BALL_THRESHOLD);
+        && (mIntakeSensor.getValue() <= INTAKE_SENSOR_NO_BALL_THRESHOLD);
   }
 
   public boolean isEmpty() {

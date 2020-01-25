@@ -64,7 +64,6 @@ public class Robot extends TimedRobot {
     mTable = inst.getTable("SmartDashboard");
     // Reset Robot State
     // Wherever the Robot is now is the starting position
-    mRobotLogger.log("Robot State Reset");
     mRobotState.reset();
 
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
@@ -209,7 +208,7 @@ public class Robot extends TimedRobot {
     }
 
     if (mOperatorInterface.getShoot()) {
-      // Shoot!
+      // Shoot
     }
 
     // Operator Controls
