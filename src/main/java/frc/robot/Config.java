@@ -205,4 +205,5 @@ public class Config {
       new RuntimeException().getStackTrace());
       return (Boolean) key.value;
     }
+  }
 }
