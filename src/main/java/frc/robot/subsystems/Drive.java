@@ -4,10 +4,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
+import frc.robot.vision.AimingParameters;
 
 public class Drive extends Subsystem {
     private static Drive mInstance;
@@ -167,11 +170,28 @@ public class Drive extends Subsystem {
     }
 
     /*
+        Auto Steer functionality
+        passed in parameters to the goal to aim at
+        allows driver to control throttle
+        this will be called with the ball as a target
+    */
+    public synchronized void autoSteerBall(double throttle, AimingParameters aim_params){
+        double timestamp = Timer.getFPGATimestamp();
+        final double kAutosteerAlignmentPointOffset = 15.0; //
+
+        setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+        setBrakeMode(true);
+
+    }
+
+    /*
         SwitchGears
         Before gears are switched, it would be a good idea to check
         psi to ensure we can properly drive the piston
     */
-    public synchronized void SwitchGears(boolean HighGear) {}
+    public synchronized void SwitchGears(boolean HighGear) {
+
+    }
 
     /*
         Test all Sensors in the Subsystem

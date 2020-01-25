@@ -7,6 +7,10 @@ import frc.robot.util.InterpolatingTreeMap;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.TargetInfo;
 import frc.robot.vision.GoalTracker;
+import frc.robot.vision.GoalTracker.TrackComparator;
+import frc.robot.vision.AimingParameters;
+
+import java.lang.StackWalker.Option;
 import java.util.*;
 
 /*
@@ -182,6 +186,71 @@ public class RobotState {
 
         }
     }
+
+
+    //Get the Latest Ball Target
+    public synchronized Optional<AimingParameters> getLatestBallAimingParameters(int prev_track_id, double max_track_age){
+       //Get Track Reports for our official goal tracker
+       List<GoalTracker.TrackReport> reports = vision_ball.getTrackReports();
+
+        //if we don't have any tracks
+        if(reports.isEmpty()){
+            return Optional.empty();
+        }
+
+        double timestamp = Timer.getFPGATimestamp();
+
+        //Determine the best Track
+        GoalTracker.TrackComparator comparator = new GoalTracker.TrackComparator(
+            Constants.kTrackStabilityWeight,
+            Constants.kTrackAgeWeight,
+            Constants.kTrackSwitchingWeight,
+            prev_track_id,
+            timestamp
+        );
+
+        //sort track comparator
+        reports.sort(comparator);
+
+        //now move from best tracks (via our sort) to worst groups
+        //get the one that is in range
+        GoalTracker.TrackReport report = null;
+        GoalTracker.TrackReport temp_report = null;
+        for(int i = 0; i < reports.size(); i++){
+            temp_report = reports.get(i);
+            if(temp_report.latest_timestamp > timestamp - max_track_age){
+                //this qualifies.. select this
+                report = temp_report;
+                break; //no need to keep looping
+            }
+        }{
+
+        //if we didn't find the report..return nothing
+        if(report == null){
+            return Optional.empty();
+        }
+
+        //Get a Vehicle to Goal Pose
+        Pose2d vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target).transformBy(0);
+
+        AimingParameters params = new AimingParameters(
+            vehicleToGoal,
+            report.field_to_target,
+            report.field_to_target.getRotation(),
+            report.latest_timestamp,
+            report.stability,
+            report.id
+        );
+        return Optional.of(params);
+    }
+
+    //Get the Latest Target
+    public synchronized Option<AimingParameters> getLatestTargetAimingParameters(){
+
+    }
+
+    //    public synchronized Optional<AimingParameters> getLatestAimingParameters() {
+
 
     //Returns a translation of the robot 
     //returns null if there is no intersection with the goal.. no shot!

@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.IO.OperatorInterface;
 import frc.robot.subsystems.*;
+import frc.robot.vision.AimingParameters;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.util.geometry.*;
+import java.util.Optional;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
@@ -31,7 +33,6 @@ public class Robot extends TimedRobot {
 
     // Subsystems
     private final Drive mDrive = Drive.getInstance();
-    private final VisionManager mVisionManager = VisionManager.getInstance();
     public Relay visionLight = new Relay(0);
     
     // Control Variables
@@ -49,7 +50,7 @@ public class Robot extends TimedRobot {
 
         // Reset Robot State - Note starting position of the Robot
         // This starting Rotation, X, Y is now the Zero Point
-        // mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity(), Rotation2d.identity());
+        mRobotState.reset();
 
     }
 
@@ -72,7 +73,7 @@ public class Robot extends TimedRobot {
         try {
             RobotLoop();
         } catch (Exception e) {
-            System.out.println("RobotLoop Exception");
+            System.out.println("RobotLoop Exception: " + e.getMessage());
         }
     }
 
@@ -101,11 +102,18 @@ public class Robot extends TimedRobot {
         boolean WantsHarvestMode = false;
         boolean WantsAutoAim = false;
         boolean AutoDrive = false;
+        boolean HarvesMode = false;
+
+        //Optional Object that may or may not contain a null value
+        Optional<AimingParameters> BallAimingParameters; //info to aim to the ball
+        Optional<AimingParameters> TargetAimingParameters; //info to aim to the target
 
         // Continue Driving
-        if (AutoDrive == true) {
-            // AutoSteer Functionality
+        if (HarvesMode == true) {
+            // Harvest Mode - AutoSteer Functionality
             // Used for tracking a ball
+            //we may want to limit the speed?
+            mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
         } else {
             // Standard Manual Drive
             mDrive.setDrive(DriveThrottle, DriveTurn, false);
