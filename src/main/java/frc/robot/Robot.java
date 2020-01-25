@@ -9,7 +9,6 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
@@ -29,33 +28,29 @@ public class Robot extends TimedRobot {
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
-  public void robotInit() {
-  }
+  public void robotInit() {}
 
   @Override
-  public void autonomousInit() {
-  }
+  public void autonomousInit() {}
 
   @Override
-  public void autonomousPeriodic() {
-  }
+  public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {
-  }
+  public void teleopInit() {}
 
   @Override
   public void teleopPeriodic() {
-    if(mController.getAButton()){
+    if (mController.getAButton()) {
       value = 0.25f;
     }
-    if(mController.getBButton()){
+    if (mController.getBButton()) {
       value = 0.5f;
     }
-    if(mController.getXButton()){
+    if (mController.getXButton()) {
       value = 0.75f;
     }
-    if(mController.getYButton()){
+    if (mController.getYButton()) {
       value = 1.0f;
     }
 
@@ -64,20 +59,16 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
-  }
+  public void testInit() {}
 
   @Override
   public void testPeriodic() {}
 
   @Override
-  public void disabledInit() {
-  }
+  public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {
-  }
+  public void disabledPeriodic() {}
 
-  public void turretLoop() {
-  }
+  public void turretLoop() {}
 }
