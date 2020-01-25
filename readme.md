@@ -79,7 +79,7 @@ We have a git hook that will format your code according to Google's style guide 
     - Find a path
     - FInd a trajectory
     - Follow the trajectory
-        - FIgure out where you should be right now
+        - Figure out where you should be right now
         - Feedforware control + Feedback control
 
 
