@@ -17,6 +17,7 @@ class UDPReciever {
     byte[] receiveData = new byte[2048];
     DatagramPacket recievePacket = null;
 
+
     /**
      * Constructor for the UDP reciever. Sets up internal memory structures in prep to start
      * listening for packets.
@@ -36,38 +37,23 @@ class UDPReciever {
         }
     }
 
+  
+
     /**
-     * Listens on the UPD connection for a packet. Casts it into a java string and returns it. Note
-     * this method will block while <i> aggressively polling </i> until a full packet is received,
-     * and drop all packets but the most recent.
-     *
-     * @return String of the data acquired from the UDP connection (if any data gotten)
+     * Listens for all packets on the connection..
+     * passes to the parser in a thread pool
      */
     public String getPacket() {
-        boolean last_packet = false;
-        String rx_string = "";
         if (recieveSocket != null) {
-            while (last_packet == false) {
-                try {
-                    recieveSocket.receive(recievePacket);
-                    rx_string = new String(recievePacket.getData(), 0, recievePacket.getLength());
-                } catch (java.net.SocketTimeoutException e) {
-                    /* timeout exception - this is OK, just means we don't see new complete packet. */
-                    if (rx_string.length() != 0) {
-                        // We have a packet and there are no more in the recieve queue. Break and
-                        // return the last packet one.
-                        last_packet = true;
-                        // System.out.println(rx_string);
-                    }
-                } catch (IOException e) {
-                    /* some other error we didn't think about... don't try to listen anymore */
-                    System.out.println("Error: Cannot get data from UDP socket: " + e.getMessage());
-                    recieveSocket = null;
-                }
+            try{
+                recieveSocket.receive(recievePacket);
+                String rx_string = new String(recievePacket.getData(), 0, recievePacket.getLength());
+                return rx_string;
+            }catch(IOException e){
+
             }
         }
-
-        return rx_string;
+        return "";
     }
 }
 
@@ -101,6 +87,9 @@ public class VisionManager extends Subsystem {
 
 
     private VisionManager() {
+        System.out.println("Vision Manager Init!");
+        System.out.println("^^$$$^^^");
+
         // Start a Socket to listen to UDP Packet
         // Each thread pass to a processer which
         PacketReciever = new UDPReciever("127.0.0.1", 5800);
@@ -108,18 +97,14 @@ public class VisionManager extends Subsystem {
 
         Thread listenerThread =
                 new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    while (true) {
-                                        ProcessPacket();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("DEBUG: Listener Thread Process!");
+                            ProcessPacket();
+                            System.out.println("DEBUG: end of listener thread loop");
+                        }
+                    });
 
         // Set Name and Start Thread!
         listenerThread.setName("VisionListenerThread");
@@ -151,11 +136,12 @@ public class VisionManager extends Subsystem {
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!
                 mRobotState.AddVisionObservation(ti);
-                System.out.println("DEBUG: ADD PACKET!")
 
             } catch (Exception Targ) {
                 // Exception Thrown when Trying to retrieve values from json object
-                CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
+                System.out.println("Packet Storing Exception: " + Targ.getMessage());
+                
+                //CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
             }
 
         } catch (ParseException pe) {
@@ -167,30 +153,37 @@ public class VisionManager extends Subsystem {
         }
     }
 
+
+   
+
     /*
         Process every single packet
     */
     private void ProcessPacket() {
-        try {
-            String PacketResult = PacketReciever.getPacket();
-            try {
 
-                // Pass call to a Runnable Object
-                // this will execute in parallel
-                executor.execute(
+        while(true){
+            try {
+                String PacketResult =  PacketReciever.getPacket();
+                try {
+    
+                    // Pass call to a Runnable Object
+                    // this will execute in parallel
+                    executor.execute(
                         new Runnable() {
                             public void run() {
                                 ParsePacket(PacketResult);
                             }
-                        });
-
+                    });
+    
+                } catch (Exception e) {
+                    System.out.println("Error: Cannot parse recieved UDP json data: " + e.toString());
+                    e.printStackTrace();
+                }
             } catch (Exception e) {
-                System.out.println("Error: Cannot parse recieved UDP json data: " + e.toString());
-                e.printStackTrace();
+    
             }
-        } catch (Exception e) {
-
         }
+       
     }
 
     public void ZeroSensors() {}

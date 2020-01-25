@@ -33,10 +33,14 @@ public class Robot extends TimedRobot {
 
     // Subsystems
     private final Drive mDrive = Drive.getInstance();
+    private final VisionManager mVisionManager = VisionManager.getInstance();
+
+
     public Relay visionLight = new Relay(0);
     
     // Control Variables
     private LatchedBoolean AutoAim = new LatchedBoolean();
+    private LatchedBoolean HarvestAim = new LatchedBoolean();
 
 
     // autonomousInit, autonomousPeriodic, disabledInit,
@@ -99,17 +103,23 @@ public class Robot extends TimedRobot {
         double DriveThrottle = mOperatorInterface.getDriveThrottle();
         double DriveTurn = mOperatorInterface.getDriveTurn();
         boolean WantsLowGear = false;
-        boolean WantsHarvestMode = false;
+        
+        //Detect Harvest Mode
+        boolean WantsHarvestMode = (mOperatorInterface.getDriverLeftTriggerPressed() | mOperatorInterface.getDriverRightTriggerPressed());
+        boolean HarvesModePressed =  HarvestAim.update(WantsHarvestMode);
+
+       
+        
+        
         boolean WantsAutoAim = false;
         boolean AutoDrive = false;
-        boolean HarvesMode = false;
 
         //Optional Object that may or may not contain a null value
         Optional<AimingParameters> BallAimingParameters; //info to aim to the ball
         Optional<AimingParameters> TargetAimingParameters; //info to aim to the target
 
         // Continue Driving
-        if (HarvesMode == true) {
+        if (WantsHarvestMode == true) {
             // Harvest Mode - AutoSteer Functionality
             // Used for tracking a ball
             //we may want to limit the speed?

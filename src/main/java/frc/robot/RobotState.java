@@ -182,31 +182,42 @@ public class RobotState {
     }
 
 
+    //Updates Goal Trackers!
+    private void updateGoalTracker(double timestamp, Translation2d cameraToVisionTargetPoses, GoalTracker tracker, boolean ball){
+        Pose2d cameraToVisionTarget = Pose2d.fromTranslation(cameraToVisionTargetPoses);
 
-    private void updateGoalTracker(double timestamp, List<Translation2d> cameraToVisionTargetPoses, GoalTracker tracker){
-        //Pose2d cameraToVisionTarget =
+        //  Pose2d fieldToVisionTarget = getFieldToTurret(timestamp).transformBy(source.getTurretToLens()).transformBy(cameraToVisionTarget);
+
+        if(ball == true){
+            
+            Pose2d fieldToBall = getFieldToVehicle(timestamp).transformBy(cameraToVisionTarget);
+            tracker.update(timestamp, List.of(new Pose2d(fieldToBall.getTranslation(), Rotation2d.identity())));
+
+        }
+
     }
 
     // Vision Manager Passes a new Target Info to the Robot State
     public synchronized void AddVisionObservation(TargetInfo ti) {
-        System.out.println("DEBUG: Add Vision Observation!");
-        /*
-  private List<Translation2d> mCameraToHighGoal = new ArrayList<>();
-    private List<Translation2d> mCameraToBall = new ArrayList<>();
-        */
+        double timestamp = Timer.getFPGATimestamp();
+        
+        mCameraToHighGoal = new ArrayList<>();
+        mCameraToBall = new ArrayList<>();
+        
         mCameraToBall.clear();
         mCameraToHighGoal.clear();
 
-        double timestamp = Timer.getFPGATimestamp();
         Translation2d translation;
 
         // Proceed based on target type
         if (ti.IsHighGoal() == true) {
             // High Goal!
             translation = getCameraToVisionTargetPose(true, ti);
+            updateGoalTracker(timestamp, translation, vision_highgoal, false);
         } else {
             // Ball
             translation = getCameraToVisionTargetPose(false, ti);
+            updateGoalTracker(timestamp, translation, vision_ball, true);
 
         }
     }
@@ -373,14 +384,33 @@ public class RobotState {
         double y = ti.getY();
         double z = xz_plane_translation.y();
 
+        x = ti.getX();
+        y = ti.getY();
+
+
+        if(TurretCamera == false){
+            //Ball Camera!
+            double hypot = Math.hypot(x, y);
+            Rotation2d angle = new Rotation2d(x, y, true);
+            double deg = angle.getDegrees();
+            double yawcheck = ti.getYaw();
+            int ii = 0;
+            
+
+        }
+
+        z = 10;
+
         // find intersection with the goal
         //if we do have an intersection with the goal, return our translation.. if we don't return null
         //double differential_height = source.getLensHeight() - (high ? Constants.kPortTargetHeight : Constants.kHatchTargetHeight);
         double differential_height = Constants.kHighGoalHeight;
-        if ((z < 0.0) == (differential_height > 0.0)) {
+        //if ((z < 0.0) == (differential_height > 0.0)) {
+        if (true) {
             double scaling = differential_height / -z;
             double distance = Math.hypot(x, y) * scaling;
             Rotation2d angle = new Rotation2d(x, y, true);
+            System.out.println(angle.getDegrees());
             return new Translation2d(distance * angle.cos(), distance * angle.sin());
         }
         return null;
@@ -394,7 +424,8 @@ public class RobotState {
      * @return
      */
     public synchronized Pose2d getFieldToVehicle(double timestamp) {
-        return Field_To_Vehicle_Map.getInterpolated(new InterpolatingDouble(timestamp));
+        Pose2d result = Field_To_Vehicle_Map.getInterpolated(new InterpolatingDouble(timestamp));
+        return result;
     }
 
     /**

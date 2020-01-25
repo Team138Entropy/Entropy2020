@@ -9,7 +9,7 @@ public class TargetInfo {
 
     protected double x = 0;
     protected double y = 0;
-    protected double z = 0;
+    protected double z = 1.0;
     private double yaw = 0;
     private int CameraID = 0;
 
@@ -20,12 +20,19 @@ public class TargetInfo {
 
     public TargetInfo() {}
 
-    public TargetInfo(int CameraID, int TargetType, int x, int y, double distance) {
+    public TargetInfo(int CameraID, int TargetType, int x, int y, int z, double distance) {
+        this.CameraID = CameraID;
         this.TargetType = TargetType;
         this.x = x;
         this.y = y;
+        this.z = z;
         this.distance = distance;
     }
+
+    public double getYaw(){
+        return yaw;
+    }
+
 
     public double getX() {
         return x;
@@ -78,6 +85,13 @@ public class TargetInfo {
     // Returns if we this target is a high goal target
     public boolean IsHighGoal() {
         if (TargetType == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean IsBall(){
+        if(TargetType == 1){
             return true;
         }
         return false;

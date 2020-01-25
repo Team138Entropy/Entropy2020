@@ -66,4 +66,14 @@ public class OperatorInterface {
     public void setDriverRumble(boolean toggle) {
         DriverController.setRumble(toggle);
     }
+
+    public boolean getDriverLeftTriggerPressed(){
+        return DriverController.getTrigger(XboxController.Side.LEFT);
+    }
+
+    public boolean getDriverRightTriggerPressed(){
+        return DriverController.getTrigger(XboxController.Side.RIGHT);
+    }
+
+
 }

@@ -32,8 +32,8 @@ import datetime as dt
 
 
 # Image Camera Size (Pixels)
-Camera_Image_Width = 640
-Camera_Image_Height = 480
+Camera_Image_Width = 320
+Camera_Image_Height = 240
 
 centerX = (Camera_Image_Width / 2) - .5
 centerY = (Camera_Image_Height/2) - .5
@@ -624,6 +624,7 @@ def MaskBall(frame):
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, Ball_HSV_Lower, Ball_HSV_Upper)
+
     # remove any small blobs left in the mask
     # mask = cv2.erode(mask, None, iterations=2)
     # mask = cv2.dilate(mask, None, iterations=2)
@@ -666,7 +667,7 @@ def findBalls(frame):
 
             CntArea = cv2.contourArea(c)
 
-            # Ignore small contours
+            # Ignore overly small contours
             if CntArea < 150:
                 continue
 
@@ -678,26 +679,32 @@ def findBalls(frame):
                 # This is a Target!
                 #		Lets calculate now!
                 ball = {}
-                ball['Type'] = 1
-                ball['CX'] = cx
-                ball['CY'] = cy
+                ball['targid'] = 1
+                ball['x'] = cx
+                ball['y'] = cy
+                ball['dis'] = 0
 
                 finalTarget = calculateYaw(cx, centerX, H_FOCAL_LENGTH)
-                ball['Yaw'] = finalTarget
-                ball['Size'] = CntArea
+                ball['yaw'] = finalTarget
+                #print("good ball!")
+                PacketQueue.put_nowait(ball)
+               # ball['Size'] = CntArea
 
                 # Set our Found Ball
+                '''
                 if FoundBall == None:
                     FoundBall = ball
                 elif FoundBall['Size'] < ball['Size']:
                     FoundBall = ball
-                print("Tracking Ball: " + str(ball['Yaw']))
+                ''' 
 
         # Check if we have a found ball for this frame
+        '''
         if not FoundBall == None:
             # print("Found Ball!")
             # print(FoundBall)(
             PacketQueue.put_nowait(FoundBall)
+        '''
     return FoundBalls
 
 
@@ -725,34 +732,11 @@ def ProcessFrame(frame, tape):
     # APPLY A BLUE TO BLUR THE LINES
     else:
         # Ball Tracker!
-        original_frame = frame.copy()
         frame = MaskBall(frame)  # Filter and Mask by HSV Values
         Targets = findBalls(frame)
 
-        '''
-        #Debug Drawing Code
-        for Targ in Targets:
-            original_frame = cv2.circle(original_frame, (Targ['x'], Targ['y']), Targ['radius'], (255, 0, 0), 2)
-            original_frame = cv2.circle(original_frame, Targ['center'], 4, (0, 0, 255), -1)
 
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            # org
-            org = (Targ['x'], Targ['y'])
-            # fontScale
-            fontScale = .5
-            # Blue color in BGR
-            color = (255, 0, 0)
-            # Line thickness of 2 px
-            thickness = 2
-            # Using cv2.putText() method
-            original_frame = cv2.putText(original_frame, str(Targ['aspectratio']), org, font, fontScale, color, thickness, cv2.LINE_AA)
-
-        cv2.imwrite("of1" + str(val) +  ".jpg", original_frame)
-        '''
-
-        someprint = print("end of process frame")
-
-        return processedFrame
+        return []
 
 
 # Link to further explanation: https://docs.google.com/presentation/d/1ediRsI-oR3-kwawFJZ34_ZTlQS2SDBLjZasjzZ-eXbQ/pub?start=false&loop=false&slide=id.g12c083cffa_0_298
@@ -946,7 +930,7 @@ if __name__ == "__main__":
         Tape = False
         frame = ProcessFrame(img, Tape)
         n2=dt.datetime.now()
-        print("Microseconds: " + str((n2-n1).microseconds))
+        #print("Milliseconds: " + str(((n2-n1).microseconds)/1000))
 
     # Doesn't do anything at the moment. You can easily get this working by indenting these three lines
     # and setting while loop to: while fps._numFrames < TOTAL_FRAMES
