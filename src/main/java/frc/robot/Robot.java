@@ -59,6 +59,8 @@ public class Robot extends TimedRobot {
       value = 1.0f;
     }
 
+    System.out.println("Set output value to " + value);
+
     mTalon0.set(ControlMode.PercentOutput, value);
     mTalon1.set(ControlMode.PercentOutput, value);
   }
