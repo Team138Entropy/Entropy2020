@@ -71,8 +71,9 @@ public class Logger {
   public void logLevel(SupportedLevels level, String message) {
     String minLevel = Config.getInstance().cfg.getString("LOG__" + mLogPath.toUpperCase());
 
-    if(minLevel == null){
-      DriverStation.reportError("No log level defined for " + mLogPath, Thread.currentThread().getStackTrace());
+    if (minLevel == null) {
+      DriverStation.reportError(
+          "No log level defined for " + mLogPath, Thread.currentThread().getStackTrace());
       minLevel = mDefaultLevel;
     }
 
@@ -80,10 +81,12 @@ public class Logger {
     // and the level is recognized,
     // and our level is higher-up or equal to the minimum specified,
     // then log it
-    if (minLevel == null || (minLevel != null
-        && minLevel != "OFF"
-        && Arrays.asList(SupportedLevels.values()).indexOf(level)
-            <= Arrays.asList(SupportedLevels.values()).indexOf(SupportedLevels.valueOf(minLevel)))) {
+    if (minLevel == null
+        || (minLevel != null
+            && minLevel != "OFF"
+            && Arrays.asList(SupportedLevels.values()).indexOf(level)
+                <= Arrays.asList(SupportedLevels.values())
+                    .indexOf(SupportedLevels.valueOf(minLevel)))) {
       // if the level we're logging at is WARN or ERR, then log to STDERR, otherwise log to
       // STDOUT
       if (level == SupportedLevels.ERROR) {
