@@ -25,7 +25,6 @@ public class RobotState {
   public void reset() {
     mRobotLogger.log("Robot State Reset");
   }
-  
 
   /*
       Record robot's initial position on field
