@@ -113,7 +113,7 @@ public class Config {
       value = cfg.getString(key.name());
     } catch (NumberFormatException ignored) {
     }
-    
+
     if (value == null) { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
           "Key "
@@ -193,7 +193,7 @@ public class Config {
       value = cfg.getBoolean(key.name());
     } catch (NumberFormatException ignored) {
     }
-    
+
     if (value == null) { // the value wasn't found in the file, so let's return a default
       DriverStation.reportError(
           "Key "
