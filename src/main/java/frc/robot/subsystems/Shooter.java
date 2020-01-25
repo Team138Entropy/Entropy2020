@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class Shooter extends Subsystem {
 
   // Temporary, until default config values are merged
-  private static final double p = 0.5, i = 0, d = 0;
+  private static final double P = 0.5, I = 0, D = 0;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
@@ -19,19 +19,19 @@ public class Shooter extends Subsystem {
   private static final double FIRE_DURATION_SECONDS = 0.5;
 
   private static class TurretPosition {
-    private double m_azimuth, m_elevation;
+    private double mAzimuth, mElevation;
 
     public TurretPosition(double azimuth, double elevation) {
-      m_azimuth = azimuth;
-      m_elevation = elevation;
+      mAzimuth = azimuth;
+      mElevation = elevation;
     }
 
     public double getAzimuth() {
-      return m_azimuth;
+      return mAzimuth;
     }
 
     public double getElevation() {
-      return m_elevation;
+      return mElevation;
     }
   }
 
@@ -54,10 +54,10 @@ public class Shooter extends Subsystem {
 
   // Aggregation
   private static Shooter instance;
-  private PIDRoller m_roller;
-  private Turret m_turret;
-  private Vision m_vision;
-  private Intake m_intake;
+  private PIDRoller mRoller;
+  private Turret mTurret;
+  private Vision mVision;
+  private Intake mIntake;
 
   // State variables
   public enum State {
@@ -67,10 +67,10 @@ public class Shooter extends Subsystem {
     FIRING
   }
 
-  private State state = State.IDLE;
-  private int m_buffer = 0;
-  private Timer m_spinUpTimer;
-  private Timer m_fireTimer;
+  private State mState = State.IDLE;
+  private int mBuffer = 0;
+  private Timer mSpinUpTimer;
+  private Timer mFireTimer;
 
   public static synchronized Shooter getInstance() {
     if (instance == null) instance = new Shooter();
@@ -78,14 +78,14 @@ public class Shooter extends Subsystem {
   }
 
   public State getState() {
-    return state;
+    return mState;
   }
 
   private Shooter() {
-    m_roller = new PIDRoller(ROLLER_PORT, p, i, d);
+    mRoller = new PIDRoller(ROLLER_PORT, P, I, D);
 
     // TODO: Replace these with real subsystems
-    m_turret =
+    mTurret =
         position ->
             System.out.println(
                 "Setting dummy turret position to ("
@@ -93,15 +93,15 @@ public class Shooter extends Subsystem {
                     + ", "
                     + position.getElevation()
                     + ")");
-    m_vision =
+    mVision =
         () -> {
           System.out.println("Getting dummy vision target");
           return new TurretPosition(0, 0);
         };
-    m_intake = () -> System.out.println("Shoving a ball into the thing");
+    mIntake = () -> System.out.println("Shoving a ball into the thing");
 
-    m_spinUpTimer = new Timer();
-    m_fireTimer = new Timer();
+    mSpinUpTimer = new Timer();
+    mFireTimer = new Timer();
   }
 
   /**
@@ -111,48 +111,48 @@ public class Shooter extends Subsystem {
   public void periodic() {
 
     // Check if we're done spinning up yet
-    if (state == State.SPINNING_UP && m_spinUpTimer.get() >= SPINUP_DELAY_SECONDS) {
-      state = State.FULL_SPEED;
-      m_spinUpTimer.stop();
-      m_spinUpTimer.reset();
+    if (mState == State.SPINNING_UP && mSpinUpTimer.get() >= SPINUP_DELAY_SECONDS) {
+      mState = State.FULL_SPEED;
+      mSpinUpTimer.stop();
+      mSpinUpTimer.reset();
     }
 
     // Check if we're done firing yet
-    if (state == State.FIRING && m_fireTimer.get() >= FIRE_DURATION_SECONDS) {
-      state = State.IDLE;
-      m_fireTimer.stop();
-      m_fireTimer.reset();
+    if (mState == State.FIRING && mFireTimer.get() >= FIRE_DURATION_SECONDS) {
+      mState = State.IDLE;
+      mFireTimer.stop();
+      mFireTimer.reset();
     }
 
     // Handle buffered fire operations
-    if (m_buffer > 0) {
+    if (mBuffer > 0) {
 
       // If we haven't started spinning up yet
-      if (state != State.SPINNING_UP) {
+      if (mState != State.SPINNING_UP) {
         start();
-        m_spinUpTimer.reset();
-        m_spinUpTimer.start();
+        mSpinUpTimer.reset();
+        mSpinUpTimer.start();
       }
 
-      if (state == State.FULL_SPEED) {
-        state = State.FIRING;
-        m_intake.shoveANodeIntoTheThing();
-        m_fireTimer.start();
-        m_buffer--;
+      if (mState == State.FULL_SPEED) {
+        mState = State.FIRING;
+        mIntake.shoveANodeIntoTheThing();
+        mFireTimer.start();
+        mBuffer--;
       }
     } else {
       // Handle the case where the buffer was reset while we were doing something
-      if (state == State.SPINNING_UP || state == State.FULL_SPEED) {
+      if (mState == State.SPINNING_UP || mState == State.FULL_SPEED) {
         stop();
-        m_spinUpTimer.stop();
-        m_spinUpTimer.reset();
+        mSpinUpTimer.stop();
+        mSpinUpTimer.reset();
       }
     }
   }
 
   /** Buffers another fire operation. */
   public void fireSingle() {
-    m_buffer++;
+    mBuffer++;
   }
 
   /**
@@ -171,7 +171,7 @@ public class Shooter extends Subsystem {
    * automatic fire.
    */
   public void resetBuffer() {
-    m_buffer = 0;
+    mBuffer = 0;
   }
 
   /** The same as {@link #resetBuffer()}. Exists to make calling code more declarative. */
@@ -181,17 +181,17 @@ public class Shooter extends Subsystem {
 
   /** Tells the turret to move to where the vision system says we should be. */
   public void target() {
-    m_turret.set(m_vision.calcTargetPosition());
+    mTurret.set(mVision.calcTargetPosition());
   }
 
   /** Starts the roller. */
   private void start() {
-    m_roller.setSpeed(ROLLER_SPEED);
+    mRoller.setSpeed(ROLLER_SPEED);
   }
 
   /** Stops the roller. */
   private void stop() {
-    m_roller.setSpeed(0);
+    mRoller.setSpeed(0);
   }
 
   @Override

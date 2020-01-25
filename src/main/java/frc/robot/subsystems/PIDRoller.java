@@ -7,37 +7,37 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 class PIDRoller {
 
-  private static final int pidLoopIndex = 0;
-  private static final int timeoutMs = 10;
+  private static final int PID_LOOP_INDEX = 0;
+  private static final int TIMEOUT_MS = 10;
 
-  private WPI_TalonSRX talon;
+  private WPI_TalonSRX mTalon;
 
   PIDRoller(int talonPort, double p, double i, double d) {
     super();
 
-    talon = new WPI_TalonSRX(talonPort);
+    mTalon = new WPI_TalonSRX(talonPort);
 
     // All of this was ripped from the 2019 elevator code
-    talon.configNominalOutputForward(0, timeoutMs);
-    talon.configNominalOutputReverse(0, timeoutMs);
-    talon.configPeakOutputForward(1, timeoutMs);
-    talon.configPeakOutputReverse(-1, timeoutMs);
+    mTalon.configNominalOutputForward(0, TIMEOUT_MS);
+    mTalon.configNominalOutputReverse(0, TIMEOUT_MS);
+    mTalon.configPeakOutputForward(1, TIMEOUT_MS);
+    mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
 
-    talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, pidLoopIndex, timeoutMs);
-    talon.setSensorPhase(false);
+    mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
+    mTalon.setSensorPhase(false);
 
-    talon.configAllowableClosedloopError(pidLoopIndex, 0, timeoutMs);
+    mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 0, TIMEOUT_MS);
 
-    talon.config_kP(pidLoopIndex, p);
-    talon.config_kI(pidLoopIndex, i);
-    talon.config_kD(pidLoopIndex, d);
+    mTalon.config_kP(PID_LOOP_INDEX, p);
+    mTalon.config_kI(PID_LOOP_INDEX, i);
+    mTalon.config_kD(PID_LOOP_INDEX, d);
 
-    talon.setNeutralMode(NeutralMode.Coast);
+    mTalon.setNeutralMode(NeutralMode.Coast);
 
-    talon.config_IntegralZone(pidLoopIndex, 200, timeoutMs);
+    mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
   }
 
   void setSpeed(int posPer100Ms) {
-    talon.set(ControlMode.Velocity, posPer100Ms);
+    mTalon.set(ControlMode.Velocity, posPer100Ms);
   }
 }
