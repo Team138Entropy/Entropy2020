@@ -99,30 +99,6 @@ public class VisionManager extends Subsystem {
     // Packets are processed in this thread!
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
-    // Thread protected booleans
-    // DO NOT access these variables without locks
-    private final Object TargetDetectedLock = new Object();
-    private boolean TargetDetected = false;
-    private final Object BallDetectedLock = new Object();
-    private boolean BallDetected = false;
-
-    public void SetTargetDetected(boolean val) {
-        synchronized (TargetDetectedLock) {
-            TargetDetected = true;
-        }
-    }
-
-    public void SetBallDetected(boolean val) {
-        synchronized (BallDetectedLock) {
-            BallDetected = true;
-        }
-    }
-
-    public boolean IsBallDetected() {
-        synchronized (BallDetectedLock) {
-            return BallDetected;
-        }
-    }
 
     private VisionManager() {
         // Start a Socket to listen to UDP Packet
@@ -175,6 +151,7 @@ public class VisionManager extends Subsystem {
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!
                 mRobotState.AddVisionObservation(ti);
+                System.out.println("DEBUG: ADD PACKET!")
 
             } catch (Exception Targ) {
                 // Exception Thrown when Trying to retrieve values from json object

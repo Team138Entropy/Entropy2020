@@ -113,7 +113,7 @@ public class Robot extends TimedRobot {
             // Harvest Mode - AutoSteer Functionality
             // Used for tracking a ball
             //we may want to limit the speed?
-            mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
+           // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
         } else {
             // Standard Manual Drive
             mDrive.setDrive(DriveThrottle, DriveTurn, false);

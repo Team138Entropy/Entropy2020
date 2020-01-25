@@ -178,9 +178,10 @@ public class Drive extends Subsystem {
     public synchronized void autoSteerBall(double throttle, AimingParameters aim_params){
         double timestamp = Timer.getFPGATimestamp();
         final double kAutosteerAlignmentPointOffset = 15.0; //
-
+/*
         setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
         setBrakeMode(true);
+        */
 
     }
 

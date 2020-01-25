@@ -118,6 +118,7 @@ public class RobotState {
 
 
     // Update Robot State
+    //called from driver code
     public void update(double timestamp) {
         // Check if previous heading has been set already
         if (update_prev_heading == null) {
@@ -151,11 +152,11 @@ public class RobotState {
                         .scaled(dt);
 
         // Update the Robot State Datastructures with new measures
-        /*
-        addVehicleToTurretObservation(timestamp,
-            Rotation2d.fromDegrees(angle_degrees)
-        )
-        */
+        double turret_angle = 0; //TODO GET THE TURRET ANGLE
+        addVehicleToTurretObservation(timestamp, Rotation2d.fromDegrees(turret_angle));
+
+        //update robot state
+        addDriveObservations(timestamp, odometry_twist, measured_velocity, predicted_velocity);
 
         // Update loops for the next cycle
         update_left_encoder_prev_distance = left_distance;
@@ -165,14 +166,37 @@ public class RobotState {
     }
 
 
+    //
+    public synchronized void addVehicleToTurretObservation(double timestamp, Rotation2d observation){
+        Vehicle_To_Turret_Map.put(new InterpolatingDouble(timestamp), observation);
+    }
+
+
 
     public synchronized void ResetDriveDistance() {
         DistanceDriven = 0;
     }
 
+    public synchronized double getDistanceDriven(){
+        return DistanceDriven;
+    }
+
+
+
+    private void updateGoalTracker(double timestamp, List<Translation2d> cameraToVisionTargetPoses, GoalTracker tracker){
+        //Pose2d cameraToVisionTarget =
+    }
 
     // Vision Manager Passes a new Target Info to the Robot State
     public synchronized void AddVisionObservation(TargetInfo ti) {
+        System.out.println("DEBUG: Add Vision Observation!");
+        /*
+  private List<Translation2d> mCameraToHighGoal = new ArrayList<>();
+    private List<Translation2d> mCameraToBall = new ArrayList<>();
+        */
+        mCameraToBall.clear();
+        mCameraToHighGoal.clear();
+
         double timestamp = Timer.getFPGATimestamp();
         Translation2d translation;
 
@@ -186,6 +210,37 @@ public class RobotState {
 
         }
     }
+
+
+    //get targeting rotation
+    //vision based how far we need to ratate
+    public synchronized Rotation2d getTurretRotation(){
+        System.out.println("Is present!");
+        //get aiming parameters of the ball
+        Optional<AimingParameters> aim = getLatestTargetAimingParameters(-1, Constants.kMaxGoalTrackAge);
+        int trackID = 0;
+        double mCorrectedRangeToTarget = 0.0;
+        if(aim.isPresent() == true){
+            trackID = aim.get().getTrackID();
+
+            final double kLookaheadTime = 0.7;
+
+            Pose2d robot_to_predicted_robot = getLatestFieldToVehicle().getValue().inverse()
+                    .transformBy(getPredictedFieldToVehicle(kLookaheadTime));
+            Pose2d predicted_robot_to_goal = robot_to_predicted_robot.inverse()
+                    .transformBy(aim.get().getRobotToGoal());
+            mCorrectedRangeToTarget = predicted_robot_to_goal.getTranslation().norm();
+
+            System.out.println("DEBUG: Get Turret RotatioN!");
+            return predicted_robot_to_goal.getRotation();
+        }
+
+        //no target.. do nothing
+        return Rotation2d.identity();
+    }
+
+
+
 
 
     //Get the Latest Ball Target
@@ -202,11 +257,11 @@ public class RobotState {
 
         //Determine the best Track
         GoalTracker.TrackComparator comparator = new GoalTracker.TrackComparator(
+            timestamp, 
             Constants.kTrackStabilityWeight,
             Constants.kTrackAgeWeight,
             Constants.kTrackSwitchingWeight,
-            prev_track_id,
-            timestamp
+            prev_track_id
         );
 
         //sort track comparator
@@ -223,7 +278,7 @@ public class RobotState {
                 report = temp_report;
                 break; //no need to keep looping
             }
-        }{
+        }
 
         //if we didn't find the report..return nothing
         if(report == null){
@@ -231,22 +286,77 @@ public class RobotState {
         }
 
         //Get a Vehicle to Goal Pose
-        Pose2d vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target).transformBy(0);
+        Pose2d vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target).transformBy(getVisionTargetToGoalOffset());
+
 
         AimingParameters params = new AimingParameters(
-            vehicleToGoal,
-            report.field_to_target,
-            report.field_to_target.getRotation(),
+            report.id,
             report.latest_timestamp,
             report.stability,
-            report.id
+            vehicleToGoal,
+            report.field_to_target,
+            report.field_to_target.getRotation()
         );
+
         return Optional.of(params);
     }
 
-    //Get the Latest Target
-    public synchronized Option<AimingParameters> getLatestTargetAimingParameters(){
+    //Get the Latest Target -- high goal!
+    public synchronized Optional<AimingParameters> getLatestTargetAimingParameters(int prev_track_id, double max_track_age){
+       //Get Track Reports for our official goal tracker
+       List<GoalTracker.TrackReport> reports = vision_highgoal.getTrackReports();
 
+        //if we don't have any tracks
+        if(reports.isEmpty()){
+            return Optional.empty();
+        }
+
+        double timestamp = Timer.getFPGATimestamp();
+
+        //Determine the best Track
+        GoalTracker.TrackComparator comparator = new GoalTracker.TrackComparator(
+            timestamp, 
+            Constants.kTrackStabilityWeight,
+            Constants.kTrackAgeWeight,
+            Constants.kTrackSwitchingWeight,
+            prev_track_id
+        );
+
+        //sort track comparator
+        reports.sort(comparator);
+
+        //now move from best tracks (via our sort) to worst groups
+        //get the one that is in range
+        GoalTracker.TrackReport report = null;
+        GoalTracker.TrackReport temp_report = null;
+        for(int i = 0; i < reports.size(); i++){
+            temp_report = reports.get(i);
+            if(temp_report.latest_timestamp > timestamp - max_track_age){
+                //this qualifies.. select this
+                report = temp_report;
+                break; //no need to keep looping
+            }
+        }
+
+        //if we didn't find the report..return nothing
+        if(report == null){
+            return Optional.empty();
+        }
+
+        //Get a Vehicle to Goal Pose
+        Pose2d vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target).transformBy(getVisionTargetToGoalOffset());
+
+
+        AimingParameters params = new AimingParameters(
+            report.id,
+            report.latest_timestamp,
+            report.stability,
+            vehicleToGoal,
+            report.field_to_target,
+            report.field_to_target.getRotation()
+        );
+
+        return Optional.of(params);
     }
 
     //    public synchronized Optional<AimingParameters> getLatestAimingParameters() {
@@ -315,13 +425,46 @@ public class RobotState {
         return Field_To_Vehicle_Map.lastEntry();
     }
 
+    //Vehicles Location of the Field
+    public synchronized void addFieldToVehicleObservation(double timestamp, Pose2d observation) {
+        Field_To_Vehicle_Map.put(new InterpolatingDouble(timestamp), observation);
+    }
 
-    // 
-    public synchronized void addObservations(
+    //Attempt to predict where on the field the vehicle will be
+    public synchronized Pose2d getPredictedFieldToVehicle(double lookahead_time){
+        return getLatestFieldToVehicle().getValue().transformBy(
+            Pose2d.exp(vehicle_velocity_predicted.scaled(lookahead_time))
+        );
+    }
+
+    //Called when updating information on where our drive is
+    public synchronized void addDriveObservations(
             double timestamp,
             Twist2d displacement,
             Twist2d measured_velocity,
             Twist2d predicted_velocity) {
+                
+                
+            DistanceDriven += displacement.dx;  
+            addFieldToVehicleObservation(timestamp, Kinematics.integrateForwardKinematics(getLatestFieldToVehicle().getValue(), displacement));
+            vehicle_velocity_measured = measured_velocity;
+            if (Math.abs(vehicle_velocity_measured.dtheta) < 2.0 * Math.PI) {
+                // Reject really high angular velocities from the filter.
+                vehicle_velocity_measured_filtered.add(vehicle_velocity_measured);
+            } else {
+                vehicle_velocity_measured_filtered.add(new Twist2d(vehicle_velocity_measured.dx, vehicle_velocity_measured.dy, 0.0));
+            }
+            vehicle_velocity_predicted = predicted_velocity;
 
     }
+
+    public synchronized Pose2d getVisionTargetToGoalOffset(){
+        return Pose2d.identity();
+    }
+
+    //not sure we need it!
+    public synchronized void outputToSmartDashboard(){
+
+    }
+
 }
