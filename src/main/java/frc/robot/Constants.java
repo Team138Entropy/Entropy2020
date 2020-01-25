@@ -1,6 +1,7 @@
 package frc.robot;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
+@Deprecated
 public class Constants {
   // Controller Ports
   public static final int OperatorControllerPort = 1;
@@ -15,6 +16,9 @@ public class Constants {
   // Solenoid Constants
   public static final int kPCMId = 1;
   public static final int kShifterSolenoidId = 7;
+
+  // PWM
+  public static final int kCameraRingId = 0;
 
   // Drive Constants
   public static final double kJoystickThreshold = 0.2;

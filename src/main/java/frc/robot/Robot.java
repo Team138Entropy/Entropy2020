@@ -52,6 +52,8 @@ public class Robot extends TimedRobot {
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
+    Config.getInstance().reload();
+
     mRobotLogger.log("robot init _ 1");
 
     // Zero all nesscary sensors on Robot
