@@ -9,7 +9,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import frc.robot.Config;
 import frc.robot.Config.Key;
 
@@ -19,7 +18,8 @@ public class Intake extends Subsystem {
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER_PORT);
 
   // TODO: Tune these values
-  private static final double ROLLER_SPEED = Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
+  private static final double ROLLER_SPEED =
+      Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
 
   private WPI_TalonSRX mRoller;
 
