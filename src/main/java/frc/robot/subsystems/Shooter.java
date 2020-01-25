@@ -7,13 +7,16 @@ import edu.wpi.first.wpilibj.Timer;
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
 
+  // Temporary, until default config values are merged
+  private static final double p = 0.5, i = 0, d = 0;
+
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
   private static final int ROLLER_PORT = 0;
   private static final int MAX_CAPACITY = 5;
 
   // TODO: Tune these values
-  private static final double ROLLER_SPEED = 1;
+  private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
   private static final double SPINUP_DELAY_SECONDS = 0.5;
   private static final double FIRE_DURATION_SECONDS = 0.5;
 
@@ -53,7 +56,7 @@ public class Shooter extends Subsystem {
 
   // Aggregation
   private static Shooter instance;
-  private WPI_TalonSRX m_roller;
+  private PIDRoller m_roller;
   private Turret m_turret;
   private Vision m_vision;
   private Intake m_intake;
@@ -81,7 +84,7 @@ public class Shooter extends Subsystem {
   }
 
   private Shooter() {
-    m_roller = new WPI_TalonSRX(ROLLER_PORT);
+    m_roller = new PIDRoller(ROLLER_PORT, p, i, d);
 
     // TODO: Replace these with real subsystems
     m_turret =
@@ -185,12 +188,12 @@ public class Shooter extends Subsystem {
 
   /** Starts the roller. */
   private void start() {
-    m_roller.set(ControlMode.PercentOutput, ROLLER_SPEED);
+    m_roller.setSpeed(ROLLER_SPEED);
   }
 
   /** Stops the roller. */
   private void stop() {
-    m_roller.set(ControlMode.PercentOutput, 0);
+    m_roller.setSpeed(0);
   }
 
   @Override
