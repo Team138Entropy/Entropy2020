@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -69,7 +68,8 @@ public class ConfigFile {
     //     DriverStation.reportError(
     //         "\n\n======================================\nKEY "
     //             + key
-    //             + " WAS NOT FOUND IN MAIN CONFIG BUT WAS FOUND IN DEFAULT FILE\nPlease add it to the file.\nYou might have unexpected issues.\n======================================\n\n",
+    //             + " WAS NOT FOUND IN MAIN CONFIG BUT WAS FOUND IN DEFAULT FILE\nPlease add it to
+    // the file.\nYou might have unexpected issues.\n======================================\n\n",
     //         Thread.currentThread().getStackTrace());
     //   }
     // }

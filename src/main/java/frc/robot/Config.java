@@ -8,7 +8,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class Config { 
+public class Config {
 
   public enum Key {
     OI__VISION__ENABLED(false),
@@ -33,27 +33,27 @@ public class Config {
 
     private Object value;
 
-    private Key(Double k){
+    private Key(Double k) {
       value = k;
     }
 
-    private Key(Float k){
+    private Key(Float k) {
       value = k;
     }
 
-    private Key(Boolean k){
-      value = k;
-    }
-    
-    private Key(Integer k){
-      value = k;
-    }
-    
-    private Key(String k){
+    private Key(Boolean k) {
       value = k;
     }
 
-    public Object getValue(){
+    private Key(Integer k) {
+      value = k;
+    }
+
+    private Key(String k) {
+      value = k;
+    }
+
+    public Object getValue() {
       return value;
     }
   }
@@ -72,7 +72,7 @@ public class Config {
     for (Key key : Key.values()) {
       Object valueFromConfig = cfg.getString(key.name());
 
-      if(valueFromConfig == null){
+      if (valueFromConfig == null) {
         DriverStation.reportError(
             "Didn't find key "
                 + key.name()
@@ -89,120 +89,165 @@ public class Config {
     return sInstance;
   }
 
-/*String value = null;
-    try{
-      value = cfg.getString(key.name());
-    }catch(NumberFormatException ignored){}
+  /*String value = null;
+  try{
+    value = cfg.getString(key.name());
+  }catch(NumberFormatException ignored){}
 
-    if(key.value instanceof String){// the key we're trying to get has the same type as what the key is defined to be
-      if(value == null){// the value wasn't found in the file, so let's return a default
-        DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
-        return (String) key.value;
-      }else{
+  if(key.value instanceof String){// the key we're trying to get has the same type as what the key is defined to be
+    if(value == null){// the value wasn't found in the file, so let's return a default
+      DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
+      return (String) key.value;
+    }else{
 
-        return value;
-      }
-    }else{ 
-      DriverStation.reportError("Key " + key.name() + " not the correct type. Got " + key.value, new RuntimeException().getStackTrace());
-      throw new RuntimeException("Read the driver station");
-    } */
+      return value;
+    }
+  }else{
+    DriverStation.reportError("Key " + key.name() + " not the correct type. Got " + key.value, new RuntimeException().getStackTrace());
+    throw new RuntimeException("Read the driver station");
+  } */
 
   public String getString(Key key) {
     String value = null;
-    try{
+    try {
       value = cfg.getString(key.name());
-    }catch(NumberFormatException ignored){}
+    } catch (NumberFormatException ignored) {
+    }
 
-    if(key.value instanceof String){// the key we're trying to get has the same type as what the key is defined to be
-      if(value == null){// the value wasn't found in the file, so let's return a default
-        DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
+    if (key.value
+        instanceof
+        String) { // the key we're trying to get has the same type as what the key is defined to be
+      if (value == null) { // the value wasn't found in the file, so let's return a default
+        DriverStation.reportError(
+            "Key "
+                + key.name()
+                + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+            new RuntimeException().getStackTrace());
         return (String) key.value;
-      }else{
+      } else {
         // everything's good
         return value;
       }
-    }else{ 
-      DriverStation.reportError("Key " + key.name() + " not the type you tried to get..", new RuntimeException().getStackTrace());
+    } else {
+      DriverStation.reportError(
+          "Key " + key.name() + " not the type you tried to get..",
+          new RuntimeException().getStackTrace());
       throw new RuntimeException("Read the driver station");
     }
   }
 
   public float getFloat(Key key) {
     Float value = null;
-    try{
+    try {
       value = cfg.getFloat(key.name());
-    }catch(NumberFormatException ignored){}
+    } catch (NumberFormatException ignored) {
+    }
 
-    if(key.value instanceof Float){// the key we're trying to get has the same type as what the key is defined to be
-      if(value == null){// the value wasn't found in the file, so let's return a default
-        DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
+    if (key.value
+        instanceof
+        Float) { // the key we're trying to get has the same type as what the key is defined to be
+      if (value == null) { // the value wasn't found in the file, so let's return a default
+        DriverStation.reportError(
+            "Key "
+                + key.name()
+                + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+            new RuntimeException().getStackTrace());
         return (Float) key.value;
-      }else{
+      } else {
         // everything's good
         return value;
       }
-    }else{ 
-      DriverStation.reportError("Key " + key.name() + " not the type you tried to get..", new RuntimeException().getStackTrace());
+    } else {
+      DriverStation.reportError(
+          "Key " + key.name() + " not the type you tried to get..",
+          new RuntimeException().getStackTrace());
       throw new RuntimeException("Read the driver station");
     }
   }
 
   public double getDouble(Key key) {
     Double value = null;
-    try{
+    try {
       value = cfg.getDouble(key.name());
-    }catch(NumberFormatException ignored){}
+    } catch (NumberFormatException ignored) {
+    }
 
-    if(key.value instanceof Double){// the key we're trying to get has the same type as what the key is defined to be
-      if(value == null){// the value wasn't found in the file, so let's return a default
-        DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
+    if (key.value
+        instanceof
+        Double) { // the key we're trying to get has the same type as what the key is defined to be
+      if (value == null) { // the value wasn't found in the file, so let's return a default
+        DriverStation.reportError(
+            "Key "
+                + key.name()
+                + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+            new RuntimeException().getStackTrace());
         return (Double) key.value;
-      }else{
+      } else {
         // everything's good
         return value;
       }
-    }else{ 
-      DriverStation.reportError("Key " + key.name() + " not the type you tried to get..", new RuntimeException().getStackTrace());
+    } else {
+      DriverStation.reportError(
+          "Key " + key.name() + " not the type you tried to get..",
+          new RuntimeException().getStackTrace());
       throw new RuntimeException("Read the driver station");
     }
   }
 
   public int getInt(Key key) {
     Integer value = null;
-    try{
+    try {
       value = cfg.getInt(key.name());
-    }catch(NumberFormatException ignored){}
+    } catch (NumberFormatException ignored) {
+    }
 
-    if(key.value instanceof Integer){// the key we're trying to get has the same type as what the key is defined to be
-      if(value == null){// the value wasn't found in the file, so let's return a default
-        DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
+    if (key.value
+        instanceof
+        Integer) { // the key we're trying to get has the same type as what the key is defined to be
+      if (value == null) { // the value wasn't found in the file, so let's return a default
+        DriverStation.reportError(
+            "Key "
+                + key.name()
+                + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+            new RuntimeException().getStackTrace());
         return (Integer) key.value;
-      }else{
+      } else {
         // everything's good
         return value;
       }
-    }else{ 
-      DriverStation.reportError("Key " + key.name() + " not the type you tried to get..", new RuntimeException().getStackTrace());
+    } else {
+      DriverStation.reportError(
+          "Key " + key.name() + " not the type you tried to get..",
+          new RuntimeException().getStackTrace());
       throw new RuntimeException("Read the driver station");
     }
   }
 
   public boolean getBoolean(Key key) {
     Boolean value = null;
-    try{
+    try {
       value = cfg.getBoolean(key.name());
-    }catch(NumberFormatException ignored){}
+    } catch (NumberFormatException ignored) {
+    }
 
-    if(key.value instanceof Boolean){// the key we're trying to get has the same type as what the key is defined to be
-      if(value == null){// the value wasn't found in the file, so let's return a default
-        DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
+    if (key.value
+        instanceof
+        Boolean) { // the key we're trying to get has the same type as what the key is defined to be
+      if (value == null) { // the value wasn't found in the file, so let's return a default
+        DriverStation.reportError(
+            "Key "
+                + key.name()
+                + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
+            new RuntimeException().getStackTrace());
         return (Boolean) key.value;
-      }else{
+      } else {
         // everything's good
         return value;
       }
-    }else{ 
-      DriverStation.reportError("Key " + key.name() + " not the type you tried to get..", new RuntimeException().getStackTrace());
+    } else {
+      DriverStation.reportError(
+          "Key " + key.name() + " not the type you tried to get..",
+          new RuntimeException().getStackTrace());
       throw new RuntimeException("Read the driver station");
     }
   }
