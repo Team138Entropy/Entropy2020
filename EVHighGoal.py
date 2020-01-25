@@ -50,9 +50,9 @@ Ball_HSV_Upper = np.array([62, 255, 255])
 rat_low = 1.5
 rat_high = 10
 
-hsv_threshold_hue = [13, 69]
-hsv_threshold_saturation = [138, 255]
-hsv_threshold_value = [76, 255]
+hsv_threshold_hue = [55, 75]
+hsv_threshold_saturation = [89, 231]
+hsv_threshold_value = [102, 255]
 
 # List will go in order [x of target position, y of target position, yaw, distance, ]
 sendValues = np.array([None] * 4)
@@ -267,14 +267,6 @@ upper_orange = np.array([23, 255, 255])
 def flipImage(frame):
     return cv2.flip(frame, -1)
 
-
-# Blurs frame
-def blurImg(frame, blur_radius):
-    img = frame.copy()
-    blur = cv2.blur(img, (blur_radius, blur_radius))
-    return blur
-
-
 # Masks the video based on a range of hsv colors
 # Takes in a frame, range of color, and a blurred frame, returns a masked frame
 def threshold_video(lower_color, upper_color, blur):
@@ -447,7 +439,7 @@ def findTape(contours, image, centerX, centerY):
 
                     ###### New code that has an averaged shooting distance to avoid outliers
 
-                    global run_count
+                    #global run_count
                     global distanceHoldValues
                     global shootingDistance
                     global outlierCount
@@ -463,18 +455,22 @@ def findTape(contours, image, centerX, centerY):
                     if abs(myDistFeet-mean(distanceHoldValues)) > 1.5:
                         outlierCount = outlierCount + 1
                         myDistFeet = None
-
+                        
                     else:
                         outlierCount = 0
                         distanceHoldValues.pop()
-                        distanceHoldValues.push(myDistFeet)
+                        distanceHoldValues.append(myDistFeet)
+                        myDistFeet = abs(myDistFeet)
 
                     ######
 
+                    '''
                     run_count = run_count + 1
                     if run_count % 100 == 0:
                         starttime = time.time()
                         print(starttime)
+                    '''
+                    print(myDistFeet)
 
                     sendValues[0] = cx
                     sendValues[1] = cy
