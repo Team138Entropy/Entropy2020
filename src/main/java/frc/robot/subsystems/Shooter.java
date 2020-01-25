@@ -104,9 +104,7 @@ public class Shooter extends Subsystem {
     mFireTimer = new Timer();
   }
 
-  /**
-   * Call this in the robot loop.
-   */
+  /** Call this in the robot loop. */
   public void periodic() {
 
     // Check if we're done spinning up yet
