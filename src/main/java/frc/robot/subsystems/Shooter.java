@@ -10,7 +10,7 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = 0;
+  private static final int ROLLER_PORT = 69;
   private static final int MAX_CAPACITY = 5;
 
   // TODO: Tune these values
