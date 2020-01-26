@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -54,11 +53,15 @@ public class Robot extends TimedRobot {
 
     value = Math.min(value, 1.0f);
     value = Math.max(value, 0f);
-   
-    System.out.println("Set output value to " + value + " at velocity " +
-      "1: " + mTalonMaster.getSensorCollection().getAnalogInVel() +
-      " 2: " + mTalonMaster.getSensorCollection().getPulseWidthPosition() 
-    );
+
+    System.out.println(
+        "Set output value to "
+            + value
+            + " at velocity "
+            + "1: "
+            + mTalonMaster.getSensorCollection().getAnalogInVel()
+            + " 2: "
+            + mTalonMaster.getSensorCollection().getPulseWidthPosition());
 
     // mTalonMaster.set(ControlMode.PercentOutput, value);
   }
