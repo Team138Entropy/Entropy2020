@@ -194,6 +194,7 @@ public class Robot extends TimedRobot {
 
     mShooter.periodic();
 
+    mBallIndicator.setStateFromTerminal();
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator.checkTimer();
     }
