@@ -57,14 +57,11 @@ public class Robot extends TimedRobot {
     value = Math.max(value, 0f);
    
     System.out.println("Set output value to " + value + " at velocity " +
-      "1: " + mTalonMaster.getSelectedSensorVelocity() + 
-      "2: " + mTalonMaster.getSelectedSensorPosition() + 
-      "3: " + mTalonMaster.getSensorCollection().getPulseWidthVelocity() + 
-      "4: " + mTalonMaster.getSensorCollection().getQuadratureVelocity() + 
-      "5: " + mTalonMaster.getSensorCollection().getAnalogInVel() 
+      "1: " + mTalonMaster.getSensorCollection().getAnalogInVel() +
+      " 2: " + mTalonMaster.getSensorCollection().getPulseWidthPosition() 
     );
 
-    mTalonMaster.set(ControlMode.PercentOutput, value);
+    // mTalonMaster.set(ControlMode.PercentOutput, value);
   }
 
   @Override
