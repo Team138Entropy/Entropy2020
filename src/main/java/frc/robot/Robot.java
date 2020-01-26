@@ -58,8 +58,9 @@ public class Robot extends TimedRobot {
 
     value = Math.min(value, 1.0f);
     value = Math.max(value, 0f);
-   
-    System.out.println("Set output value to " + value + " at velocity " + mSensor.getQuadratureVelocity());
+
+    System.out.println(
+        "Set output value to " + value + " at velocity " + mSensor.getQuadratureVelocity());
 
     mTalonMaster.set(ControlMode.PercentOutput, value);
   }
