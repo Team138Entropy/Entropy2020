@@ -304,6 +304,7 @@ public class Robot extends TimedRobot {
       case IDLE:
         break;
       case READY_TO_INTAKE:
+        // If the operator issues the intake command, start intake
         if (mOperatorInterface.getLoadChamber()) {
           mIntakeState = IntakeState.INTAKE;
         }
@@ -312,6 +313,8 @@ public class Robot extends TimedRobot {
         // Check transition to shooting before we start intake of a new ball
         if (!checkTransitionToShooting()) {
           mIntake.start();
+
+          // If a ball is detected, store it
           if (mStorage.isBallDetected()) {
             mIntakeState = IntakeState.STORE_BALL;
           }
@@ -322,14 +325,21 @@ public class Robot extends TimedRobot {
         // TODO: may need to delay stopping the intake roller
         mIntake.stop();
         
+        // If the sensor indicates the ball is stored, complete ball storage
         if (mStorage.isBallStored()) {
           mIntakeState = IntakeState.STORAGE_COMPLETE;
         }
         break;
       case STORAGE_COMPLETE:
+        mStorage.addBall();
+        
         // TODO: may need to delay stopping the storage roller
         mStorage.stop();
-        mStorage.addBall();
+
+        // If the storage is not full, intake another ball
+        if (!mStorage.isFull()) {
+          mIntakeState = IntakeState.INTAKE;
+        }
 
         // Check transition to shooting after storage of ball 
         checkTransitionToShooting();
