@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
 
   XboxController mController = new XboxController(0);
 
-  float value = 0.8f;
+  float value = 1.0f;
 
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
@@ -56,7 +56,13 @@ public class Robot extends TimedRobot {
     value = Math.min(value, 1.0f);
     value = Math.max(value, 0f);
    
-    System.out.println("Set output value to " + value + " at velocity " + mTalonMaster.getSelectedSensorVelocity());
+    System.out.println("Set output value to " + value + " at velocity " +
+      "1: " + mTalonMaster.getSelectedSensorVelocity() + 
+      "2: " + mTalonMaster.getSelectedSensorPosition() + 
+      "3: " + mTalonMaster.getSensorCollection().getPulseWidthVelocity() + 
+      "4: " + mTalonMaster.getSensorCollection().getQuadratureVelocity() + 
+      "5: " + mTalonMaster.getSensorCollection().getAnalogInVel() 
+    );
 
     mTalonMaster.set(ControlMode.PercentOutput, value);
   }
