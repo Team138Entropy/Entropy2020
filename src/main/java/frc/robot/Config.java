@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class Config {
 
   public enum Key {
+    INTAKE__ROLLER_PORT(1),
+    INTAKE__ROLLER_SPEED(1d),
+
     OI__VISION__ENABLED(false),
 
     OI__VISION__POT__MIN(0),
