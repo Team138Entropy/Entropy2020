@@ -21,6 +21,33 @@ import frc.robot.subsystems.*;
  */
 public class Robot extends TimedRobot {
 
+  // State variables
+  public enum State {
+    IDLE,             // Default state
+    INTAKE,
+    SHOOTING
+  }
+
+  public enum IntakeState {
+    IDLE,             // Default state, when State is not INTAKE
+    READY_TO_INTAKE,
+    INTAKE,
+    STORE_BALL,
+    STORAGE_COMPLETE
+  }
+
+  public enum ShootingState {
+    IDLE,             // Default state, when State is not SHOOTING
+    PREPARE_TO_SHOOT,
+    SHOOT_BALL,
+    SHOOT_BALL_COMPLETE,
+    SHOOTING_COMPLETE
+  }
+
+  private State mState = State.IDLE;
+  private IntakeState mIntakeState = IntakeState.IDLE;
+  private ShootingState mShootingState = ShootingState.IDLE;
+
   private Drive mDrive;
 
   // Controller Reference
