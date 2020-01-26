@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
+import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 
 /**
@@ -59,11 +60,12 @@ public class Robot extends TimedRobot {
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-  private BallIndicator mBallIndicator;
-
   // Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
+  private final Intake mIntake = Intake.getInstance();
+  private final Storage mStorage = Storage.getInstance();
+  private BallIndicator mBallIndicator;
 
   // Variables from State
 
@@ -84,14 +86,14 @@ public class Robot extends TimedRobot {
     // Zero all nesscary sensors on Robot
     ZeroSensors();
 
-    // Reset Robot State
-    // Wherever the Robot is now is the starting position
-    mRobotLogger.log("Robot State Reset");
-    mRobotState.reset();
+    EventWatcherThread.getInstance().start();
 
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
+    // Reset Robot State
+    // Wherever the Robot is now is the starting position
+    mRobotState.reset();
 
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
@@ -223,6 +225,8 @@ public class Robot extends TimedRobot {
 
     mShooter.periodic();
 
+    mStorage.periodic();
+
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator.checkTimer();
     }
@@ -230,6 +234,10 @@ public class Robot extends TimedRobot {
     // Climb
     if (mOperatorInterface.getClimb()) {
       // climb!
+    }
+
+    if (mOperatorInterface.getShoot()) {
+      // Shoot
     }
 
     // Operator Controls

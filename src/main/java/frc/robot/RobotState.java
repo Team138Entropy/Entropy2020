@@ -8,6 +8,8 @@ package frc.robot;
 public class RobotState {
   private static RobotState mInstance;
 
+  Logger mRobotLogger = new Logger("robot");
+
   public static RobotState getInstance() {
     if (mInstance == null) {
       mInstance = new RobotState();
@@ -20,7 +22,9 @@ public class RobotState {
 
   // Reset Robot State
   // Make note of the Starting Position
-  public void reset() {}
+  public void reset() {
+    mRobotLogger.log("Robot State Reset");
+  }
 
   /*
       Record robot's initial position on field
