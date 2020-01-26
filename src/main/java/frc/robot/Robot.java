@@ -23,13 +23,13 @@ public class Robot extends TimedRobot {
 
   // State variables
   public enum State {
-    IDLE,             // Default state
+    IDLE, // Default state
     INTAKE,
     SHOOTING
   }
 
   public enum IntakeState {
-    IDLE,             // Default state, when State is not INTAKE
+    IDLE, // Default state, when State is not INTAKE
     READY_TO_INTAKE,
     INTAKE,
     STORE_BALL,
@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
   }
 
   public enum ShootingState {
-    IDLE,             // Default state, when State is not SHOOTING
+    IDLE, // Default state, when State is not SHOOTING
     PREPARE_TO_SHOOT,
     SHOOT_BALL,
     SHOOT_BALL_COMPLETE,
