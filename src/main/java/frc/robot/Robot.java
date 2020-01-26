@@ -26,7 +26,8 @@ public class Robot extends TimedRobot {
   public enum State {
     IDLE, // Default state
     INTAKE,
-    SHOOTING
+    SHOOTING,
+    CLIMBING
   }
 
   public enum IntakeState {
@@ -45,9 +46,16 @@ public class Robot extends TimedRobot {
     SHOOTING_COMPLETE
   }
 
+  public enum ClimingState {
+    IDLE
+  }
+
+  private final int AUTONOMOUS_BALL_COUNT = 3;
+
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
+  private ClimingState mClimingState = ClimingState.IDLE;
 
   private Drive mDrive;
 
@@ -95,6 +103,9 @@ public class Robot extends TimedRobot {
     // Wherever the Robot is now is the starting position
     mRobotState.reset();
 
+    // Set the initial Robot State
+    mState = State.INTAKE;
+
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
       mTurret = Turret.getInstance();
@@ -140,6 +151,10 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Auto Init Called");
 
     Config.getInstance().reload();
+
+    mState = State.SHOOTING;
+    mShootingState = ShootingState.PREPARE_TO_SHOOT;
+    mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
   }
 
   @Override
@@ -153,6 +168,9 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Teleop Init!");
 
     Config.getInstance().reload();
+
+    mState = State.INTAKE;
+    mIntakeState = IntakeState.READY_TO_INTAKE;
   }
 
   @Override
@@ -219,13 +237,13 @@ public class Robot extends TimedRobot {
   public void RobotLoop() {
     updateSmartDashboard();
 
+    executeRobotStateMachine();
+
     turretLoop();
 
     driveTrainLoop();
 
     mShooter.periodic();
-
-    mStorage.periodic();
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator.checkTimer();
@@ -260,5 +278,113 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getLoadChamber()) {
       // Load chamber!
     }
+  }
+
+  private void executeRobotStateMachine() {
+    switch(mState) {
+      case IDLE:
+        break;
+      case INTAKE:
+        executeIntakeStateMachine();
+        break;
+      case SHOOTING:
+        executeShootingStateMachine();
+        break;
+      case CLIMBING:
+        executeClimbingStateMachine();
+        break;
+      default:
+        mRobotLogger.error("Invalid Robot State");
+        break;
+    }
+  }
+
+  private void executeIntakeStateMachine() {
+    switch(mIntakeState) {
+      case IDLE:
+        break;
+      case READY_TO_INTAKE:
+        if (mOperatorInterface.getLoadChamber()) {
+          mIntakeState = IntakeState.INTAKE;
+        }
+        break;
+      case INTAKE:
+        // Check transition to shooting before we start intake of a new ball
+        if (!checkTransitionToShooting()) {
+          mIntake.start();
+          if (mStorage.isBallDetected()) {
+            mIntakeState = IntakeState.STORE_BALL;
+          }
+        }
+        break;
+      case STORE_BALL:
+        mStorage.storeBall();
+        // TODO: may need to delay stopping the intake roller
+        mIntake.stop();
+        
+        if (mStorage.isBallStored()) {
+          mIntakeState = IntakeState.STORAGE_COMPLETE;
+        }
+        break;
+      case STORAGE_COMPLETE:
+        // TODO: may need to delay stopping the storage roller
+        mStorage.stop();
+        mStorage.addBall();
+
+        // Check transition to shooting after storage of ball 
+        checkTransitionToShooting();
+        break;
+      default:
+        mRobotLogger.error("Invalid Intake State");
+        break;
+    }
+  }
+
+  private boolean checkTransitionToShooting() {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
+      switch (mState) {
+        case INTAKE:
+          mIntake.stop();
+          mStorage.stop();
+          mIntakeState = IntakeState.IDLE;
+          break;
+        default:
+          break;
+      }
+      mState = State.SHOOTING;
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  private void executeShootingStateMachine() {
+    switch(mShootingState) {
+      case IDLE:
+        break;
+      case PREPARE_TO_SHOOT:
+        break;
+      case SHOOT_BALL:
+        break;
+      case SHOOT_BALL_COMPLETE:
+        break;
+      case SHOOTING_COMPLETE:
+        break;
+      default:
+        mRobotLogger.error("Invalid Shooting State");
+        break;
+    }
+  }
+
+  private void executeClimbingStateMachine() {
+    switch(mClimingState) {
+      case IDLE:
+        break;
+      default:
+        mRobotLogger.error("Invalid Climbing State");
+        break;
+    }
+
   }
 }
