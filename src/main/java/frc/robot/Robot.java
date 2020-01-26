@@ -17,8 +17,8 @@ import edu.wpi.first.wpilibj.XboxController;
  * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
-  WPI_TalonSRX mTalon0 = new WPI_TalonSRX(0);
-  WPI_TalonSRX mTalon1 = new WPI_TalonSRX(1);
+  WPI_TalonSRX mTalonMaster = new WPI_TalonSRX(0);
+  WPI_TalonSRX mTalonSlave = new WPI_TalonSRX(1);
 
   XboxController mController = new XboxController(0);
 
@@ -28,7 +28,9 @@ public class Robot extends TimedRobot {
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    mTalonSlave.follow(mTalonMaster);
+  }
 
   @Override
   public void autonomousInit() {}
@@ -56,8 +58,7 @@ public class Robot extends TimedRobot {
 
     System.out.println("Set output value to " + value);
 
-    mTalon0.set(ControlMode.PercentOutput, value);
-    mTalon1.set(ControlMode.PercentOutput, value);
+    mTalonMaster.set(ControlMode.PercentOutput, value);
   }
 
   @Override
