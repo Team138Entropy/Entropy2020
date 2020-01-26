@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.XboxController;
 public class Robot extends TimedRobot {
   WPI_TalonSRX mTalonMaster = new WPI_TalonSRX(1);
   WPI_TalonSRX mTalonSlave = new WPI_TalonSRX(3);
-  SensorCollection mSensor;
 
   XboxController mController = new XboxController(0);
 
@@ -34,8 +33,6 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     mTalonSlave.follow(mTalonMaster);
     mTalonMaster.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.QuadEncoder, 0, 0);
-
-    mSensor = new SensorCollection(mTalonMaster);
   }
 
   @Override
@@ -59,7 +56,7 @@ public class Robot extends TimedRobot {
     value = Math.min(value, 1.0f);
     value = Math.max(value, 0f);
    
-    System.out.println("Set output value to " + value + " at velocity " + mSensor.getQuadratureVelocity());
+    System.out.println("Set output value to " + value + " at velocity " + mTalonMaster.getSelectedSensorVelocity());
 
     mTalonMaster.set(ControlMode.PercentOutput, value);
   }
