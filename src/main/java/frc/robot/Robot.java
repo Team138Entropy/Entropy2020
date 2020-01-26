@@ -8,6 +8,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.SensorCollection;
+import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,12 +19,13 @@ import edu.wpi.first.wpilibj.XboxController;
  * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
-  WPI_TalonSRX mTalonMaster = new WPI_TalonSRX(0);
-  WPI_TalonSRX mTalonSlave = new WPI_TalonSRX(1);
+  WPI_TalonSRX mTalonMaster = new WPI_TalonSRX(1);
+  WPI_TalonSRX mTalonSlave = new WPI_TalonSRX(3);
+  SensorCollection mSensor;
 
   XboxController mController = new XboxController(0);
 
-  float value = 0.25f;
+  float value = 0.8f;
 
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
@@ -30,6 +33,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     mTalonSlave.follow(mTalonMaster);
+    mTalonMaster.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.QuadEncoder, 0, 0);
+
+    mSensor = new SensorCollection(mTalonMaster);
   }
 
   @Override
@@ -43,20 +49,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    if (mController.getAButton()) {
-      value = 0.25f;
+    if (mController.getAButtonPressed()) {
+      value -= 0.05f;
     }
-    if (mController.getBButton()) {
-      value = 0.5f;
-    }
-    if (mController.getXButton()) {
-      value = 0.75f;
-    }
-    if (mController.getYButton()) {
-      value = 1.0f;
+    if (mController.getBButtonPressed()) {
+      value += 0.05f;
     }
 
-    System.out.println("Set output value to " + value);
+    value = Math.min(value, 1.0f);
+    value = Math.max(value, 0f);
+   
+    System.out.println("Set output value to " + value + " at velocity " + mSensor.getQuadratureVelocity());
 
     mTalonMaster.set(ControlMode.PercentOutput, value);
   }
