@@ -8,6 +8,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
+// TODO: Address performance concerns by profiling execution time and trimming calls
 public class Config {
 
   public enum Key {
