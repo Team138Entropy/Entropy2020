@@ -126,8 +126,8 @@ public class VisionManager extends Subsystem {
             // is possible this fails!
             TargetInfo ti = new TargetInfo();
             try {
-                ti.SetX(((Number) CurrentPacket.get("x")).doubleValue());
-                ti.SetY(((Number) CurrentPacket.get("y")).doubleValue());
+                ti.SetY(((Number) CurrentPacket.get("x")).doubleValue());
+                ti.SetZ(((Number) CurrentPacket.get("y")).doubleValue());
                 ti.SetDistance(((Number) CurrentPacket.get("dis")).doubleValue());
                 ti.SetYaw(((Number) CurrentPacket.get("yaw")).doubleValue());
                 // ti.SetCameraID(((Number)CurrentPacket.get("id")).intValue());

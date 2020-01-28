@@ -4,10 +4,13 @@ package frc.robot.vision;
  * Container Class for Targets detected by the division system Contains a center point in 3D Space
  *
  * <p>On the field there are 3 Types of Targets, 0 - High Goal 1 - Feeder Station 2 - Ball
+ * 
+ *  The vector has an x component (+x is out towards the goal) that is always set to 1; a y component (+y is to the left in the camera image); and a z component (+z is up).
+ * 
  */
 public class TargetInfo {
 
-    protected double x = 0;
+    protected double x = 1.0;
     protected double y = 0;
     protected double z = 1.0;
     private double yaw = 0;
@@ -23,7 +26,7 @@ public class TargetInfo {
     public TargetInfo(int CameraID, int TargetType, int x, int y, int z, double distance) {
         this.CameraID = CameraID;
         this.TargetType = TargetType;
-        this.x = x;
+        this.x = 1.0;
         this.y = y;
         this.z = z;
         this.distance = distance;
@@ -68,6 +71,10 @@ public class TargetInfo {
 
     public void SetY(double y) {
         this.y = y;
+    }
+
+    public void SetZ(double z){
+        this.z = z;
     }
 
     public void SetTargetID(int id) {

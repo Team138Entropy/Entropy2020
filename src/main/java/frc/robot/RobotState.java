@@ -377,16 +377,16 @@ public class RobotState {
     //returns null if there is no intersection with the goal.. no shot!
     private Translation2d getCameraToVisionTargetPose(boolean TurretCamera, TargetInfo ti){
 
+        Rotation2d testRotation = Rotation2d.fromDegrees(-135);
+
         //Compensate for camera pitch!
-        Translation2d xz_plane_translation = new Translation2d(ti.getX(), ti.getZ()).rotateBy(Rotation2d.identity());
+        Translation2d xz_plane_translation = new Translation2d(ti.getX(), ti.getZ()).rotateBy(testRotation);
 
         double x = xz_plane_translation.x();
         double y = ti.getY();
         double z = xz_plane_translation.y();
 
-        x = ti.getX();
-        y = ti.getY();
-
+  
 
         if(TurretCamera == false){
             //Ball Camera!
@@ -394,7 +394,7 @@ public class RobotState {
             Rotation2d angle = new Rotation2d(x, y, true);
             double deg = angle.getDegrees();
             double yawcheck = ti.getYaw();
-            int ii = 0;
+            System.out.println(Double.toString(deg));
             
 
         }
