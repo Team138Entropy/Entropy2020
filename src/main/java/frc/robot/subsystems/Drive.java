@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
@@ -15,6 +16,8 @@ public class Drive extends Subsystem {
 
   // Drive Talons
   private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
+
+  private Solenoid mGearSolenoid;
 
   // Gear Shifting Solenoid
   // private final Solenoid mShifter;
@@ -79,6 +82,8 @@ public class Drive extends Subsystem {
 
     mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
     // configureSpark(mRightSlave, false, false);
+
+    mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
 
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
@@ -181,7 +186,10 @@ public class Drive extends Subsystem {
       Before gears are switched, it would be a good idea to check
       psi to ensure we can properly drive the piston
   */
-  public synchronized void SwitchGears(boolean HighGear) {}
+  public synchronized void SwitchGears() {
+    mHighGear = !mHighGear;
+    mGearSolenoid.set(mHighGear);
+  }
 
   /*
       Test all Sensors in the Subsystem

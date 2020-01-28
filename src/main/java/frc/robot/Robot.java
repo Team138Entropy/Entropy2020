@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
@@ -39,6 +40,8 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private BallIndicator mBallIndicator;
+
+  private final Compressor mCompressor = new Compressor();
 
   // Variables from State
 
@@ -80,6 +83,14 @@ public class Robot extends TimedRobot {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator = BallIndicator.getInstance();
     }
+  }
+
+  /*
+    Returns true if the pressure switch reads "low", an undefined value we have no control over.
+    Cool!
+  */
+  public boolean getLowPSI() {
+    return mCompressor.getPressureSwitchValue();
   }
 
   /*
@@ -176,6 +187,7 @@ public class Robot extends TimedRobot {
       // Check User Inputs
       double DriveThrottle = mOperatorInterface.getDriveThrottle();
       double DriveTurn = mOperatorInterface.getDriveTurn();
+      boolean DriveShift = mOperatorInterface.getDriveShift();
       boolean AutoDrive = false;
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
 
@@ -183,6 +195,8 @@ public class Robot extends TimedRobot {
       if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
         // Quickturn!
       }
+
+      if (DriveShift) mDrive.SwitchGears();
     }
   }
 
