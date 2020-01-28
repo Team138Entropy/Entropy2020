@@ -186,7 +186,10 @@ public class Drive extends Subsystem {
       Before gears are switched, it would be a good idea to check
       psi to ensure we can properly drive the piston
   */
-  public synchronized void SwitchGears(boolean HighGear) {}
+  public synchronized void SwitchGears() {
+    mHighGear = !mHighGear;
+    mGearSolenoid.set(mHighGear);
+  }
 
   /*
       Test all Sensors in the Subsystem

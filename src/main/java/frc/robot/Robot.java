@@ -183,6 +183,7 @@ public class Robot extends TimedRobot {
       // Check User Inputs
       double DriveThrottle = mOperatorInterface.getDriveThrottle();
       double DriveTurn = mOperatorInterface.getDriveTurn();
+      boolean DriveShift = mOperatorInterface.getDriveShift();
       boolean AutoDrive = false;
       mDrive.setDrive(DriveThrottle, DriveTurn, false);
 
@@ -190,6 +191,8 @@ public class Robot extends TimedRobot {
       if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
         // Quickturn!
       }
+
+      if (DriveShift) mDrive.SwitchGears();
     }
   }
 
