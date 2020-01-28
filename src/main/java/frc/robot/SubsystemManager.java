@@ -18,7 +18,8 @@ public class SubsystemManager {
   }
 
   private SubsystemManager() {
-    mSubsystemLogger = new Logger("subsystem");mSubsystems = new ArrayList<>();
+    mSubsystemLogger = new Logger("subsystem");
+    mSubsystems = new ArrayList<>();
   }
 
   /*

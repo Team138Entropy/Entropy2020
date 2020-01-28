@@ -75,7 +75,7 @@ public class OperatorInterface {
 
   // Operator
 
-  public boolean getHarvestMode(){
+  public boolean getHarvestMode() {
     return DriverController.getTrigger(XboxController.Side.LEFT);
   }
 
