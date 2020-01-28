@@ -254,10 +254,6 @@ public class Robot extends TimedRobot {
       // climb!
     }
 
-    if (mOperatorInterface.getShoot()) {
-      // Shoot
-    }
-
     // Operator Controls
     if (mOperatorInterface.getTurretManual() != -1) {
       // manual turret aim
@@ -302,6 +298,7 @@ public class Robot extends TimedRobot {
   private void executeIntakeStateMachine() {
     switch(mIntakeState) {
       case IDLE:
+        mRobotLogger.warn("Intake state is idle");
         break;
       case READY_TO_INTAKE:
         // If the operator issues the intake command, start intake
@@ -362,6 +359,7 @@ public class Robot extends TimedRobot {
           break;
       }
       mState = State.SHOOTING;
+      mShootingState = ShootingState.PREPARE_TO_SHOOT;
       return true;
     }
     else {
@@ -372,14 +370,19 @@ public class Robot extends TimedRobot {
   private void executeShootingStateMachine() {
     switch(mShootingState) {
       case IDLE:
+        mRobotLogger.warn("Shooting State is Idle");
         break;
       case PREPARE_TO_SHOOT:
+        mShooter.periodic();
         break;
       case SHOOT_BALL:
+        mShooter.periodic();
         break;
       case SHOOT_BALL_COMPLETE:
+        mShooter.periodic();
         break;
       case SHOOTING_COMPLETE:
+        mShooter.periodic();
         break;
       default:
         mRobotLogger.error("Invalid Shooting State");
