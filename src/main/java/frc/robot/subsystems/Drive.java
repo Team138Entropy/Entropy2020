@@ -183,12 +183,19 @@ public class Drive extends Subsystem {
 
   /*
       SwitchGears
-      Before gears are switched, it would be a good idea to check
-      psi to ensure we can properly drive the piston
+      Toggles the current gear
   */
   public synchronized void SwitchGears() {
     mHighGear = !mHighGear;
     mGearSolenoid.set(mHighGear);
+  }
+
+  /*
+      SetGear
+      TODO: This may be the incorrect polarity. Verfiy this.
+  */
+  public synchronized void SetGear(boolean HighGear) {
+    mGearSolenoid.set(HighGear);
   }
 
   /*
