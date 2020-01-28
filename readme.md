@@ -1,7 +1,12 @@
 # Entropy 2020
 
-A baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
+This is a baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
 This readme highlights portions of the architecture, ideas, and best practices.
+
+
+### Code Formatting
+We have a git hook that will format your code according to Google's style guide whenever you commit. To enable it, you will need to run
+`update-hooks.bat` on Windows or `gradlew installGitHooks` on Linux and macOS.
 
 ### Architecture Highlights
 - Multithreading Support
@@ -10,17 +15,17 @@ This readme highlights portions of the architecture, ideas, and best practices.
     - We may find that subsystems would be better suited with field based controls. 
         - Turret for example, Don't force the drivers to have to overthink where the turret will be
 - Singleton Class approach
-    - For many of the classes, like the subsytems, force the system to use a singelton method. Guard nesscary methods with a synchronized keywork.
+    - For many of the classes, like the subsytems, force the system to use a singelton method. Guard nesscary methods with a synchronized keyword.
 - Backplane Approach
     - The general contept is to expose as much logic as possible to the Robot.java class. For example the drive operation is called from Robot.java.
     - The concept behind this is easier thinking at a systems level.
     - Drive as much logic in the `RobotLoop` function found in the Robot.java.  
 - Subsystem Subclass and Subsystem Manager
-    - All subsystems must inherit the abstract subsystem class
+    - All subsystems must extend the abstract subsystem class
     - This adds subsystems automatically to the constructor via the abstract class
     - Intialially all this really is used for is to quickly loop through all the subsystems and run a subsystem check.
 - Subsystem Checks
-    - All Subsystem classes must inherit the Subsystem class. Within that class is a Subsystem Check Class. 
+    - All Subsystem classes must extend the Subsystem class. Within that class is a Subsystem Check Class. 
     - If we intend on playing deep into playoff matchups, it is likely we will encounter a match with a fast turnaround to the next match. It would be good to have a fast and effective functional that could give us some confidence.
 - RobotState
     - Essentially just a position Tracker for the robot. Record Pose2D at points.
@@ -74,7 +79,7 @@ This readme highlights portions of the architecture, ideas, and best practices.
     - Find a path
     - FInd a trajectory
     - Follow the trajectory
-        - FIgure out where you should be right now
+        - Figure out where you should be right now
         - Feedforware control + Feedback control
 
 
@@ -97,13 +102,5 @@ We want our code to execute as efficiently as possible.
 - Use a leading 's' on static ("class") variables `int sClassVariable = 0;`
 - Use a leading k on Constants `kDriveSpeed`
 - Define all constants in Constants.java, to avoid reusing memory on the stack as needed
-
-
-
-
-
-
-
-
 
 

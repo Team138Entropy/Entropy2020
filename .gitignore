@@ -1,4 +1,5 @@
 .gradle
 .classpath
+.format
 build
 bin

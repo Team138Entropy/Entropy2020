@@ -1,4 +1,4 @@
-package frc.robot.IO;
+package frc.robot.OI;
 
 import frc.robot.Constants;
 
@@ -24,12 +24,26 @@ public class OperatorInterface {
     OperatorController = new XboxController(Constants.OperatorControllerPort);
   }
 
+  // Driver
+
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
   }
 
   public double getDriveTurn() {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
+  }
+
+  public boolean getDriveShift() {
+    return DriverController.getButton(XboxController.Button.START);
+  }
+
+  public boolean getClimb() {
+    return DriverController.getButton(XboxController.Button.Y);
+  }
+
+  public boolean getQuickturn() {
+    return DriverController.getButton(XboxController.Button.RB);
   }
 
   // Returns if we are in low gear, sets to low gear as well
@@ -51,6 +65,16 @@ public class OperatorInterface {
     return LowGear;
   }
 
+  public boolean getTurretAdjustLeft() {
+    return OperatorController.getButton(XboxController.Button.A);
+  }
+
+  public boolean getTurretAdjustRight() {
+    return OperatorController.getButton(XboxController.Button.B);
+  }
+
+  // Operator
+
   public double getOperatorThrottle() {
     return OperatorController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
   }
@@ -59,19 +83,27 @@ public class OperatorInterface {
     return OperatorController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
+  public int getTurretManual() {
+    return OperatorController.getDPad();
+  }
+
+  public boolean getCameraSwap() {
+    return OperatorController.getButton(XboxController.Button.Y);
+  }
+
+  public boolean getShoot() {
+    return OperatorController.getButton(XboxController.Button.X);
+  }
+
+  public boolean getLoadChamber() {
+    return OperatorController.getButton(XboxController.Button.A);
+  }
+
   public void setOperatorRumble(boolean toggle) {
     OperatorController.setRumble(toggle);
   }
 
   public void setDriverRumble(boolean toggle) {
     DriverController.setRumble(toggle);
-  }
-
-  public boolean getDriverLeftTriggerPressed() {
-    return DriverController.getTrigger(XboxController.Side.LEFT);
-  }
-
-  public boolean getDriverRightTriggerPressed() {
-    return DriverController.getTrigger(XboxController.Side.RIGHT);
   }
 }

@@ -4,8 +4,6 @@ package frc.robot.util;
 public class LatchedBoolean {
   private boolean mLast = false;
 
-  public LatchedBoolean() {}
-
   public boolean update(boolean newValue) {
     boolean ret = false;
     if (newValue && !mLast) {

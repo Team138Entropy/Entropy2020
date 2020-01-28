@@ -10,6 +10,12 @@ import frc.robot.Kinematics;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
+import edu.wpi.first.wpilibj.Solenoid;
+import frc.robot.Constants;
+import frc.robot.Kinematics;
+import frc.robot.Logger;
+import frc.robot.util.*;
+import frc.robot.util.geometry.*;
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
@@ -17,7 +23,7 @@ public class Drive extends Subsystem {
   // Drive Talons
   private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
 
-  // Gear Shifting Solenoid
+  private Solenoid mGearSolenoid;// Gear Shifting Solenoid
   // private final Solenoid mShifter;
 
   // Drive is plummed to default to high gear
@@ -31,6 +37,7 @@ public class Drive extends Subsystem {
   private DriveControlState mDriveControlState;
 
   private PeriodicIO mPeriodicIO;
+  private Logger mDriveLogger;
 
   public static class PeriodicIO {
     // INPUTS
@@ -63,6 +70,7 @@ public class Drive extends Subsystem {
   }
 
   private Drive() {
+      mDriveLogger = new Logger("drive");
 
     // Shifter Solenoid
     // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
@@ -79,7 +87,7 @@ public class Drive extends Subsystem {
     mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
     // configureSpark(mRightSlave, false, false);
 
-    mLeftMaster.configNominalOutputForward(0., 0);
+    mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
     mLeftMaster.configPeakOutputReverse(-1, 0);
@@ -120,8 +128,7 @@ public class Drive extends Subsystem {
   public synchronized void setOpenLoop(DriveSignal signal) {
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
       // setBrakeMode(true);
-      System.out.println("switching to open loop");
-      System.out.println(signal);
+      mDriveLogger.verbose("switching to open loop " +signal);
       mDriveControlState = DriveControlState.OPEN_LOOP;
     }
 
@@ -132,6 +139,8 @@ public class Drive extends Subsystem {
 
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
+
+      // add a "minimum"
     if (throttle >= .17) {
       throttle = .17;
     }
@@ -140,12 +149,15 @@ public class Drive extends Subsystem {
       throttle = -.17;
     }
 
-    if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
+    // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
+    // If we're not pushing forward on the throttle, automatically enable quickturn so that we
+    // don't have to
+    // explicitly enable it before turning.if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
       throttle = 0.0;
       quickTurn = true;
     }
 
-    if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
+    // This is just a convoluted way to do a deadband.if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
       wheel = 0.0;
     }
 
@@ -160,7 +172,12 @@ public class Drive extends Subsystem {
     }
 
     wheel *= kWheelGain;
+// We pass 0 for dy because we use a differential drive and can't strafe.
+    // The wheel here is a constant curvature rather than an actual heading. This is what makes
+    // the drive cheesy.
     DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
+
+    // Either the bigger of the two drive signals or 1, whichever is bigger.
     double scaling_factor =
         Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
     setOpenLoop(
@@ -188,7 +205,9 @@ public class Drive extends Subsystem {
       Before gears are switched, it would be a good idea to check
       psi to ensure we can properly drive the piston
   */
-  public synchronized void SwitchGears(boolean HighGear) {}
+  public synchronized void SwitchGears() {mHighGear = !mHighGear;
+    mGearSolenoid.set(mHighGear);
+  }
 
   /*
       Test all Sensors in the Subsystem
