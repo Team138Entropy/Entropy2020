@@ -209,6 +209,8 @@ public class Robot extends TimedRobot {
         // Quickturn!
       }
 
+      if (DriveShift) mDrive.SwitchGears();
+
       // Detect Harvest Mode
       boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
       boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
