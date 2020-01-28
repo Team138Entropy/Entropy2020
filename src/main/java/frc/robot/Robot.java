@@ -373,21 +373,24 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Shooting State is Idle");
         break;
       case PREPARE_TO_SHOOT:
-        mShooter.periodic();
+        mShooter.fireSingle();
+        mShooter.target();
+        // if ()
         break;
       case SHOOT_BALL:
-        mShooter.periodic();
+        mShooter.fireSingle();
+        mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
         break;
       case SHOOT_BALL_COMPLETE:
-        mShooter.periodic();
+        if 
         break;
       case SHOOTING_COMPLETE:
-        mShooter.periodic();
         break;
       default:
         mRobotLogger.error("Invalid Shooting State");
         break;
     }
+    mShooter.periodic();
   }
 
   private void executeClimbingStateMachine() {
