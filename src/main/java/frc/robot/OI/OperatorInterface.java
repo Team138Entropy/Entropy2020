@@ -75,6 +75,10 @@ public class OperatorInterface {
 
   // Operator
 
+  public boolean getHarvestMode(){
+    return DriverController.getTrigger(XboxController.Side.LEFT);
+  }
+
   public double getOperatorThrottle() {
     return OperatorController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
   }

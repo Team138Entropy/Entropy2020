@@ -182,7 +182,9 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
   }
 
-  @Overridepublic void disabledPeriodic() {if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
+  @Override
+  public void disabledPeriodic() {
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
       mRobotLogger.verbose("got pot value of " + mTurret.getPotValue());
     }
   }
@@ -208,13 +210,10 @@ public class Robot extends TimedRobot {
       }
 
       // Detect Harvest Mode
-      boolean WantsHarvestMode =
-          (mOperatorInterface.getDriverLeftTriggerPressed()
-              | mOperatorInterface.getDriverRightTriggerPressed());
+      boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
       boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
 
       boolean WantsAutoAim = false;
-      boolean AutoDrive = false;
 
       // Optional Object that may or may not contain a null value
       Optional<AimingParameters> BallAimingParameters; // info to aim to the ball

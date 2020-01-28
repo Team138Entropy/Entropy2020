@@ -36,8 +36,6 @@ public class Constants {
 
   // Path Following Constants
   public static final double kPathFollowingMaxAccel = 80.0; // inches per second ^ 2
-  // Path Following Constants
-  public static final double kPathFollowingMaxAccel = 80.0; // inches per second ^ 2
 
   // Vision Tracking Constants
   public static final double kMaxTrackerDistance = 60.0;

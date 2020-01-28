@@ -149,15 +149,17 @@ public class Drive extends Subsystem {
       throttle = -.17;
     }
 
-    // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
+// TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
     // don't have to
-    // explicitly enable it before turning.if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
+    // explicitly enable it before turning.
+    if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
       throttle = 0.0;
       quickTurn = true;
     }
 
-    // This is just a convoluted way to do a deadband.if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
+    // This is just a convoluted way to do a deadband.
+    if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
       wheel = 0.0;
     }
 
