@@ -7,6 +7,37 @@ package frc.robot.vision;
  * 
  *  The vector has an x component (+x is out towards the goal) that is always set to 1; a y component (+y is to the left in the camera image); and a z component (+z is up).
  * 
+ * 
+ *  Last year 254 tracked the corners of the target.
+ * 
+ *  Y = Horizontal 
+ *  Z = Vertical
+ *  X = Forward (set to 1).. 1 unit away
+ * 
+ * 
+ *  Limelight -> Pixels to Angles
+ *      The limelight has a horizontal field of view of 54 degrees
+ *      the limelight has a vertical field of view of 41 degrees
+ *      Captures at a resolution of 320x240
+ *      Assume center of camera is center of optical axis
+ *              at this point the x and y angles are also zero
+ *      using trig we can calculate 
+ * 
+ *      Step 1 -> Convert from pixel coordinates to normalized 2D coordinates
+ *                  where 0,0 is the center of the image and 1.0
+ * 
+ *      (px, py) = pixel coords, 0,0 is upper left.. positive down and to the right
+ *                  far right down is the positive directiona
+ * 
+ * 
+ *      (nx, ny) = normalized pixel coords, 0,0 is the center, psoition right and up
+ *                  this runs like a normal graph.. 
+ * 
+ *      nx = (1/160) * (px - 159.5)
+ *      ny = (1/120) * (119.5 - py)     
+ *          
+ *             
+ * 
  */
 public class TargetInfo {
 
