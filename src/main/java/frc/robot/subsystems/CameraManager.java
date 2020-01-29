@@ -4,6 +4,10 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+/* This is the camera manager code from last years (2019) robot.              */
+/* It has some adaptations and changes since the 2019 code was mashed together*/
+/* in one file.                                                               */
+/*----------------------------------------------------------------------------*/
 
 package frc.robot.subsystems;
 
