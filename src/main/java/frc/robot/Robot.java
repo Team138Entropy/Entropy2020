@@ -250,5 +250,30 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getLoadChamber()) {
       // Load chamber!
     }
+
+    if (mOperatorInterface.isManualOverride()) {
+
+      if (mOperatorInterface.isIntakeRollertest()) {
+        mIntake.start();
+      }
+      else {
+        mIntake.stop();
+      }
+
+      if (mOperatorInterface.isStorageRollerTest()) {
+        mStorage.storeBall();
+      }
+      else {
+        mStorage.stop();
+      }
+
+      if (mOperatorInterface.isShooterTest()) {
+        mShooter.start();
+      }
+      else {
+        mShooter.stop();
+      }
+    }
+
   }
 }

@@ -99,4 +99,23 @@ public class OperatorInterface {
   public void setDriverRumble(boolean toggle) {
     DriverController.setRumble(toggle);
   }
+
+  public boolean isManualOverride() {
+    return OperatorController.getButton(NykoController.Button.RIGHT_TRIGGER);
+  } 
+
+  public boolean isIntakeRollertest() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  }
+
+  public boolean isStorageRollerTest() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+  }
+
+  public boolean isShooterTest() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+  }
+  
+
+
 }
