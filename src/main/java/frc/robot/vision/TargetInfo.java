@@ -32,18 +32,48 @@ package frc.robot.vision;
  * 
  *      (nx, ny) = normalized pixel coords, 0,0 is the center, psoition right and up
  *                  this runs like a normal graph.. 
+ *      
+ *      next define an imaginary view plane and compute it size
+ *      for simplicity, we place this plane 1 unit (1.0) in front of camera
  * 
- *      nx = (1/160) * (px - 159.5)
- *      ny = (1/120) * (119.5 - py)     
- *          
- *             
+ *      view plane width = vpw = 2.0*tan(horizontal_fov/2)
+ *      view plane height = vph = 2.0*tan(vertical_fov/2)
+ * 
+ *      using these two values, we can now convert between normalized pixel coordinates
+ * 
+ *      x = vpw/2 * nx
+ *      y = vph/2 * ny
+ * 
+ *      ax = horizontal angle (x angle)
+ *      ay = vertical angle
+ *      tan(ax) = x/1
+ *      tan(ay) = y/1
+ *      ax = atan2(1,x)
+ *      ay = atan2(1,y)d
+ *      in 254's case:
+ *          double nY = -((y_pixels - 160.0) / 160.0);
+            double nZ = -((z_pixels - 120.0) / 120.0);
+            double y = Constants.kVPW / 2 * nY;
+            double z = Constants.kVPH / 2 * nZ;
+
+            then they use the y and z values as y and z
+            x just represents 1 unit in front of you!
+            z is height, y is left -> right
+
+            (0,0,0) is the point on the floor immediately underneath the robots center of rattation
+
+            in their case, their lightlight was -24 degrees angled down
+
+        xz plane translation:
+            the xz translation 
+ * 
  * 
  */
 public class TargetInfo {
 
     protected double x = 1.0;
-    protected double y = 0;
-    protected double z = 1.0;
+    protected double y;
+    protected double z;
     private double yaw = 0;
     private int CameraID = 0;
 
@@ -54,6 +84,13 @@ public class TargetInfo {
 
     public TargetInfo() {}
 
+    public TargetInfo(int TargType, double y, double z, double distance){
+        this.TargetType = TargType;
+        this.y = y;
+        this.z = z;
+        this.distance = distance;
+    }
+
     public TargetInfo(int CameraID, int TargetType, int x, int y, int z, double distance) {
         this.CameraID = CameraID;
         this.TargetType = TargetType;
@@ -61,6 +98,29 @@ public class TargetInfo {
         this.y = y;
         this.z = z;
         this.distance = distance;
+    }
+
+    /*
+        Convert Fields to Limelights vision concept
+        0,0 is top left most corner
+        
+        
+
+    */
+    public void CalculateFields(){
+        //
+        switch(TargetType){
+            case 0:
+                //packets from High Goal Camera
+
+
+            break;
+            case 1:
+                //packets from Ball Tracking Camera
+
+
+            break;
+        }
     }
 
     public double getYaw(){

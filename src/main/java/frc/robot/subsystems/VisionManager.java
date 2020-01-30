@@ -124,14 +124,18 @@ public class VisionManager extends Subsystem {
 
             // Attempt to form target info object
             // is possible this fails!
-            TargetInfo ti = new TargetInfo();
+            TargetInfo ti;
             try {
-                ti.SetY(((Number) CurrentPacket.get("x")).doubleValue());
-                ti.SetZ(((Number) CurrentPacket.get("y")).doubleValue());
-                ti.SetDistance(((Number) CurrentPacket.get("dis")).doubleValue());
-                ti.SetYaw(((Number) CurrentPacket.get("yaw")).doubleValue());
-                // ti.SetCameraID(((Number)CurrentPacket.get("id")).intValue());
-                ti.SetTargetID(((Number) CurrentPacket.get("targid")).intValue());
+                //Parse Target Info
+                ti = new TargetInfo(
+                    ((Number) CurrentPacket.get("targid")).intValue(),
+                    ((Number) CurrentPacket.get("y")).doubleValue(),
+                    ((Number) CurrentPacket.get("z")).doubleValue(),
+                    ((Number) CurrentPacket.get("dis")).doubleValue()
+                );
+
+                //Reconvert Field information
+                ti.CalculateFields();
 
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!
@@ -140,8 +144,6 @@ public class VisionManager extends Subsystem {
             } catch (Exception Targ) {
                 // Exception Thrown when Trying to retrieve values from json object
                 System.out.println("Packet Storing Exception: " + Targ.getMessage());
-                
-                //CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
             }
 
         } catch (ParseException pe) {
