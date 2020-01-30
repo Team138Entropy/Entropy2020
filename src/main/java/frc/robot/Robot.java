@@ -12,6 +12,9 @@ import com.ctre.phoenix.motorcontrol.TalonSRXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
@@ -25,6 +28,8 @@ public class Robot extends TimedRobot {
 
   float value = 1.0f;
 
+  FileWriter writer;
+
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
@@ -32,24 +37,40 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     mTalonSlave.follow(mTalonMaster);
     mTalonMaster.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.QuadEncoder, 0, 0);
-
-
+    try{
+      writer = new FileWriter("output1.csv");
+        System.out.println("OPENED FILE WRITER!");
+    }catch(Exception e){
+      System.out.println("EXCEPTION! " + e.getMessage());
+    }
 
     //fgain = (100% x 1023)/ nativeUnits
     //fgain = (100% x 1023)/ 9323
     //6.6
     //mTalonMaster.config_kF(0, 6.6);
-    //mTalonMaster.set(ControlMode.PercentOutput, 1.0f);
+   mTalonMaster.set(ControlMode.PercentOutput, -1.0f);
     //mTalonMaster.set(ControlMode.Position, )
+
+
   }
 
 
   @Override
-  public void teleopPeriodic() {
+    public void teleopPeriodic() {
+      System.out.println( Integer.toString(mTalonMaster.getSensorCollection().getQuadratureVelocity()) + "," + Double.toString(mTalonMaster.getSupplyCurrent()));
 
-
-    System.out.println("Encoder Velocity: " + mTalonMaster.getSensorCollection().getQuadratureVelocity());
-
+      try{
+        writer.append("\n");
+        writer.flush();
+      }catch(Exception e){
+        //System.out.println("WRITE EXCEPTION");
+        //System.out.println("EXCEPTION!");
+      }
+/*
+    System.out.println( 
+      mTalonMaster.getSensorCollection().getQuadratureVelocity() + 
+    "," + mTalonMaster.getSupplyCurrent());
+    */
   }
 
   @Override
