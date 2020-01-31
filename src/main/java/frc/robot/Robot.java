@@ -370,21 +370,38 @@ public class Robot extends TimedRobot {
   private void executeShootingStateMachine() {
     switch(mShootingState) {
       case IDLE:
-        mRobotLogger.warn("Shooting State is Idle");
+        mRobotLogger.warn("Shooting state is idle");
         break;
       case PREPARE_TO_SHOOT:
-        mShooter.fireSingle();
+        mShooter.start();
         mShooter.target();
-        // if ()
+        mShooter.incrementBuffer();
+        if (mShooter.getIsReady()) {
+          mShootingState = ShootingState.SHOOT_BALL;
+        }
         break;
       case SHOOT_BALL:
-        mShooter.fireSingle();
-        mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
+        if (checkTransitionToShooting()) {
+          mShooter.incrementBuffer();
+        }
+        mShooter.shootBall();
+        if (mShooter.getIsDoneShooting()) {
+          mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
+        }
         break;
       case SHOOT_BALL_COMPLETE:
-        if 
+        if (checkTransitionToShooting()) {
+          mShooter.incrementBuffer();
+        }
+        mStorage.removeBall();
+        if (mShooter.getFireAgain()) {
+          mShootingState = ShootingState.PREPARE_TO_SHOOT;
+        }
         break;
       case SHOOTING_COMPLETE:
+        mShooter.stop();
+        mShootingState = ShootingState.IDLE;
+        mState = State.INTAKE;
         break;
       default:
         mRobotLogger.error("Invalid Shooting State");

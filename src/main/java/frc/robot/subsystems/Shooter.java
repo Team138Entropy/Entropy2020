@@ -17,6 +17,7 @@ public class Shooter extends Subsystem {
   private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
   private static final double SPINUP_DELAY_SECONDS = 0.5;
   private static final double FIRE_DURATION_SECONDS = 0.5;
+  private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
     private double mAzimuth, mElevation;
@@ -71,6 +72,7 @@ public class Shooter extends Subsystem {
   private int mBuffer = 0;
   private Timer mSpinUpTimer;
   private Timer mFireTimer;
+  private double mRollerVelocity;
 
   public static synchronized Shooter getInstance() {
     if (instance == null) instance = new Shooter();
@@ -148,20 +150,20 @@ public class Shooter extends Subsystem {
   }
 
   /** Buffers another fire operation. */
-  public void fireSingle() {
+  public void incrementBuffer() {
     mBuffer++;
   }
 
   /**
-   * Equivalent to calling {@link #resetBuffer()} and then calling {@link #fireSingle()} a number of
+   * Equivalent to calling {@link #resetBuffer()} and then calling {@link #incrementBuffer()} a number of
    * times equal to the number of balls in the storage mechanism.
    */
-  public void fireAuto() {
-    resetBuffer();
-    for (int i = 0; i < MAX_CAPACITY; i++) {
-      fireSingle();
-    }
-  }
+//  public void fireAuto() {
+//    resetBuffer();
+//    for (int i = 0; i < MAX_CAPACITY; i++) {
+//      incrementBuffer();
+//    }
+//  }
 
   /**
    * Resets the firing buffer. Has the effect of cancelling any buffered fire operations, including
@@ -182,13 +184,35 @@ public class Shooter extends Subsystem {
   }
 
   /** Starts the roller. */
-  private void start() {
+  public void start() {
     mRoller.setSpeed(ROLLER_SPEED);
   }
 
   /** Stops the roller. */
-  private void stop() {
+  public void stop() {
     mRoller.setSpeed(0);
+  }
+
+  public boolean getIsReady() {
+    return mRollerVelocity > TARGET_ROLLER_VELOCITY && mFireTimer.get() >= FIRE_DURATION_SECONDS;
+  }
+
+  public boolean getFireAgain() {
+    return mBuffer > 0;
+  }
+
+  public void shootBall() {
+    mIntake.shoveANodeIntoTheThing();
+    mFireTimer.start();
+    mBuffer--;
+  }
+
+  public boolean getIsDoneShooting() {
+    if (mFireTimer.get() >= FIRE_DURATION_SECONDS*1000) {
+      mFireTimer.stop();
+      mFireTimer.reset();
+    }
+    return mFireTimer.get() >= FIRE_DURATION_SECONDS*1000;
   }
 
   @Override
