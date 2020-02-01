@@ -378,9 +378,8 @@ public class Robot extends TimedRobot {
       mFireTimer.stop();
       mFireTimer.reset();
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   private void executeShootingStateMachine() {
@@ -397,9 +396,8 @@ public class Robot extends TimedRobot {
         mShooter.target();
 
         /* If rollers are spun up, changes to next state */
-        if (mShooter.isAtVelocity()) {
+        if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
           mShootingState = ShootingState.SHOOT_BALL;
-          //TODO: Add check of whether vision has acquired a target.
         }
         break;
       case SHOOT_BALL:
