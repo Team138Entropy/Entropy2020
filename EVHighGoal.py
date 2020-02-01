@@ -228,8 +228,8 @@ class WebcamVideoStream:
 image_width = 640
 image_height = 480
 
-# Lifecam 3000 from datasheet
-# Datasheet: https://dl2jx7zfbtwvr.cloudfront.net/specsheets/WEBC1010.pdf
+# Playstation Eye
+# Datasheet: https://en.wikipedia.org/wiki/PlayStation_Eye
 diagonalView = math.radians(75)
 
 # 16:9 aspect ratio

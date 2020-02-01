@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 // UDP Reciever used in vision manager
 class UDPReciever {
@@ -87,9 +86,6 @@ public class VisionManager extends Subsystem {
 
 
     private VisionManager() {
-        System.out.println("Vision Manager Init!");
-        System.out.println("^^$$$^^^");
-
         // Start a Socket to listen to UDP Packet
         // Each thread pass to a processer which
         PacketReciever = new UDPReciever("127.0.0.1", 5800);
@@ -100,9 +96,7 @@ public class VisionManager extends Subsystem {
                     new Runnable() {
                         @Override
                         public void run() {
-                            System.out.println("DEBUG: Listener Thread Process!");
                             ProcessPacket();
-                            System.out.println("DEBUG: end of listener thread loop");
                         }
                     });
 
@@ -145,10 +139,6 @@ public class VisionManager extends Subsystem {
                 // Exception Thrown when Trying to retrieve values from json object
                 System.out.println("Packet Storing Exception: " + Targ.getMessage());
             }
-
-        } catch (ParseException pe) {
-            // Exception with the Parser
-            System.out.println("Parser Exception: " + pe.getMessage());
         } catch (Exception e) {
             // Other Exception
             System.out.println("Parse Packet Exception: " + e.getMessage());
@@ -166,6 +156,12 @@ public class VisionManager extends Subsystem {
         while(true){
             try {
                 String PacketResult =  PacketReciever.getPacket();
+                
+                //make sure this packet has size
+                if(PacketResult.length() == 0){
+                    continue; //null packet.. see ya!
+                }
+
                 try {
     
                     // Pass call to a Runnable Object

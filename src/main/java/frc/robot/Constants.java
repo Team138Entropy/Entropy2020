@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.lang.Math;
+
 // Any Sort of Constant or 'Magic Number' should be defined here
 public class Constants {
     // Controller Ports
@@ -42,8 +44,15 @@ public class Constants {
     public static final double kTrackSwitchingWeight = 100.0;
     public static final double kCameraFrameRate = 90.0; //fps
 
-    public static final double kBallCamera
 
+
+    //Camera Specific Information
+    public static final double kCameraDiagonalView = Math.toRadians(75);
+    public static final double kCameraHorizontalAspect = 4;
+    public static final double kCameraVerticalAspect = 3;
+    public static final double kDiagonalAspect = Math.hypot(kCameraHorizontalAspect, kCameraVerticalAspect);
+    public static final double kCameraHorizontalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView)) * 2;
+    public static final double kCameraVerticalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView)) * 2;
 
 
     //Field Related Constants

@@ -33,13 +33,25 @@ public class Robot extends TimedRobot {
 
     // Subsystems
     private final Drive mDrive = Drive.getInstance();
-    private final VisionManager mVisionManager = VisionManager.getInstance();
+    private final VisionManager mVisionManager = VisionManager.getInstance(); 
 
 
     public Relay visionLight = new Relay(0);
     
+    // State Variables
+    private boolean mAutoAim = true; //is our auto aim system running? 
+    private boolean mAutoIntake = false;
+    private boolean mIntaking = false; //is instake system running?
+    private boolean mShooting = false; //are we shooting? if we are shooting the 
+
+    //Storage so should never be directly run, needs to be on if we are shooting or intaking
+    private boolean mStorageRunning = false; 
+
+    private boolean mClimbMode = false;
+
+
     // Control Variables
-    private LatchedBoolean AutoAim = new LatchedBoolean();
+    private LatchedBoolean mWantsAutoSteer = new LatchedBoolean();
     private LatchedBoolean HarvestAim = new LatchedBoolean();
 
 
@@ -104,28 +116,48 @@ public class Robot extends TimedRobot {
         double DriveTurn = mOperatorInterface.getDriveTurn();
         boolean WantsLowGear = false;
         
-        //Detect Harvest Mode
-        boolean WantsHarvestMode = (mOperatorInterface.getDriverLeftTriggerPressed() | mOperatorInterface.getDriverRightTriggerPressed());
-        boolean HarvesModePressed =  HarvestAim.update(WantsHarvestMode);
-
-       
+        //Detect Harvest Mode - Harvest mode is HOLD based
+        //Driver must be holding it each frame
+        boolean HarvestModePressed = (mOperatorInterface.getDriverLeftTriggerPressed() | mOperatorInterface.getDriverRightTriggerPressed());
+        if(HarvestModePressed == false){
+            mAutoIntake = false;
+        }else{
+            mAutoIntake = true;
+        }
         
-        
-        boolean WantsAutoAim = false;
-        boolean AutoDrive = false;
 
-        //Optional Object that may or may not contain a null value
-        Optional<AimingParameters> BallAimingParameters; //info to aim to the ball
-        Optional<AimingParameters> TargetAimingParameters; //info to aim to the target
 
-        // Continue Driving
-        if (WantsHarvestMode == true) {
-            // Harvest Mode - AutoSteer Functionality
-            // Used for tracking a ball
-            //we may want to limit the speed?
-           // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
-        } else {
-            // Standard Manual Drive
+        //Turret Control
+        if(mAutoAim == true){
+            //Turret is automatically aligning to vision target
+
+
+        }else{
+            //Manual Turret Control
+            System.out.println("DEBUG: Manual Turret Mode");
+
+
+        }
+
+
+        //Shooter System
+        if(mShooting == true){
+
+            //Ensure that the storage belts are running
+
+
+        }
+
+
+
+        //Drive System
+        if(mAutoIntake == true){
+            System.out.println("DEBUG: Auto Drive");
+            //Driver only has control of throttle
+            //Steering is vision based
+        }else{
+            System.out.println("DEBUG: Manual Drive");
+            //Standard Manual Drive
             mDrive.setDrive(DriveThrottle, DriveTurn, false);
         }
     }

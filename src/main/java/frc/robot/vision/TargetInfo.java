@@ -1,5 +1,7 @@
 package frc.robot.vision;
 
+import frc.robot.Constants;
+
 /**
  * Container Class for Targets detected by the division system Contains a center point in 3D Space
  *
@@ -104,21 +106,34 @@ public class TargetInfo {
         Convert Fields to Limelights vision concept
         0,0 is top left most corner
         
-        
+        double nY = -((y_pixels - 160.0) / 160.0);
+        double nZ = -((z_pixels - 120.0) / 120.0);
+        double y = Constants.kVPW / 2 * nY;
+        double z = Constants.kVPH / 2 * nZ;
+
 
     */
     public void CalculateFields(){
-        //
+        double y = 0;
+        double z = 0;
+        double nY = 0;
+        double nZ = 0;
+        //320x240 - ball camera
+        //640x480 - turret camera
         switch(TargetType){
             case 0:
                 //packets from High Goal Camera
-
-
+                nY = -((y - 160.0)/160.0);
+                nZ = -((z - 120.0)/120.0);
+                y = (Constants.kCameraHorizontalView / 2) * nY;
+                z = (Constants.kCameraVerticalView / 2) * nZ;
             break;
             case 1:
                 //packets from Ball Tracking Camera
-
-
+                nY = -((y - 160.0)/160.0);
+                nZ = -((z - 120.0)/120.0);
+                y = (Constants.kCameraHorizontalView / 2) * nY;
+                z = (Constants.kCameraVerticalView / 2) * nZ;
             break;
         }
     }

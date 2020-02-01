@@ -69,16 +69,9 @@ public class Drive extends Subsystem {
         // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
 
         mLeftMaster = new WPI_TalonSRX(Constants.kLeftDriveMasterId);
-        // configureSpark(mLeftMaster, true, true);
-
         mLeftSlave = new WPI_TalonSRX(Constants.kLeftDriveSlaveId);
-        // configureSpark(mLeftSlave, true, false);
-
         mRightMaster = new WPI_TalonSRX(Constants.kRightDriveMasterId);
-        // configureSpark(mRightMaster, false, true);
-
         mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
-        // configureSpark(mRightSlave, false, false);
 
         mLeftMaster.configNominalOutputForward(0., 0);
         mLeftMaster.configNominalOutputReverse(0., 0);
@@ -133,13 +126,6 @@ public class Drive extends Subsystem {
 
     public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
         wheel = wheel * -1; // invert wheel
-        if (throttle >= .17) {
-            throttle = .17;
-        }
-
-        if (throttle <= -.17) {
-            throttle = -.17;
-        }
 
         if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
             throttle = 0.0;
@@ -159,7 +145,6 @@ public class Drive extends Subsystem {
             wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
             wheel = wheel / (denominator * denominator) * Math.abs(throttle);
         }
-
         wheel *= kWheelGain;
         DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
         double scaling_factor =
