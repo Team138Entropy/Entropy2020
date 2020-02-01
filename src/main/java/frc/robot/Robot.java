@@ -31,10 +31,12 @@ public class Robot extends TimedRobot {
     // Subsystem Manager
     private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-    // Subsystems
+    // Subsystems - Call all subsystems here to foce initialization
     private final Drive mDrive = Drive.getInstance();
     private final VisionManager mVisionManager = VisionManager.getInstance(); 
-
+    private final Intake mIntake = Intake.getInstance();
+    private final Shooter mShooter = Shooter.getInstance();
+    private final Storage mStorage = Storage.getInstance();
 
     public Relay visionLight = new Relay(0);
     

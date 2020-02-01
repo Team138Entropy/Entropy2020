@@ -4,6 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
@@ -16,7 +18,14 @@ public class Drive extends Subsystem {
     private static Drive mInstance;
 
     // Drive Talons
-    private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
+    private final WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
+
+    //Encoders
+    private final Encoder mLeftEncoder, mRightEncoder;
+
+    //Gyro Rotation
+    private final ADXRS450_Gyro mGyro;
+
 
     // Gear Shifting Solenoid
     // private final Solenoid mShifter;
@@ -64,6 +73,9 @@ public class Drive extends Subsystem {
     }
 
     private Drive() {
+
+        mGyro = new ADXRS450_Gyro();
+        mLeftEncoder = new Enc
 
         // Shifter Solenoid
         // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
@@ -203,4 +215,8 @@ public class Drive extends Subsystem {
     public double getRightLinearVelocity() {
         return 0;
     }
+
+
+    
+
 }
