@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
   private final Storage mStorage = Storage.getInstance();
   private BallIndicator mBallIndicator;
 
-  private final Compressor mCompressor = new Compressor();
+  private Compressor mCompressor;
 
   public Relay visionLight = new Relay(0);
 
@@ -76,6 +76,10 @@ public class Robot extends TimedRobot {
     // Wherever the Robot is now is the starting position
     mRobotState.reset();
 
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
+      mCompressor = new Compressor();
+    }
+
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
       mTurret = Turret.getInstance();
@@ -95,7 +99,11 @@ public class Robot extends TimedRobot {
     Cool!
   */
   public boolean getLowPSI() {
-    return mCompressor.getPressureSwitchValue();
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
+      return mCompressor.getPressureSwitchValue();
+    }else{
+      return false;
+    }
   }
 
   /*
