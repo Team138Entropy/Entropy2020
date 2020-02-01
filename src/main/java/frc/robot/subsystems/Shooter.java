@@ -1,9 +1,8 @@
 package frc.robot.subsystems;
 
-import frc.robot.SpeedLookupTable;
-
 import frc.robot.Config;
 import frc.robot.Config.Key;
+import frc.robot.SpeedLookupTable;
 
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
