@@ -13,7 +13,7 @@ public abstract class Subsystem {
     SubsystemManager.getInstance().RegisterSubsystem(this);
   }
 
-  public abstract void ZeroSensors();
+  public abstract void zeroSensors();
 
-  public abstract void CheckSubsystems();
+  public abstract void checkSubsystems();
 }

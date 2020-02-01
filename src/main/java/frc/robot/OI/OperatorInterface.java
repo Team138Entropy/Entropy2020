@@ -1,12 +1,14 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
+import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
 
 public class OperatorInterface {
+  Logger mLogger;
   private static OperatorInterface mInstance;
 
   // Instances of the Driver and Operator Controller
@@ -21,6 +23,7 @@ public class OperatorInterface {
   }
 
   private OperatorInterface() {
+    mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new NykoController(Constants.OperatorControllerPort);
   }
@@ -53,10 +56,10 @@ public class OperatorInterface {
     // Check if Low Gear is Toggled
     if (DriverController.getButton(XboxController.Button.START)) {
       if (LowGear == false) {
-        System.out.println("Y PRESSED ON");
+        mLogger.verbose("Y PRESSED ON");
 
       } else {
-        System.out.println("Y PRESSED OFF");
+        mLogger.verbose("Y PRESSED OFF");
       }
       LowGear = !LowGear;
     }
@@ -75,6 +78,10 @@ public class OperatorInterface {
   }
 
   // Operator
+
+  public boolean getHarvestMode() {
+    return DriverController.getTrigger(XboxController.Side.LEFT);
+  }
 
   public double getOperatorThrottle() {
     return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);

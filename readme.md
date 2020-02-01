@@ -3,7 +3,6 @@
 This is a baseline of the 2020 Robotics Code. This code seeks to provide the team with a strong baseline entering the 2020 Build season.
 This readme highlights portions of the architecture, ideas, and best practices.
 
-
 ### Code Formatting
 We have a git hook that will format your code according to Google's style guide whenever you commit. To enable it, you will need to run
 `update-hooks.bat` on Windows or `gradlew installGitHooks` on Linux and macOS.
@@ -43,7 +42,6 @@ We have a git hook that will format your code according to Google's style guide 
     - All Manipulators should have a 'state' based focus. With a state based system we should rely on PID Control to reach exact points
 - SmartNav
     
-
 
 ### Concepts
 - Physics
