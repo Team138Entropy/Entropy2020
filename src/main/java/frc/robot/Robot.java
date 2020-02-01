@@ -5,8 +5,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
@@ -162,8 +162,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("ShooterFull", false);
     // TODO: decide if this is necessary and hook it up
     SmartDashboard.putBoolean("ShooterLoaded", false);
-    SmartDashboard.putBoolean(
-        "ShooterSpunUp", mShooter.isAtVelocity());
+    SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
     // TODO: also, finally, hook this up.
     SmartDashboard.putBoolean("TargetLocked", false);
     // TODO: haha that was a joke this is the real last one
@@ -326,7 +325,7 @@ public class Robot extends TimedRobot {
   }
 
   private void executeRobotStateMachine() {
-    switch(mState) {
+    switch (mState) {
       case IDLE:
         break;
       case INTAKE:
@@ -345,7 +344,7 @@ public class Robot extends TimedRobot {
   }
 
   private void executeIntakeStateMachine() {
-    switch(mIntakeState) {
+    switch (mIntakeState) {
       case IDLE:
         mRobotLogger.warn("Intake state is idle");
         break;
@@ -370,7 +369,7 @@ public class Robot extends TimedRobot {
         mStorage.storeBall();
         // TODO: may need to delay stopping the intake roller
         mIntake.stop();
-        
+
         // If the sensor indicates the ball is stored, complete ball storage
         if (mStorage.isBallStored()) {
           mIntakeState = IntakeState.STORAGE_COMPLETE;
@@ -378,7 +377,7 @@ public class Robot extends TimedRobot {
         break;
       case STORAGE_COMPLETE:
         mStorage.addBall();
-        
+
         // TODO: may need to delay stopping the storage roller
         mStorage.stop();
 
@@ -387,7 +386,7 @@ public class Robot extends TimedRobot {
           mIntakeState = IntakeState.INTAKE;
         }
 
-        // Check transition to shooting after storage of ball 
+        // Check transition to shooting after storage of ball
         checkTransitionToShooting();
         break;
       default:
@@ -412,8 +411,7 @@ public class Robot extends TimedRobot {
         mShootingState = ShootingState.PREPARE_TO_SHOOT;
       }
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -430,7 +428,7 @@ public class Robot extends TimedRobot {
   }
 
   private void executeShootingStateMachine() {
-    switch(mShootingState) {
+    switch (mShootingState) {
       case IDLE:
         mRobotLogger.warn("Shooting state is idle");
         break;
@@ -439,7 +437,7 @@ public class Robot extends TimedRobot {
         /* Starts roller */
         mShooter.start();
 
-        //TODO: Placeholder method, replace later.
+        // TODO: Placeholder method, replace later.
         mShooter.target();
 
         /* If rollers are spun up, changes to next state */
@@ -481,13 +479,12 @@ public class Robot extends TimedRobot {
   }
 
   private void executeClimbingStateMachine() {
-    switch(mClimingState) {
+    switch (mClimingState) {
       case IDLE:
         break;
       default:
         mRobotLogger.error("Invalid Climbing State");
         break;
     }
-
   }
 }
