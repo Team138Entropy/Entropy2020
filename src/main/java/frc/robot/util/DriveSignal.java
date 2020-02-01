@@ -22,10 +22,7 @@ public class DriveSignal {
   public static final DriveSignal NEUTRAL = new DriveSignal(0, 0);
   public static final DriveSignal BRAKE = new DriveSignal(0, 0, true);
 
-  public void PrintLog() {
-    // System.out.println("Left: " + String.valueOf(mLeftMotor) + "   Right: " +
-    // String.valueOf(mRightMotor));
-  }
+  public void PrintLog() {}
 
   public double getLeft() {
     return mLeftMotor;
