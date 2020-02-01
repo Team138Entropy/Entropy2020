@@ -97,6 +97,18 @@ public class Robot extends TimedRobot {
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
+    SpeedLookupTable table = SpeedLookupTable.getInstance();
+    System.out.println(table.getSpeedFromDistance(9));
+    System.out.println(table.getSpeedFromDistance(10));
+    System.out.println(table.getSpeedFromDistance(11));
+    System.out.println(table.getSpeedFromDistance(17));
+    System.out.println(table.getSpeedFromDistance(20));
+    System.out.println(table.getSpeedFromDistance(23));
+    System.out.println(table.getSpeedFromDistance(30));
+    System.out.println(table.getSpeedFromDistance(50));
+    System.out.println(table.getSpeedFromDistance(100));
+
+
     // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
 
