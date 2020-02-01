@@ -3,3 +3,8 @@
 .format
 build
 bin
+/.idea/caches
+/.idea/libraries
+/local.properties
+/Entropy2020.iml
+.idea
