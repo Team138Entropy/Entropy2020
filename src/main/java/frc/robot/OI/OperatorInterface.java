@@ -109,7 +109,7 @@ public class OperatorInterface {
 
   public boolean isManualOverride() {
     return OperatorController.getButton(NykoController.Button.RIGHT_TRIGGER);
-  } 
+  }
 
   public boolean isIntakeRollertest() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_9);
@@ -122,7 +122,4 @@ public class OperatorInterface {
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
-  
-
-
 }

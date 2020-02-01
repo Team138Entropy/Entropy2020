@@ -307,8 +307,7 @@ public class Robot extends TimedRobot {
     // Operator Controls
     if (mOperatorInterface.getTurretAdjustLeft()) {
       // manual turret aim
-    }
-    else if (mOperatorInterface.getTurretAdjustRight()) {
+    } else if (mOperatorInterface.getTurretAdjustRight()) {
       // manual turret aim
     }
 
@@ -332,26 +331,22 @@ public class Robot extends TimedRobot {
 
       if (mOperatorInterface.isIntakeRollertest()) {
         mIntake.start();
-      }
-      else {
+      } else {
         mIntake.stop();
       }
 
       if (mOperatorInterface.isStorageRollerTest()) {
         mStorage.storeBall();
-      }
-      else {
+      } else {
         mStorage.stop();
       }
 
       if (mOperatorInterface.isShooterTest()) {
         mShooter.start();
-      }
-      else {
+      } else {
         mShooter.stop();
       }
     }
-
   }
 
   private void executeRobotStateMachine() {
