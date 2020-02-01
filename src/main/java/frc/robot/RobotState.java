@@ -11,7 +11,7 @@ import frc.robot.vision.TargetInfo;
 import java.util.*;
 
 /*
-    Robot State handles robot tra king throughout the match
+    Robot State handles robot tracking throughout the match
     Handles all rotation positional information
 
 
@@ -32,6 +32,7 @@ import java.util.*;
 */
 public class RobotState {
   private static RobotState mInstance;
+  Logger mLogger;
 
   public static RobotState getInstance() {
     if (mInstance == null) {
@@ -81,6 +82,7 @@ public class RobotState {
   // Constructor for Robot State
   // Called upon RobotState startup, reset everything
   private RobotState() {
+    mLogger = new Logger("robotState");
     // At the time of this call, this is our zero point!
     zero(0.0, Pose2d.identity(), Rotation2d.identity());
   }
@@ -223,7 +225,7 @@ public class RobotState {
   // get targeting rotation
   // vision based how far we need to ratate
   public synchronized Rotation2d getTurretRotation() {
-    System.out.println("Is present!");
+    mLogger.verbose("Is present!");
     // get aiming parameters of the ball
     Optional<AimingParameters> aim =
         getLatestTargetAimingParameters(-1, Constants.kMaxGoalTrackAge);
@@ -243,7 +245,7 @@ public class RobotState {
           robot_to_predicted_robot.inverse().transformBy(aim.get().getRobotToGoal());
       mCorrectedRangeToTarget = predicted_robot_to_goal.getTranslation().norm();
 
-      System.out.println("DEBUG: Get Turret RotatioN!");
+      mLogger.debug("DEBUG: Get Turret Rotation!");
       return predicted_robot_to_goal.getRotation();
     }
 
@@ -397,7 +399,7 @@ public class RobotState {
       Rotation2d angle = new Rotation2d(x, y, true);
       double deg = angle.getDegrees();
       double yawcheck = ti.getYaw();
-      System.out.println(Double.toString(deg));
+      mLogger.verbose(Double.toString(deg));
     }
 
     z = 10;
@@ -407,12 +409,14 @@ public class RobotState {
     // double differential_height = source.getLensHeight() - (high ? Constants.kPortTargetHeight :
     // Constants.kHatchTargetHeight);
     double differential_height = Constants.kHighGoalHeight;
+
+    //TODO: why isn't this here
     // if ((z < 0.0) == (differential_height > 0.0)) {
     if (true) {
       double scaling = differential_height / -z;
       double distance = Math.hypot(x, y) * scaling;
       Rotation2d angle = new Rotation2d(x, y, true);
-      System.out.println(angle.getDegrees());
+      mLogger.verbose(Double.toString(angle.getDegrees()));
       return new Translation2d(distance * angle.cos(), distance * angle.sin());
     }
     return null;

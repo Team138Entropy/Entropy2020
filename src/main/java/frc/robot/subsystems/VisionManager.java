@@ -28,7 +28,7 @@ class UDPReciever {
    *     whitepaper. Must match whatever port the coprocessor is sending information to.
    */
   public UDPReciever(String listen_from_addr_in, int listen_on_port_in) {
-    mLogger = new Logger("visionmanager");
+    mLogger = new Logger("visionManager");
     try {
       recieveSocket = new DatagramSocket(listen_on_port_in);
       recievePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -84,7 +84,7 @@ public class VisionManager extends Subsystem {
   private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
   private VisionManager() {
-    mLogger = new Logger("visionmanager");
+    mLogger = new Logger("visionManager");
 
     mLogger.log("Vision Manager Init!");
     mLogger.log("^^$$$^^^");

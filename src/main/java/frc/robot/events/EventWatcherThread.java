@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 
 /** Singleton thread for monitoring things. */
 public class EventWatcherThread extends Thread {
-  Logger mLogger = new Logger("eventwatcherthread");
+  Logger mLogger = new Logger("eventWatcherThread");
 
   private ArrayList<Event> queue = new ArrayList<>();
   private LinkedHashMap<Event, Boolean> lastStateCache = new LinkedHashMap<>();
