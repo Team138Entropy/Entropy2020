@@ -13,8 +13,11 @@ public class Constants {
     public static final double kIntakeRollerPercentOutput = 0.5f;
 
     //Storage
-    public static final int kStorageTalonPort = 0;
+    public static final int kStorageTalon1Port = 0;
+    public static final int kStorageTalon2Port = 0;
+    public static final int kStorageBeamSensorPort = 0;
     public static final double kStorageRollerPercentOutput = 0.5;
+    public static final int kStorageCapacity = 5;
 
     // Talon Variables
     //Drive

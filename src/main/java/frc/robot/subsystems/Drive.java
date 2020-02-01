@@ -21,7 +21,7 @@ public class Drive extends Subsystem {
     private final WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
 
     //Encoders
-    private final Encoder mLeftEncoder, mRightEncoder;
+   // private final Encoder mLeftEncoder, mRightEncoder;
 
     //Gyro Rotation
     private final ADXRS450_Gyro mGyro;
@@ -75,7 +75,7 @@ public class Drive extends Subsystem {
     private Drive() {
 
         mGyro = new ADXRS450_Gyro();
-        mLeftEncoder = new Enc
+        //mLeftEncoder = new Enc
 
         // Shifter Solenoid
         // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
@@ -101,7 +101,7 @@ public class Drive extends Subsystem {
         mLeftMaster.setNeutralMode(NeutralMode.Brake);
         mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
-        // Configure Talon gains
+        // Configure Talon PID Values
         /*
         mLeftMaster.config_kF(0, Drive_Kf,0);
         mLeftMaster.config_kP(0, Drive_Kp,0);
@@ -111,7 +111,7 @@ public class Drive extends Subsystem {
         mRightMaster.config_kP(0, Drive_Kp,0);
         mRightMaster.config_kI(0, Drive_Ki,0);
         mRightMaster.config_kD(0, Drive_Kd,0);
-              */
+        */
 
         // Configure slave Talons to follow masters
         mLeftSlave.follow(mLeftMaster);

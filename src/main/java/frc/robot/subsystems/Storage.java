@@ -5,23 +5,19 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 
-/** Add your docs here. */
+/** 
+ * Storage System is made up of two motors
+ * 
+ */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
-  private static final int INTAKE_SENSOR_PORT =
-      Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
-
-  private static final int STORAGE_CAPICTY = 5;
-
-  // TODO: Tune these values
-  private static final double STORE_SPEED = Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
-  private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
-
-  private WPI_TalonSRX mRoller;
-  private DigitalInput mIntakeSensor;
+  private final WPI_TalonSRX mLowerRoller;
+  private final WPI_TalonSRX mUpperRoller;
+  private final DigitalInput mIntakeSensor;
 
   private int mBallCount = 0;
+
+  private boolean IsOn = false;
 
   private static Storage sInstance;
 
@@ -33,8 +29,25 @@ public class Storage extends Subsystem {
   }
 
   private Storage() {
-    mRoller = new WPI_TalonSRX(kStorageRollerPercentOutput);
-    mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
+    mLowerRoller = new WPI_TalonSRX(Constants.kStorageTalon1Port);
+    mUpperRoller = new WPI_TalonSRX(Constants.kStorageTalon2Port);
+    mIntakeSensor = new DigitalInput(Constants.kStorageBeamSensorPort);
+
+    //The way the rollers are setup, both motors need to run to work
+    mLowerRoller.follow(mUpperRoller);
+  }
+
+  public synchronized boolean IsOn(){
+      return this.IsOn;
+  }
+
+  //Simple Enable the 
+  public synchronized void Enable(){
+    IsOn = true;
+  }
+
+  public synchronized void Disable(){
+      IsOn = false;
   }
 
   public synchronized boolean isBallDetected() {
@@ -50,7 +63,7 @@ public class Storage extends Subsystem {
   }
 
   public void addBall() {
-    if (mBallCount < STORAGE_CAPICTY) {
+    if (mBallCount < Constants.kStorageCapacity) {
       mBallCount++;
     }
   }
@@ -66,20 +79,20 @@ public class Storage extends Subsystem {
   }
 
   public boolean isFull() {
-    return mBallCount == STORAGE_CAPICTY;
+    return mBallCount == Constants.kStorageCapacity;
   }
 
   public void storeBall() {
-    mRoller.set(ControlMode.PercentOutput, STORE_SPEED);
+    //mRoller.set(ControlMode.PercentOutput, STORE_SPEED);
   }
 
   /** Stops the roller. */
-  public void stop() {
-    mRoller.set(ControlMode.PercentOutput, 0);
+  public synchronized void stop() {
+    //mRoller.set(ControlMode.PercentOutput, 0);
   }
 
-  public void ejectBall() {
-    mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
+  public synchronized void ejectBall() {
+  //  mRoller.set(ControlMode.PercentOutput, Constants.kStorageCapacity);
   }
 
   public int getBallCount() {
