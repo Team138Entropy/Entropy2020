@@ -43,7 +43,6 @@ We have a git hook that will format your code according to Google's style guide 
 - SmartNav
     
 
-
 ### Concepts
 - Physics
     We adopt some physic concepts that teams like 254 used (which are now included in the WPILIB apparently). Here is a brief explanation of each.
