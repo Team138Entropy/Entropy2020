@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
     System.out.println(table.getSpeedFromDistance(9));
     System.out.println(table.getSpeedFromDistance(10));
     System.out.println(table.getSpeedFromDistance(11));
+    System.out.println(table.getSpeedFromDistance(15));
     System.out.println(table.getSpeedFromDistance(17));
     System.out.println(table.getSpeedFromDistance(20));
     System.out.println(table.getSpeedFromDistance(23));
