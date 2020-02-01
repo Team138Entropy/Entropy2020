@@ -1,6 +1,5 @@
 package frc.robot;
 
-
 public class SpeedLookupTable {
   static SpeedLookupTable mInstance;
 
