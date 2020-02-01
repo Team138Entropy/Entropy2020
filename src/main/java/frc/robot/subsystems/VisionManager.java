@@ -94,7 +94,7 @@ public class VisionManager extends Subsystem {
               @Override
               public void run() {
                 System.out.println("DEBUG: Listener Thread Process!");
-                ProcessPacket();
+                processPacket();
                 System.out.println("DEBUG: end of listener thread loop");
               }
             });
@@ -105,9 +105,9 @@ public class VisionManager extends Subsystem {
     listenerThread.start();
   }
 
-  private void ParsePacket(String packet) {
-    // if(packet.isBlank()) return;
-    System.out.println("Packet Length: " + packet.length());
+  private void parsePacket(String packet) {
+    if(packet.isEmpty()) return; // if the packet has a length of 0, don't parse it
+  
     try {
       JSONObject CurrentPacket;
 
@@ -150,7 +150,7 @@ public class VisionManager extends Subsystem {
   /*
       Process every single packet
   */
-  private void ProcessPacket() {
+  private void processPacket() {
 
     while (true) {
       try {
@@ -162,7 +162,7 @@ public class VisionManager extends Subsystem {
           executor.execute(
               new Runnable() {
                 public void run() {
-                  ParsePacket(PacketResult);
+                  parsePacket(PacketResult);
                 }
               });
 
@@ -176,14 +176,14 @@ public class VisionManager extends Subsystem {
     }
   }
 
-  public void ZeroSensors() {}
+  public void zeroSensors() {}
 
-  public void UpdateActiveCamera(int value) {
+  public void updateActiveCamera(int value) {
     // mActiveCamera = mCameras.get(value);
   }
 
   /*
       Test all Sensors in the Subsystem
   */
-  public void CheckSubsystems() {}
+  public void checkSubsystems() {}
 }

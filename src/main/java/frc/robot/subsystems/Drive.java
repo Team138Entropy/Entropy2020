@@ -123,7 +123,7 @@ public class Drive extends Subsystem {
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
-  public void ZeroSensors() {}
+  public void zeroSensors() {}
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
@@ -218,7 +218,7 @@ public class Drive extends Subsystem {
   /*
       Test all Sensors in the Subsystem
   */
-  public void CheckSubsystems() {}
+  public void checkSubsystems() {}
 
   public synchronized double getLeftEncoderDistance() {
     return 0.0;
