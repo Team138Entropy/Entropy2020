@@ -47,7 +47,7 @@ public class InterpolatingTreeMap<
 
   @Override
   public void putAll(Map<? extends K, ? extends V> map) {
-    System.out.println("Unimplemented Method");
+    System.err.println("Unimplemented Method");
   }
 
   /**
