@@ -22,3 +22,7 @@ jobs:
           ${{ runner.os }}-gradle- 
     - name: Build with Gradle
       run: ./gradlew build --info
+    - name: Lint with Google Java
+      uses: axel-op/googlejavaformat-action@v2.0.0
+      with:
+        args: --replace

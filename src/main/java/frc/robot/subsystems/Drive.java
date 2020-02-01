@@ -5,11 +5,15 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Config;
+import frc.robot.Config.Key;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
+import frc.robot.vision.AimingParameters;
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
@@ -17,9 +21,7 @@ public class Drive extends Subsystem {
   // Drive Talons
   private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
 
-  private Solenoid mGearSolenoid;
-
-  // Gear Shifting Solenoid
+  private Solenoid mGearSolenoid; // Gear Shifting Solenoid
   // private final Solenoid mShifter;
 
   // Drive is plummed to default to high gear
@@ -83,8 +85,9 @@ public class Drive extends Subsystem {
     mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
     // configureSpark(mRightSlave, false, false);
 
-    mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
-
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
+      mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
+    }
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
@@ -120,7 +123,7 @@ public class Drive extends Subsystem {
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
-  public void ZeroSensors() {}
+  public void zeroSensors() {}
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
@@ -137,10 +140,15 @@ public class Drive extends Subsystem {
 
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
-    /*
-    if(throttle >= 0){
+
+    // add a "minimum"
+    if (throttle >= .17) {
+      throttle = .17;
     }
-    */
+
+    if (throttle <= -.17) {
+      throttle = -.17;
+    }
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -167,7 +175,6 @@ public class Drive extends Subsystem {
     }
 
     wheel *= kWheelGain;
-
     // We pass 0 for dy because we use a differential drive and can't strafe.
     // The wheel here is a constant curvature rather than an actual heading. This is what makes
     // the drive cheesy.
@@ -176,9 +183,24 @@ public class Drive extends Subsystem {
     // Either the bigger of the two drive signals or 1, whichever is bigger.
     double scaling_factor =
         Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
-
     setOpenLoop(
         new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
+  }
+
+  /*
+      Auto Steer functionality
+      passed in parameters to the goal to aim at
+      allows driver to control throttle
+      this will be called with the ball as a target
+  */
+  public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
+    double timestamp = Timer.getFPGATimestamp();
+    final double kAutosteerAlignmentPointOffset = 15.0; //
+    /*
+    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+    setBrakeMode(true);
+    */
+
   }
 
   /*
@@ -187,12 +209,34 @@ public class Drive extends Subsystem {
       psi to ensure we can properly drive the piston
   */
   public synchronized void SwitchGears() {
-    mHighGear = !mHighGear;
-    mGearSolenoid.set(mHighGear);
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
+      mHighGear = !mHighGear;
+      mGearSolenoid.set(mHighGear);
+    }
   }
 
   /*
       Test all Sensors in the Subsystem
   */
-  public void CheckSubsystems() {}
+  public void checkSubsystems() {}
+
+  public synchronized double getLeftEncoderDistance() {
+    return 0.0;
+  }
+
+  public synchronized double getRightEncoderDistance() {
+    return 0.0;
+  }
+
+  public synchronized Rotation2d getRotation() {
+    return null;
+  }
+
+  public double getLeftLinearVelocity() {
+    return 0;
+  }
+
+  public double getRightLinearVelocity() {
+    return 0;
+  }
 }
