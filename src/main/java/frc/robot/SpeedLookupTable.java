@@ -47,16 +47,6 @@ public class SpeedLookupTable {
       upperBoundDistance = thisDistance;
       upperBoundSpeed = thisSpeed;
 
-      System.out.println(
-          " lowerBoundDistance: "
-              + lowerBoundDistance
-              + " lowerBoundSpeed: "
-              + lowerBoundSpeed
-              + " upperBoundDistance: "
-              + upperBoundDistance
-              + " upperBoundSpeed: "
-              + upperBoundSpeed);
-
       if (distance > lowerBoundDistance && distance < upperBoundDistance) {
         return linearInterpolate(
             distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
