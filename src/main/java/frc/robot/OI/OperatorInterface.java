@@ -80,7 +80,7 @@ public class OperatorInterface {
   // Operator
 
   public boolean getHarvestMode() {
-    return DriverController.getTrigger(XboxController.Side.LEFT);
+    return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
   }
 
   public double getOperatorThrottle() {
@@ -107,10 +107,7 @@ public class OperatorInterface {
     DriverController.setRumble(toggle);
   }
 
-  public boolean isManualOverride() {
-    return OperatorController.getButton(NykoController.Button.RIGHT_TRIGGER);
-  } 
-
+  // Test Mode functions
   public boolean isIntakeRollertest() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_9);
   }
@@ -122,7 +119,4 @@ public class OperatorInterface {
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
-  
-
-
 }
