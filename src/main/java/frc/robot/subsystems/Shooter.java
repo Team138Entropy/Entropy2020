@@ -69,7 +69,6 @@ public class Shooter extends Subsystem {
   }
 
   private State mState = State.IDLE;
-  private int mBuffer = 0;
   private Timer mSpinUpTimer;
   private Timer mFireTimer;
   private double mRollerVelocity;
@@ -106,78 +105,6 @@ public class Shooter extends Subsystem {
     mFireTimer = new Timer();
   }
 
-  /** Call this in the robot loop. */
-  public void periodic() {
-
-    // Check if we're done spinning up yet
-    if (mState == State.SPINNING_UP && mSpinUpTimer.get() >= SPINUP_DELAY_SECONDS) {
-      mState = State.FULL_SPEED;
-      mSpinUpTimer.stop();
-      mSpinUpTimer.reset();
-    }
-
-    // Check if we're done firing yet
-    if (mState == State.FIRING && mFireTimer.get() >= FIRE_DURATION_SECONDS) {
-      mState = State.IDLE;
-      mFireTimer.stop();
-      mFireTimer.reset();
-    }
-
-    // Handle buffered fire operations
-    if (mBuffer > 0) {
-
-      // If we haven't started spinning up yet
-      if (mState != State.SPINNING_UP) {
-        start();
-        mSpinUpTimer.reset();
-        mSpinUpTimer.start();
-      }
-
-      if (mState == State.FULL_SPEED) {
-        mState = State.FIRING;
-        mIntake.shoveANodeIntoTheThing();
-        mFireTimer.start();
-        mBuffer--;
-      }
-    } else {
-      // Handle the case where the buffer was reset while we were doing something
-      if (mState == State.SPINNING_UP || mState == State.FULL_SPEED) {
-        stop();
-        mSpinUpTimer.stop();
-        mSpinUpTimer.reset();
-      }
-    }
-  }
-
-  /** Buffers another fire operation. */
-  public void incrementBuffer() {
-    mBuffer++;
-  }
-
-  /**
-   * Equivalent to calling {@link #resetBuffer()} and then calling {@link #incrementBuffer()} a number of
-   * times equal to the number of balls in the storage mechanism.
-   */
-//  public void fireAuto() {
-//    resetBuffer();
-//    for (int i = 0; i < MAX_CAPACITY; i++) {
-//      incrementBuffer();
-//    }
-//  }
-
-  /**
-   * Resets the firing buffer. Has the effect of cancelling any buffered fire operations, including
-   * automatic fire.
-   */
-  public void resetBuffer() {
-    mBuffer = 0;
-  }
-
-  /** The same as {@link #resetBuffer()}. Exists to make calling code more declarative. */
-  public void stopFiring() {
-    resetBuffer();
-  }
-
   /** Tells the turret to move to where the vision system says we should be. */
   public void target() {
     mTurret.set(mVision.calcTargetPosition());
@@ -193,26 +120,25 @@ public class Shooter extends Subsystem {
     mRoller.setSpeed(0);
   }
 
-  public boolean getIsReady() {
-    return mRollerVelocity > TARGET_ROLLER_VELOCITY && mFireTimer.get() >= FIRE_DURATION_SECONDS;
+  /** Returns whether roller is at full speed. */
+  public boolean isAtVelocity() {
+    return mRollerVelocity > TARGET_ROLLER_VELOCITY;
   }
 
-  public boolean getFireAgain() {
-    return mBuffer > 0;
-  }
-
+  /** Starts the firing timer and roller.  */
   public void shootBall() {
-    mIntake.shoveANodeIntoTheThing();
     mFireTimer.start();
-    mBuffer--;
+    start();
   }
 
-  public boolean getIsDoneShooting() {
-    if (mFireTimer.get() >= FIRE_DURATION_SECONDS*1000) {
+  /** Returns whether the firing timer has run longer than the duration. */
+  public boolean isDoneShooting() {
+    if (mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000) {
+      stop();
       mFireTimer.stop();
       mFireTimer.reset();
     }
-    return mFireTimer.get() >= FIRE_DURATION_SECONDS*1000;
+    return mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000;
   }
 
   @Override

@@ -243,8 +243,6 @@ public class Robot extends TimedRobot {
 
     driveTrainLoop();
 
-    mShooter.periodic();
-
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator.checkTimer();
     }
@@ -359,7 +357,9 @@ public class Robot extends TimedRobot {
           break;
       }
       mState = State.SHOOTING;
-      mShootingState = ShootingState.PREPARE_TO_SHOOT;
+      if (mShootingState == ShootingState.IDLE) {
+        mShootingState = ShootingState.PREPARE_TO_SHOOT;
+      }
       return true;
     }
     else {
@@ -373,41 +373,46 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Shooting state is idle");
         break;
       case PREPARE_TO_SHOOT:
+
+        /** Starts roller */
         mShooter.start();
+
+        //TODO: Placeholder method, replace later
         mShooter.target();
-        mShooter.incrementBuffer();
-        if (mShooter.getIsReady()) {
+
+        /* If rollers are spun up, changes to next state */
+        if (mShooter.isAtVelocity()) {
           mShootingState = ShootingState.SHOOT_BALL;
         }
         break;
       case SHOOT_BALL:
-        if (checkTransitionToShooting()) {
-          mShooter.incrementBuffer();
-        }
         mShooter.shootBall();
-        if (mShooter.getIsDoneShooting()) {
+
+        /* If finished shooting, changes to next state*/
+        if (mShooter.isDoneShooting()) {
           mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
         }
         break;
       case SHOOT_BALL_COMPLETE:
-        if (checkTransitionToShooting()) {
-          mShooter.incrementBuffer();
-        }
+        /* Decrements storage */
         mStorage.removeBall();
-        if (mShooter.getFireAgain()) {
+
+        /* Fires again if storage not empty */
+        if (!mStorage.isEmpty()) {
           mShootingState = ShootingState.PREPARE_TO_SHOOT;
         }
         break;
       case SHOOTING_COMPLETE:
+
+        /* Stops the roller and returns to intake state */
         mShooter.stop();
         mShootingState = ShootingState.IDLE;
         mState = State.INTAKE;
         break;
       default:
-        mRobotLogger.error("Invalid Shooting State");
+        mRobotLogger.error("Invalid shooting state");
         break;
     }
-    mShooter.periodic();
   }
 
   private void executeClimbingStateMachine() {
