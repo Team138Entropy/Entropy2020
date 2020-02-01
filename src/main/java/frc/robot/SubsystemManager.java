@@ -35,7 +35,7 @@ public class SubsystemManager {
   public void ZeroSensors() {
     for (int i = 0; i < mSubsystems.size(); i++) {
       try {
-        mSubsystems.get(i).ZeroSensors();
+        mSubsystems.get(i).zeroSensors();
       } catch (Exception e) {
         mSubsystemLogger.verbose("Sensor Zero Exception: " + e.getMessage());
       }
@@ -48,7 +48,7 @@ public class SubsystemManager {
   public void CheckSubsystems() {
     for (int i = 0; i < mSubsystems.size(); i++) {
       try {
-        mSubsystems.get(i).CheckSubsystems();
+        mSubsystems.get(i).checkSubsystems();
       } catch (Exception e) {
         mSubsystemLogger.verbose("Subsystem Check Exception: " + e.getMessage());
       }

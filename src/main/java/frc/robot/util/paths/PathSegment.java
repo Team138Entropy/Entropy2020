@@ -1,6 +1,7 @@
 package frc.robot.util.paths;
 
 import frc.robot.Constants;
+import frc.robot.Logger;
 import frc.robot.util.geometry.Rotation2d;
 import frc.robot.util.geometry.Translation2d;
 import frc.robot.util.motion.*;
@@ -18,6 +19,7 @@ public class PathSegment {
   private MotionProfile speedController;
   private boolean extrapolateLookahead;
   private String marker;
+  Logger mLogger;
 
   /**
    * Constructor for a linear segment
@@ -45,6 +47,8 @@ public class PathSegment {
     extrapolateLookahead = false;
     isLine = true;
     createMotionProfiler(startState, endSpeed);
+
+    mLogger = new Logger("pathsegment");
   }
 
   public PathSegment(
@@ -138,7 +142,6 @@ public class PathSegment {
     MotionProfileGoal goal_state = new MotionProfileGoal(getLength(), end_speed);
     speedController =
         MotionProfileGenerator.generateProfile(motionConstraints, goal_state, start_state);
-    // System.out.println(speedController);
   }
 
   /** @return starting point of the segment */
@@ -257,7 +260,7 @@ public class PathSegment {
     if (state.isPresent()) {
       return state.get().vel();
     } else {
-      System.out.println("Velocity does not exist at that position!");
+      mLogger.warn("Velocity does not exist at that position!");
       return 0.0;
     }
   }

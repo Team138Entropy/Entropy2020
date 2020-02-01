@@ -7,7 +7,7 @@ import frc.robot.subsystems.Storage;
 
 public class BallDetected implements Event {
 
-  Logger mLogger = new Logger("Ball Detector");
+  Logger mLogger = new Logger("ballDetected");
 
   public boolean check() {
     return (Storage.getInstance().isBallDetected());

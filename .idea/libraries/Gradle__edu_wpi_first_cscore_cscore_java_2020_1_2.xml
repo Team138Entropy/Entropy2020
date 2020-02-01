@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: edu.wpi.first.cscore:cscore-java:2020.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/edu.wpi.first.cscore/cscore-java/2020.1.2/a42a7c49a54c3feb6e42f5dfae5f087e0edba7a7/cscore-java-2020.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/edu.wpi.first.cscore/cscore-java/2020.1.2/26678e4db72f4a0cf1050fb192a73dd6b8788042/cscore-java-2020.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

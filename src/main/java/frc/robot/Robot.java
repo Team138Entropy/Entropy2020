@@ -3,12 +3,17 @@ package frc.robot;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
+import frc.robot.util.LatchedBoolean;
+import frc.robot.util.geometry.*;
+import frc.robot.vision.AimingParameters;
+import java.util.Optional;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
@@ -34,10 +39,13 @@ public class Robot extends TimedRobot {
   private final Storage mStorage = Storage.getInstance();
   private BallIndicator mBallIndicator;
 
-  private final Compressor mCompressor = new Compressor();
+  private Compressor mCompressor;
 
-  // Variables from State
+  public Relay visionLight = new Relay(0);
 
+  // Control Variables
+  private LatchedBoolean AutoAim = new LatchedBoolean();
+  private LatchedBoolean HarvestAim = new LatchedBoolean();
   private Turret mTurret;
   static NetworkTable mTable;
 
@@ -48,13 +56,17 @@ public class Robot extends TimedRobot {
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
+    // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
 
     mRobotLogger.log("robot init _ 1");
 
     // Zero all nesscary sensors on Robot
     ZeroSensors();
+    visionLight.set(Relay.Value.kForward);
 
+    // Reset Robot State - Note starting position of the Robot
+    // This starting Rotation, X, Y is now the Zero Point
     EventWatcherThread.getInstance().start();
 
     // prepare the network table
@@ -63,6 +75,10 @@ public class Robot extends TimedRobot {
     // Reset Robot State
     // Wherever the Robot is now is the starting position
     mRobotState.reset();
+
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
+      mCompressor = new Compressor();
+    }
 
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
@@ -83,7 +99,11 @@ public class Robot extends TimedRobot {
     Cool!
   */
   public boolean getLowPSI() {
-    return mCompressor.getPressureSwitchValue();
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
+      return mCompressor.getPressureSwitchValue();
+    } else {
+      return false;
+    }
   }
 
   /*
@@ -137,7 +157,7 @@ public class Robot extends TimedRobot {
     try {
       RobotLoop();
     } catch (Exception e) {
-      mRobotLogger.log("RobotLoop Exception");
+      mRobotLogger.log("RobotLoop Exception: " + e.getMessage());
 
       // print the exception to the system error
       e.printStackTrace(System.err);
@@ -149,6 +169,7 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Entropy 138: Test Init");
 
     Config.getInstance().reload();
+    mSubsystemManager.CheckSubsystems();
   }
 
   @Override
@@ -190,6 +211,27 @@ public class Robot extends TimedRobot {
       }
 
       if (DriveShift) mDrive.SwitchGears();
+
+      // Detect Harvest Mode
+      boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
+      boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
+
+      boolean WantsAutoAim = false;
+
+      // Optional Object that may or may not contain a null value
+      Optional<AimingParameters> BallAimingParameters; // info to aim to the ball
+      Optional<AimingParameters> TargetAimingParameters; // info to aim to the target
+
+      // Continue Driving
+      if (WantsHarvestMode == true) {
+        // Harvest Mode - AutoSteer Functionality
+        // Used for tracking a ball
+        // we may want to limit the speed?
+        // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
+      } else {
+        // Standard Manual Drive
+        mDrive.setDrive(DriveThrottle, DriveTurn, false);
+      }
     }
   }
 
@@ -219,7 +261,6 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getShoot()) {
       // Shoot
     }
-
     // Operator Controls
     if (mOperatorInterface.getTurretManual() != -1) {
       // manual turret aim
