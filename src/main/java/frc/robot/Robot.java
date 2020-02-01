@@ -397,8 +397,10 @@ public class Robot extends TimedRobot {
         /* Decrements storage */
         mStorage.removeBall();
 
-        /* Fires again if storage not empty */
-        if (!mStorage.isEmpty()) {
+        /* Goes to complete if storage is empty, otherwise fires again */
+        if (mStorage.isEmpty()) {
+          mShootingState = ShootingState.SHOOTING_COMPLETE;
+        } else {
           mShootingState = ShootingState.PREPARE_TO_SHOOT;
         }
         break;

@@ -11,11 +11,9 @@ public class Shooter extends Subsystem {
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
   private static final int ROLLER_PORT = 69;
-  private static final int MAX_CAPACITY = 5;
 
   // TODO: Tune these values
   private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
-  private static final double SPINUP_DELAY_SECONDS = 0.5;
   private static final double FIRE_DURATION_SECONDS = 0.5;
   private static final double TARGET_ROLLER_VELOCITY = 0;
 
@@ -58,29 +56,9 @@ public class Shooter extends Subsystem {
   private PIDRoller mRoller;
   private Turret mTurret;
   private Vision mVision;
-  private Intake mIntake;
 
-  // State variables
-  public enum State {
-    IDLE,
-    FULL_SPEED,
-    SPINNING_UP,
-    FIRING
-  }
-
-  private State mState = State.IDLE;
-  private Timer mSpinUpTimer;
   private Timer mFireTimer;
   private double mRollerVelocity;
-
-  public static synchronized Shooter getInstance() {
-    if (instance == null) instance = new Shooter();
-    return instance;
-  }
-
-  public State getState() {
-    return mState;
-  }
 
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, P, I, D);
@@ -99,10 +77,13 @@ public class Shooter extends Subsystem {
           System.out.println("Getting dummy vision target");
           return new TurretPosition(0, 0);
         };
-    mIntake = () -> System.out.println("Shoving a ball into the thing");
 
-    mSpinUpTimer = new Timer();
     mFireTimer = new Timer();
+  }
+
+  public static synchronized Shooter getInstance() {
+    if (instance == null) instance = new Shooter();
+    return instance;
   }
 
   /** Tells the turret to move to where the vision system says we should be. */
