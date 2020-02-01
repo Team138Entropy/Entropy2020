@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.robot.Logger;
 import frc.robot.RobotState;
 import frc.robot.vision.TargetInfo;
 import java.io.IOException;
@@ -16,6 +17,7 @@ class UDPReciever {
   DatagramSocket recieveSocket = null;
   byte[] receiveData = new byte[2048];
   DatagramPacket recievePacket = null;
+  Logger mLogger;
 
   /**
    * Constructor for the UDP reciever. Sets up internal memory structures in prep to start listening
@@ -26,12 +28,13 @@ class UDPReciever {
    *     whitepaper. Must match whatever port the coprocessor is sending information to.
    */
   public UDPReciever(String listen_from_addr_in, int listen_on_port_in) {
+    mLogger = new Logger("visionmanager");
     try {
       recieveSocket = new DatagramSocket(listen_on_port_in);
       recievePacket = new DatagramPacket(receiveData, receiveData.length);
       recieveSocket.setSoTimeout(10);
     } catch (IOException e) {
-      System.out.println("Error: Cannot set up UDP reciever socket: " + e.getMessage());
+      mLogger.log("Error: Cannot set up UDP reciever socket: " + e.getMessage());
       recieveSocket = null;
     }
   }
@@ -57,6 +60,7 @@ class UDPReciever {
    Runs in its own thread
 */
 public class VisionManager extends Subsystem {
+  Logger mLogger;
   private static VisionManager mInstance;
 
   public static synchronized VisionManager getInstance() {
@@ -80,8 +84,10 @@ public class VisionManager extends Subsystem {
   private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
   private VisionManager() {
-    System.out.println("Vision Manager Init!");
-    System.out.println("^^$$$^^^");
+    mLogger = new Logger("visionmanager");
+
+    mLogger.log("Vision Manager Init!");
+    mLogger.log("^^$$$^^^");
 
     // Start a Socket to listen to UDP Packet
     // Each thread pass to a processer which
@@ -93,9 +99,9 @@ public class VisionManager extends Subsystem {
             new Runnable() {
               @Override
               public void run() {
-                System.out.println("DEBUG: Listener Thread Process!");
+                mLogger.verbose("DEBUG: Listener Thread Process!");
                 processPacket();
-                System.out.println("DEBUG: end of listener thread loop");
+                mLogger.verbose("DEBUG: end of listener thread loop");
               }
             });
 
@@ -134,16 +140,16 @@ public class VisionManager extends Subsystem {
 
       } catch (Exception Targ) {
         // Exception Thrown when Trying to retrieve values from json object
-        System.out.println("Packet Storing Exception: " + Targ.getMessage());
+        mLogger.warn("Packet Storing Exception: " + Targ.getMessage());
         // CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
       }
 
     } catch (ParseException pe) {
       // Exception with the Parser
-      System.out.println("Parser Exception: " + pe.getMessage());
+      mLogger.warn("Parser Exception: " + pe.getMessage());
     } catch (Exception e) {
       // Other Exception
-      System.out.println("Parse Packet Exception: " + e.getMessage());
+      mLogger.warn("Parse Packet Exception: " + e.getMessage());
     }
   }
 
@@ -167,7 +173,7 @@ public class VisionManager extends Subsystem {
               });
 
         } catch (Exception e) {
-          System.out.println("Error: Cannot parse recieved UDP json data: " + e.toString());
+          mLogger.warn("Error: Cannot parse recieved UDP json data: " + e.toString());
           e.printStackTrace();
         }
       } catch (Exception e) {
