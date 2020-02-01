@@ -14,12 +14,15 @@ package frc.robot.subsystems;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.cameraserver.CameraServer;
+import frc.robot.Logger;
 
 // camera subsystem
 public class CameraManager extends Subsystem {
   private static UsbCamera frontCamera;
   private static UsbCamera backCamera;
   private static CameraManager sInstance;
+
+  Logger mLogger = new Logger("cameraManager");
 
   // this is a singleton
   public static synchronized CameraManager getInstance() {
@@ -34,14 +37,29 @@ public class CameraManager extends Subsystem {
     // front camera 
     frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
     // resolution set
-    frontCamera.setVideoMode(PixelFormat.kMJPEG, 80, 60, 30);
+    frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
 
     // back camera
     backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
     // another resolution set
-    backCamera.setVideoMode(PixelFormat.kMJPEG, 80, 60, 30);
+    backCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
   }
 
-  public void CheckSubsystems(){}
-  public void ZeroSensors(){}
+  @Override
+  public void zeroSensors() {}
+
+  @Override
+  public void checkSubsystems() {
+    if(frontCamera.isEnabled()){
+      mLogger.info("Front camera ready");
+    }else{
+      mLogger.warn("Front camera not enabled " + frontCamera.isConnected() + " " + frontCamera.isValid());
+    }
+
+    if(backCamera.isEnabled()){
+      mLogger.info("Back camera ready");
+    }else{
+      mLogger.warn("Back camera not enabled " + backCamera.isConnected() + " " + backCamera.isValid());
+    }
+  }
 }
