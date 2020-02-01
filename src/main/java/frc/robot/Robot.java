@@ -376,12 +376,13 @@ public class Robot extends TimedRobot {
         /** Starts roller */
         mShooter.start();
 
-        //TODO: Placeholder method, replace later
+        //TODO: Placeholder method, replace later.
         mShooter.target();
 
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity()) {
           mShootingState = ShootingState.SHOOT_BALL;
+          //TODO: Add check of whether vision has acquired a target.
         }
         break;
       case SHOOT_BALL:
