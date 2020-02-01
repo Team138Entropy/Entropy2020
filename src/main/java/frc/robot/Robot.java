@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private BallIndicator mBallIndicator;
+  private CameraManager mCameraManager;
 
   private Compressor mCompressor;
 
@@ -72,6 +73,7 @@ public class Robot extends TimedRobot {
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
+    mCameraManager = CameraManager.getInstance();
     // Reset Robot State
     // Wherever the Robot is now is the starting position
     mRobotState.reset();
