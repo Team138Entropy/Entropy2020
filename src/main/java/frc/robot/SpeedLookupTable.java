@@ -1,7 +1,7 @@
 package frc.robot;
 
 public class SpeedLookupTable {
-  static SpeedLookupTable mInstance;
+  private static SpeedLookupTable mInstance;
 
   public static synchronized SpeedLookupTable getInstance() {
     if (mInstance == null) {
@@ -10,10 +10,9 @@ public class SpeedLookupTable {
     return mInstance;
   }
 
-  // the key is distance in meters
-  // the value is velocity in whatever our system uses
   // note: This MUST be sorted by lowest distance first
   double[][] mLookupTable = {
+    // {distance in meters, speed in whatever our system uses}
     {10d, 100d},
     {20d, 200d},
     {30d, 300d},
