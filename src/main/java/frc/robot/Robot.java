@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
   private final Shooter mShooter = Shooter.getInstance();
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
-  final SpeedLookupTable table = SpeedLookupTable.getInstance();
+  private final SpeedLookupTable mTable = SpeedLookupTable.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
