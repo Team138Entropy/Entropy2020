@@ -13,7 +13,7 @@ public class SpeedLookupTable {
   // the key is distance in meters
   // the value is velocity in whatever our system uses
   // note: This MUST be sorted by lowest distance first
-  double[][] map = {
+  double[][] mLookupTable = {
     {10d, 100d},
     {20d, 200d},
     {30d, 300d},
@@ -34,9 +34,9 @@ public class SpeedLookupTable {
     double lowerBoundSpeed = 0;
     double upperBoundDistance = 0;
     double upperBoundSpeed = 0;
-    for (int i = 0; i < map.length; i++) {
-      double thisDistance = map[i][0];
-      double thisSpeed = map[i][1];
+    for (int i = 0; i < mLookupTable.length; i++) {
+      double thisDistance = mLookupTable[i][0];
+      double thisSpeed = mLookupTable[i][1];
 
       if (thisDistance == distance) {
         return thisSpeed;
@@ -46,16 +46,6 @@ public class SpeedLookupTable {
       lowerBoundSpeed = upperBoundSpeed;
       upperBoundDistance = thisDistance;
       upperBoundSpeed = thisSpeed;
-
-      System.out.println(
-          " lowerBoundDistance: "
-              + lowerBoundDistance
-              + " lowerBoundSpeed: "
-              + lowerBoundSpeed
-              + " upperBoundDistance: "
-              + upperBoundDistance
-              + " upperBoundSpeed: "
-              + upperBoundSpeed);
 
       if (distance > lowerBoundDistance && distance < upperBoundDistance) {
         return linearInterpolate(
