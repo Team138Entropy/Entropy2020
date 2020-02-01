@@ -90,6 +90,9 @@ public class Storage extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
+  public int getBallCount() {
+    return mBallCount;
+  }
   @Override
   public void ZeroSensors() {}
 
