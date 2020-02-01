@@ -118,8 +118,10 @@ public class Shooter extends Subsystem {
       stop();
       mFireTimer.stop();
       mFireTimer.reset();
+      return true;
+    } else {
+      return false;
     }
-    return mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000;
   }
 
   @Override
