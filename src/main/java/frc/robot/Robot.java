@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
@@ -51,6 +52,7 @@ public class Robot extends TimedRobot {
   }
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
+  private final double FIRE_DURATION_SECONDS = 0.5;
 
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
@@ -79,6 +81,9 @@ public class Robot extends TimedRobot {
 
   private Turret mTurret;
   static NetworkTable mTable;
+
+  // Fire timer for shooter
+  private Timer mFireTimer = new Timer();
 
   Logger mRobotLogger = new Logger("robot");
 
@@ -366,6 +371,18 @@ public class Robot extends TimedRobot {
     }
   }
 
+  /** Returns whether the firing timer has run longer than the duration. */
+  public boolean isBallFired() {
+    if (mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000) {
+      mShooter.stop();
+      mFireTimer.stop();
+      mFireTimer.reset();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private void executeShootingStateMachine() {
     switch(mShootingState) {
       case IDLE:
@@ -373,7 +390,7 @@ public class Robot extends TimedRobot {
         break;
       case PREPARE_TO_SHOOT:
 
-        /** Starts roller */
+        /* Starts roller */
         mShooter.start();
 
         //TODO: Placeholder method, replace later.
@@ -386,16 +403,17 @@ public class Robot extends TimedRobot {
         }
         break;
       case SHOOT_BALL:
-        mShooter.shootBall();
+        mStorage.ejectBall();
 
         /* If finished shooting, changes to next state*/
-        if (mShooter.isDoneShooting()) {
+        if (isBallFired()) {
           mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
         }
         break;
       case SHOOT_BALL_COMPLETE:
         /* Decrements storage */
         mStorage.removeBall();
+        mStorage.stop();
 
         /* Goes to complete if storage is empty, otherwise fires again */
         if (mStorage.isEmpty()) {

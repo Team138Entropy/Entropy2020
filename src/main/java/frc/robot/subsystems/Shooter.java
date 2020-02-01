@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Timer;
-
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
 
@@ -14,7 +12,6 @@ public class Shooter extends Subsystem {
 
   // TODO: Tune these values
   private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
-  private static final double FIRE_DURATION_SECONDS = 0.5;
   private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
@@ -57,7 +54,6 @@ public class Shooter extends Subsystem {
   private Turret mTurret;
   private Vision mVision;
 
-  private Timer mFireTimer;
   private double mRollerVelocity;
 
   private Shooter() {
@@ -77,8 +73,6 @@ public class Shooter extends Subsystem {
           System.out.println("Getting dummy vision target");
           return new TurretPosition(0, 0);
         };
-
-    mFireTimer = new Timer();
   }
 
   public static synchronized Shooter getInstance() {
@@ -104,24 +98,6 @@ public class Shooter extends Subsystem {
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
     return mRollerVelocity > TARGET_ROLLER_VELOCITY;
-  }
-
-  /** Starts the firing timer and roller.  */
-  public void shootBall() {
-    mFireTimer.start();
-    start();
-  }
-
-  /** Returns whether the firing timer has run longer than the duration. */
-  public boolean isDoneShooting() {
-    if (mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000) {
-      stop();
-      mFireTimer.stop();
-      mFireTimer.reset();
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @Override

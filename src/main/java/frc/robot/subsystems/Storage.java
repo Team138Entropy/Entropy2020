@@ -86,7 +86,7 @@ public class Storage extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, 0);
   }
 
-  public void ejectBalls() {
+  public void ejectBall() {
     mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
