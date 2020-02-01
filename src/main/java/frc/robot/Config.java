@@ -27,6 +27,7 @@ public class Config {
     ROBOT__HAS_TURRET(false),
     ROBOT__HAS_LEDS(false),
     ROBOT__HAS_COMPRESSOR(false),
+    ROBOT__HAS_SOLENOID(false),
 
     ROBOT__POT__LOCATION(0),
     ROBOT__POT__RANGE(-6),

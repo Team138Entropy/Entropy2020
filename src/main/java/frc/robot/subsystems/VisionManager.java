@@ -106,6 +106,8 @@ public class VisionManager extends Subsystem {
   }
 
   private void ParsePacket(String packet) {
+    // if(packet.isBlank()) return;
+    System.out.println("Packet Length: " + packet.length());
     try {
       JSONObject CurrentPacket;
 
@@ -133,7 +135,6 @@ public class VisionManager extends Subsystem {
       } catch (Exception Targ) {
         // Exception Thrown when Trying to retrieve values from json object
         System.out.println("Packet Storing Exception: " + Targ.getMessage());
-
         // CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
       }
 
