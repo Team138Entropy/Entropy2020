@@ -225,27 +225,24 @@ public class Robot extends TimedRobot {
     // Intake roller ON while button held
     if (mOperatorInterface.isIntakeRollertest()) {
       mIntake.start();
-    }
-    else {
+    } else {
       mIntake.stop();
     }
 
     // Storage rollers ON while button held
     if (mOperatorInterface.isStorageRollerTest()) {
       mStorage.storeBall();
-    }
-    else {
+    } else {
       mStorage.stop();
     }
 
     // Shooter roller ON while button held
     if (mOperatorInterface.isShooterTest()) {
       mShooter.start();
-    }
-    else {
+    } else {
       mShooter.stop();
     }
-  } 
+  }
 
   @Override
   public void disabledInit() {

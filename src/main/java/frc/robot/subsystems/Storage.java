@@ -1,15 +1,17 @@
 package frc.robot.subsystems;
-import frc.robot.Config;
-import frc.robot.Config.Key;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.DigitalInput;;
+import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Config;
+import frc.robot.Config.Key;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
-  private static final int INTAKE_SENSOR_PORT = Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
+  private static final int INTAKE_SENSOR_PORT =
+      Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
 
   private static final int STORAGE_CAPICTY = 5;
 
