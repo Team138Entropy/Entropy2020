@@ -36,4 +36,17 @@ public class Constants {
 
   // Path Following Constants
   public static final double kPathFollowingMaxAccel = 80.0; // inches per second ^ 2
+
+  // Vision Tracking Constants
+  public static final double kMaxTrackerDistance = 60.0;
+  public static final double kMaxGoalTrackAge = 3.0;
+  public static final double kMaxGoalTrackAgeNotTracking = 0.1;
+  public static final double kMaxGoalTrackSmoothingTime = 0.5;
+  public static final double kTrackStabilityWeight = 0.0;
+  public static final double kTrackAgeWeight = 10.0;
+  public static final double kTrackSwitchingWeight = 100.0;
+  public static final double kCameraFrameRate = 90.0; // fps
+
+  // Field Related Constants
+  public static final double kHighGoalHeight = 96.25; // Center Goal Height
 }
