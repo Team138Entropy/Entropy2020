@@ -1,11 +1,13 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
+import frc.robot.Logger;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
 
 public class OperatorInterface {
+  Logger mLogger;
   private static OperatorInterface mInstance;
 
   // Instances of the Driver and Operator Controller
@@ -20,6 +22,7 @@ public class OperatorInterface {
   }
 
   private OperatorInterface() {
+    mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new XboxController(Constants.OperatorControllerPort);
   }
@@ -52,10 +55,10 @@ public class OperatorInterface {
     // Check if Low Gear is Toggled
     if (DriverController.getButton(XboxController.Button.START)) {
       if (LowGear == false) {
-        System.out.println("Y PRESSED ON");
+        mLogger.verbose("Y PRESSED ON");
 
       } else {
-        System.out.println("Y PRESSED OFF");
+        mLogger.verbose("Y PRESSED OFF");
       }
       LowGear = !LowGear;
     }
