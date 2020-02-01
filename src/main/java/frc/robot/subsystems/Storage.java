@@ -2,24 +2,25 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Config;
+import frc.robot.Config.Key;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_PORT = 1;
-  private static final int INTAKE_SENSOR_PORT = 1;
+  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
+  private static final int INTAKE_SENSOR_PORT =
+      Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
 
   private static final int STORAGE_CAPICTY = 5;
 
   // TODO: Tune these values
-  private static final double STORE_SPEED = 1;
-  private static final double EJECT_SPEED = 1;
-  public static final int INTAKE_SENSOR_BALL_THRESHOLD = 375;
-  public static final int INTAKE_SENSOR_NO_BALL_THRESHOLD = 100;
+  private static final double STORE_SPEED = Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
+  private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
 
   private WPI_TalonSRX mRoller;
-  private AnalogInput mIntakeSensor;
+  private DigitalInput mIntakeSensor;
 
   private int mBallCount = 0;
 
@@ -34,15 +35,15 @@ public class Storage extends Subsystem {
 
   private Storage() {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
-    mIntakeSensor = new AnalogInput(INTAKE_SENSOR_PORT);
+    mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
   public boolean isBallDetected() {
-    return (mIntakeSensor.getValue() >= INTAKE_SENSOR_BALL_THRESHOLD);
+    return (mIntakeSensor.get());
   }
 
   public boolean isBallStored() {
-    return (mIntakeSensor.getValue() <= INTAKE_SENSOR_NO_BALL_THRESHOLD);
+    return (!mIntakeSensor.get());
   }
 
   public void preloadBalls(int ballCount) {

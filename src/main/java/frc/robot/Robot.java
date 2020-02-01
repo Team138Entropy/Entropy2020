@@ -168,6 +168,8 @@ public class Robot extends TimedRobot {
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
 
+    SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
+
     // TODO: cameras will go here eventually
   }
 
@@ -219,7 +221,28 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    // Intake roller ON while button held
+    if (mOperatorInterface.isIntakeRollertest()) {
+      mIntake.start();
+    } else {
+      mIntake.stop();
+    }
+
+    // Storage rollers ON while button held
+    if (mOperatorInterface.isStorageRollerTest()) {
+      mStorage.storeBall();
+    } else {
+      mStorage.stop();
+    }
+
+    // Shooter roller ON while button held
+    if (mOperatorInterface.isShooterTest()) {
+      mShooter.start();
+    } else {
+      mShooter.stop();
+    }
+  }
 
   @Override
   public void disabledInit() {
@@ -303,7 +326,9 @@ public class Robot extends TimedRobot {
     }
 
     // Operator Controls
-    if (mOperatorInterface.getTurretManual() != -1) {
+    if (mOperatorInterface.getTurretAdjustLeft()) {
+      // manual turret aim
+    } else if (mOperatorInterface.getTurretAdjustRight()) {
       // manual turret aim
     }
 

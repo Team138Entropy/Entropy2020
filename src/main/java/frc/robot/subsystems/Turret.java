@@ -86,9 +86,6 @@ public class Turret extends PIDSubsystem {
 
   /** Run this every tick. */
   public void loop() {
-    // This has to be turned off every tick to keep Mailly's hands from falling off
-    OperatorInterface.getInstance().setOperatorRumble(false);
-
     float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
     float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
 
@@ -123,7 +120,6 @@ public class Turret extends PIDSubsystem {
     } else {
       if (this.isEnabled()) disable();
       mTurretLogger.verbose("movement blocked");
-      OperatorInterface.getInstance().setOperatorRumble(true);
     }
     // run the PIDSubsystem system's loop
     this.periodic();

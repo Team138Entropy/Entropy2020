@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import frc.robot.Config;
+import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
 
 /** Singleton that represents the shooter mechanism. */
@@ -11,7 +13,7 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = 69;
+  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_PORT);
 
   // TODO: Tune these values
   private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
