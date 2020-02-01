@@ -26,7 +26,7 @@ public class NykoController {
     LEFT,
     RIGHT,
     OTHER
-  }  
+  }
 
   public enum Button {
     BUTTON_1(1),
@@ -84,7 +84,7 @@ public class NykoController {
       case 270:
         return DPad.LEFT;
       default:
-         return DPad.OTHER;
+        return DPad.OTHER;
     }
   }
 

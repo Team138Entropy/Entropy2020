@@ -331,8 +331,7 @@ public class Robot extends TimedRobot {
     // Operator Controls
     if (mOperatorInterface.getTurretAdjustLeft()) {
       // manual turret aim
-    }
-    else if (mOperatorInterface.getTurretAdjustRight()) {
+    } else if (mOperatorInterface.getTurretAdjustRight()) {
       // manual turret aim
     }
 
