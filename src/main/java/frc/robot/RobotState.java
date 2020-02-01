@@ -410,7 +410,7 @@ public class RobotState {
     // Constants.kHatchTargetHeight);
     double differential_height = Constants.kHighGoalHeight;
 
-    //TODO: why isn't this here
+    // TODO: why isn't this here
     // if ((z < 0.0) == (differential_height > 0.0)) {
     if (true) {
       double scaling = differential_height / -z;

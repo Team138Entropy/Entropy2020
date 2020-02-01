@@ -2,7 +2,6 @@ package frc.robot.events;
 
 import edu.wpi.first.wpilibj.command.Scheduler;
 import frc.robot.Logger;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 

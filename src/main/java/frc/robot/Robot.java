@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
   public boolean getLowPSI() {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
       return mCompressor.getPressureSwitchValue();
-    }else{
+    } else {
       return false;
     }
   }

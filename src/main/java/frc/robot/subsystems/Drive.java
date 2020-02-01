@@ -7,10 +7,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
+import frc.robot.Config.Key;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
-import frc.robot.Config.Key;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
@@ -85,7 +85,7 @@ public class Drive extends Subsystem {
     mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
     // configureSpark(mRightSlave, false, false);
 
-    if(Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)){
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
       mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
     }
     mLeftMaster.configNominalOutputForward(0., 0);
@@ -209,7 +209,7 @@ public class Drive extends Subsystem {
       psi to ensure we can properly drive the piston
   */
   public synchronized void SwitchGears() {
-    if(Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)){
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
       mHighGear = !mHighGear;
       mGearSolenoid.set(mHighGear);
     }

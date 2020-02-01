@@ -112,8 +112,8 @@ public class VisionManager extends Subsystem {
   }
 
   private void parsePacket(String packet) {
-    if(packet.isEmpty()) return; // if the packet has a length of 0, don't parse it
-  
+    if (packet.isEmpty()) return; // if the packet has a length of 0, don't parse it
+
     try {
       JSONObject CurrentPacket;
 

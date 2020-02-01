@@ -7,7 +7,8 @@ import frc.robot.subsystems.Storage;
 
 public class BallStored implements Event {
   Logger mLogger;
-  public BallStored(){
+
+  public BallStored() {
     mLogger = new Logger("ballStored");
   }
 
