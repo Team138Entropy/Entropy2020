@@ -32,9 +32,8 @@ public class CameraManager extends Subsystem {
     return sInstance;
   }
 
-
   private CameraManager() {
-    // front camera 
+    // front camera
     frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
     // resolution set
     frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
@@ -50,16 +49,18 @@ public class CameraManager extends Subsystem {
 
   @Override
   public void checkSubsystems() {
-    if(frontCamera.isEnabled()){
+    if (frontCamera.isEnabled()) {
       mLogger.info("Front camera ready");
-    }else{
-      mLogger.warn("Front camera not enabled " + frontCamera.isConnected() + " " + frontCamera.isValid());
+    } else {
+      mLogger.warn(
+          "Front camera not enabled " + frontCamera.isConnected() + " " + frontCamera.isValid());
     }
 
-    if(backCamera.isEnabled()){
+    if (backCamera.isEnabled()) {
       mLogger.info("Back camera ready");
-    }else{
-      mLogger.warn("Back camera not enabled " + backCamera.isConnected() + " " + backCamera.isValid());
+    } else {
+      mLogger.warn(
+          "Back camera not enabled " + backCamera.isConnected() + " " + backCamera.isValid());
     }
   }
 }
