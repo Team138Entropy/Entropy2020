@@ -1,9 +1,9 @@
 package frc.robot;
 
-import java.util.HashMap;
 
 public class SpeedLookupTable {
   static SpeedLookupTable mInstance;
+
   public static synchronized SpeedLookupTable getInstance() {
     if (mInstance == null) {
       mInstance = new SpeedLookupTable();
@@ -23,25 +23,23 @@ public class SpeedLookupTable {
     {60d, 600d}
   };
 
-  SpeedLookupTable(){
-    
-  }
+  SpeedLookupTable() {}
 
   // https://en.wikipedia.org/wiki/Linear_interpolation
-  public double linearInterpolate(double x, double x0, double y0, double x1, double y1){
+  public double linearInterpolate(double x, double x0, double y0, double x1, double y1) {
     return (y0 * (x1 - x) + y1 * (x - x0)) / (x1 - x0);
   }
 
-  public double getSpeedFromDistance(double distance){
+  public double getSpeedFromDistance(double distance) {
     double lowerBoundDistance = 0;
     double lowerBoundSpeed = 0;
     double upperBoundDistance = 0;
     double upperBoundSpeed = 0;
-    for(int i = 0; i < map.length ; i++){
+    for (int i = 0; i < map.length; i++) {
       double thisDistance = map[i][0];
       double thisSpeed = map[i][1];
 
-      if(thisDistance == distance){
+      if (thisDistance == distance) {
         return thisSpeed;
       }
 
@@ -50,10 +48,19 @@ public class SpeedLookupTable {
       upperBoundDistance = thisDistance;
       upperBoundSpeed = thisSpeed;
 
-      System.out.println(" lowerBoundDistance: " + lowerBoundDistance + " lowerBoundSpeed: " + lowerBoundSpeed + " upperBoundDistance: " + upperBoundDistance + " upperBoundSpeed: " + upperBoundSpeed);
+      System.out.println(
+          " lowerBoundDistance: "
+              + lowerBoundDistance
+              + " lowerBoundSpeed: "
+              + lowerBoundSpeed
+              + " upperBoundDistance: "
+              + upperBoundDistance
+              + " upperBoundSpeed: "
+              + upperBoundSpeed);
 
-      if(distance > lowerBoundDistance && distance < upperBoundDistance){
-        return linearInterpolate(distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
+      if (distance > lowerBoundDistance && distance < upperBoundDistance) {
+        return linearInterpolate(
+            distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
       }
     }
 
