@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import frc.robot.SpeedLookupTable;
+
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
+  private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
   // Temporary, until default config values are merged
   private static final double P = 0.5, I = 0, D = 0;
