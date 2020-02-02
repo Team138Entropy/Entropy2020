@@ -35,16 +35,17 @@ public class Robot extends TimedRobot {
     private final Drive mDrive = Drive.getInstance();
     private final VisionManager mVisionManager = VisionManager.getInstance(); 
     private final Intake mIntake = Intake.getInstance();
-    private final Shooter mShooter = Shooter.getInstance();
+    //private final Shooter mShooter = Shooter.getInstance();
     private final Storage mStorage = Storage.getInstance();
 
     public Relay visionLight = new Relay(0);
     
     // State Variables
-    private boolean mAutoAim = true; //is our auto aim system running? 
-    private boolean mAutoIntake = false;
+    private boolean mAutoAim = true; //autonomously manage turret rotation
+    private boolean mAutoShoot = false; //automously manage shooting
+    private boolean mAutoIntake = false; //automously manage ball lineup
     private boolean mIntaking = false; //is instake system running?
-    private boolean mShooting = false; //are we shooting? if we are shooting the 
+    private boolean mShooting = false; //are we shooting? (shooter wheels running)
 
     //Storage so should never be directly run, needs to be on if we are shooting or intaking
     private boolean mStorageRunning = false; 
@@ -113,6 +114,7 @@ public class Robot extends TimedRobot {
       Called constantly, houses the main functionality of robot
     */
     public void RobotLoop() {
+        System.out.println("==Teleop Loop==");
         // Check User Inputs
         double DriveThrottle = mOperatorInterface.getDriveThrottle();
         double DriveTurn = mOperatorInterface.getDriveTurn();
@@ -127,6 +129,12 @@ public class Robot extends TimedRobot {
             mAutoIntake = true;
         }
         
+        //Check if Auto Shoot has been pressed
+        boolean AutoShootPressed = mOperatorInterface.getAutoShootToggle();
+        if(AutoShootPressed){
+            //Toggle the value of auto shoot!
+            mAutoShoot = !mAutoShoot;
+        }
 
 
         //Turret Control
@@ -136,6 +144,10 @@ public class Robot extends TimedRobot {
 
         }else{
             //Manual Turret Control
+            //(save latency by only polling this if we need to)
+            double AsmithThrottle = mOperatorInterface.getOperatorThrottle();
+            double ShooterSpeed = mOperatorInterface.getOperatorTurn();
+
             System.out.println("DEBUG: Manual Turret Mode");
 
 
@@ -143,12 +155,24 @@ public class Robot extends TimedRobot {
 
 
         //Shooter System
+        if(mAutoShoot){
+            //Auto Shooting State
+            //Robot determines if range is shootable, and angle is reachable
+
+
+        }else{
+            //Manual Shoot
+            //This is trigger based
+            //it can be trigger based, or continuous (scoop and score)
+            //trigger based is when we aren't going to be in range
+        }
+        /*
         if(mShooting == true){
 
             //Ensure that the storage belts are running
 
 
-        }
+        }*/
 
 
 

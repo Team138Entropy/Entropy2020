@@ -4,7 +4,31 @@ import frc.robot.Constants;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
+/*
+Current Mapping:
 
+    Operator:
+        Right Stick - Manual Azmith Control
+        Left Stick - Manual Shooter Speed (UP -> Increase, Down -> Decrease)
+        Left Trigger - Toggle Auto Aim
+        Right Trigger - Toggle Auto Shoot
+        A - Minimum Elevator Elevation (Closed Mode)
+        B - Level Elevation
+        Y - Upper Elevation
+
+    Drive:
+        Left Stick - Throttle
+        Right Stick - Steering
+        Right Trigger - Auto Align (harvest)
+        Left Trigger - Auto Align (harvest)
+        Start - Toggle Gear
+        Select - (Also) Toggle Gear
+
+
+
+
+
+*/
 public class OperatorInterface {
     private static OperatorInterface mInstance;
 
@@ -22,6 +46,17 @@ public class OperatorInterface {
     private OperatorInterface() {
         DriverController = new XboxController(Constants.DriverControllerPort);
         OperatorController = new XboxController(Constants.OperatorControllerPort);
+    }
+
+
+    //check if the value of auto aim toggle button is pressed
+    public boolean getAutoAimToggle(){
+        return OperatorController.getButton(XboxController.Button.RB);
+    }
+
+    //check if the auto shoot toggle button is pressed
+    public boolean getAutoShootToggle(){
+        return OperatorController.getButton(XboxController.Button.LB);
     }
 
     public double getDriveThrottle() {

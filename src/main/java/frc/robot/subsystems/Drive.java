@@ -120,7 +120,12 @@ public class Drive extends Subsystem {
         setOpenLoop(DriveSignal.NEUTRAL);
     }
 
-    public void ZeroSensors() {}
+    public void ZeroSensors() {
+        mGyro.calibrate();
+        mGyro.reset();
+
+
+    }
 
     /** Configure talons for open loop control */
     public synchronized void setOpenLoop(DriveSignal signal) {
