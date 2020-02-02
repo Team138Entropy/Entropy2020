@@ -42,5 +42,5 @@ public class Intake extends Subsystem {
   public void zeroSensors() {}
 
   @Override
-  public void checkSubsystems() {}
+  public void checkSubsystem() {}
 }

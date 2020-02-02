@@ -225,7 +225,7 @@ public class Drive extends Subsystem {
   /*
       Test all Sensors in the Subsystem
   */
-  public void checkSubsystems() {}
+  public void checkSubsystem() {}
 
   public synchronized double getLeftEncoderDistance() {
     return 0.0;

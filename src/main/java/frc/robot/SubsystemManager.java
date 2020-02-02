@@ -48,7 +48,7 @@ public class SubsystemManager {
   public void checkSubsystems() {
     for (int i = 0; i < mSubsystems.size(); i++) {
       try {
-        mSubsystems.get(i).checkSubsystems();
+        mSubsystems.get(i).checkSubsystem();
       } catch (Exception e) {
         mSubsystemLogger.verbose("Subsystem Check Exception: " + e.getMessage());
       }

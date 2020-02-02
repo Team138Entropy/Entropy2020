@@ -15,5 +15,5 @@ public abstract class Subsystem {
 
   public abstract void zeroSensors();
 
-  public abstract void checkSubsystems();
+  public abstract void checkSubsystem();
 }
