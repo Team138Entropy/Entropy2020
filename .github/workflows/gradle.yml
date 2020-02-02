@@ -1,4 +1,4 @@
-name: Java CI + Google Lint
+name: Java Build
 
 on: [push]
 

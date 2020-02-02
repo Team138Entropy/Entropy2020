@@ -1,16 +1,19 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
+import frc.robot.Logger;
+import frc.robot.OI.NykoController.DPad;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
 
 public class OperatorInterface {
+  Logger mLogger;
   private static OperatorInterface mInstance;
 
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
-  private final XboxController OperatorController;
+  private final NykoController OperatorController;
 
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
@@ -20,8 +23,9 @@ public class OperatorInterface {
   }
 
   private OperatorInterface() {
+    mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
-    OperatorController = new XboxController(Constants.OperatorControllerPort);
+    OperatorController = new NykoController(Constants.OperatorControllerPort);
   }
 
   // Driver
@@ -52,10 +56,10 @@ public class OperatorInterface {
     // Check if Low Gear is Toggled
     if (DriverController.getButton(XboxController.Button.START)) {
       if (LowGear == false) {
-        System.out.println("Y PRESSED ON");
+        mLogger.verbose("Y PRESSED ON");
 
       } else {
-        System.out.println("Y PRESSED OFF");
+        mLogger.verbose("Y PRESSED OFF");
       }
       LowGear = !LowGear;
     }
@@ -66,44 +70,53 @@ public class OperatorInterface {
   }
 
   public boolean getTurretAdjustLeft() {
-    return OperatorController.getButton(XboxController.Button.A);
+    return OperatorController.getDPad() == DPad.LEFT;
   }
 
   public boolean getTurretAdjustRight() {
-    return OperatorController.getButton(XboxController.Button.B);
+    return OperatorController.getDPad() == DPad.RIGHT;
   }
 
   // Operator
 
+  public boolean getHarvestMode() {
+    return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
+  }
+
   public double getOperatorThrottle() {
-    return OperatorController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
+    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
   }
 
   public double getOperatorTurn() {
-    return OperatorController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
-  }
-
-  public int getTurretManual() {
-    return OperatorController.getDPad();
+    return OperatorController.getJoystick(NykoController.Side.RIGHT, NykoController.Axis.X);
   }
 
   public boolean getCameraSwap() {
-    return OperatorController.getButton(XboxController.Button.Y);
+    return OperatorController.getButton(NykoController.Button.BUTTON_4);
   }
 
   public boolean getShoot() {
-    return OperatorController.getButton(XboxController.Button.X);
+    return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
 
   public boolean getLoadChamber() {
-    return OperatorController.getButton(XboxController.Button.A);
-  }
-
-  public void setOperatorRumble(boolean toggle) {
-    OperatorController.setRumble(toggle);
+    return OperatorController.getButton(NykoController.Button.BUTTON_1);
   }
 
   public void setDriverRumble(boolean toggle) {
     DriverController.setRumble(toggle);
+  }
+
+  // Test Mode functions
+  public boolean isIntakeRollertest() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  }
+
+  public boolean isStorageRollerTest() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+  }
+
+  public boolean isShooterTest() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
 }

@@ -16,7 +16,7 @@ public class ShuffleboardHandler extends Subsystem {
   // SmartDashboard and not sending data. Stuff used in number tuning usually goes here.
   public void UpdateShuffleboard() {}
 
-  public void ZeroSensors() {}
+  public void zeroSensors() {}
 
-  public void CheckSubsystems() {}
+  public void checkSubsystems() {}
 }
