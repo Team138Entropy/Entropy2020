@@ -62,18 +62,28 @@ public class Logger {
     return "[" + logPath + ":" + thisLogLevel.name() + "] " + message;
   }
 
-  /**
+    /**
    * Logs to a given level
    *
    * @param level The level to log to
    * @param message The message to log
    */
   public void logLevel(SupportedLevels level, String message) {
-    String minLevel = Config.getInstance().cfg.getString("LOG__" + mLogPath.toUpperCase());
+    logLevel(level, message, false);
+  }
 
-    if (minLevel == null) {
-      DriverStation.reportError(
-          "No log level defined for " + mLogPath, Thread.currentThread().getStackTrace());
+  /**
+   * Logs to a given level
+   *
+   * @param level The level to log to
+   * @param message The message to log
+   * @param stackTrace True if stack trace is desired
+   */
+  public void logLevel(SupportedLevels level, String message, Boolean stackTrace) {
+    String minLevel;
+    try {
+      minLevel = Config.getInstance().cfg.getString("LOG__" + mLogPath.toUpperCase());
+    } catch (Exception exception) {
       minLevel = mDefaultLevel;
     }
 
@@ -90,11 +100,21 @@ public class Logger {
       // if the level we're logging at is WARN or ERR, then log to STDERR, otherwise log to
       // STDOUT
       if (level == SupportedLevels.ERROR) {
-        DriverStation.reportError(
-            getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
+        if (stackTrace) {
+          DriverStation.reportError(
+              getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
+        } else {
+          DriverStation.reportError(
+              getLogMsg(mLogPath, level, message), false);
+        }
       } else if (level == SupportedLevels.WARN) {
-        DriverStation.reportWarning(
-            getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
+        if (stackTrace) {
+          DriverStation.reportWarning(
+              getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
+        } else {
+          DriverStation.reportWarning(
+              getLogMsg(mLogPath, level, message), false);
+        }
       } else {
         System.out.println(getLogMsg(mLogPath, level, message));
       }
@@ -102,12 +122,12 @@ public class Logger {
   }
 
   /**
-   * Logs at the level ERROR
+   * Logs at the level ERROR, with full Stack Trace
    *
    * @param message The message to log
    */
-  public void err(String message) {
-    logLevel(SupportedLevels.ERROR, message);
+  public void errorWithStackTrace(String message) {
+    logLevel(SupportedLevels.ERROR, message, true);
   }
 
   /**

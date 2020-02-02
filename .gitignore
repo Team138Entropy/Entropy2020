@@ -8,3 +8,4 @@ bin
 /local.properties
 /Entropy2020.iml
 .idea
+/imgui.ini

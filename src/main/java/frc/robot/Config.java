@@ -6,8 +6,6 @@ package frc.robot;
 // @Deprecated
 // public class Constants {
 
-import edu.wpi.first.wpilibj.DriverStation;
-
 // TODO: Address performance concerns by profiling execution time and trimming calls
 public class Config {
 
@@ -74,6 +72,8 @@ public class Config {
     }
   }
 
+  Logger mLogger = new Logger("Config");
+
   private static Config sInstance;
   public ConfigFile cfg;
 
@@ -86,14 +86,19 @@ public class Config {
 
     // check that each key is there
     for (Key key : Key.values()) {
-      Object valueFromConfig = cfg.getString(key.name());
+      Object valueFromConfig = null;
+
+      try {
+        valueFromConfig = cfg.getString(key.name());
+      } catch (Exception exception) {
+        mLogger.error("Malformed configuration");
+      }
 
       if (valueFromConfig == null) {
-        DriverStation.reportError(
+        mLogger.warn(
             "Didn't find key "
                 + key.name()
-                + " in the configuration file. Did you forget to add it? Using a default anyway...",
-            new RuntimeException().getStackTrace());
+                + " in the configuration file. Using a default.");
       }
     }
   }
@@ -105,121 +110,73 @@ public class Config {
     return sInstance;
   }
 
-  /*String value = null;
-  try{
-    value = cfg.getString(key.name());
-  }catch(NumberFormatException ignored){}
-
-  if(key.value instanceof String){// the key we're trying to get has the same type as what the key is defined to be
-    if(value == null){// the value wasn't found in the file, so let's return a default
-      DriverStation.reportError("Key " + key.name() + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.", new RuntimeException().getStackTrace());
-      return (String) key.value;
-    }else{
-
-      return value;
-    }
-  }else{
-    DriverStation.reportError("Key " + key.name() + " not the correct type. Got " + key.value, new RuntimeException().getStackTrace());
-    throw new RuntimeException("Read the driver station");
-  } */
-
   public String getString(Key key) {
     String value = null;
     try {
       value = cfg.getString(key.name());
-    } catch (NumberFormatException ignored) {
+    } catch (Exception exception) {
+      mLogger.warn(
+        "Key "
+            + key.name()
+            + " was not found in the config file! Using default value.");
+      value = (String) key.value;
     }
-
-    if (value != null) {
-      // everything's good
-      return value;
-    } else { // the value wasn't found in the file, so let's return a default
-      DriverStation.reportError(
-          "Key "
-              + key.name()
-              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-          new RuntimeException().getStackTrace());
-      return (String) key.value;
-    }
+    return value;
   }
 
   public float getFloat(Key key) {
     Float value = null;
     try {
       value = cfg.getFloat(key.name());
-    } catch (NumberFormatException ignored) {
-    }
-
-    if (value != null) {
-      // everything's good
-      return value;
-    } else { // the value wasn't found in the file, so let's return a default
-      DriverStation.reportError(
+    } catch (Exception exception) {
+      mLogger.warn(
           "Key "
               + key.name()
-              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-          new RuntimeException().getStackTrace());
-      return (Float) key.value;
+              + " was not found in the config file! Using default value.");
+      value = (Float) key.value;
     }
+    return value;
   }
 
   public double getDouble(Key key) {
     Double value = null;
     try {
       value = cfg.getDouble(key.name());
-    } catch (NumberFormatException ignored) {
-    }
-
-    if (value != null) {
-      // everything's good
-      return value;
-    } else { // the value wasn't found in the file, so let's return a default
-      DriverStation.reportError(
+    } catch (Exception exception) {
+      mLogger.warn(
           "Key "
               + key.name()
-              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-          new RuntimeException().getStackTrace());
-      return (Double) key.value;
+              + " was not found in the config file! Using default value.");
+      value = (Double) key.value;
     }
+    return value;
   }
 
   public int getInt(Key key) {
     Integer value = null;
     try {
       value = cfg.getInt(key.name());
-    } catch (NumberFormatException ignored) {
+    } catch (Exception exception) {
+      mLogger.warn(
+        "Key "
+            + key.name()
+            + " was not found in the config file! Using default value.");
+    value = (Integer) key.value;
     }
-
-    if (value != null) {
-      // everything's good
-      return value;
-    } else { // the value wasn't found in the file, so let's return a default
-      DriverStation.reportError(
-          "Key "
-              + key.name()
-              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-          new RuntimeException().getStackTrace());
-      return (Integer) key.value;
-    }
+    return value;
   }
 
   public boolean getBoolean(Key key) {
     Boolean value = null;
     try {
       value = cfg.getBoolean(key.name());
-    } catch (NumberFormatException ignored) {
+    } catch (Exception exception) {
+      mLogger.warn(
+        "Key "
+            + key.name()
+            + " was not found in the config file! Using default value.");
+      value = (Boolean) key.value;
     }
-
-    if (value != null) {
-      // everything's good
-      return value;
-    } else { // the value wasn't found in the file, so let's return a default
-      DriverStation.reportError(
-          "Key "
-              + key.name()
-              + " was not found in the config file! You might have mistyped something, please fix this! A default value was used.",
-          new RuntimeException().getStackTrace());
-      return (Boolean) key.value;
-    }
+    return value;
   }
 }
