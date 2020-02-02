@@ -196,7 +196,7 @@ public class Robot extends TimedRobot {
         // Quickturn!
       }
 
-      if (driveShift) mDrive.SwitchGears();
+      if (driveShift) mDrive.switchGears();
     }
   }
 

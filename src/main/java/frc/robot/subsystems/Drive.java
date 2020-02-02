@@ -185,7 +185,7 @@ public class Drive extends Subsystem {
       SwitchGears
       Toggles the current gear
   */
-  public synchronized void SwitchGears() {
+  public synchronized void switchGears() {
     mHighGear = !mHighGear;
     mGearSolenoid.set(mHighGear);
   }
@@ -194,8 +194,8 @@ public class Drive extends Subsystem {
       SetGear
       TODO: This may be the incorrect polarity. Verfiy this.
   */
-  public synchronized void SetGear(boolean HighGear) {
-    mGearSolenoid.set(HighGear);
+  public synchronized void setGear(boolean highGear) {
+    mGearSolenoid.set(highGear);
   }
 
   /*
