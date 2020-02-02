@@ -109,5 +109,5 @@ public class Shooter extends Subsystem {
   public void zeroSensors() {}
 
   @Override
-  public void checkSubsystems() {}
+  public void checkSubsystem() {}
 }

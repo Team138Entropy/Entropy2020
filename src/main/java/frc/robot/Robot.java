@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
   */
   private void ZeroSensors() {
     mRobotLogger.log("Zeroing sensors...");
-    mSubsystemManager.ZeroSensors();
+    mSubsystemManager.zeroSensors();
     mRobotLogger.log("Zeroed sensors");
   }
 
@@ -219,7 +219,7 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Entropy 138: Test Init");
 
     Config.getInstance().reload();
-    mSubsystemManager.CheckSubsystems();
+    mSubsystemManager.checkSubsystems();
   }
 
   @Override

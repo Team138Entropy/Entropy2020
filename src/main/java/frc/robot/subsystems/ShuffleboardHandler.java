@@ -18,5 +18,5 @@ public class ShuffleboardHandler extends Subsystem {
 
   public void zeroSensors() {}
 
-  public void checkSubsystems() {}
+  public void checkSubsystem() {}
 }

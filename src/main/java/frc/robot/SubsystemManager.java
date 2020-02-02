@@ -25,14 +25,14 @@ public class SubsystemManager {
   /*
       Add Subsystem to the Subsystem manager
   */
-  public void RegisterSubsystem(Subsystem arg) {
+  public void registerSubsystem(Subsystem arg) {
     mSubsystems.add(arg);
   }
 
   /*
       Zero all Sensors
   */
-  public void ZeroSensors() {
+  public void zeroSensors() {
     for (int i = 0; i < mSubsystems.size(); i++) {
       try {
         mSubsystems.get(i).zeroSensors();
@@ -45,10 +45,10 @@ public class SubsystemManager {
   /*
       Run Subsystem check command on all subsystems
   */
-  public void CheckSubsystems() {
+  public void checkSubsystems() {
     for (int i = 0; i < mSubsystems.size(); i++) {
       try {
-        mSubsystems.get(i).checkSubsystems();
+        mSubsystems.get(i).checkSubsystem();
       } catch (Exception e) {
         mSubsystemLogger.verbose("Subsystem Check Exception: " + e.getMessage());
       }

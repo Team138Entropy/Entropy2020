@@ -191,5 +191,5 @@ public class VisionManager extends Subsystem {
   /*
       Test all Sensors in the Subsystem
   */
-  public void checkSubsystems() {}
+  public void checkSubsystem() {}
 }
