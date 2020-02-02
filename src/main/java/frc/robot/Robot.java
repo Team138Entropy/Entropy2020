@@ -114,6 +114,8 @@ public class Robot extends TimedRobot {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
     mCameraManager = CameraManager.getInstance();
+    mCameraManager.init();
+    
     // Reset Robot State
     // Wherever the Robot is now is the starting position
     mRobotState.reset();
