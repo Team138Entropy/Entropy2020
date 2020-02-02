@@ -268,18 +268,18 @@ public class Robot extends TimedRobot {
   public void driveTrainLoop() {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
-      double DriveThrottle = mOperatorInterface.getDriveThrottle();
-      double DriveTurn = mOperatorInterface.getDriveTurn();
-      boolean DriveShift = mOperatorInterface.getDriveShift();
-      boolean AutoDrive = false;
-      mDrive.setDrive(DriveThrottle, DriveTurn, false);
+      double driveThrottle = mOperatorInterface.getDriveThrottle();
+      double driveTurn = mOperatorInterface.getDriveTurn();
+      boolean driveShift = mOperatorInterface.getDriveShift();
+      boolean autoDrive = false;
+      mDrive.setDrive(driveThrottle, driveTurn, false);
 
       // Quickturn
-      if (AutoDrive == false && mOperatorInterface.getQuickturn()) {
+      if (autoDrive == false && mOperatorInterface.getQuickturn()) {
         // Quickturn!
       }
 
-      if (DriveShift) mDrive.SwitchGears();
+      if (driveShift) mDrive.switchGears();
 
       // Detect Harvest Mode
       boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
@@ -299,7 +299,7 @@ public class Robot extends TimedRobot {
         // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
       } else {
         // Standard Manual Drive
-        mDrive.setDrive(DriveThrottle, DriveTurn, false);
+        mDrive.setDrive(driveThrottle, driveTurn, false);
       }
     }
   }
