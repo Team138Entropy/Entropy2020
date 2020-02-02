@@ -172,6 +172,8 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
 
+    SmartDashboard.putString("RobotState", mState.name());
+
     // TODO: cameras will go here eventually
   }
 
@@ -354,14 +356,18 @@ public class Robot extends TimedRobot {
   private void executeRobotStateMachine() {
     switch (mState) {
       case IDLE:
+        SmartDashboard.putString("RobotState", mState.name());
         break;
       case INTAKE:
+        SmartDashboard.putString("RobotState", mState.name() + ": " + mIntakeState.name());
         executeIntakeStateMachine();
         break;
       case SHOOTING:
+        SmartDashboard.putString("RobotState", mState.name() + ": " + mShootingState.name());
         executeShootingStateMachine();
         break;
       case CLIMBING:
+        SmartDashboard.putString("RobotState", mState.name() + ": " + mClimingState.name());
         executeClimbingStateMachine();
         break;
       default:
