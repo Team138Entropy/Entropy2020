@@ -242,19 +242,19 @@ public class Drive extends Subsystem {
     return null;
   }
 
-  public void setOutputBackLeft (double output) {
+  public void setOutputLeftBack (double output) {
     mLeftMaster.set(ControlMode.PercentOutput, output);
   }
 
-  public void setOutputFrontLeft (double output) {
+  public void setOutputLeftFront (double output) {
     mLeftSlave.set(ControlMode.PercentOutput, output);
   }
 
-  public void setOutputBackRight (double output) {
+  public void setOutputRightBack (double output) {
     mRightMaster.set(ControlMode.PercentOutput, output);
   }
 
-  public void setOutputFrontRight (double output) {
+  public void setOutputRightFront (double output) {
     mRightSlave.set(ControlMode.PercentOutput, output);
   }
 

@@ -261,27 +261,27 @@ public class Robot extends TimedRobot {
     }
 
     if(mOperatorInterface.isDriveLeftBackTest()) {
-      mDrive.setOutputBackLeft(mOperatorInterface.getDriveThrottle());
+      mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
     } else {
-      mDrive.setOutputBackLeft(0);
+      mDrive.setOutputLeftBack(0);
     }
 
     if(mOperatorInterface.isDriveLeftFrontTest()) {
-      mDrive.setOutputFrontLeft(mOperatorInterface.getDriveThrottle());
+      mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
     } else {
-      mDrive.setOutputFrontLeft(0);
+      mDrive.setOutputLeftFront(0);
     }
 
     if(mOperatorInterface.isDriveRightBackTest()) {
-      mDrive.setOutputBackLeft(mOperatorInterface.getDriveThrottle());
+      mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
     } else {
-      mDrive.setOutputBackRight(0);
+      mDrive.setOutputRightBack(0);
     }
 
     if(mOperatorInterface.isDriveRightFrontTest()) {
-      mDrive.setOutputFrontRight(mOperatorInterface.getDriveThrottle());
+      mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
     } else {
-      mDrive.setOutputFrontRight(0);
+      mDrive.setOutputRightFront(0);
     }
   }
 
