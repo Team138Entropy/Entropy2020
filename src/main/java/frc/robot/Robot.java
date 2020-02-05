@@ -182,6 +182,7 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Auto Init Called");
 
     mStorage.init();
+    mDrive.init();
 
     Config.getInstance().reload();
 
@@ -201,6 +202,7 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Teleop Init!");
 
     mStorage.init();
+    mDrive.init();
 
     Config.getInstance().reload();
 
@@ -232,7 +234,7 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     // Intake roller ON while button held
     if (mOperatorInterface.isIntakeRollerTest()) {
-      mIntake.setOutput(mOperatorInterface.getDriveThrottle());
+      mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
     } else {
       mIntake.stop();
     }
@@ -256,6 +258,30 @@ public class Robot extends TimedRobot {
       mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
     } else {
       mShooter.stop();
+    }
+
+    if(mOperatorInterface.isDriveLeftBackTest()) {
+      mDrive.setOutputBackLeft(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputBackLeft(0);
+    }
+
+    if(mOperatorInterface.isDriveLeftFrontTest()) {
+      mDrive.setOutputFrontLeft(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputFrontLeft(0);
+    }
+
+    if(mOperatorInterface.isDriveRightBackTest()) {
+      mDrive.setOutputBackLeft(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputBackRight(0);
+    }
+
+    if(mOperatorInterface.isDriveRightFrontTest()) {
+      mDrive.setOutputFrontRight(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputFrontRight(0);
     }
   }
 

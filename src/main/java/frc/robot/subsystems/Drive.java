@@ -88,6 +88,9 @@ public class Drive extends Subsystem {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
       mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
     }
+  }
+
+  public void init() {
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
@@ -237,6 +240,22 @@ public class Drive extends Subsystem {
 
   public synchronized Rotation2d getRotation() {
     return null;
+  }
+
+  public void setOutputBackLeft (double output) {
+    mLeftMaster.set(ControlMode.PercentOutput, output);
+  }
+
+  public void setOutputFrontLeft (double output) {
+    mLeftSlave.set(ControlMode.PercentOutput, output);
+  }
+
+  public void setOutputBackRight (double output) {
+    mRightMaster.set(ControlMode.PercentOutput, output);
+  }
+
+  public void setOutputFrontRight (double output) {
+    mRightSlave.set(ControlMode.PercentOutput, output);
   }
 
   public double getLeftLinearVelocity() {
