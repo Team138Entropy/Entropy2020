@@ -1,7 +1,11 @@
 package frc.robot;
 
-// Any Sort of Constant or 'Magic Number' should be defined here
-@Deprecated
+/*
+  Constants
+  Any 
+
+
+*/
 public class Constants {
   // Controller Ports
   public static final int OperatorControllerPort = 1;
@@ -49,4 +53,13 @@ public class Constants {
 
   // Field Related Constants
   public static final double kHighGoalHeight = 96.25; // Center Goal Height
+
+
+
+  //Constant Intialization!
+  //Dyanmic Config System is loaded into true java constants
+  //Doing this allows java to optimize around these values
+  static {
+    
+  };
 }

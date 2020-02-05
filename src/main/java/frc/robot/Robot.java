@@ -58,7 +58,6 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
 
-  private Drive mDrive;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -74,6 +73,7 @@ public class Robot extends TimedRobot {
   private final Shooter mShooter = Shooter.getInstance();
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
+  private final Drive mDrive = Drive.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -129,7 +129,7 @@ public class Robot extends TimedRobot {
     }
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
-      mDrive = Drive.getInstance();
+      //mDrive = Drive.getInstance();
     }
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
