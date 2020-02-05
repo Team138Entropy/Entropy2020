@@ -222,6 +222,12 @@ public class Drive extends Subsystem {
     }
 
 
-    
+    @Override
+    public void SetTestValue(double value){
+
+    }
+  
+    @Override
+    public void ClearTestValue(){}
 
 }

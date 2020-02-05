@@ -26,6 +26,7 @@ public class Intake extends Subsystem {
 
   private Intake() {
     mRoller = new WPI_TalonSRX(Constants.kIntakeTalonPort);
+    mRoller.configFactoryDefault();
   }
 
   /** Starts the Roller **/
@@ -50,4 +51,16 @@ public class Intake extends Subsystem {
 
   @Override
   public void CheckSubsystems() {}
+
+     
+  @Override
+    public void SetTestValue(double value){
+      mRoller.set(ControlMode.PercentOutput, value);
+    }
+  
+    @Override
+    public void ClearTestValue(){
+      mRoller.set(ControlMode.PercentOutput, 0);
+
+    }
 }

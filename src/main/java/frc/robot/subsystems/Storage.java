@@ -104,4 +104,18 @@ public class Storage extends Subsystem {
 
   @Override
   public void CheckSubsystems() {}
+
+  @Override
+  public void SetTestValue(double value){
+
+    mLowerRoller.set(ControlMode.PercentOutput, value);
+
+  }
+
+  @Override
+  public void ClearTestValue(){
+
+    mLowerRoller.set(ControlMode.PercentOutput, 0);
+
+  }
 }

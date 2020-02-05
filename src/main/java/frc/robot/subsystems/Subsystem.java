@@ -13,6 +13,10 @@ public abstract class Subsystem {
         SubsystemManager.getInstance().RegisterSubsystem(this);
     }
 
+    
+    public abstract void SetTestValue(double value);
+    public abstract void ClearTestValue();
+
     public abstract void ZeroSensors();
 
     public abstract void CheckSubsystems();

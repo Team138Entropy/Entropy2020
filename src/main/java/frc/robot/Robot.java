@@ -35,27 +35,19 @@ public class Robot extends TimedRobot {
     private final Drive mDrive = Drive.getInstance();
     private final VisionManager mVisionManager = VisionManager.getInstance(); 
     private final Intake mIntake = Intake.getInstance();
-    //private final Shooter mShooter = Shooter.getInstance();
+    private final Shooter mShooter = Shooter.getInstance();
     private final Storage mStorage = Storage.getInstance();
 
+    //Manae the Light rings
     public Relay visionLight = new Relay(0);
     
     // State Variables
     private boolean mAutoAim = true; //autonomously manage turret rotation
     private boolean mAutoShoot = false; //automously manage shooting
-    private boolean mAutoIntake = false; //automously manage ball lineup
-    private boolean mIntaking = false; //is instake system running?
-    private boolean mShooting = false; //are we shooting? (shooter wheels running)
-
-    //Storage so should never be directly run, needs to be on if we are shooting or intaking
-    private boolean mStorageRunning = false; 
-
-    private boolean mClimbMode = false;
+    private boolean mAutoIntake = false; //automously manage ball lineup via drivetrain
 
 
-    // Control Variables
-    private LatchedBoolean mWantsAutoSteer = new LatchedBoolean();
-    private LatchedBoolean HarvestAim = new LatchedBoolean();
+
 
 
     // autonomousInit, autonomousPeriodic, disabledInit,
@@ -97,14 +89,42 @@ public class Robot extends TimedRobot {
     }
 
     public void testInit() {
-        System.out.println("Entropy 138: Test Init");
-
         // Test all Subsystems
         System.out.println("Running Subsystem Checks");
         mSubsystemManager.CheckSubsystems();
     }
 
-    public void testPeriodic() {}
+
+    /*
+        Respond to button presses for testing motors
+    */
+    public void testPeriodic() {
+        //Intake Toggles
+        if(mOperatorInterface.getDriverA()){
+            mIntake.SetTestValue(.3);
+        }else if(mOperatorInterface.getDriverB()){
+            mIntake.SetTestValue(-.3);
+        }else if(mOperatorInterface.getDriverX()){
+            mIntake.ClearTestValue();
+        }
+
+        //Storage Toggles
+        if(mOperatorInterface.getDriverRB()){
+            mStorage.SetTestValue(.3);
+        }else if(mOperatorInterface.getDriverLB()){
+            mStorage.SetTestValue(-.3);
+        }else if(mOperatorInterface.getDriverY()){
+            mStorage.ClearTestValue();
+        }
+
+
+        //Drive Code
+        double DriveThrottle = mOperatorInterface.getDriveThrottle();
+        double DriveTurn = mOperatorInterface.getDriveTurn();
+        mDrive.setDrive(DriveThrottle, DriveTurn, false);
+
+
+    }
 
     public void disabledInit() {}
 
@@ -140,6 +160,9 @@ public class Robot extends TimedRobot {
         //Turret Control
         if(mAutoAim == true){
             //Turret is automatically aligning to vision target
+            //Constantly pull for new coordinates to turn to
+           // Optional<AimingParameters> drive_aim_params = mSuperstructure.getLatestAimingParameters();
+
 
 
         }else{
@@ -148,6 +171,7 @@ public class Robot extends TimedRobot {
             double AsmithThrottle = mOperatorInterface.getOperatorThrottle();
             double ShooterSpeed = mOperatorInterface.getOperatorTurn();
 
+            
             System.out.println("DEBUG: Manual Turret Mode");
 
 

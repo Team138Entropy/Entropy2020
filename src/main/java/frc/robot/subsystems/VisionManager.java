@@ -128,6 +128,8 @@ public class VisionManager extends Subsystem {
                     ((Number) CurrentPacket.get("dis")).doubleValue()
                 );
 
+                System.out.println("Got Packet!");
+
                 //Reconvert Field information
                 ti.CalculateFields();
 
@@ -194,4 +196,12 @@ public class VisionManager extends Subsystem {
         Test all Sensors in the Subsystem
     */
     public void CheckSubsystems() {}
+
+    @Override
+    public void SetTestValue(double value){
+
+    }
+  
+    @Override
+    public void ClearTestValue(){}
 }

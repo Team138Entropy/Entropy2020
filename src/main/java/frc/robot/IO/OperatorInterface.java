@@ -1,6 +1,7 @@
 package frc.robot.IO;
 
 import frc.robot.Constants;
+import frc.robot.IO.XboxController.Button;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -109,6 +110,34 @@ public class OperatorInterface {
     public boolean getDriverRightTriggerPressed(){
         return DriverController.getTrigger(XboxController.Side.RIGHT);
     }
+
+
+
+    //Used for test functionality
+    public boolean getDriverA(){
+        return DriverController.getButton(XboxController.Button.A);
+    }
+
+    public boolean getDriverB(){
+        return DriverController.getButton(XboxController.Button.B);
+    }
+
+    public boolean getDriverX(){
+        return DriverController.getButton(XboxController.Button.X);
+    }
+
+    public boolean getDriverY(){
+        return DriverController.getButton(XboxController.Button.Y);
+    }
+
+    public boolean getDriverRB(){
+        return DriverController.getButton(XboxController.Button.RB);
+    }
+
+    public boolean getDriverLB(){
+        return DriverController.getButton(XboxController.Button.LB);
+    }
+
 
 
 }

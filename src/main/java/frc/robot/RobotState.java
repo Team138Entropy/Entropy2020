@@ -9,6 +9,7 @@ import frc.robot.vision.TargetInfo;
 import frc.robot.vision.GoalTracker;
 import frc.robot.vision.GoalTracker.TrackComparator;
 import frc.robot.vision.AimingParameters;
+import java.util.Optional;
 
 import java.lang.StackWalker.Option;
 import java.util.*;
@@ -29,6 +30,9 @@ import java.util.*;
 
         To find our Angle to Aim -> Atan2(Y_Goal - Y_Now, X_Goal - X_Now)
         To find our Range -> Sqrt((Y_Goal - Y_now)^2  + (X_Goal - X_now)^2 )
+
+
+
 
 
 
@@ -80,6 +84,76 @@ public class RobotState {
     private double update_right_encoder_prev_distance = 0.0;
     private double update_prev_timestamp = -1.0;
     private Rotation2d update_prev_heading = null;
+
+    //Latest Aiming Parameters
+    //This is essentially the final packets before translating to use with robot
+    private Optional<AimingParameters> mLatestGoalTarget = Optional.empty();
+    private Optional<AimingParameters> mLatestBallTarget = Optional.empty();
+    private double mCorrectedRangetoBall = 0.0;
+    private double mCorrectedRangetoGoal = 0.0;
+
+
+
+
+    public synchronized void UpdateGoalFromVision(double timestamp, boolean HighGoal){
+        //Get Latest Aiming Parameters
+        Optional<AimingParameters> SelectedTarget;
+        if(HighGoal == true){
+            //High Goal
+            SelectedTarget = mLatestGoalTarget;
+        }else{
+            //Ball
+            SelectedTarget = mLatestBallTarget;
+        }
+
+
+
+        //Use latency compensation to calculate
+        final double kLookaheadTime = 0.7;
+
+        //Predicted Robot Pose
+        //Predict where our robot is going to be
+        Pose2d robot_to_predicted_robot;
+        robot_to_predicted_robot = getLatestFieldToVehicle().getValue().inverse().transformBy(getPredictedFieldToVehicle(kLookaheadTime));
+
+        //Predict Robot to Goal/Ball
+        Pose2d predicted_robot_to_goal;
+        predicted_robot_to_goal = robot_to_predicted_robot.inverse().transformBy(SelectedTarget.get().getRobotToGoal());
+
+
+        //Set Corrected Range (correct corresponding goal)
+        if(HighGoal){
+            //Highgoal
+            mCorrectedRangetoGoal = predicted_robot_to_goal.getTranslation().norm();
+
+            //check minimum distance requirements
+
+            //Get Turrets Error to the Goal
+            Rotation2d turret_error;
+            turret_error = getVehicleToTurret(timestamp).getRotation().inverse().rotateBy(SelectedTarget.get().getRobotToGoalRotation();
+
+        }else{
+            //Ball
+            mCorrectedRangetoBall = predicted_robot_to_goal.getTranslation().norm();
+
+            //check minimum distance requirements
+
+
+            //Get Drive's Error to the Ball
+
+
+
+        }
+
+
+        
+
+
+        
+        //Rotation2d turret_error = getVehicleToTurret(timestamp).getRotation().inverse().rotateBy(other)
+
+
+    }
 
     // Constructor for Robot State
     // Called upon RobotState startup, reset everything
@@ -186,13 +260,16 @@ public class RobotState {
     private void updateGoalTracker(double timestamp, Translation2d cameraToVisionTargetPoses, GoalTracker tracker, boolean ball){
         Pose2d cameraToVisionTarget = Pose2d.fromTranslation(cameraToVisionTargetPoses);
 
-        //  Pose2d fieldToVisionTarget = getFieldToTurret(timestamp).transformBy(source.getTurretToLens()).transformBy(cameraToVisionTarget);
+        //Perform interpolation?
 
-        if(ball == true){
-            
+        if(ball){
+            //Ball
             Pose2d fieldToBall = getFieldToVehicle(timestamp).transformBy(cameraToVisionTarget);
             tracker.update(timestamp, List.of(new Pose2d(fieldToBall.getTranslation(), Rotation2d.identity())));
-
+        }else{
+            //High Goal
+            Pose2d fieldToGoal = getFieldToVehicle(timestamp).transformBy(cameraToVisionTarget);
+            tracker.update(timestamp, List.of(new Pose2d(fieldToGoal.getTranslation(), Rotation2d.identity())));
         }
 
     }
@@ -200,10 +277,8 @@ public class RobotState {
     // Vision Manager Passes a new Target Info to the Robot State
     public synchronized void AddVisionObservation(TargetInfo ti) {
         double timestamp = Timer.getFPGATimestamp();
-        
-        mCameraToHighGoal = new ArrayList<>();
-        mCameraToBall = new ArrayList<>();
-        
+
+        //clear out previous poses
         mCameraToBall.clear();
         mCameraToHighGoal.clear();
 
@@ -220,6 +295,7 @@ public class RobotState {
             updateGoalTracker(timestamp, translation, vision_ball, true);
 
         }
+        
     }
 
 
@@ -250,67 +326,27 @@ public class RobotState {
         return Rotation2d.identity();
     }
 
+    /*
+      Get latest aiming parameters of a desired target
+      if high goal is false, target is low goal
+    */
+    public synchronized Optional<AimingParameters> getAimingParameters(boolean highGoal, int prev_track_id, double max_track_age){
+        GoalTracker tracker = highGoal ? vision_highgoal : vision_ball;
+        List<GoalTracker.TrackReport> reports = tracker.getTrackReports();
 
-
-
-
-    //Get the Latest Ball Target
-    public synchronized Optional<AimingParameters> getLatestBallAimingParameters(int prev_track_id, double max_track_age){
-       //Get Track Reports for our official goal tracker
-       List<GoalTracker.TrackReport> reports = vision_ball.getTrackReports();
-
-        //if we don't have any tracks
         if(reports.isEmpty()){
             return Optional.empty();
         }
 
-        double timestamp = Timer.getFPGATimestamp();
+        //get current timestamp
 
-        //Determine the best Track
-        GoalTracker.TrackComparator comparator = new GoalTracker.TrackComparator(
-            timestamp, 
-            Constants.kTrackStabilityWeight,
-            Constants.kTrackAgeWeight,
-            Constants.kTrackSwitchingWeight,
-            prev_track_id
-        );
-
-        //sort track comparator
-        reports.sort(comparator);
-
-        //now move from best tracks (via our sort) to worst groups
-        //get the one that is in range
-        GoalTracker.TrackReport report = null;
-        GoalTracker.TrackReport temp_report = null;
-        for(int i = 0; i < reports.size(); i++){
-            temp_report = reports.get(i);
-            if(temp_report.latest_timestamp > timestamp - max_track_age){
-                //this qualifies.. select this
-                report = temp_report;
-                break; //no need to keep looping
-            }
-        }
-
-        //if we didn't find the report..return nothing
-        if(report == null){
-            return Optional.empty();
-        }
-
-        //Get a Vehicle to Goal Pose
-        Pose2d vehicleToGoal = getFieldToVehicle(timestamp).inverse().transformBy(report.field_to_target).transformBy(getVisionTargetToGoalOffset());
-
-
-        AimingParameters params = new AimingParameters(
-            report.id,
-            report.latest_timestamp,
-            report.stability,
-            vehicleToGoal,
-            report.field_to_target,
-            report.field_to_target.getRotation()
-        );
-
-        return Optional.of(params);
+        //AimingParameters params = new AimingParameters(trackIDarg, last_seen_timestamparg, stabilityarg, robot_to_goalarg, field_to_goalarg, field_to_visionarg)
+       // return Optional.of(params);
+       return null;
     }
+
+
+   
 
     //Get the Latest Target -- high goal!
     public synchronized Optional<AimingParameters> getLatestTargetAimingParameters(int prev_track_id, double max_track_age){
@@ -375,44 +411,42 @@ public class RobotState {
 
     //Returns a translation of the robot 
     //returns null if there is no intersection with the goal.. no shot!
+    //Turret Camera is true if this is running on the turret
+    //Turret Camera is false if this is the ball camera
     private Translation2d getCameraToVisionTargetPose(boolean TurretCamera, TargetInfo ti){
 
-        Rotation2d testRotation = Rotation2d.fromDegrees(-135);
+        //Select Rotation
+        Rotation2d CameraHorizontalPlane;
+        double CameraHeight; //Camera Height (Inches)
+        double TargetHeight; //desired target height (Inches)
+        if(TurretCamera){
+            //Turret Camera
+            CameraHorizontalPlane = Constants.kShooterCameraHorizontalPlaneToLens;
+            CameraHeight = Constants.kShooterCameraHeight;
+            TargetHeight = Constants.kHighGoalHeight;
+        }else{
+            //Ball Camera
+            CameraHorizontalPlane = Constants.kBallCameraHorizontalPlaneToLens;
+            CameraHeight = Constants.kBallCameraHeight;
+            TargetHeight = Constants.kBallHeight;
+        }
 
         //Compensate for camera pitch!
-        Translation2d xz_plane_translation = new Translation2d(ti.getX(), ti.getZ()).rotateBy(testRotation);
-
+        Translation2d xz_plane_translation = new Translation2d(ti.getX(), ti.getZ()).rotateBy(CameraHorizontalPlane);
         double x = xz_plane_translation.x();
         double y = ti.getY();
         double z = xz_plane_translation.y();
 
   
-
-        if(TurretCamera == false){
-            //Ball Camera!
-            double hypot = Math.hypot(x, y);
-            Rotation2d angle = new Rotation2d(x, y, true);
-            double deg = angle.getDegrees();
-            double yawcheck = ti.getYaw();
-            System.out.println(Double.toString(deg));
-            
-
-        }
-
-        z = 10;
-
-        // find intersection with the goal
-        //if we do have an intersection with the goal, return our translation.. if we don't return null
-        //double differential_height = source.getLensHeight() - (high ? Constants.kPortTargetHeight : Constants.kHatchTargetHeight);
-        double differential_height = Constants.kHighGoalHeight;
-        //if ((z < 0.0) == (differential_height > 0.0)) {
-        if (true) {
+        //Calculate difference between target and camera height
+        double differential_height = CameraHeight - TargetHeight;
+        if ((z < 0.0) == (differential_height > 0.0)) {
             double scaling = differential_height / -z;
             double distance = Math.hypot(x, y) * scaling;
             Rotation2d angle = new Rotation2d(x, y, true);
-            System.out.println(angle.getDegrees());
             return new Translation2d(distance * angle.cos(), distance * angle.sin());
         }
+
         return null;
     }
 
@@ -437,6 +471,8 @@ public class RobotState {
     public synchronized Rotation2d getVehicleToTurret(double timestamp) {
         return Vehicle_To_Turret_Map.getInterpolated(new InterpolatingDouble(timestamp));
     }
+
+   
 
     /**
      * Get Turrets Pose on the Field This will be basically be the robots x,y and then the rotation
