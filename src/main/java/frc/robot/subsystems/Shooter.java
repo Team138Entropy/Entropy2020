@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
@@ -13,7 +16,7 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_PORT);
+  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
 
   // TODO: Tune these values
   private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
@@ -56,6 +59,7 @@ public class Shooter extends Subsystem {
   // Aggregation
   private static Shooter instance;
   private PIDRoller mRoller;
+  private TalonSRX mTestRoller;
   private Turret mTurret;
   private Vision mVision;
 
@@ -63,6 +67,7 @@ public class Shooter extends Subsystem {
 
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, P, I, D);
+    mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
     mTurret =
@@ -103,6 +108,10 @@ public class Shooter extends Subsystem {
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
     return mRollerVelocity > TARGET_ROLLER_VELOCITY;
+  }
+
+  public void setOutput(double output) {
+    mTestRoller.set(ControlMode.PercentOutput, output);
   }
 
   @Override

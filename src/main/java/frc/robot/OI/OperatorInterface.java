@@ -108,15 +108,37 @@ public class OperatorInterface {
   }
 
   // Test Mode functions
-  public boolean isIntakeRollertest() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  public boolean isDriveLeftBackTest() {
+    return DriverController.getButton(XboxController.Button.A);
   }
 
-  public boolean isStorageRollerTest() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+  public boolean isDriveLeftFrontTest() {
+    return DriverController.getButton(XboxController.Button.X);
+  }
+
+  public boolean isDriveRightBackTest() {
+    return DriverController.getButton(XboxController.Button.B);
+  }
+
+  public boolean isDriveRightFrontTest() {
+    return DriverController.getButton(XboxController.Button.Y);
+  }
+
+  public boolean isIntakeRollerTest() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_1);
+  }
+
+  public boolean isStorageRollerBottomTest() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_2);
+  }
+
+  public boolean isStorageRollerTopTest() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_4);
   }
 
   public boolean isShooterTest() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+    return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
+
+
 }

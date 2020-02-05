@@ -181,6 +181,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     mRobotLogger.log("Auto Init Called");
 
+    mStorage.init();
+
     Config.getInstance().reload();
 
     mState = State.SHOOTING;
@@ -197,6 +199,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
+
+    mStorage.init();
 
     Config.getInstance().reload();
 
@@ -227,22 +231,29 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     // Intake roller ON while button held
-    if (mOperatorInterface.isIntakeRollertest()) {
-      mIntake.start();
+    if (mOperatorInterface.isIntakeRollerTest()) {
+      mIntake.setOutput(mOperatorInterface.getDriveThrottle());
     } else {
       mIntake.stop();
     }
 
-    // Storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerTest()) {
-      mStorage.storeBall();
+    // Bottom storage rollers ON while button held
+    if (mOperatorInterface.isStorageRollerBottomTest()) {
+      mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
     } else {
-      mStorage.stop();
+      mStorage.stopBottom();
+    }
+
+    // Top storage rollers ON while button held
+    if (mOperatorInterface.isStorageRollerTopTest()) {
+      mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
+    } else {
+      mStorage.stopTop();
     }
 
     // Shooter roller ON while button held
     if (mOperatorInterface.isShooterTest()) {
-      mShooter.start();
+      mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
     } else {
       mShooter.stop();
     }
