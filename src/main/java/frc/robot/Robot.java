@@ -319,6 +319,18 @@ public class Robot extends TimedRobot {
     turretLoop();
 
     driveTrainLoop();
+
+    // Operator Controls
+    if (mOperatorInterface.getTurretAdjustLeft()) {
+      // manual turret aim
+    } else if (mOperatorInterface.getTurretAdjustRight()) {
+      // manual turret aim
+    }
+
+    // Camera Swap
+    if (mOperatorInterface.getCameraSwap()) {
+      // Swap Camera!
+    }
   }
 
   private void executeRobotStateMachine() {
