@@ -73,21 +73,24 @@ public class Drive extends Subsystem {
     // Shifter Solenoid
     // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
 
-    mLeftMaster = new WPI_TalonSRX(Constants.kLeftDriveMasterId);
+    mLeftMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_BACK_PORT));
     // configureSpark(mLeftMaster, true, true);
 
-    mLeftSlave = new WPI_TalonSRX(Constants.kLeftDriveSlaveId);
+    mLeftSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_FRONT_PORT));
     // configureSpark(mLeftSlave, true, false);
 
-    mRightMaster = new WPI_TalonSRX(Constants.kRightDriveMasterId);
+    mRightMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_BACK_PORT));
     // configureSpark(mRightMaster, false, true);
 
-    mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
+    mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
       mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
     }
+  }
+
+  public void init() {
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
@@ -237,6 +240,26 @@ public class Drive extends Subsystem {
 
   public synchronized Rotation2d getRotation() {
     return null;
+  }
+
+  // Used only in TEST mode
+  public void setOutputLeftBack (double output) {
+    mLeftMaster.set(ControlMode.PercentOutput, output);
+  }
+
+  // Used only in TEST mode
+  public void setOutputLeftFront (double output) {
+    mLeftSlave.set(ControlMode.PercentOutput, output);
+  }
+
+  // Used only in TEST mode
+  public void setOutputRightBack (double output) {
+    mRightMaster.set(ControlMode.PercentOutput, output);
+  }
+
+  // Used only in TEST mode
+  public void setOutputRightFront (double output) {
+    mRightSlave.set(ControlMode.PercentOutput, output);
   }
 
   public double getLeftLinearVelocity() {

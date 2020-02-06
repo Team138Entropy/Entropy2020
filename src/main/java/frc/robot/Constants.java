@@ -7,12 +7,6 @@ public class Constants {
   public static final int OperatorControllerPort = 1;
   public static final int DriverControllerPort = 0;
 
-  // Talon Variables
-  public static final int kLeftDriveMasterId = 1;
-  public static final int kLeftDriveSlaveId = 2;
-  public static final int kRightDriveMasterId = 3;
-  public static final int kRightDriveSlaveId = 4;
-
   // Solenoid Constants
   public static final int kPCMId = 1;
   public static final int kShifterSolenoidId = 7;

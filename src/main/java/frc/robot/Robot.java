@@ -181,6 +181,9 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     mRobotLogger.log("Auto Init Called");
 
+    mStorage.init();
+    mDrive.init();
+
     Config.getInstance().reload();
 
     mState = State.SHOOTING;
@@ -197,6 +200,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
+
+    mStorage.init();
+    mDrive.init();
 
     Config.getInstance().reload();
 
@@ -227,24 +233,55 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     // Intake roller ON while button held
-    if (mOperatorInterface.isIntakeRollertest()) {
-      mIntake.start();
+    if (mOperatorInterface.isIntakeRollerTest()) {
+      mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
     } else {
       mIntake.stop();
     }
 
-    // Storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerTest()) {
-      mStorage.storeBall();
+    // Bottom storage rollers ON while button held
+    if (mOperatorInterface.isStorageRollerBottomTest()) {
+      mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
     } else {
-      mStorage.stop();
+      mStorage.setBottomOutput(0);
+    }
+
+    // Top storage rollers ON while button held
+    if (mOperatorInterface.isStorageRollerTopTest()) {
+      mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
+    } else {
+      mStorage.setTopOutput(0);
     }
 
     // Shooter roller ON while button held
     if (mOperatorInterface.isShooterTest()) {
-      mShooter.start();
+      mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
     } else {
       mShooter.stop();
+    }
+
+    if(mOperatorInterface.isDriveLeftBackTest()) {
+      mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputLeftBack(0);
+    }
+
+    if(mOperatorInterface.isDriveLeftFrontTest()) {
+      mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputLeftFront(0);
+    }
+
+    if(mOperatorInterface.isDriveRightBackTest()) {
+      mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputRightBack(0);
+    }
+
+    if(mOperatorInterface.isDriveRightFrontTest()) {
+      mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
+    } else {
+      mDrive.setOutputRightFront(0);
     }
   }
 

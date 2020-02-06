@@ -8,7 +8,7 @@ import frc.robot.Config.Key;
 /** Add your docs here. */
 public class Intake extends Subsystem {
 
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER_PORT);
+  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
 
   // TODO: Tune these values
   private static final double ROLLER_SPEED =
@@ -36,6 +36,11 @@ public class Intake extends Subsystem {
   /** Stops the roller. */
   public void stop() {
     mRoller.set(ControlMode.PercentOutput, 0);
+  }
+
+  // This is for TEST mode only
+  public void setOutput(double output) {
+    mRoller.set(ControlMode.PercentOutput, output);
   }
 
   @Override
