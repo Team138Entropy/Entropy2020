@@ -1,4 +1,8 @@
 package frc.robot;
+
+import frc.robot.util.geometry.*;
+
+
 /*
  * Constant values used throughout robot code.
  * In "C" this would be a header file, but alas, this is Java

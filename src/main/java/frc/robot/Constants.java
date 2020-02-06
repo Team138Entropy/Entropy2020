@@ -1,6 +1,8 @@
 package frc.robot;
 
 import java.lang.Math;
+
+import frc.robot.Config.Key;
 import frc.robot.util.geometry.*;
 /*
   Constants
@@ -33,6 +35,13 @@ public class Constants {
   public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
   public static final double kDriveWheelTrackRadiusWidthMeters =
       kDriveWheelTrackWidthInches / 2.0 * 0.0254;
+
+
+  //Intake
+  public static final int kIntakeRollerPort;
+
+  //Storage
+  //public static final int k
 
   //Drive Encoder Port
   public static final int kDriveGyroPort = 0;
@@ -84,5 +93,14 @@ public class Constants {
   //Doing this allows java to optimize around these values
   static {
     //Open Constants System and load into static variables
+    Config mConfig = Config.getInstance();
+    mConfig.reload();
+
+
+    //Now our values are dynamically loaded in
+    //lets now load these to our variables!
+    
+    kIntakeRollerPort = mConfig.getInt(Key.INTAKE__ROLLER_PORT);
+
   };
 }
