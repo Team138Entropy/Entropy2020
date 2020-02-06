@@ -19,6 +19,7 @@ public class Storage extends Subsystem {
   private static final int STORAGE_CAPICTY = 5;
 
   private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
   private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
 
   private WPI_TalonSRX mBottomRoller;
@@ -43,7 +44,6 @@ public class Storage extends Subsystem {
   }
 
   public void init() {
-    mTopRoller.follow(mBottomRoller);
   }
 
   public boolean isBallDetected() {
@@ -79,19 +79,19 @@ public class Storage extends Subsystem {
   }
 
   public void storeBall() {
-    // Top TALON is slaved to the bottom one, no need to command seperately. init() is only called in auto + teleop
-    mBottomRoller.set(ControlMode.PercentOutput, STORE_SPEED);
+    mBottomRoller.set(ControlMode.PercentOutput, STORE_SPEED * BOTTOM_SPEED_FACTOR);
+    mTopRoller.set(ControlMode.PercentOutput, STORE_SPEED);
   }
 
   /** Stops the roller. */
   public void stop() {
-    // Top TALON is slaved to the bottom one, no need to command seperately. init() is only called in auto + teleop
     mBottomRoller.set(ControlMode.PercentOutput, 0);
+    mTopRoller.set(ControlMode.PercentOutput, 0);
   }
 
   public void ejectBall() {
-    // Top TALON is slaved to the bottom one, no need to command seperately. init() is only called in auto + teleop
-    mBottomRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
+    mBottomRoller.set(ControlMode.PercentOutput, EJECT_SPEED * BOTTOM_SPEED_FACTOR);
+    mTopRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
   public int getBallCount() {
@@ -99,7 +99,7 @@ public class Storage extends Subsystem {
   }
 
   public void setBottomOutput(double output) {
-    mBottomRoller.set(ControlMode.PercentOutput, output);
+    mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR);
   }
 
   public void setTopOutput(double output) {
