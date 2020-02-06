@@ -38,6 +38,7 @@ public class Intake extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, 0);
   }
 
+  // This is for TEST mode only
   public void setOutput(double output) {
     mRoller.set(ControlMode.PercentOutput, output);
   }

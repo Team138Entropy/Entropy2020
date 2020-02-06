@@ -18,7 +18,6 @@ public class Storage extends Subsystem {
 
   private static final int STORAGE_CAPICTY = 5;
 
-  // TODO: Tune these values
   private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
 
@@ -105,14 +104,6 @@ public class Storage extends Subsystem {
 
   public void setTopOutput(double output) {
     mTopRoller.set(ControlMode.PercentOutput, output);
-  }
-
-  public void stopBottom() {
-    mBottomRoller.set(ControlMode.PercentOutput, 0);
-  }
-
-  public void stopTop() {
-    mTopRoller.set(ControlMode.PercentOutput, 0);
   }
 
   @Override

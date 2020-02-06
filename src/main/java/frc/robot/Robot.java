@@ -243,14 +243,14 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.isStorageRollerBottomTest()) {
       mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
     } else {
-      mStorage.stopBottom();
+      mStorage.setBottomOutput(0);
     }
 
     // Top storage rollers ON while button held
     if (mOperatorInterface.isStorageRollerTopTest()) {
       mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
     } else {
-      mStorage.stopTop();
+      mStorage.setTopOutput(0);
     }
 
     // Shooter roller ON while button held

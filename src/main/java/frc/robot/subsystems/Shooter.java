@@ -110,6 +110,7 @@ public class Shooter extends Subsystem {
     return mRollerVelocity > TARGET_ROLLER_VELOCITY;
   }
 
+  // Used in TEST mode only
   public void setOutput(double output) {
     mTestRoller.set(ControlMode.PercentOutput, output);
   }

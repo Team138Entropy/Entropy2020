@@ -11,7 +11,10 @@ public class Config {
 
   public enum Key {
     // Motors
-    //DRIVE__LEFT_FRONT_PORT()
+    DRIVE__LEFT_BACK_PORT(1),
+    DRIVE__LEFT_FRONT_PORT(2),
+    DRIVE__RIGHT_BACK_PORT(3),
+    DRIVE__RIGHT_FRONT_PORT(4),
     INTAKE__ROLLER(10),
     STORAGE__BOTTOM_ROLLER(8),
     STORAGE__TOP_ROLLER(7),
