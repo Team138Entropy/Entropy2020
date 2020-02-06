@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.lang.Math;
+import frc.robot.util.geometry.*;
 /*
   Constants
   Any 
@@ -32,6 +34,9 @@ public class Constants {
   public static final double kDriveWheelTrackRadiusWidthMeters =
       kDriveWheelTrackWidthInches / 2.0 * 0.0254;
 
+  //Drive Encoder Port
+  public static final int kDriveGyroPort = 0;
+
   // Based on how this is used, I'm pretty sure this is a corrective factor
   public static final double kTrackScrubFactor = 1.0469745223;
   public static final double kDriveVoltageRampRate = 0.0;
@@ -51,8 +56,26 @@ public class Constants {
   public static final double kTrackSwitchingWeight = 100.0;
   public static final double kCameraFrameRate = 90.0; // fps
 
-  // Field Related Constants
-  public static final double kHighGoalHeight = 96.25; // Center Goal Height
+   //Camera Specific Information
+   public static final double kCameraDiagonalView = Math.toRadians(75);
+   public static final double kCameraHorizontalAspect = 4;
+   public static final double kCameraVerticalAspect = 3;
+   public static final double kDiagonalAspect = Math.hypot(kCameraHorizontalAspect, kCameraVerticalAspect);
+   public static final double kCameraHorizontalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView)) * 2;
+   public static final double kCameraVerticalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView)) * 2;
+   public static final Rotation2d kShooterCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(0); //Shooter should sit pretty flat
+   public static final Rotation2d kBallCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(-15); //camera is angled downards
+   public static final double kShooterCameraHeight = 40; //shooter camera height on robot (inches)
+   public static final double kBallCameraHeight = 15; //ball camera height
+   
+   //Offsets from our center point
+   public static final Pose2d kTurrentToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 
+   public static final Pose2d kWheelsToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 
+
+
+  //Field Related Constants
+  public static final double kHighGoalHeight = 96.25; //Center Goal Height
+  public static final double kBallHeight = 10; //ball height (inches)
 
 
 
@@ -60,6 +83,6 @@ public class Constants {
   //Dyanmic Config System is loaded into true java constants
   //Doing this allows java to optimize around these values
   static {
-    
+    //Open Constants System and load into static variables
   };
 }

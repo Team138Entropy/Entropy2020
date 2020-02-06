@@ -63,7 +63,7 @@ public class Robot extends TimedRobot {
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
   // Robot State
-  private final RobotState mRobotState = RobotState.getInstance();
+  private final RobotTracker mRobotTracker = RobotTracker.getInstance();
 
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
@@ -107,7 +107,6 @@ public class Robot extends TimedRobot {
     visionLight.set(Relay.Value.kForward);
 
     // Reset Robot State - Note starting position of the Robot
-    // This starting Rotation, X, Y is now the Zero Point
     EventWatcherThread.getInstance().start();
 
     // prepare the network table
@@ -118,23 +117,13 @@ public class Robot extends TimedRobot {
     
     // Reset Robot State
     // Wherever the Robot is now is the starting position
-    mRobotState.reset();
+    // This starting Rotation, X, Y is now the Zero Point
+    mRobotTracker.reset();
 
     // Set the initial Robot State
     mState = State.INTAKE;
 
-    // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mTurret = Turret.getInstance();
-    }
-
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
-      //mDrive = Drive.getInstance();
-    }
-
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
-      mBallIndicator = BallIndicator.getInstance();
-    }
+    
   }
 
   /*
