@@ -357,15 +357,6 @@ public class Robot extends TimedRobot {
 
     driveTrainLoop();
 
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
-      mBallIndicator.checkTimer();
-    }
-
-    // Climb
-    if (mOperatorInterface.getClimb()) {
-      // climb!
-    }
-
     // Operator Controls
     if (mOperatorInterface.getTurretAdjustLeft()) {
       // manual turret aim
@@ -376,17 +367,6 @@ public class Robot extends TimedRobot {
     // Camera Swap
     if (mOperatorInterface.getCameraSwap()) {
       // Swap Camera!
-    }
-
-    // Shoot
-    if (mOperatorInterface.getShoot()) {
-      // Shoot!
-    }
-
-    // Load chamber
-    // NOTE: This may or may not be necessary depending on how our sensor pack turns out
-    if (mOperatorInterface.getLoadChamber()) {
-      // Load chamber!
     }
   }
 
