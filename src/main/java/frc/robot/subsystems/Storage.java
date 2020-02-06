@@ -20,7 +20,7 @@ public class Storage extends Subsystem {
 
   private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
+  private static final double SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
   private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
 
   private WPI_TalonSRX mBottomRoller;
