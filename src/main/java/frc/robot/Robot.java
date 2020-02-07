@@ -400,7 +400,7 @@ public class Robot extends TimedRobot {
         break;
       case READY_TO_INTAKE:
         // If the operator issues the intake command, start intake
-        if (mOperatorInterface.getLoadChamber()) {
+        if (mOperatorInterface.startIntake()) {
           mIntakeState = IntakeState.INTAKE;
         }
         break;

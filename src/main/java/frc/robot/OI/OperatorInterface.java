@@ -99,7 +99,7 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
 
-  public boolean getLoadChamber() {
+  public boolean startIntake() {
     return OperatorController.getButton(NykoController.Button.BUTTON_1);
   }
 
