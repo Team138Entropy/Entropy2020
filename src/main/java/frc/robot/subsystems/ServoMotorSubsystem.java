@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.Constants;
 import frc.robot.util.loops.ILooper;
-import frc.robot.util.loops.Loop;;
+import frc.robot.util.loops.Loop;
 import frc.robot.util.drivers.TalonSRXFactory;
 import frc.robot.util.drivers.TalonSRXUtil;
 import frc.robot.util.motion.MotionProfileConstraints;
