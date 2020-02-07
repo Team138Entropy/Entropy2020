@@ -17,7 +17,7 @@ while(True):
     data['y'] = 100
     data['yaw'] = 100
     data['dis'] = 100
-    data['targid'] = 0
+    data['targid'] = 1
 
     print("Send Packet")
     data_string = json.dumps(data)

@@ -130,7 +130,7 @@ public class RobotState {
 
             //Get Turrets Error to the Goal
             Rotation2d turret_error;
-            turret_error = getVehicleToTurret(timestamp).getRotation().inverse().rotateBy(SelectedTarget.get().getRobotToGoalRotation();
+            //turret_error = getVehicleToTurret(timestamp).getRotation().inverse().rotateBy(SelectedTarget.get().getRobotToGoalRotation();
 
         }else{
             //Ball
