@@ -17,7 +17,7 @@ public class Storage extends Subsystem {
   private static final int INTAKE_SENSOR_PORT =
       Config.getInstance().getInt(Key.INTAKE__SENSOR);
 
-  private static final int STORAGE_CAPICTY = 5;
+  private static final int STORAGE_CAPICTY = 4;
 
   private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
@@ -53,7 +53,8 @@ public class Storage extends Subsystem {
   // }
 
   public boolean isBallStored() {
-    return (!mIntakeSensor.get());
+    System.out.println("intake sensor " + mIntakeSensor.get() + " on port " + mIntakeSensor.getChannel());
+    return mIntakeSensor.get();
   }
 
   public void preloadBalls(int ballCount) {

@@ -3,7 +3,7 @@ package frc.robot.events;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Logger;
 import frc.robot.commands.StopBallStorage;
-import frc.robot.subsystems.Storage;
+import frc.robot.subsystems.Intake;
 
 public class BallStored implements Event {
   Logger mLogger;
@@ -13,7 +13,7 @@ public class BallStored implements Event {
   }
 
   public boolean check() {
-    return (Storage.getInstance().isBallStored());
+    return (!Intake.getInstance().isBallDetected());
   }
 
   public Command getCommand() {

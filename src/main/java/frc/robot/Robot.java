@@ -113,8 +113,8 @@ public class Robot extends TimedRobot {
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
-    mCameraManager = CameraManager.getInstance();
-    mCameraManager.init();
+    // mCameraManager = CameraManager.getInstance();
+    // mCameraManager.init();
     
     // Reset Robot State
     // Wherever the Robot is now is the starting position
@@ -122,6 +122,9 @@ public class Robot extends TimedRobot {
 
     // Set the initial Robot State
     mState = State.INTAKE;
+    mIntakeState = IntakeState.IDLE;
+    mClimingState = ClimingState.IDLE;
+    mShootingState = ShootingState.IDLE;
 
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
@@ -159,7 +162,7 @@ public class Robot extends TimedRobot {
   }
 
   private void updateSmartDashboard() {
-    SmartDashboard.putString("BallCounter", "BallValue" + mStorage.getBallCount());
+    SmartDashboard.putNumber("BallCounter", mStorage.getBallCount());
     // TODO: change this to the real boolean
     SmartDashboard.putBoolean("ShooterFull", false);
     // TODO: decide if this is necessary and hook it up
@@ -170,7 +173,9 @@ public class Robot extends TimedRobot {
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
 
-    SmartDashboard.putBoolean("StorageSensor", mIntake.isBallDetected());
+    SmartDashboard.putBoolean("Ball Detected", mIntake.isBallDetected());
+    
+    SmartDashboard.putBoolean("Ball Stored", mStorage.isBallStored());
 
     SmartDashboard.putString("RobotState", mState.name());
 
@@ -201,13 +206,18 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
 
+    mStorage.preloadBalls(0);
+
+    // Set the initial Robot State
+    mState = State.INTAKE;
+    mIntakeState = IntakeState.IDLE;
+    mClimingState = ClimingState.IDLE;
+    mShootingState = ShootingState.IDLE;
+
     mStorage.init();
     mDrive.init();
 
     Config.getInstance().reload();
-
-    mState = State.INTAKE;
-    mIntakeState = IntakeState.READY_TO_INTAKE;
   }
 
   @Override
@@ -397,10 +407,14 @@ public class Robot extends TimedRobot {
     switch (mIntakeState) {
       case IDLE:
         mRobotLogger.warn("Intake state is idle");
+        mIntake.stop();
+        mStorage.stop();
+        mIntakeState = IntakeState.READY_TO_INTAKE;
         break;
       case READY_TO_INTAKE:
         // If the operator issues the intake command, start intake
         if (mOperatorInterface.startIntake()) {
+          mIntake.resetOvercurrentCooldown();
           mIntakeState = IntakeState.INTAKE;
         }
         break;

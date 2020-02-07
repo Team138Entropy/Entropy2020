@@ -11,6 +11,9 @@ public class Intake extends Subsystem {
   private Logger mLogger = new Logger("intake");
   private int mOverCurrentCount = 0;
 
+  // initial cooldown because our startup of the roller induces a countdown
+  private int mOverCurrentCountdown = 30;
+
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
 
   // TODO: Tune these values
@@ -32,6 +35,10 @@ public class Intake extends Subsystem {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
   }
 
+  public void resetOvercurrentCooldown(){
+    mOverCurrentCountdown = 30;
+  }
+
   public void start() {
     mRoller.set(ControlMode.PercentOutput, ROLLER_SPEED);
   }
@@ -48,9 +55,13 @@ public class Intake extends Subsystem {
 
   public boolean isBallDetected(){
     mLogger.log("Input current: " + mRoller.getSupplyCurrent() + ", Output current: " + mRoller.getStatorCurrent());
-
+    
+    if(mOverCurrentCountdown > 0){
+      mOverCurrentCountdown --;
+      return false;
+    }
+    
     double current = mRoller.getSupplyCurrent();
-    mLogger.log("got current " + current);
     if (current > Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)){
       mOverCurrentCount++;
       mLogger.log("debounce overcurrent " + mOverCurrentCount);
