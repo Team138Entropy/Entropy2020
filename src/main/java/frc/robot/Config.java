@@ -33,7 +33,7 @@ public class Config {
     OI__VISION__POT__MAX(100d),
     OI__VISION__PID__P(0.3d),
     OI__VISION__PID__I(0.003d),
-    OI__VISION__PID__D(0),
+    OI__VISION__PID__D(0.0),
 
     ROBOT__HAS_DRIVETRAIN(true),
     ROBOT__HAS_TURRET(false),
@@ -86,7 +86,7 @@ public class Config {
   }
 
   public void reload() {
-    this.cfg.reload();
+   this.cfg.reload();
 
     // check that each key is there
     for (Key key : Key.values()) {

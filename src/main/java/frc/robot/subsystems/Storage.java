@@ -35,7 +35,7 @@ public class Storage extends Subsystem {
 
   private Storage() {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
-    mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
+   // mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
   public boolean isBallDetected() {
@@ -92,4 +92,7 @@ public class Storage extends Subsystem {
 
   @Override
   public void checkSubsystem() {}
+
+  @Override
+  public void stopSubsytem(){}
 }

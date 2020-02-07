@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-import frc.robot.Config;
-import frc.robot.Config.Key;
 import frc.robot.Constants;
 import frc.robot.Logger;
-import frc.robot.OI.OperatorInterface;
+import edu.wpi.first.wpilibj.Encoder;
+
+
 
 /**
  * This Turret singleton extends WPILIB's PID subsystem via @Overriding methods use enable(),
@@ -20,11 +20,14 @@ import frc.robot.OI.OperatorInterface;
 public class Turret extends PIDSubsystem {
   private static Turret sInstance;
 
-  private Logger mTurretLogger;
-  private WPI_TalonSRX mTurretTalon;
+  private final Logger mTurretLogger;
+  private final WPI_TalonSRX mTurretTalon;
+  private final Encoder mTurretEncoder;
   private Potentiometer mPot;
 
-  private Relay cameraLight = new Relay(Constants.kCameraRingId);
+
+
+ // private Relay cameraLight = new Relay(Constants.kCameraRingId);
 
   // the target position (on a scale from 0 to 100)
   private double mManualTargetPos = 50;
@@ -43,16 +46,14 @@ public class Turret extends PIDSubsystem {
     // Set PID values
     super(
         new PIDController(
-            Config.getInstance().getDouble(Key.OI__VISION__PID__P),
-            Config.getInstance().getDouble(Key.OI__VISION__PID__I),
-            Config.getInstance().getDouble(Key.OI__VISION__PID__D)));
+          Constants.kPIDController_P,
+          Constants.kPIDController_I,
+          Constants.kPIDController_D
+        ));
     mTurretLogger = new Logger("turret");
-    mTurretTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
-    mPot =
-        new AnalogPotentiometer(
-            Config.getInstance().getInt(Key.ROBOT__POT__LOCATION),
-            Config.getInstance().getFloat(Key.ROBOT__POT__RANGE),
-            Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
+    mTurretTalon = new WPI_TalonSRX(Constants.kTurretTalonMotorPort);
+    mTurretEncoder = new Encoder(Constants.kTurretEncoderA, Constants.kTurrentEncoderB, false);
+
   }
 
   /**
@@ -74,9 +75,9 @@ public class Turret extends PIDSubsystem {
   @Override
   protected void useOutput(double output, double unused) {
     // limit the output to prevent the motor from going too fast
-    output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
-    mTurretLogger.verbose("pid out " + output);
-    mTurretTalon.set(ControlMode.PercentOutput, output);
+    //output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
+    //mTurretLogger.verbose("pid out " + output);
+    //mTurretTalon.set(ControlMode.PercentOutput, output);
   }
 
   /** @return the raw POT value */
@@ -86,9 +87,9 @@ public class Turret extends PIDSubsystem {
 
   /** Run this every tick. */
   public void loop() {
-    float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
-    float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
-
+    //float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
+    //float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
+    /*
     boolean allowMovement = (mPot.get() < potMax && mPot.get() > potMin);
     mTurretLogger.silly(
         "allow movement "
@@ -117,15 +118,17 @@ public class Turret extends PIDSubsystem {
                 + " : "
                 + OperatorInterface.getInstance().getTurretAdjustRight());
       }
+    
     } else {
       if (this.isEnabled()) disable();
       mTurretLogger.verbose("movement blocked");
     }
     // run the PIDSubsystem system's loop
     this.periodic();
+      */
   }
 
   public void setCameraLight(boolean on) {
-    cameraLight.set(on ? Relay.Value.kOn : Relay.Value.kOff);
+    //cameraLight.set(on ? Relay.Value.kOn : Relay.Value.kOff);
   }
 }

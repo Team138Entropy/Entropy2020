@@ -6,20 +6,34 @@ import frc.robot.Config.Key;
 import frc.robot.util.geometry.*;
 /*
   Constants
-  Any 
+  Any thing used throughout the classes that dosen't need to be changed
+  Or something that feels like a setting that we don't want to buy too much
 
 
+  Interfaces to the config class (static constructor at bottom) to load in the config's
+  parsed values
 */
 public class Constants {
   // Controller Ports
   public static final int OperatorControllerPort = 1;
   public static final int DriverControllerPort = 0;
 
-  // Talon Variables
+  // Drive Talon Variables
   public static final int kLeftDriveMasterId = 1;
   public static final int kLeftDriveSlaveId = 2;
   public static final int kRightDriveMasterId = 3;
   public static final int kRightDriveSlaveId = 4;
+
+  // Drive Encoder Ports
+  public static final int kLeftDriveEncoderPortA = 0;
+  public static final int kLeftDriveEncoderPortB = 1;
+  public static final int kRightDriveEncoderPortA = 2;
+  public static final int kRightDriveEncoderPortB = 3;
+
+  //Encoder Pulse Per Revolution PPR
+  //number of high pulses an encoder will have on either of its square waves over a revolution
+  public static final double kDriveEncoderPPR = 1000.0;
+
 
   // Solenoid Constants
   public static final int kPCMId = 1;
@@ -40,6 +54,15 @@ public class Constants {
   //Intake
   public static final int kIntakeRollerPort;
 
+  //Turret
+  public static final int kTurretTalonMotorPort;
+  public static final double kPIDController_P;
+  public static final double kPIDController_I;
+  public static final double kPIDController_D;
+  public static final int kTurretEncoderA = 4;
+  public static final int kTurrentEncoderB = 5;
+
+
   //Storage
   //public static final int k
 
@@ -57,7 +80,7 @@ public class Constants {
 
   // Vision Tracking Constants
   public static final double kMaxTrackerDistance = 60.0;
-  public static final double kMaxGoalTrackAge = 15.0; //originally was 3, lets tune this down!
+  public static final double kMaxGoalTrackAge = 5.0; //originally was 3, lets tune this down!
   public static final double kMaxGoalTrackAgeNotTracking = 0.1;
   public static final double kMaxGoalTrackSmoothingTime = 0.5;
   public static final double kTrackStabilityWeight = 0.0;
@@ -86,6 +109,9 @@ public class Constants {
   public static final double kHighGoalHeight = 96.25; //Center Goal Height
   public static final double kBallHeight = 10; //ball height (inches)
 
+  //Looper System
+  public static final double kLooperDt = 0.01;
+
 
 
   //Constant Intialization!
@@ -100,7 +126,15 @@ public class Constants {
     //Now our values are dynamically loaded in
     //lets now load these to our variables!
     
+    //Intake
     kIntakeRollerPort = mConfig.getInt(Key.INTAKE__ROLLER_PORT);
+
+    //Turret
+    kTurretTalonMotorPort = mConfig.getInt(Key.ROBOT__TURRET__TALON_LOCATION);
+    kPIDController_P = mConfig.getDouble(Key.OI__VISION__PID__P);
+    kPIDController_I = mConfig.getDouble(Key.OI__VISION__PID__I);
+    kPIDController_D = mConfig.getDouble(Key.OI__VISION__PID__D);
+
 
   };
 }

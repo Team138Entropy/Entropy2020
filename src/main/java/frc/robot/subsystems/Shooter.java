@@ -110,4 +110,7 @@ public class Shooter extends Subsystem {
 
   @Override
   public void checkSubsystem() {}
+
+  @Override
+  public void stopSubsytem(){}
 }

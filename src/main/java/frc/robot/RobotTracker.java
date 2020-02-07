@@ -158,7 +158,7 @@ public class RobotTracker{
         mRobot_to_Turret.put(new InterpolatingDouble(timestamp), observation);
     }
 
-
+    //called from the robot tracker updater method
     public synchronized void addDriveObservations(double timestamp, Twist2d displacement, Twist2d measured_velocity,
                                              Twist2d predicted_velocity) {
         mRobot_Distance_Driven += displacement.dx;
@@ -246,7 +246,7 @@ public class RobotTracker{
         double distance = target.getDistance();
         Rotation2d angle = new Rotation2d(x, y, true);
 
-        System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
+       // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
 
         return new Translation2d(distance * angle.cos(), distance * angle.sin());
 
@@ -387,6 +387,9 @@ public class RobotTracker{
     //this is the function the turret will use to correct to
     public synchronized Rotation2d GetTurretError(double timestamp){
         Optional<AimingParameters> mLatestAimingParameters = getAimingParameters(true, -1, Constants.kMaxGoalTrackAge);
+
+        //check age here to make sure we didn't loose packets and this isn't really old
+
         if(mLatestAimingParameters.isPresent()){
             //We have Aiming Parameters!
 

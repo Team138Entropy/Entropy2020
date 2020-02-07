@@ -197,5 +197,8 @@ public class VisionManager extends Subsystem {
     */
     public void checkSubsystem() {}
 
+    @Override
+    public void stopSubsytem(){}
+
 
 }

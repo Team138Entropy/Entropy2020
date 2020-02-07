@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
+import frc.robot.util.loops.Looper;
 import java.util.Optional;
 
 /**
@@ -58,12 +58,39 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
 
+  //NEW STATES
+
+  //Turret Aiming State
+  private enum AimState {
+    AUTO_AIM,
+    MANUAL_AIM
+  };
+
+  private enum ShootState {
+    AUTO_SHOOT, 
+    MANUAL_SHOOT
+  };
+
+  private enum DriveState {
+    MANUAL_DRIVE,
+    AUTO_STEER
+  };
+
+  //States Initalization
+  private AimState mAimState = AimState.AUTO_AIM;
+  private ShootState mShootState = ShootState.MANUAL_SHOOT;
+  private DriveState mDriveState = DriveState.MANUAL_DRIVE;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
-  // Robot State
+  // Robot Tracker and Robot Update Tracker
   private final RobotTracker mRobotTracker = RobotTracker.getInstance();
+  private final RobotTrackerUpdater mRobotTrackerUpdater = RobotTrackerUpdater.getInstance();
+
+  //Loopers
+  //Less important task running systems
+  private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
 
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
@@ -74,6 +101,7 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private final Drive mDrive = Drive.getInstance();
+  private Turret mTurret = Turret.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -81,10 +109,7 @@ public class Robot extends TimedRobot {
 
   public Relay visionLight = new Relay(0);
 
-  // Control Variables
-  private LatchedBoolean AutoAim = new LatchedBoolean();
-  private LatchedBoolean HarvestAim = new LatchedBoolean();
-  private Turret mTurret;
+
   static NetworkTable mTable;
 
   // Fire timer for shooter
@@ -100,6 +125,11 @@ public class Robot extends TimedRobot {
     // Zero all nesscary sensors on Robot
 
     mRobotLogger.log("robot init _ 1");
+
+    //Register the Enabled Looper
+    //Used to run background tasks!
+    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+
 
     // Zero all nesscary sensors on Robot
     ZeroSensors();
@@ -129,11 +159,14 @@ public class Robot extends TimedRobot {
     Cool!
   */
   public boolean getLowPSI() {
+    /*
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
       return mCompressor.getPressureSwitchValue();
     } else {
       return false;
     }
+    */
+    return false;
   }
 
   /*
@@ -166,12 +199,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    mRobotLogger.log("Auto Init Called");
-
-
-
-    //
-    System.out.println("----");
+    mEnabledLooper.start(); //begin background tasks
   }
 
   @Override
@@ -184,8 +212,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    mRobotLogger.log("Teleop Init!");
 
+    mEnabledLooper.start();
 
     mState = State.INTAKE;
     mIntakeState = IntakeState.READY_TO_INTAKE;
@@ -207,7 +235,6 @@ public class Robot extends TimedRobot {
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
 
-    Config.getInstance().reload();
     mSubsystemManager.checkSubsystems();
   }
 
@@ -238,6 +265,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 
+    //Turn off background task
+    mEnabledLooper.stop();
   }
 
   @Override
@@ -245,13 +274,10 @@ public class Robot extends TimedRobot {
 
   }
 
-  public void turretLoop() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mTurret.loop();
-    }
-  }
+ 
 
   public void driveTrainLoop() {
+    /*
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
@@ -288,12 +314,62 @@ public class Robot extends TimedRobot {
         mDrive.setDrive(driveThrottle, driveTurn, false);
       }
     }
+    */
   }
+
+
+
+  public void RobotLoop(){
+    turretLoop();
+    driveLoop();
+  }
+
+
+  public void turretLoop() {
+    switch(mAimState){
+      case AUTO_AIM: {
+        //VIsion Handles Aiming
+        Rotation2d VisionError = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+        System.out.println("VISION ERROR: " + VisionError.getDegrees());
+
+
+        //            mTurret.setSetpointPositionPID(mCurrentSetpoint.state.turret, mTurretFeedforwardV);
+
+        break;
+      }case MANUAL_AIM: {
+        //operator controls turret
+
+        break;
+      }
+    };
+  }
+
+  private void driveLoop(){
+    double driveThrottle = mOperatorInterface.getDriveThrottle();
+    double driveTurn = mOperatorInterface.getDriveTurn();
+    boolean driveShift = mOperatorInterface.getDriveShift();
+    boolean autoDrive = false;
+
+    //Drive Logic
+    switch(mDriveState){
+      case MANUAL_DRIVE: {
+        //Manually Drive the robot used
+        mDrive.setDrive(driveThrottle, driveTurn, false);
+        break;
+      }
+      case AUTO_STEER: {
+        //Allow the Driver to only control the thottle
+
+      }
+
+    } //End Drive State
+  }
+
 
   /*
     Called constantly, houses the main functionality of robot
   */
-  public void RobotLoop() {
+  public void RobotLoop2() {
     updateSmartDashboard();
 
     executeRobotStateMachine();
@@ -302,9 +378,11 @@ public class Robot extends TimedRobot {
 
     driveTrainLoop();
 
+    /*
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator.checkTimer();
     }
+    */
 
     // Climb
     if (mOperatorInterface.getClimb()) {

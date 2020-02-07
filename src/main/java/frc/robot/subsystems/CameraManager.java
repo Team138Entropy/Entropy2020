@@ -56,6 +56,9 @@ public class CameraManager extends Subsystem {
   public void zeroSensors() {}
 
   @Override
+  public void stopSubsytem(){}
+
+  @Override
   public void checkSubsystem() {
     if (frontCamera.isEnabled()) {
       mLogger.info("Front camera ready");

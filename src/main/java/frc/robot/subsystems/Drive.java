@@ -14,12 +14,21 @@ import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
 
   // Drive Talons
-  private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
+  private final WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
+
+  //Drive Encoders
+  private final Encoder mLeftEncoder, mRightEncoder;
+
+  //Robot Gyro
+  private final ADXRS450_Gyro mGyro;
 
   private Solenoid mGearSolenoid; // Gear Shifting Solenoid
   // private final Solenoid mShifter;
@@ -37,6 +46,8 @@ public class Drive extends Subsystem {
   private PeriodicIO mPeriodicIO;
   private Logger mDriveLogger;
 
+
+  //Class containing information for periodic updates
   public static class PeriodicIO {
     // INPUTS
     public double timestamp;
@@ -60,6 +71,34 @@ public class Drive extends Subsystem {
     public double right_feedforward;
   }
 
+  @Override
+  public synchronized void readPeriodicInputs() {
+      mPeriodicIO.timestamp = Timer.getFPGATimestamp();
+      double prevLeftTicks = mPeriodicIO.left_position_ticks;
+      double prevRightTicks = mPeriodicIO.right_position_ticks;
+
+      mPeriodicIO.left_voltage = mLeftMaster.getMotorOutputVoltage() * mLeftMaster.getBusVoltage();
+      mPeriodicIO.right_voltage = mRightMaster.getMotorOutputVoltage() * mRightMaster.getBusVoltage();
+
+      mPeriodicIO.left_position_ticks = mLeftEncoder.get();
+      mPeriodicIO.right_position_ticks = mRightEncoder.get();
+      mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mGyro.getAngle());
+
+      double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / Constants.kDriveEncoderPPR)
+              * Math.PI;
+      mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
+
+      double deltaRightTicks = ((mPeriodicIO.right_position_ticks - prevRightTicks) / Constants.kDriveEncoderPPR)
+              * Math.PI;
+      mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
+
+      mPeriodicIO.left_velocity_ticks_per_100ms = (int) (mLeftEncoder.getRate()
+              / (10 * mLeftEncoder.getDistancePerPulse()));
+      mPeriodicIO.right_velocity_ticks_per_100ms = (int) (mRightEncoder.getRate()
+              / (10 * mRightEncoder.getDistancePerPulse()));
+
+  }
+
   public static synchronized Drive getInstance() {
     if (mInstance == null) {
       mInstance = new Drive();
@@ -74,16 +113,27 @@ public class Drive extends Subsystem {
     // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
 
     mLeftMaster = new WPI_TalonSRX(Constants.kLeftDriveMasterId);
-    // configureSpark(mLeftMaster, true, true);
 
     mLeftSlave = new WPI_TalonSRX(Constants.kLeftDriveSlaveId);
-    // configureSpark(mLeftSlave, true, false);
 
     mRightMaster = new WPI_TalonSRX(Constants.kRightDriveMasterId);
-    // configureSpark(mRightMaster, false, true);
 
     mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
-    // configureSpark(mRightSlave, false, false);
+
+    //Encoder Intialization
+    //last argument is to reverse directions!
+    mLeftEncoder = new Encoder(Constants.kLeftDriveEncoderPortA, Constants.kLeftDriveEncoderPortB, false);
+    mRightEncoder = new Encoder(Constants.kRightDriveEncoderPortA, Constants.kRightDriveEncoderPortB, true);
+
+    //Configure Distance Per Pulse
+    mLeftEncoder.setDistancePerPulse(Constants.kDriveWheelDiameterInches * Math.PI / Constants.kDriveEncoderPPR);
+    mRightEncoder.setDistancePerPulse(Constants.kDriveWheelDiameterInches * Math.PI / Constants.kDriveEncoderPPR);
+
+    //Intialize Gyro on RoboRio
+    mGyro = new ADXRS450_Gyro();
+    mGyro.reset();
+    mGyro.calibrate();
+
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
       mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
@@ -123,7 +173,25 @@ public class Drive extends Subsystem {
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
-  public void zeroSensors() {}
+
+  //Clear Everything and start a new periodic IO container
+  public synchronized void resetEncoders() {
+    mLeftEncoder.reset();
+    mRightEncoder.reset();
+    mPeriodicIO = new PeriodicIO();
+  }
+
+  public synchronized void resetGyro(){
+    //TODO: Find proper order of this
+    mGyro.calibrate();
+    mGyro.reset();
+  }
+
+
+  public void zeroSensors() {
+    resetEncoders();
+    resetGyro();
+  }
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
@@ -141,14 +209,6 @@ public class Drive extends Subsystem {
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
-    // add a "minimum"
-    if (throttle >= .17) {
-      throttle = .17;
-    }
-
-    if (throttle <= -.17) {
-      throttle = -.17;
-    }
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -227,23 +287,79 @@ public class Drive extends Subsystem {
   */
   public void checkSubsystem() {}
 
-  public synchronized double getLeftEncoderDistance() {
-    return 0.0;
+  
+
+
+  private static double rotationsToInches(double rotations) {
+      return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
   }
 
-  public synchronized double getRightEncoderDistance() {
-    return 0.0;
+  private static double rpmToInchesPerSecond(double rpm) {
+      return rotationsToInches(rpm) / 60;
   }
 
-  public synchronized Rotation2d getRotation() {
-    return null;
+  private static double inchesToRotations(double inches) {
+      return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
   }
 
-  public double getLeftLinearVelocity() {
-    return 0;
+  private static double inchesPerSecondToRpm(double inches_per_second) {
+      return inchesToRotations(inches_per_second) * 60;
+  }
+
+  private static double radiansPerSecondToTicksPer100ms(double rad_s) {
+      return rad_s / (Math.PI * 2.0) * Constants.kDriveEncoderPPR / 10.0;
+  }
+
+
+    public double getLeftEncoderRotations() {
+      return mPeriodicIO.left_position_ticks / Constants.kDriveEncoderPPR;
+  }
+
+  public double getRightEncoderRotations() {
+      return mPeriodicIO.right_position_ticks / Constants.kDriveEncoderPPR;
+  }
+
+  public double getLeftEncoderDistance() {
+      return rotationsToInches(getLeftEncoderRotations());
+  }
+
+  public double getRightEncoderDistance() {
+      return rotationsToInches(getRightEncoderRotations());
+  }
+
+  public double getRightVelocityNativeUnits() {
+      return mPeriodicIO.right_velocity_ticks_per_100ms;
   }
 
   public double getRightLinearVelocity() {
-    return 0;
+      return rotationsToInches(getRightVelocityNativeUnits() * 10.0 / Constants.kDriveEncoderPPR);
   }
+
+  public double getLeftVelocityNativeUnits() {
+      return mPeriodicIO.left_velocity_ticks_per_100ms;
+  }
+
+  public double getLeftLinearVelocity() {
+      return rotationsToInches(getLeftVelocityNativeUnits() * 10.0 / Constants.kDriveEncoderPPR);
+  }
+
+  public double getLinearVelocity() {
+      return (getLeftLinearVelocity() + getRightLinearVelocity()) / 2.0;
+  }
+
+  public double getAverageDriveVelocityMagnitude() {
+      return Math.abs(getLeftLinearVelocity()) + Math.abs(getRightLinearVelocity()) / 2.0;
+  }
+
+  public double getAngularVelocity() {
+      return (getRightLinearVelocity() - getLeftLinearVelocity()) / Constants.kDriveWheelTrackWidthInches;
+  }
+
+  public synchronized Rotation2d getHeading() {
+    return mPeriodicIO.gyro_heading;
+}
+
+  @Override
+  public void stopSubsytem(){}
+
 }
