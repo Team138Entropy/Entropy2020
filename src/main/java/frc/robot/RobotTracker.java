@@ -56,8 +56,8 @@ public class RobotTracker{
     //Goal Trackers
     //Each vision target is a goal
     //so goal trackers for balls, and high goal
-    private GoalTracker mVisionTarget_Ball;
-    private GoalTracker mVisionTarget_Goal;
+    private GoalTracker mVisionTarget_Ball = new GoalTracker(1);
+    private GoalTracker mVisionTarget_Goal = new GoalTracker(69);
 
     //Lists of Translations to the Vision Targets
     List<Translation2d> mCameraToVisionTarget_Ball = new ArrayList<>();
@@ -207,6 +207,9 @@ public class RobotTracker{
     }
 
     //Get translation 
+    /*
+
+    */
     private Translation2d getCameraToVisionTargetPose(TargetInfo target, boolean highgoal) {
         Rotation2d SelectedCameraRotation;
         double TargetHeight;
@@ -232,15 +235,31 @@ public class RobotTracker{
         double z = xz_plane_translation.y();
 
         // find intersection with the goal
-        double differential_height = LensHeight - TargetHeight;
+        //254's distance method
+        /*
+        double differential_height = TargetHeight - LensHeight;
+        double scaling = differential_height / z;
+        scaling = 20;
+        double distance = Math.hypot(x, y) * scaling;
+        */
+
+        double distance = target.getDistance();
+        Rotation2d angle = new Rotation2d(x, y, true);
+
+        System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
+
+        return new Translation2d(distance * angle.cos(), distance * angle.sin());
+
+        /*
         if ((z < 0.0) == (differential_height > 0.0)) {
             double scaling = differential_height / -z;
             double distance = Math.hypot(x, y) * scaling;
             Rotation2d angle = new Rotation2d(x, y, true);
             return new Translation2d(distance * angle.cos(), distance * angle.sin());
         }
+        */
 
-        return null;
+        //return null;
     }
 
     //updates the goal tracker!
@@ -338,6 +357,7 @@ public class RobotTracker{
 
         //return empty if nothing
         if(reports.isEmpty()){
+            //System.out.println("Returning Optional!");
             return Optional.empty();
         }
 

@@ -57,7 +57,7 @@ public class Constants {
 
   // Vision Tracking Constants
   public static final double kMaxTrackerDistance = 60.0;
-  public static final double kMaxGoalTrackAge = 3.0;
+  public static final double kMaxGoalTrackAge = 15.0; //originally was 3, lets tune this down!
   public static final double kMaxGoalTrackAgeNotTracking = 0.1;
   public static final double kMaxGoalTrackSmoothingTime = 0.5;
   public static final double kTrackStabilityWeight = 0.0;

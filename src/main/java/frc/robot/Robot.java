@@ -98,7 +98,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Zero all nesscary sensors on Robot
-    Config.getInstance().reload();
 
     mRobotLogger.log("robot init _ 1");
 
@@ -106,7 +105,6 @@ public class Robot extends TimedRobot {
     ZeroSensors();
     visionLight.set(Relay.Value.kForward);
 
-    // Reset Robot State - Note starting position of the Robot
     EventWatcherThread.getInstance().start();
 
     // prepare the network table
@@ -170,24 +168,24 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     mRobotLogger.log("Auto Init Called");
 
-    Config.getInstance().reload();
 
-    mState = State.SHOOTING;
-    mShootingState = ShootingState.PREPARE_TO_SHOOT;
-    mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
+
+    //
+    System.out.println("----");
   }
 
   @Override
   public void autonomousPeriodic() {
-    mRobotLogger.log("Auto Periodic");
-    updateSmartDashboard();
+    Rotation2d result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+
+    System.out.println("Auto Error: " + result.getDegrees());
+    //updateSmartDashboard();
   }
 
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
 
-    Config.getInstance().reload();
 
     mState = State.INTAKE;
     mIntakeState = IntakeState.READY_TO_INTAKE;
@@ -239,17 +237,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mTurret.disable();
-    }
-    Config.getInstance().reload();
+
   }
 
   @Override
   public void disabledPeriodic() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mRobotLogger.verbose("got pot value of " + mTurret.getPotValue());
-    }
+
   }
 
   public void turretLoop() {

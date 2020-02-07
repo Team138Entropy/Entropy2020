@@ -138,8 +138,9 @@ public class VisionManager extends Subsystem {
 
             } catch (Exception Targ) {
                 // Exception Thrown when Trying to retrieve values from json object
-                System.out.println("Packet Storing Exception: " + Targ.getMessage());
-            }
+                //System.out.println("Packet Storing Exception: " + Targ.getMessage());
+                return;
+            } 
         } catch (Exception e) {
             // Other Exception
             System.out.println("Parse Packet Exception: " + e.getMessage());

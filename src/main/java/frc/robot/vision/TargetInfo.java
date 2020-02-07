@@ -103,19 +103,26 @@ public class TargetInfo {
     }
 
     /*
+        From pixels to angles
         Convert Fields to Limelights vision concept
         0,0 is top left most corner
+        max,max is bottom right corner
         
-        double nY = -((y_pixels - 160.0) / 160.0);
-        double nZ = -((z_pixels - 120.0) / 120.0);
-        double y = Constants.kVPW / 2 * nY;
-        double z = Constants.kVPH / 2 * nZ;
+        example math:
+        (px, py) = pixel coordinates, 0,0 is the upper left, positive down to the right
+        (nx, ny), normalized pixel coordinates, 0,0 is center, positive right and up (typical grid)
+        
+        nx = (1/160) * (px - 159.5)
+        ny = (1/120) * (119.5 - py)
 
-
+        we can compute the size of the view plane rectangele
+        view plane width = vpw = 2.0*tan(horizontal_fov/2)
+        view plane height = vph = 2.0*tan(vertical_fov/2)
+        
+        x = vwp/2 * nx
+        y = vph/2 * ny
     */
     public void CalculateFields(){
-        double y = 0;
-        double z = 0;
         double nY = 0;
         double nZ = 0;
         //320x240 - ball camera
@@ -123,19 +130,27 @@ public class TargetInfo {
         switch(TargetType){
             case 0:
                 //packets from High Goal Camera
-                nY = -((y - 160.0)/160.0);
-                nZ = -((z - 120.0)/120.0);
+                //Height (z), horizontal (y)
+                nZ = (1.0/240.0) * (239.5 - z);
+                nY = (1.0/320.0) * (y - 319.5);
+
+                //nY = -((y - 320.0)/320.0);
+                //nZ = -((z - 240.0)/240.0);
                 y = (Constants.kCameraHorizontalView / 2) * nY;
                 z = (Constants.kCameraVerticalView / 2) * nZ;
             break;
             case 1:
                 //packets from Ball Tracking Camera
-                nY = -((y - 160.0)/160.0);
-                nZ = -((z - 120.0)/120.0);
+                nZ = (1.0/120.0) * (119.5 - z);
+                nY = (1.0/160.0) * (y - 159.5);
                 y = (Constants.kCameraHorizontalView / 2) * nY;
                 z = (Constants.kCameraVerticalView / 2) * nZ;
             break;
         }
+    }
+
+    public double getDistance(){
+        return distance;
     }
 
     public double getYaw(){
