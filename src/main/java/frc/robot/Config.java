@@ -50,6 +50,9 @@ public class Config {
 
     ROBOT__TURRET__TALON_LOCATION(1),
 
+    INTAKE__OVERCURRENT_THRESHOLD(12d),
+    INTAKE__OVERCURRENT_MIN_OCCURENCES(25),
+
     OI__VISION__PID__MAX_SPEED(0.25d);
 
     private Object value;

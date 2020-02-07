@@ -170,7 +170,7 @@ public class Robot extends TimedRobot {
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
 
-    SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
+    SmartDashboard.putBoolean("StorageSensor", mIntake.isBallDetected());
 
     SmartDashboard.putString("RobotState", mState.name());
 
@@ -410,7 +410,7 @@ public class Robot extends TimedRobot {
           mIntake.start();
 
           // If a ball is detected, store it
-          if (mStorage.isBallDetected()) {
+          if (mIntake.isBallDetected()) {
             mIntakeState = IntakeState.STORE_BALL;
           }
         }

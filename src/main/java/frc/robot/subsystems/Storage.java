@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Config;
+import frc.robot.Logger;
 import frc.robot.Config.Key;
 
 /** Add your docs here. */
@@ -47,9 +48,9 @@ public class Storage extends Subsystem {
   public void init() {
   }
 
-  public boolean isBallDetected() {
-    return (mIntakeSensor.get());
-  }
+  // public boolean isBallDetected() {
+  //   return (mIntakeSensor.get());
+  // }
 
   public boolean isBallStored() {
     return (!mIntakeSensor.get());

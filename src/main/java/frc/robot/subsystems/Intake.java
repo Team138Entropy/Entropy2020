@@ -3,10 +3,13 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Config;
+import frc.robot.Logger;
 import frc.robot.Config.Key;
 
 /** Add your docs here. */
 public class Intake extends Subsystem {
+  private Logger mLogger = new Logger("intake");
+  private int mOverCurrentCount = 0;
 
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
 
@@ -43,6 +46,26 @@ public class Intake extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, output);
   }
 
+  public boolean isBallDetected(){
+    mLogger.log("Input current: " + mRoller.getSupplyCurrent() + ", Output current: " + mRoller.getStatorCurrent());
+
+    double current = mRoller.getSupplyCurrent();
+    mLogger.log("got current " + current);
+    if (current > Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)){
+      mOverCurrentCount++;
+      mLogger.log("debounce overcurrent " + mOverCurrentCount);
+    }else{
+      mOverCurrentCount = 0;
+    }
+    if (mOverCurrentCount > Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)){
+      System.out.println("Overcurrent!");
+      mOverCurrentCount = 0;
+      return true;
+    }else{
+      return false;
+    }
+  }
+  
   @Override
   public void zeroSensors() {}
 
