@@ -343,13 +343,13 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop() {
-    updateSmartDashboard();
-
     executeRobotStateMachine();
 
     turretLoop();
 
     driveTrainLoop();
+
+    updateSmartDashboard();
 
     // Operator Controls
     if (mOperatorInterface.getTurretAdjustLeft()) {
