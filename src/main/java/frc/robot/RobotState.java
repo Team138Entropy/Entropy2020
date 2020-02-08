@@ -79,6 +79,9 @@ public class RobotState {
   private double update_prev_timestamp = -1.0;
   private Rotation2d update_prev_heading = null;
 
+  // Shuffleboard tracker var
+  private boolean highGoalTargetLocked = false;
+
   // Constructor for Robot State
   // Called upon RobotState startup, reset everything
   private RobotState() {
@@ -210,11 +213,15 @@ public class RobotState {
 
     Translation2d translation;
 
+    // Putting this here because I don't know where else it should go
+    highGoalTargetLocked = false;
+
     // Proceed based on target type
     if (ti.IsHighGoal() == true) {
       // High Goal!
       translation = getCameraToVisionTargetPose(true, ti);
       updateGoalTracker(timestamp, translation, vision_highgoal, false);
+      highGoalTargetLocked = true;
     } else {
       // Ball
       translation = getCameraToVisionTargetPose(false, ti);
@@ -502,4 +509,9 @@ public class RobotState {
 
   // not sure we need it!
   public synchronized void outputToSmartDashboard() {}
+
+  // Used for shuffleboard stuff only 
+  public synchronized boolean getHighGoalLocked() {
+    return highGoalTargetLocked;
+  }
 }

@@ -160,18 +160,12 @@ public class Robot extends TimedRobot {
 
   private void updateSmartDashboard() {
     SmartDashboard.putString("BallCounter", "BallValue" + mStorage.getBallCount());
-    // TODO: change this to the real boolean
-    SmartDashboard.putBoolean("ShooterFull", false);
-    // TODO: decide if this is necessary and hook it up
-    SmartDashboard.putBoolean("ShooterLoaded", false);
+    SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // TODO: also, finally, hook this up.
-    SmartDashboard.putBoolean("TargetLocked", false);
+    SmartDashboard.putBoolean("TargetLocked", mRobotState.getHighGoalLocked());
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
-
     SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
-
     SmartDashboard.putString("RobotState", mState.name());
 
     // TODO: cameras will go here eventually
