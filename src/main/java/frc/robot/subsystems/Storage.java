@@ -23,7 +23,9 @@ public class Storage extends Subsystem {
   private WPI_TalonSRX mLowerRoller;
   private WPI_TalonSRX mUpperRoller;
   private DigitalInput mIntakeSensor;
+  private boolean Running = false;
 
+  private double SpeedModifier = 1.0;
   
 
   private int mBallCount = 0;
@@ -78,24 +80,40 @@ public class Storage extends Subsystem {
   }
 
   public void storeBall() {
-    mLowerRoller.set(ControlMode.PercentOutput, .4);
-    mUpperRoller.set(ControlMode.PercentOutput, .5 );
+    Running = true;
+    mLowerRoller.set(ControlMode.PercentOutput, SpeedModifier * .4);
+    mUpperRoller.set(ControlMode.PercentOutput, SpeedModifier * .5 );
 
   }
 
   /** Stops the roller. */
   public void stop() {
+    Running = false;
     mLowerRoller.set(ControlMode.PercentOutput, 0);
     mUpperRoller.set(ControlMode.PercentOutput, 0);
 
+  }
+
+  public void invert(){
+    if(SpeedModifier == -1){
+      SpeedModifier = 1;
+    }else{
+      SpeedModifier = -1;
+    }
   }
 
   public void ejectBall() {
    // mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
+  
+
   public int getBallCount() {
     return mBallCount;
+  }
+
+  public synchronized boolean IsRunning(){
+    return Running;
   }
 
   @Override

@@ -46,6 +46,14 @@ public class OperatorInterface {
     return DriverController.getButton(XboxController.Button.Y);
   }
 
+  public boolean ToggleInnerRollers(){
+    return DriverController.getButton(XboxController.Button.X);
+  }
+
+  public boolean ToggleInnerRollersDirection(){
+    return DriverController.getButton(XboxController.Button.B);
+  }
+
 
 
 

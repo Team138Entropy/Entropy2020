@@ -14,13 +14,22 @@ import frc.robot.util.LatchedBoolean;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import frc.robot.util.loops.Looper;
+import frc.robot.Config;
+import frc.robot.Config.Key;
+
+import java.io.FileWriter;
 import java.util.Optional;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
  * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
+  WPI_TalonSRX intakeRoller = new WPI_TalonSRX(10);
+  WPI_TalonSRX upperIntake = new WPI_TalonSRX(8);
+  WPI_TalonSRX lowerIntake = new WPI_TalonSRX(7);
 
   // State variables
   public enum State {
@@ -90,6 +99,9 @@ public class Robot extends TimedRobot {
   private LatchedBoolean mIntakeToggle = new LatchedBoolean();
   private LatchedBoolean mIntakeReverse = new LatchedBoolean();
 
+  private LatchedBoolean mInnerIntakeToggle = new LatchedBoolean();
+  private LatchedBoolean mInnerIntakeReverse = new LatchedBoolean();
+
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
@@ -125,6 +137,7 @@ public class Robot extends TimedRobot {
   private Timer mFireTimer = new Timer();
 
   Logger mRobotLogger = new Logger("robot");
+  FileWriter writer;
 
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
@@ -132,6 +145,13 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Zero all nesscary sensors on Robot
+
+    try{
+      writer = new FileWriter("/U/output_newincrementagain4.csv");
+        System.out.println("OPENED FILE WRITER!");
+    }catch(Exception e){
+      System.out.println("EXCEPTION! " + e.getMessage());
+    }
 
     mRobotLogger.log("robot init _ 1");
 
@@ -231,6 +251,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    String intakeVals = ("Intake Roller: " + Double.toString(intakeRoller.getSupplyCurrent()) +
+        ", Upper Intake: " + Double.toString(upperIntake.getSupplyCurrent()) + ", Lower Intake: " + Double.toString(lowerIntake.getSupplyCurrent()));
+    
+    System.out.println(intakeVals);
+
+    try{
+      writer.append(intakeVals);
+      writer.append("\n");
+      
+      writer.flush();
+    }catch(Exception e){
+      //System.out.println("WRITE EXCEPTION");
+      //System.out.println("EXCEPTION!");
+    }
+
     try {
       RobotLoop();
     } catch (Exception e) {
@@ -337,6 +372,27 @@ public class Robot extends TimedRobot {
   }
 
   public void storageLoop(){
+    boolean WantInnerIntakeToggle = mOperatorInterface.ToggleInnerRollers();
+    boolean WantInnerIntakeReverse = mOperatorInterface.ToggleInnerRollersDirection();
+    boolean InnerRollersPressed = mInnerIntakeToggle.update(WantInnerIntakeToggle);
+    boolean InnerRollersFlipped = mInnerIntakeToggle.update(WantInnerIntakeReverse);
+
+    if(InnerRollersPressed == true){
+      if(mStorage.IsRunning()){
+        mStorage.stop();
+      }else{
+        //start intake
+        mStorage.storeBall();
+      }
+    }
+
+    //if intake direction toggle
+    if(InnerRollersFlipped == true){
+      if(mStorage.IsRunning()){
+        mStorage.invert();
+        mStorage.storeBall();
+      }
+    }
 
   }
 
@@ -352,11 +408,11 @@ public class Robot extends TimedRobot {
     if(IntakePressed == true){
       if(mIntake.IsRunning()){
         mIntake.stop();
-        mStorage.stop();
+        
       }else{
         //start intake
         mIntake.start();
-        mStorage.storeBall();
+        
       }
     }
 
