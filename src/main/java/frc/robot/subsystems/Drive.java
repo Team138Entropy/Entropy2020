@@ -128,6 +128,21 @@ public class Drive extends Subsystem {
 
   public void zeroSensors() {}
 
+  // Temp
+  private static final int AUTO_TICKS = 100;
+  public synchronized void setAutoPosition() {
+    mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
+    mRightMaster.set(ControlMode.Position, AUTO_TICKS);
+  }
+
+  public synchronized int getLeftPos() {
+    return mLeftMaster.getSelectedSensorPosition(0);
+  }
+
+  public synchronized int getRightPos() {
+    return mRightMaster.getSelectedSensorPosition(0);
+  }
+
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
