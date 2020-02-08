@@ -130,6 +130,7 @@ public class Drive extends Subsystem {
 
   // Temp
   private static final int AUTO_TICKS = 100;
+
   public synchronized void setAutoPosition() {
     mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
     mRightMaster.set(ControlMode.Position, AUTO_TICKS);
@@ -258,22 +259,22 @@ public class Drive extends Subsystem {
   }
 
   // Used only in TEST mode
-  public void setOutputLeftBack (double output) {
+  public void setOutputLeftBack(double output) {
     mLeftMaster.set(ControlMode.PercentOutput, output);
   }
 
   // Used only in TEST mode
-  public void setOutputLeftFront (double output) {
+  public void setOutputLeftFront(double output) {
     mLeftSlave.set(ControlMode.PercentOutput, output);
   }
 
   // Used only in TEST mode
-  public void setOutputRightBack (double output) {
+  public void setOutputRightBack(double output) {
     mRightMaster.set(ControlMode.PercentOutput, output);
   }
 
   // Used only in TEST mode
-  public void setOutputRightFront (double output) {
+  public void setOutputRightFront(double output) {
     mRightSlave.set(ControlMode.PercentOutput, output);
   }
 

@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;

@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
     mTable = inst.getTable("SmartDashboard");
     mCameraManager = CameraManager.getInstance();
     mCameraManager.init();
-    
+
     // Reset Robot State
     // Wherever the Robot is now is the starting position
     mRobotState.reset();
@@ -189,11 +189,15 @@ public class Robot extends TimedRobot {
     mState = State.SHOOTING;
     mShootingState = ShootingState.PREPARE_TO_SHOOT;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
+
+    // TODO: Delet this
+    mDrive.setAutoPosition();
   }
 
   @Override
   public void autonomousPeriodic() {
     mRobotLogger.log("Auto Periodic");
+    mRobotLogger.info("Encoder distances: (" + mDrive.getLeftPos() + ", " + mDrive.getRightPos() + ")");
     updateSmartDashboard();
   }
 
@@ -260,25 +264,25 @@ public class Robot extends TimedRobot {
       mShooter.stop();
     }
 
-    if(mOperatorInterface.isDriveLeftBackTest()) {
+    if (mOperatorInterface.isDriveLeftBackTest()) {
       mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
     } else {
       mDrive.setOutputLeftBack(0);
     }
 
-    if(mOperatorInterface.isDriveLeftFrontTest()) {
+    if (mOperatorInterface.isDriveLeftFrontTest()) {
       mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
     } else {
       mDrive.setOutputLeftFront(0);
     }
 
-    if(mOperatorInterface.isDriveRightBackTest()) {
+    if (mOperatorInterface.isDriveRightBackTest()) {
       mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
     } else {
       mDrive.setOutputRightBack(0);
     }
 
-    if(mOperatorInterface.isDriveRightFrontTest()) {
+    if (mOperatorInterface.isDriveRightFrontTest()) {
       mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
     } else {
       mDrive.setOutputRightFront(0);

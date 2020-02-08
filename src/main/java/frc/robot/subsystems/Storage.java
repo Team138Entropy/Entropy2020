@@ -10,18 +10,22 @@ import frc.robot.Config.Key;
 public class Storage extends Subsystem {
 
   // TODO: Need to implement top roller
-  private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
+  private static final int ROLLER_BOTTOM_PORT =
+      Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
-  private static final int INTAKE_SENSOR_PORT =
-      Config.getInstance().getInt(Key.INTAKE__SENSOR);
+  private static final int INTAKE_SENSOR_PORT = Config.getInstance().getInt(Key.INTAKE__SENSOR);
 
   private static final int STORAGE_CAPICTY = 5;
 
-  private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
-  private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double STORE_SPEED =
+      Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double BOTTOM_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
+  private static final double SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED =
+      Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
@@ -44,8 +48,7 @@ public class Storage extends Subsystem {
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
-  public void init() {
-  }
+  public void init() {}
 
   public boolean isBallDetected() {
     return (mIntakeSensor.get());
