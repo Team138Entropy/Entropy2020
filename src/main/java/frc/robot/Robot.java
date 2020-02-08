@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("robot init _ 1");
 
     // Zero all nesscary sensors on Robot
-    ZeroSensors();
+    mSubsystemManager.zeroSensors();
     visionLight.set(Relay.Value.kForward);
 
     // Reset Robot State - Note starting position of the Robot
@@ -150,15 +150,6 @@ public class Robot extends TimedRobot {
     } else {
       return false;
     }
-  }
-
-  /*
-    Called on bootup, Zero all Sensors
-  */
-  private void ZeroSensors() {
-    mRobotLogger.log("Zeroing sensors...");
-    mSubsystemManager.zeroSensors();
-    mRobotLogger.log("Zeroed sensors");
   }
 
   private void updateSmartDashboard() {
