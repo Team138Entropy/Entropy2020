@@ -21,9 +21,6 @@ public class Drive extends Subsystem {
   // Drive Talons
   private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
 
-  private Solenoid mGearSolenoid; // Gear Shifting Solenoid
-  // private final Solenoid mShifter;
-
   // Drive is plummed to default to high gear
   private boolean mHighGear = true;
 
@@ -70,9 +67,6 @@ public class Drive extends Subsystem {
   private Drive() {
     mDriveLogger = new Logger("drive");
 
-    // Shifter Solenoid
-    // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
-
     mLeftMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_BACK_PORT));
     // configureSpark(mLeftMaster, true, true);
 
@@ -84,10 +78,6 @@ public class Drive extends Subsystem {
 
     mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
-
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
-      mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
-    }
   }
 
   public void init() {
@@ -204,25 +194,6 @@ public class Drive extends Subsystem {
     setBrakeMode(true);
     */
 
-  }
-
-  /*
-      SwitchGears
-      Toggles the current gear
-  */
-  public synchronized void switchGears() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
-      mHighGear = !mHighGear;
-      mGearSolenoid.set(mHighGear);
-    }
-  }
-
-  /*
-      SetGear
-      TODO: This may be the incorrect polarity. Verfiy this.
-  */
-  public synchronized void setGear(boolean highGear) {
-    mGearSolenoid.set(highGear);
   }
 
   /*
