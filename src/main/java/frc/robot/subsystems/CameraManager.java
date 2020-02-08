@@ -35,19 +35,20 @@ public class CameraManager extends Subsystem {
   private CameraManager() {}
 
   public void init() {
-    try {
-      // front camera
-      frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
-      // resolution set
-      frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+    return;
+    // try {
+    //   // front camera
+    //   frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
+    //   // resolution set
+    //   frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
 
-      // back camera
-      backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
-      // another resolution set
-      backCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
-    } catch (Exception exception) {
-      mLogger.error("Camera Initialization failed");
-    }
+    //   // back camera
+    //   backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
+    //   // another resolution set
+    //   backCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+    // } catch (Exception exception) {
+    //   mLogger.error("Camera Initialization failed");
+    // }
   }
 
   @Override

@@ -107,6 +107,22 @@ public class Drive extends Subsystem {
     mLeftMaster.setNeutralMode(NeutralMode.Brake);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
+    mRightMaster.configNominalOutputForward(0., 0);
+    mRightMaster.configNominalOutputReverse(0., 0);
+    mRightMaster.configPeakOutputForward(1, 0);
+    mRightMaster.configPeakOutputReverse(-1, 0);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+
+    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    mRightMaster.setSensorPhase(true);
+    mRightMaster.configNominalOutputForward(0., 0);
+    mRightMaster.configNominalOutputReverse(-0., 0);
+    mRightMaster.configPeakOutputForward(1, 0);
+    mRightMaster.configPeakOutputReverse(-1, 0);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    mRightSlave.setNeutralMode(NeutralMode.Brake);
+
     // Configure Talon gains
     /*
     mLeftMaster.config_kF(0, Drive_Kf,0);
@@ -129,11 +145,16 @@ public class Drive extends Subsystem {
   public void zeroSensors() {}
 
   // Temp
-  private static final int AUTO_TICKS = 100;
+  private static final int AUTO_TICKS = 1000;
 
   public synchronized void setAutoPosition() {
     mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
-    mRightMaster.set(ControlMode.Position, AUTO_TICKS);
+    mRightMaster.set(ControlMode.Position, -AUTO_TICKS);
+  }
+
+  public synchronized void reset() {
+    mLeftMaster.setSelectedSensorPosition(0);
+    mRightMaster.setSelectedSensorPosition(0);
   }
 
   public synchronized int getLeftPos() {

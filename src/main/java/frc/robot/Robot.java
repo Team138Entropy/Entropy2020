@@ -191,6 +191,7 @@ public class Robot extends TimedRobot {
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
     // TODO: Delet this
+    mDrive.reset();
     mDrive.setAutoPosition();
   }
 
