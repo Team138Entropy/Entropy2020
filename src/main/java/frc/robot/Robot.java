@@ -219,22 +219,28 @@ public class Robot extends TimedRobot {
     // Intake roller ON while button held
     if (mOperatorInterface.isIntakeRollerTest()) {
       mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
+    }else if(mOperatorInterface.isBarf()){
+      mIntake.barf();
     } else {
       mIntake.stop();
     }
 
-    // Bottom storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerBottomTest()) {
-      mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
-    } else {
-      mStorage.setBottomOutput(0);
-    }
+    if(mOperatorInterface.isBarf()){
+      mStorage.barf();
+    }else{
+      // Bottom storage rollers ON while button held
+      if (mOperatorInterface.isStorageRollerBottomTest()) {
+        mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
+      } else {
+        mStorage.setBottomOutput(0);
+      }
 
-    // Top storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerTopTest()) {
-      mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
-    } else {
-      mStorage.setTopOutput(0);
+      // Top storage rollers ON while button held
+      if (mOperatorInterface.isStorageRollerTopTest()) {
+        mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
+      } else {
+        mStorage.setTopOutput(0);
+      }
     }
 
     // Shooter roller ON while button held
@@ -422,7 +428,7 @@ public class Robot extends TimedRobot {
         mIntake.stop();
 
         // If the sensor indicates the ball is stored, complete ball storage
-        if (mStorage.isBallStored()) {
+        if (mStorage.wasLineBroke()) {
           mIntakeState = IntakeState.STORAGE_COMPLETE;
         }
         break;

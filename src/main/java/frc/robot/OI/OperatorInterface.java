@@ -103,6 +103,10 @@ public class OperatorInterface {
     DriverController.setRumble(toggle);
   }
 
+  public boolean isBarf() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+  }
+
   // Test Mode functions
   public boolean isDriveLeftBackTest() {
     return DriverController.getButton(XboxController.Button.A);

@@ -35,6 +35,10 @@ public class Intake extends Subsystem {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
   }
 
+  public void barf(){
+    mRoller.set(ControlMode.PercentOutput, -ROLLER_SPEED);
+  }
+
   public void resetOvercurrentCooldown(){
     mOverCurrentCountdown = 30;
   }

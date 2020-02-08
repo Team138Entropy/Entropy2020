@@ -29,6 +29,8 @@ public class Storage extends Subsystem {
 
   private int mBallCount = 0;
 
+  private boolean mWasLineBroke = false;
+
   private static Storage sInstance;
 
   public static synchronized Storage getInstance() {
@@ -53,6 +55,22 @@ public class Storage extends Subsystem {
 
   public boolean isBallStored() {
     return mIntakeSensor.get();
+  }
+
+  public boolean wasLineBroke(){
+    if(mWasLineBroke && !isBallStored()){
+      mWasLineBroke = false;
+      return true;
+    }
+    if(isBallStored()){
+      mWasLineBroke = true;
+    }
+    return false;
+  }
+
+  public void barf(){
+    mBottomRoller.set(ControlMode.PercentOutput, -(STORE_SPEED * BOTTOM_SPEED_FACTOR));
+    mTopRoller.set(ControlMode.PercentOutput, -(STORE_SPEED));
   }
 
   public void preloadBalls(int ballCount) {
