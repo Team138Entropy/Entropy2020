@@ -38,10 +38,6 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
-  public boolean getDriveShift() {
-    return DriverController.getButton(XboxController.Button.START);
-  }
-
   public boolean getClimb() {
     return DriverController.getButton(XboxController.Button.Y);
   }

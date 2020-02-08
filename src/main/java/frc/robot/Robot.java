@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -79,8 +78,6 @@ public class Robot extends TimedRobot {
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
-  private Compressor mCompressor;
-
   public Relay visionLight = new Relay(0);
 
   // Control Variables
@@ -142,17 +139,6 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /*
-    Returns true if the pressure switch reads "low", an undefined value we have no control over.
-    Cool!
-  */
-  public boolean getLowPSI() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
-      return mCompressor.getPressureSwitchValue();
-    } else {
-      return false;
-    }
-  }
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("BallCounter", mStorage.getBallCount());
@@ -309,7 +295,6 @@ public class Robot extends TimedRobot {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
       double driveTurn = mOperatorInterface.getDriveTurn();
-      boolean driveShift = mOperatorInterface.getDriveShift();
       boolean autoDrive = false;
       mDrive.setDrive(driveThrottle, driveTurn, false);
 
@@ -317,8 +302,6 @@ public class Robot extends TimedRobot {
       if (autoDrive == false && mOperatorInterface.getQuickturn()) {
         // Quickturn!
       }
-
-      if (driveShift) mDrive.switchGears();
 
       // Detect Harvest Mode
       boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
