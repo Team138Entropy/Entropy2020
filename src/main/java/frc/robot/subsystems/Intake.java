@@ -53,7 +53,6 @@ public class Intake extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, output);
   }
   
-  private int counter = 0;
   public boolean isBallDetected(){
     mLogger.verbose("Input current: " + mRoller.getSupplyCurrent() + ", Output current: " + mRoller.getStatorCurrent());
 
