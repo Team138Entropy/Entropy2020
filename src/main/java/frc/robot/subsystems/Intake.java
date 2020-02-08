@@ -1,20 +1,18 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import frc.robot.Config;
-import frc.robot.Config.Key;
-
+import frc.robot.Constants;
 /** Add your docs here. */
 public class Intake extends Subsystem {
 
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER_PORT);
-
-  // TODO: Tune these values
-  private static final double ROLLER_SPEED =
-      Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
+  
+  private double SpeedModifier = 1.0;
 
   private WPI_TalonSRX mRoller;
+
+  private boolean Running = false;
 
   private static Intake sInstance;
 
@@ -26,16 +24,35 @@ public class Intake extends Subsystem {
   }
 
   private Intake() {
-    mRoller = new WPI_TalonSRX(ROLLER_PORT);
+    mRoller = new WPI_TalonSRX(Constants.kIntakeRollerPort);
+    mRoller.configFactoryDefault();
+    mRoller.setNeutralMode(NeutralMode.Brake);
+
   }
 
   public void start() {
-    mRoller.set(ControlMode.PercentOutput, ROLLER_SPEED);
+    Running = true;
+    mRoller.set(ControlMode.PercentOutput, SpeedModifier * Constants.kIntakeRollerSpeed); 
+  
+  }
+
+  //Incase spitting the ball back out is needed
+  public void invert(){
+    if(SpeedModifier == -1){
+      SpeedModifier = 1;
+    }else{
+      SpeedModifier = -1;
+    }
   }
 
   /** Stops the roller. */
   public void stop() {
+    Running = false;
     mRoller.set(ControlMode.PercentOutput, 0);
+  }
+
+  public synchronized boolean IsRunning(){
+    return Running;
   }
 
   @Override

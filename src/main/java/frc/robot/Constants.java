@@ -53,7 +53,8 @@ public class Constants {
 
 
   //Intake
-  public static final int kIntakeRollerPort;
+  public static final int kIntakeRollerPort = 10;
+  public static final double kIntakeRollerSpeed = 0.8;
 
   //Turret
   public static final int kTurretTalonMotorPort;
@@ -65,7 +66,8 @@ public class Constants {
 
 
   //Storage
-  //public static final int k
+  public static final int kStorageLowerTalon = 7;
+  public static final int kStorageUpperTalon = 8;
 
   //Drive Encoder Port
   public static final int kDriveGyroPort = 0;
@@ -123,7 +125,7 @@ public class Constants {
   static {
       kTurretConstants.kName = "Turret";
 
-      kTurretConstants.kMasterConstants.id = 10;
+      kTurretConstants.kMasterConstants.id = 9;
       kTurretConstants.kMasterConstants.invert_motor = false;
       kTurretConstants.kMasterConstants.invert_sensor_phase = true;
 
@@ -177,10 +179,10 @@ public class Constants {
     //lets now load these to our variables!
     
     //Intake
-    kIntakeRollerPort = mConfig.getInt(Key.INTAKE__ROLLER_PORT);
+    //kIntakeRollerPort = mConfig.getInt(Key.INTAKE__ROLLER_PORT);
 
     //Turret
-    kTurretTalonMotorPort = mConfig.getInt(Key.ROBOT__TURRET__TALON_LOCATION);
+    kTurretTalonMotorPort = 7;
     kPIDController_P = mConfig.getDouble(Key.OI__VISION__PID__P);
     kPIDController_I = mConfig.getDouble(Key.OI__VISION__PID__I);
     kPIDController_D = mConfig.getDouble(Key.OI__VISION__PID__D);

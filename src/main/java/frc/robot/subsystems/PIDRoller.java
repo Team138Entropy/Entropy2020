@@ -15,7 +15,7 @@ class PIDRoller {
   PIDRoller(int talonPort, double p, double i, double d) {
     super();
 
-    mTalon = new WPI_TalonSRX(talonPort);
+    mTalon = new WPI_TalonSRX(9);
 
     // All of this was ripped from the 2019 elevator code
     mTalon.configNominalOutputForward(0, TIMEOUT_MS);

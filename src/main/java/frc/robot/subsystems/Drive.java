@@ -142,8 +142,8 @@ public class Drive extends Subsystem {
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
     mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
+    mLeftMaster.setNeutralMode(NeutralMode.Coast);
+    mLeftMaster.setNeutralMode(NeutralMode.Coast);
 
     mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     mLeftMaster.setSensorPhase(true);
@@ -151,8 +151,8 @@ public class Drive extends Subsystem {
     mLeftMaster.configNominalOutputReverse(-0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
     mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
-    mLeftSlave.setNeutralMode(NeutralMode.Brake);
+    mLeftMaster.setNeutralMode(NeutralMode.Coast);
+    mLeftSlave.setNeutralMode(NeutralMode.Coast);
 
     // Configure Talon gains
     /*

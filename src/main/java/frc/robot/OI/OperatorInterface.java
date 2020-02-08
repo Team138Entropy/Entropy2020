@@ -38,6 +38,17 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
+  public boolean ToggleIntake(){
+    return DriverController.getButton(XboxController.Button.A);
+  }
+
+  public boolean ToggleIntakeDirection(){
+    return DriverController.getButton(XboxController.Button.Y);
+  }
+
+
+
+
   public boolean getDriveShift() {
     return DriverController.getButton(XboxController.Button.START);
   }

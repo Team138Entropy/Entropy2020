@@ -76,10 +76,19 @@ public class Robot extends TimedRobot {
     AUTO_STEER
   };
 
+  private enum IntakeState2 {
+    INTAKE_ENABLED,
+    INTAKE_DISABLED
+  };
+
   //States Initalization
   private AimState mAimState = AimState.AUTO_AIM;
   private ShootState mShootState = ShootState.MANUAL_SHOOT;
   private DriveState mDriveState = DriveState.MANUAL_DRIVE;
+  private IntakeState2 mIntakeState2 = IntakeState2.INTAKE_DISABLED;
+
+  private LatchedBoolean mIntakeToggle = new LatchedBoolean();
+  private LatchedBoolean mIntakeReverse = new LatchedBoolean();
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -321,8 +330,44 @@ public class Robot extends TimedRobot {
 
 
   public void RobotLoop(){
+    storageLoop();
+    intakeLoop();
     turretLoop();
     driveLoop();
+  }
+
+  public void storageLoop(){
+
+  }
+
+  public void intakeLoop(){
+    boolean WantIntakeToggle = mOperatorInterface.ToggleIntake();
+    boolean WantIntakeReverse = mOperatorInterface.ToggleIntakeDirection();
+    boolean IntakePressed = mIntakeToggle.update(WantIntakeToggle);
+    boolean IntakeFlipped = mIntakeReverse.update(WantIntakeReverse);
+  //System.out.println("Intake Loop");
+
+
+    //if intake press
+    if(IntakePressed == true){
+      if(mIntake.IsRunning()){
+        mIntake.stop();
+        mStorage.stop();
+      }else{
+        //start intake
+        mIntake.start();
+        mStorage.storeBall();
+      }
+    }
+
+    //if intake direction toggle
+    if(IntakeFlipped == true){
+      if(mIntake.IsRunning()){
+        mIntake.invert();
+        mIntake.start();
+      }
+    }
+
   }
 
 

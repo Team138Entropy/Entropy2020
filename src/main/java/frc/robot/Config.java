@@ -15,12 +15,12 @@ public class Config {
 
   public enum Key {
     // Motors
-    INTAKE__ROLLER_PORT(1),
-    STORAGE__ROLLER_PORT(2),
+    INTAKE__ROLLER_PORT(10),
+    STORAGE__ROLLER_PORT(20),
     SHOOTER__ROLLER_PORT(3),
 
     // Sensors
-    INTAKE__SENSOR_PORT(1),
+    INTAKE__SENSOR_PORT(.4),
 
     // Speeds
     INTAKE__ROLLER_SPEED(1d),
