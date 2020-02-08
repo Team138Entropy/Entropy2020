@@ -154,8 +154,7 @@ public class Robot extends TimedRobot {
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("BallCounter", mStorage.getBallCount());
-    // TODO: change this to the real boolean
-    SmartDashboard.putBoolean("ShooterFull", false);
+    SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     // TODO: decide if this is necessary and hook it up
     SmartDashboard.putBoolean("ShooterLoaded", false);
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
@@ -169,8 +168,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Ball Stored", mStorage.isBallStored());
 
     SmartDashboard.putString("RobotState", mState.name());
-
-    // TODO: cameras will go here eventually
   }
 
   @Override

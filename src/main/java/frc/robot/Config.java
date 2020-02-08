@@ -6,7 +6,6 @@ package frc.robot;
 // @Deprecated
 // public class Constants {
 
-// TODO: Address performance concerns by profiling execution time and trimming calls
 public class Config {
 
   public enum Key {

@@ -10,7 +10,6 @@ import frc.robot.Config.Key;
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  // TODO: Need to implement top roller
   private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
