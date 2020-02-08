@@ -456,6 +456,8 @@ public class Robot extends TimedRobot {
 
         // Check transition to shooting after storage of ball
         checkTransitionToShooting();
+        
+        mIntake.resetOvercurrentCooldown();
         break;
       default:
         mRobotLogger.error("Invalid Intake State");
