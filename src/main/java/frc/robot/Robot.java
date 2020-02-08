@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private final Drive mDrive = Drive.getInstance();
-  private Turret mTurret = Turret.getInstance();
+  private Turret2 mTurret = Turret2.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -204,9 +204,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    Rotation2d result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+  
 
-    System.out.println("Auto Error: " + result.getDegrees());
+
+
     //updateSmartDashboard();
   }
 
@@ -329,8 +330,20 @@ public class Robot extends TimedRobot {
     switch(mAimState){
       case AUTO_AIM: {
         //VIsion Handles Aiming
-        Rotation2d VisionError = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-        System.out.println("VISION ERROR: " + VisionError.getDegrees());
+        //Rotation2d VisionError = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+        //System.out.println("VISION ERROR: " + VisionError.getDegrees());
+
+       // RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+       /*
+       if(result.HasResult){
+          //We have target information
+        }else{
+          //No target information
+          //our identity will be 0
+          // System.out.println("Auto Error: " + result.getDegrees());
+    
+        }
+        */
 
 
         //            mTurret.setSetpointPositionPID(mCurrentSetpoint.state.turret, mTurretFeedforwardV);
