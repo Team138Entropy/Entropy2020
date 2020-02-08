@@ -49,10 +49,6 @@ public class Storage extends Subsystem {
   public void init() {
   }
 
-  // public boolean isBallDetected() {
-  //   return (mIntakeSensor.get());
-  // }
-
   public boolean isBallStored() {
     return mIntakeSensor.get();
   }
