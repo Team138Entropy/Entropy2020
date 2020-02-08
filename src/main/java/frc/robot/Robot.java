@@ -16,6 +16,8 @@ import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import java.util.Optional;
 
+import com.ctre.phoenix.sensors.PigeonIMU.CalibrationMode;
+
 /**
  * The VM is configured to automatically run this class. If you change the name of this class or the
  * package after creating this project, you must also update the build.gradle file in the project.
@@ -162,8 +164,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("TargetLocked", false);
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
-
-    SmartDashboard.putBoolean("Ball Detected", mIntake.isBallDetected());
     
     SmartDashboard.putBoolean("Ball Stored", mStorage.isBallStored());
 
@@ -348,8 +348,24 @@ public class Robot extends TimedRobot {
   */
   public void RobotLoop() {
     updateSmartDashboard();
-
+    
+    State prevState = mState;
+    IntakeState prevIntakeState = mIntakeState;
+    ClimingState prevClimbState = mClimingState;
+    ShootingState prevShootState = mShootingState;
     executeRobotStateMachine();
+    if(prevState != mState){
+      mRobotLogger.log("Changed state to " + mState);
+    }
+    if(prevIntakeState != mIntakeState){
+      mRobotLogger.log("Changed state to " + mIntakeState);
+    }
+    if(prevClimbState != mClimingState){
+      mRobotLogger.log("Changed state to " + mClimingState);
+    }
+    if(prevShootState != mShootingState){
+      mRobotLogger.log("Changed state to " + mShootingState);
+    }
 
     turretLoop();
 
@@ -449,6 +465,7 @@ public class Robot extends TimedRobot {
 
   private boolean checkTransitionToShooting() {
     if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
+      mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
           mIntake.stop();

@@ -52,9 +52,11 @@ public class Intake extends Subsystem {
   public void setOutput(double output) {
     mRoller.set(ControlMode.PercentOutput, output);
   }
-
+  
+  private int counter = 0;
   public boolean isBallDetected(){
-    mLogger.log("Input current: " + mRoller.getSupplyCurrent() + ", Output current: " + mRoller.getStatorCurrent());
+    mLogger.verbose("Input current: " + mRoller.getSupplyCurrent() + ", Output current: " + mRoller.getStatorCurrent());
+
     
     if(mOverCurrentCountdown > 0){
       mOverCurrentCountdown --;
@@ -62,14 +64,14 @@ public class Intake extends Subsystem {
     }
     
     double current = mRoller.getSupplyCurrent();
-    if (current > Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)){
+    if (current >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)){
       mOverCurrentCount++;
       mLogger.log("debounce overcurrent " + mOverCurrentCount);
     }else{
       mOverCurrentCount = 0;
     }
-    if (mOverCurrentCount > Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)){
-      System.out.println("Overcurrent!");
+    if (mOverCurrentCount >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)){
+      mLogger.log("Overcurrent!");
       mOverCurrentCount = 0;
       return true;
     }else{
