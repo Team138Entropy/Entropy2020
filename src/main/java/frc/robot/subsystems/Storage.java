@@ -52,7 +52,6 @@ public class Storage extends Subsystem {
   // }
 
   public boolean isBallStored() {
-    System.out.println("intake sensor " + mIntakeSensor.get() + " on port " + mIntakeSensor.getChannel());
     return mIntakeSensor.get();
   }
 
