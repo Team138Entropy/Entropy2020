@@ -18,6 +18,7 @@ public class BallStored implements Event {
 
   public Command getCommand() {
     mLogger.info("Ball Stored");
+    Storage.getInstance().increaseBallCount();
     return new StopBallStorage();
   }
 }

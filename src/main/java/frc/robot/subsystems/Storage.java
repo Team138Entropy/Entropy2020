@@ -29,6 +29,9 @@ public class Storage extends Subsystem {
 
   private int mBallCount = 0;
 
+  // TODO: Hook this up with Autonomous starting with balls
+  private int ballsStored = 0;
+
   private static Storage sInstance;
 
   public static synchronized Storage getInstance() {
@@ -95,16 +98,24 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
-  public int getBallCount() {
-    return mBallCount;
-  }
-
   public void setBottomOutput(double output) {
     mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * SPEED_FACTOR);
   }
 
   public void setTopOutput(double output) {
     mTopRoller.set(ControlMode.PercentOutput, output * SPEED_FACTOR);
+  }
+
+  public void increaseBallCount() {
+    ballsStored++;
+  }
+
+  public void decreaseBallCount() {
+    ballsStored--;
+  }
+
+  public int getBallCount() {
+    return ballsStored;
   }
 
   @Override
