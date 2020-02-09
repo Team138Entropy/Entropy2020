@@ -91,55 +91,41 @@ public class Drive extends Subsystem {
   }
 
   public void init() {
-    mLeftMaster.configNominalOutputForward(0., 0);
-    mLeftMaster.configNominalOutputReverse(0., 0);
-    mLeftMaster.configPeakOutputForward(1, 0);
-    mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
-
-    mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    mLeftMaster.setSensorPhase(true);
-    mLeftMaster.configNominalOutputForward(0., 0);
-    mLeftMaster.configNominalOutputReverse(-0., 0);
-    mLeftMaster.configPeakOutputForward(1, 0);
-    mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
+    configTalon(mLeftMaster);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
-    mRightMaster.configNominalOutputForward(0., 0);
-    mRightMaster.configNominalOutputReverse(0., 0);
-    mRightMaster.configPeakOutputForward(1, 0);
-    mRightMaster.configPeakOutputReverse(-1, 0);
-    mRightMaster.setNeutralMode(NeutralMode.Brake);
-    mRightMaster.setNeutralMode(NeutralMode.Brake);
-
-    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    mRightMaster.setSensorPhase(true);
-    mRightMaster.configNominalOutputForward(0., 0);
-    mRightMaster.configNominalOutputReverse(-0., 0);
-    mRightMaster.configPeakOutputForward(1, 0);
-    mRightMaster.configPeakOutputReverse(-1, 0);
-    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    configTalon(mRightMaster);
     mRightSlave.setNeutralMode(NeutralMode.Brake);
-
-    // Configure Talon gains
-    /*
-    mLeftMaster.config_kF(0, Drive_Kf,0);
-    mLeftMaster.config_kP(0, Drive_Kp,0);
-    mLeftMaster.config_kI(0, Drive_Ki,0);
-    mLeftMaster.config_kD(0, Drive_Kd,0);
-    mRightMaster.config_kF(0, Drive_Kf,0);
-    mRightMaster.config_kP(0, Drive_Kp,0);
-    mRightMaster.config_kI(0, Drive_Ki,0);
-    mRightMaster.config_kD(0, Drive_Kd,0);
-          */
 
     // Configure slave Talons to follow masters
     mLeftSlave.follow(mLeftMaster);
     mRightSlave.follow(mRightMaster);
 
     setOpenLoop(DriveSignal.NEUTRAL);
+  }
+
+  private void configTalon(WPI_TalonSRX talon) {
+    talon.configNominalOutputForward(0., 0);
+    talon.configNominalOutputReverse(0., 0);
+    talon.configPeakOutputForward(1, 0);
+    talon.configPeakOutputReverse(-1, 0);
+    talon.setNeutralMode(NeutralMode.Brake);
+    talon.setNeutralMode(NeutralMode.Brake);
+    talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    talon.setSensorPhase(true);
+    talon.configNominalOutputForward(0., 0);
+    talon.configNominalOutputReverse(-0., 0);
+    talon.configPeakOutputForward(1, 0);
+    talon.configPeakOutputReverse(-1, 0);
+    talon.setNeutralMode(NeutralMode.Brake);
+
+    // Configure Talon gains
+    //    talon.config_kF(0, Drive_Kf,0);
+    //    talon.config_kP(0, Drive_Kp,0);
+    //    talon.config_kI(0, Drive_Ki,0);
+    //    talon.config_kD(0, Drive_Kd,0);
+
+    talon.configClosedloopRamp(1);
   }
 
   public void zeroSensors() {}
@@ -268,7 +254,7 @@ public class Drive extends Subsystem {
   public void checkSubsystem() {}
 
   public synchronized double getLeftEncoderDistance() {
-    return 0.0;
+    return mLeftMaster.getSelectedSensorPosition();
   }
 
   public synchronized double getRightEncoderDistance() {
