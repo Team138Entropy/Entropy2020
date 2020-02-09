@@ -29,13 +29,16 @@ public class OperatorInterface {
   }
 
   // Driver
-
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
   }
 
   public double getDriveTurn() {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
+  }
+
+  public boolean wantsAutoSteer(){
+    return DriverController.getTrigger(XboxController.Side.RIGHT);
   }
 
   public boolean ToggleIntake(){

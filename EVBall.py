@@ -201,10 +201,8 @@ class WebcamVideoStream:
             # Boolean logic we don't keep setting exposure over and over to the same value
             '''
             if self.autoExpose:
-
                 self.webcam.setExposureAuto()
             else:
-
                 self.webcam.setExposureManual(0)
             '''
             # gets the image and timestamp from cameraserver
@@ -680,13 +678,12 @@ def findBalls(frame):
                 #		Lets calculate now!
                 ball = {}
                 ball['targid'] = 1
-                ball['x'] = cx
-                ball['y'] = cy
-                ball['dis'] = 0
+                ball['y'] = float(cx)
+                ball['z'] = float(cy)
+                ball['dis'] = float(1.0)
 
                 finalTarget = calculateYaw(cx, centerX, H_FOCAL_LENGTH)
                 ball['yaw'] = finalTarget
-                #print("good ball!")
                 PacketQueue.put_nowait(ball)
                # ball['Size'] = CntArea
 
@@ -890,6 +887,8 @@ def startCamera(config):
 
 
 if __name__ == "__main__":
+    print("\n\n\n\n")
+    print("Entropy Vision! BALL")
     if len(sys.argv) >= 2:
         configFile = sys.argv[1]
     # read configuration

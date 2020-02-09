@@ -16,6 +16,8 @@ import frc.robot.vision.AimingParameters;
 import frc.robot.util.loops.Looper;
 import frc.robot.Config;
 import frc.robot.Config.Key;
+import frc.robot.util.Util;
+
 
 import java.io.FileWriter;
 import java.util.Optional;
@@ -83,6 +85,10 @@ public class Robot extends TimedRobot {
   private enum DriveState {
     MANUAL_DRIVE,
     AUTO_STEER
+  };
+
+  private enum StorageState2 {
+
   };
 
   private enum IntakeState2 {
@@ -251,6 +257,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    /*
     String intakeVals = ("Intake Roller: " + Double.toString(intakeRoller.getSupplyCurrent()) +
         ", Upper Intake: " + Double.toString(upperIntake.getSupplyCurrent()) + ", Lower Intake: " + Double.toString(lowerIntake.getSupplyCurrent()));
     
@@ -265,7 +272,7 @@ public class Robot extends TimedRobot {
       //System.out.println("WRITE EXCEPTION");
       //System.out.println("EXCEPTION!");
     }
-
+    */
     try {
       RobotLoop();
     } catch (Exception e) {
@@ -461,22 +468,49 @@ public class Robot extends TimedRobot {
   private void driveLoop(){
     double driveThrottle = mOperatorInterface.getDriveThrottle();
     double driveTurn = mOperatorInterface.getDriveTurn();
-    boolean driveShift = mOperatorInterface.getDriveShift();
-    boolean autoDrive = false;
+    boolean autoSteer = mOperatorInterface.wantsAutoSteer();
+    Optional<AimingParameters> ball_aiming_parameters;
 
+    if(autoSteer == true){
+      //Auto Steering the robot
+      //Auto Steers to the ball!
+      ball_aiming_parameters = mRobotTracker.getAimingParameters(false, -1, Constants.kMaxGoalTrackAge);
+
+      //proceed if we have aiming parameters
+      //if not continue manual drive
+      if(ball_aiming_parameters.isEmpty() == false){
+        //Get Aiming Parameters, and throttle value
+        Rotation2d rb = ball_aiming_parameters.get().getRobotToGoalRotation();
+        System.out.println("Measured Rotation: " + rb.getDegrees());
+        mDrive.autoSteer(Util.limit(driveThrottle, 0.3), ball_aiming_parameters.get());
+      }else{
+        System.out.println("No Params.. manual drive!");
+        //We don't have aiming parameters, continue manual drive
+        mDrive.setDrive(driveThrottle, driveTurn, false);
+      }
+
+
+
+    }else{
+      //Manual Drive
+      mDrive.setDrive(driveThrottle, driveTurn, false);
+
+    }
+    /*
     //Drive Logic
     switch(mDriveState){
       case MANUAL_DRIVE: {
+        System.out.println("Wants Manual Drive");
         //Manually Drive the robot used
         mDrive.setDrive(driveThrottle, driveTurn, false);
         break;
       }
       case AUTO_STEER: {
         //Allow the Driver to only control the thottle
-
       }
 
     } //End Drive State
+    */
   }
 
 

@@ -99,9 +99,9 @@ public class Constants {
    public static final double kCameraHorizontalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView)) * 2;
    public static final double kCameraVerticalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView)) * 2;
    public static final Rotation2d kShooterCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(0); //Shooter should sit pretty flat
-   public static final Rotation2d kBallCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(-15); //camera is angled downards
+   public static final Rotation2d kBallCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(-5); //camera is angled downards
    public static final double kShooterCameraHeight = 40; //shooter camera height on robot (inches)
-   public static final double kBallCameraHeight = 15; //ball camera height
+   public static final double kBallCameraHeight = 12; //ball camera height
    
    //Offsets from our center point
    public static final Pose2d kTurrentToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 
@@ -110,7 +110,7 @@ public class Constants {
 
   //Field Related Constants
   public static final double kHighGoalHeight = 96.25; //Center Goal Height
-  public static final double kBallHeight = 10; //ball height (inches)
+  public static final double kBallHeight = 5; //ball height (inches)
 
   //Looper System
   public static final double kLooperDt = 0.01;

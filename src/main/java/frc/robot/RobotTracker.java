@@ -259,9 +259,10 @@ public class RobotTracker{
         */
 
         double distance = target.getDistance();
+        distance = 3;
         Rotation2d angle = new Rotation2d(x, y, true);
 
-       // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
+      // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
 
         return new Translation2d(distance * angle.cos(), distance * angle.sin());
 

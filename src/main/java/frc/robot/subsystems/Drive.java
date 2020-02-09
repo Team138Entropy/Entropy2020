@@ -6,8 +6,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Config;
-import frc.robot.Config.Key;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
@@ -16,10 +14,14 @@ import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import frc.robot.RobotTracker;
 
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
+
+  // Robot Tracker (for aiming purposes)
+  private final RobotTracker mRobotTracker = RobotTracker.getInstance();
 
   // Drive Talons
   private final WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
@@ -113,12 +115,19 @@ public class Drive extends Subsystem {
     // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
 
     mLeftMaster = new WPI_TalonSRX(Constants.kLeftDriveMasterId);
+    mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 
+    0,0);
 
     mLeftSlave = new WPI_TalonSRX(Constants.kLeftDriveSlaveId);
 
+
     mRightMaster = new WPI_TalonSRX(Constants.kRightDriveMasterId);
+    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 
+    0,0);
 
     mRightSlave = new WPI_TalonSRX(Constants.kRightDriveSlaveId);
+
+    
 
     //Encoder Intialization
     //last argument is to reverse directions!
@@ -134,10 +143,6 @@ public class Drive extends Subsystem {
     mGyro.reset();
     mGyro.calibrate();
 
-
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
-      mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
-    }
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
@@ -209,6 +214,10 @@ public class Drive extends Subsystem {
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
+    int absolutePositionr = mRightMaster.getSelectedSensorPosition();
+    int absolutePositionl = mLeftMaster.getSensorCollection().getPulseWidthPosition();
+    //System.out.println("Abs Right: " + absolutePositionr);
+    //System.out.println("Abs Left: " + absolutePositionl);
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -249,7 +258,7 @@ public class Drive extends Subsystem {
 
   /*
       Auto Steer functionality
-      passed ub oaraneters akkiw yser ti druve tiwards bakk
+      passed an aiming parameter of the ball's location!
   */
   public synchronized void autoSteer(double throttle, AimingParameters aim_params) {
     double timestamp = Timer.getFPGATimestamp();
@@ -259,7 +268,7 @@ public class Drive extends Subsystem {
     Pose2d field_to_vision_target = aim_params.getFieldToGoal();
     final Pose2d vision_target_to_alignment_point = Pose2d.fromTranslation(new Translation2d(Math.min(kAutosteerAlignmentPointOffset, aim_params.getRange() - kAutosteerAlignmentPointOffset), 0.0));
     Pose2d field_to_alignment_point = field_to_vision_target.transformBy(vision_target_to_alignment_point);
-    Pose2d vehicle_to_alignment_point = RobotState.getInstance().getFieldToVehicle(timestamp).inverse().transformBy(field_to_alignment_point);
+    Pose2d vehicle_to_alignment_point = mRobotTracker.getFieldToRobot(timestamp).inverse().transformBy(field_to_alignment_point);
     Rotation2d vehicle_to_alignment_point_bearing = vehicle_to_alignment_point.getTranslation().direction();
     if (reverse) {
         vehicle_to_alignment_point_bearing = vehicle_to_alignment_point_bearing.rotateBy(Rotation2d.fromDegrees(180.0));
@@ -269,19 +278,20 @@ public class Drive extends Subsystem {
     final double kAutosteerKp = 0.05;
     double curvature = (towards_goal ? 1.0 : 0.0) * heading_error_rad * kAutosteerKp;
     setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    setBrakeMode(true);
+    setDriveBrakeMode(true);
+}
 
-  }
+
+private synchronized void setDriveBrakeMode(boolean value){
+
+}
 
   /*
       SwitchGears
       Toggles the current gear
   */
   public synchronized void switchGears() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
-      mHighGear = !mHighGear;
-      mGearSolenoid.set(mHighGear);
-    }
+
   }
 
   /*

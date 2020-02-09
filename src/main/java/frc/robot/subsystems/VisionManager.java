@@ -128,9 +128,14 @@ public class VisionManager extends Subsystem {
                     ((Number) CurrentPacket.get("z")).doubleValue(),
                     ((Number) CurrentPacket.get("dis")).doubleValue()
                 );
+                
+               // ti.SetY(((320/2)- .5) - 40);
+               // ti.SetZ((240/2)- .5);
 
                 //Reconvert Field information
                 ti.CalculateFields();
+        
+                //System.out.println("Recieved Packet: z: " + ti.getZ() + "  y: " + ti.getY());
 
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!

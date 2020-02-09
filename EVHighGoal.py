@@ -199,10 +199,8 @@ class WebcamVideoStream:
             # Boolean logic we don't keep setting exposure over and over to the same value
             '''
             if self.autoExpose:
-
                 self.webcam.setExposureAuto()
             else:
-
                 self.webcam.setExposureManual(0)
             '''
             # gets the image and timestamp from cameraserver
@@ -228,8 +226,8 @@ class WebcamVideoStream:
 image_width = 640
 image_height = 480
 
-# Lifecam 3000 from datasheet
-# Datasheet: https://dl2jx7zfbtwvr.cloudfront.net/specsheets/WEBC1010.pdf
+# Playstation Eye
+# Datasheet: https://en.wikipedia.org/wiki/PlayStation_Eye
 diagonalView = math.radians(75)
 
 # 16:9 aspect ratio
@@ -732,7 +730,6 @@ def ProcessFrame(frame, tape):
         for Targ in Targets:
             original_frame = cv2.circle(original_frame, (Targ['x'], Targ['y']), Targ['radius'], (255, 0, 0), 2)
             original_frame = cv2.circle(original_frame, Targ['center'], 4, (0, 0, 255), -1)
-
             font = cv2.FONT_HERSHEY_SIMPLEX
             # org
             org = (Targ['x'], Targ['y'])
@@ -744,7 +741,6 @@ def ProcessFrame(frame, tape):
             thickness = 2
             # Using cv2.putText() method
             original_frame = cv2.putText(original_frame, str(Targ['aspectratio']), org, font, fontScale, color, thickness, cv2.LINE_AA)
-
         cv2.imwrite("of1" + str(val) +  ".jpg", original_frame)
         '''
 
