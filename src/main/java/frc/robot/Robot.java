@@ -198,7 +198,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     mRobotLogger.log("Auto Periodic");
-    mRobotLogger.info("Encoder distances: (" + mDrive.getLeftPos() + ", " + mDrive.getRightPos() + ")");
+    mRobotLogger.info(
+        "Encoder distances: (" + mDrive.getLeftPos() + ", " + mDrive.getRightPos() + ")");
     updateSmartDashboard();
   }
 
