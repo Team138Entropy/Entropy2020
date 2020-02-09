@@ -54,6 +54,8 @@ hsv_threshold_hue = [55, 75]
 hsv_threshold_saturation = [89, 231]
 hsv_threshold_value = [102, 255]
 
+solidity_threshold = [0, 65]
+
 # List will go in order [x of target position, y of target position, yaw, distance, ]
 sendValues = np.array([None] * 4)
 distanceHoldValues = np.array([])
@@ -419,10 +421,12 @@ def findTape(contours, image, centerX, centerY):
             # calculate area of convex hull
             hullArea = cv2.contourArea(hull)
 
+            mySolidity = float (cntArea)/hullArea
+
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
             # Filters contours based off of size
-            if (checkContours(cntArea, hullArea, ratio)):
+            if (checkContours(cntArea, hullArea, ratio, mySolidity)):
                 # Next three lines are for debugging the contouring
                 # contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 # cv2.imwrite("drawncontours.jpg", contimage)
@@ -543,8 +547,8 @@ def findTape(contours, image, centerX, centerY):
 
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
-def checkContours(cntSize, hullSize, aspRatio):
-    return cntSize > (image_width / 6) and not (aspRatio < rat_low or aspRatio > rat_high)
+def checkContours(cntSize, hullSize, aspRatio, solidity):
+    return cntSize > (image_width / 6) and not (aspRatio < rat_low or aspRatio > rat_high) and (solidity > 0 and solidity < 65)
 
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
