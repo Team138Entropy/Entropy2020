@@ -249,17 +249,27 @@ public class Drive extends Subsystem {
 
   /*
       Auto Steer functionality
-      passed in parameters to the goal to aim at
-      allows driver to control throttle
-      this will be called with the ball as a target
+      passed ub oaraneters akkiw yser ti druve tiwards bakk
   */
-  public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
+  public synchronized void autoSteer(double throttle, AimingParameters aim_params) {
     double timestamp = Timer.getFPGATimestamp();
-    final double kAutosteerAlignmentPointOffset = 15.0; //
-    /*
+    final double kAutosteerAlignmentPointOffset = 15.0;  // Distance from wall
+    boolean reverse = throttle < 0.0;
+    boolean towards_goal = reverse == (Math.abs(aim_params.getRobotToGoalRotation().getDegrees()) > 90.0);
+    Pose2d field_to_vision_target = aim_params.getFieldToGoal();
+    final Pose2d vision_target_to_alignment_point = Pose2d.fromTranslation(new Translation2d(Math.min(kAutosteerAlignmentPointOffset, aim_params.getRange() - kAutosteerAlignmentPointOffset), 0.0));
+    Pose2d field_to_alignment_point = field_to_vision_target.transformBy(vision_target_to_alignment_point);
+    Pose2d vehicle_to_alignment_point = RobotState.getInstance().getFieldToVehicle(timestamp).inverse().transformBy(field_to_alignment_point);
+    Rotation2d vehicle_to_alignment_point_bearing = vehicle_to_alignment_point.getTranslation().direction();
+    if (reverse) {
+        vehicle_to_alignment_point_bearing = vehicle_to_alignment_point_bearing.rotateBy(Rotation2d.fromDegrees(180.0));
+    }
+    double heading_error_rad = vehicle_to_alignment_point_bearing.getRadians();
+
+    final double kAutosteerKp = 0.05;
+    double curvature = (towards_goal ? 1.0 : 0.0) * heading_error_rad * kAutosteerKp;
     setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
     setBrakeMode(true);
-    */
 
   }
 
