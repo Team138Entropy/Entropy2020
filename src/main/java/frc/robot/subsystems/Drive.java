@@ -143,14 +143,6 @@ public class Drive extends Subsystem {
     mRightMaster.setSelectedSensorPosition(0);
   }
 
-  public synchronized int getLeftPos() {
-    return mLeftMaster.getSelectedSensorPosition(0);
-  }
-
-  public synchronized int getRightPos() {
-    return mRightMaster.getSelectedSensorPosition(0);
-  }
-
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
@@ -254,11 +246,11 @@ public class Drive extends Subsystem {
   public void checkSubsystem() {}
 
   public synchronized double getLeftEncoderDistance() {
-    return mLeftMaster.getSelectedSensorPosition();
+    return mLeftMaster.getSelectedSensorPosition(0);
   }
 
   public synchronized double getRightEncoderDistance() {
-    return 0.0;
+    return mRightMaster.getSelectedSensorPosition(0);
   }
 
   public synchronized Rotation2d getRotation() {
