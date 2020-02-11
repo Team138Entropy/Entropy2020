@@ -24,87 +24,7 @@ import java.util.Optional;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-/**
- * The VM is configured to automatically run this class. If you change the name of this class or the
- * package after creating this project, you must also update the build.gradle file in the project.
- */
 public class Robot extends TimedRobot {
-  // State variables
-  public enum State {
-    IDLE, // Default state
-    INTAKE,
-    SHOOTING,
-    CLIMBING
-  }
-
-  public enum IntakeState {
-    IDLE, // Default state, when State is not INTAKE
-    READY_TO_INTAKE,
-    INTAKE,
-    STORE_BALL,
-    STORAGE_COMPLETE
-  }
-
-  public enum ShootingState {
-    IDLE, // Default state, when State is not SHOOTING
-    PREPARE_TO_SHOOT,
-    SHOOT_BALL,
-    SHOOT_BALL_COMPLETE,
-    SHOOTING_COMPLETE
-  }
-
-  public enum ClimingState {
-    IDLE
-  }
-
-  private final int AUTONOMOUS_BALL_COUNT = 3;
-  private final double FIRE_DURATION_SECONDS = 0.5;
-
-  private State mState = State.IDLE;
-  private IntakeState mIntakeState = IntakeState.IDLE;
-  private ShootingState mShootingState = ShootingState.IDLE;
-  private ClimingState mClimingState = ClimingState.IDLE;
-
-  //NEW STATES
-
-  //Turret Aiming State
-  private enum AimState {
-    AUTO_AIM,
-    MANUAL_AIM
-  };
-
-  private enum ShootState {
-    AUTO_SHOOT, 
-    MANUAL_SHOOT
-  };
-
-  private enum DriveState {
-    MANUAL_DRIVE,
-    AUTO_STEER
-  };
-
-  private enum StorageState2 {
-
-  };
-
-  private enum IntakeState2 {
-    INTAKE_ENABLED,
-    INTAKE_DISABLED
-  };
-
-  //States Initalization
-  private AimState mAimState = AimState.AUTO_AIM;
-  private ShootState mShootState = ShootState.MANUAL_SHOOT;
-  private DriveState mDriveState = DriveState.MANUAL_DRIVE;
-  private IntakeState2 mIntakeState2 = IntakeState2.INTAKE_DISABLED;
-
-  private LatchedBoolean mIntakeToggle = new LatchedBoolean();
-  private LatchedBoolean mIntakeReverse = new LatchedBoolean();
-
-  private LatchedBoolean mInnerIntakeToggle = new LatchedBoolean();
-  private LatchedBoolean mInnerIntakeReverse = new LatchedBoolean();
-
-  private LatchedBoolean mShooterToggle = new LatchedBoolean();
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -120,9 +40,6 @@ public class Robot extends TimedRobot {
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
-
-  boolean Shooting = false;
-
   // Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
   private final Shooter mShooter = Shooter.getInstance();
@@ -133,42 +50,85 @@ public class Robot extends TimedRobot {
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
-  private Compressor mCompressor;
+  private static NetworkTable mTable;
 
-  public Relay visionLight = new Relay(0);
+  // Relays
+  public Relay visionLight = new Relay(0); //Controls Vision Light
+
+  // Robot States
+  // each state is small and simple
+  enum RobotState {
+    Sharpshooter,
+    Rebounder,
+    Climber
+  };
+
+  enum AimingState {
+    AutoAim,
+    ManualAim,
+    Disabled
+  };
+
+  enum DrivingState {
+    ManualDrive,
+    AutoSteer,
+    Disabled
+  };
+
+  enum ClimbingState {
+    Enabled,
+    Disabled
+  };
+
+  enum IntakingState {
+    Enabled,
+    Disabled
+  };
+
+  enum ShootingState {
+    Enabled,
+    Disabled
+  };
+
+  //Intialize Default States
+  private RobotState mRobotState = RobotState.Sharpshooter;
+  private AimingState mAimState = AimingState.AutoAim;
+  private DrivingState mDriveState = DrivingState.ManualDrive;
+  private ClimbingState mClimbState = ClimbingState.Disabled;
+  private IntakingState mIntakeState = IntakingState.Disabled;
+  private ShootingState mShootingState = ShootingState.Disabled;
+
+  //Latched Booleans
+  //Used for detecting presses with debouncing
+  //so we accidently don't trigger a press event twice 
+  private LatchedBoolean mIntakeTogglePressed = new LatchedBoolean();
+  private LatchedBoolean mShootTogglePressed = new LatchedBoolean();
+  private LatchedBoolean mRobotModeTogglePressed = new LatchedBoolean();
+  private LatchedBoolean mAutoAimTogglePressed = new LatchedBoolean();
 
 
-  static NetworkTable mTable;
+  //Auto Steer Aiming Parameters
+  private Optional<AimingParameters>  mBall_aiming_parameters;
 
-  // Fire timer for shooter
-  private Timer mFireTimer = new Timer();
 
-  Logger mRobotLogger = new Logger("robot");
-  FileWriter writer;
+
+  private final Logger mRobotLogger = new Logger("robot");
 
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
-    // Zero all nesscary sensors on Robot
-
-    try{
-      writer = new FileWriter("/U/output_newincrementagain4.csv");
-        System.out.println("OPENED FILE WRITER!");
-    }catch(Exception e){
-      System.out.println("EXCEPTION! " + e.getMessage());
-    }
-
     mRobotLogger.log("robot init _ 1");
 
     //Register the Enabled Looper
     //Used to run background tasks!
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
 
-
     // Zero all nesscary sensors on Robot
     ZeroSensors();
+
+    //Enabled Vision Light
     visionLight.set(Relay.Value.kForward);
 
     EventWatcherThread.getInstance().start();
@@ -182,36 +142,17 @@ public class Robot extends TimedRobot {
     // Reset Robot State
     // Wherever the Robot is now is the starting position
     // This starting Rotation, X, Y is now the Zero Point
-    mRobotTracker.reset();
-
-    // Set the initial Robot State
-    mState = State.INTAKE;
-
-    
+    mRobotTracker.reset();   
   }
 
-  /*
-    Returns true if the pressure switch reads "low", an undefined value we have no control over.
-    Cool!
-  */
-  public boolean getLowPSI() {
-    /*
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
-      return mCompressor.getPressureSwitchValue();
-    } else {
-      return false;
-    }
-    */
-    return false;
-  }
 
   /*
     Called on bootup, Zero all Sensors
   */
   private void ZeroSensors() {
-    mRobotLogger.log("Zeroing sensors...");
+    mRobotLogger.log("Begining Sensor Zeroing");
     mSubsystemManager.zeroSensors();
-    mRobotLogger.log("Zeroed sensors");
+    mRobotLogger.log("Sensor Zeroing Complete");
   }
 
   private void updateSmartDashboard() {
@@ -226,9 +167,7 @@ public class Robot extends TimedRobot {
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
 
-    SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
 
-    SmartDashboard.putString("RobotState", mState.name());
 
     // TODO: cameras will go here eventually
   }
@@ -240,45 +179,24 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-  
-
-
-
-    //updateSmartDashboard();
   }
 
   @Override
   public void teleopInit() {
 
+    //Start background looper
+    //collections information periodically
     mEnabledLooper.start();
 
-    mState = State.INTAKE;
-    mIntakeState = IntakeState.READY_TO_INTAKE;
+
   }
 
   @Override
   public void teleopPeriodic() {
-    /*
-    String intakeVals = ("Intake Roller: " + Double.toString(intakeRoller.getSupplyCurrent()) +
-        ", Upper Intake: " + Double.toString(upperIntake.getSupplyCurrent()) + ", Lower Intake: " + Double.toString(lowerIntake.getSupplyCurrent()));
-    
-    System.out.println(intakeVals);
-
-    try{
-      writer.append(intakeVals);
-      writer.append("\n");
-      
-      writer.flush();
-    }catch(Exception e){
-      //System.out.println("WRITE EXCEPTION");
-      //System.out.println("EXCEPTION!");
-    }
-    */
     try {
       RobotLoop();
     } catch (Exception e) {
       mRobotLogger.log("RobotLoop Exception: " + e.getMessage());
-
       // print the exception to the system error
       e.printStackTrace(System.err);
     }
@@ -329,54 +247,81 @@ public class Robot extends TimedRobot {
 
  
 
-  public void driveTrainLoop() {
-    /*
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
-      // Check User Inputs
-      double driveThrottle = mOperatorInterface.getDriveThrottle();
-      double driveTurn = mOperatorInterface.getDriveTurn();
-      boolean driveShift = mOperatorInterface.getDriveShift();
-      boolean autoDrive = false;
-      mDrive.setDrive(driveThrottle, driveTurn, false);
+  
 
-      // Quickturn
-      if (autoDrive == false && mOperatorInterface.getQuickturn()) {
-        // Quickturn!
-      }
 
-      if (driveShift) mDrive.switchGears();
+  /*
+    Robot Loop
+    Main functionality 
 
-      // Detect Harvest Mode
-      boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
-      boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
+    Sharpshooter - 
+      Normal mode of operation
+      Picking up Balls, then shooting
 
-      boolean WantsAutoAim = false;
+      this mode of operation is designed for full field shooting
 
-      // Optional Object that may or may not contain a null value
-      Optional<AimingParameters> BallAimingParameters; // info to aim to the ball
-      Optional<AimingParameters> TargetAimingParameters; // info to aim to the target
+    Rebounder - 
+      we know there is going to be enough time inbetween picking up balls
+      and we will already be in range
 
-      // Continue Driving
-      if (WantsHarvestMode == true) {
-        // Harvest Mode - AutoSteer Functionality
-        // Used for tracking a ball
-        // we may want to limit the speed?
-        // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
-      } else {
-        // Standard Manual Drive
-        mDrive.setDrive(driveThrottle, driveTurn, false);
-      }
+      this mode of operation is designed for rebounding balls in close range
+      this mode may not be a good fit, we will find out 
+  */
+  public void RobotLoop(){
+
+    if(isSharpShooter() == true){
+      //Normal Robot Loop
+      //Can't intake, shoot at the same time
+      //intake and then shoot
+      intakeLoop();
+      shootLoop();
+    }else if
+      //Rebounder
+      //run everything!
+      //either driver needs to be smart enough to not enable with balls
+      //or delay on storage needs to be implimented
+      mShooter.start();
+      mIntake.start();
+      mStorage.start();
     }
-    */
+
+
+    //Turret and Drive are indepdent of intake and shoot
+    turretLoop();
+    driveLoop();
   }
 
+  //Check for a change in Robot State
+  //robot is likely always in sharpshooter mode
+  public boolean isSharpShooter(){
+    boolean getTogglePress = mOperatorInterface.ToggleRobotMode();
+    boolean WantsToggle = mRobotModeTogglePressed.update(getTogglePress);
 
+    //check if state needs to be reset
+    if(WantsToggle){
+      if(mRobotState == RobotState.Sharpshooter){
+        //go to rebound mode
+        mRobotState = RobotState.Rebounder;
+      }else if(mRobotState == RobotState.Rebounder){
+        //disable all running elements from being in rebounder
+        mShooter.stop();
+        mIntake.stop();
+        mStorage.stop();
 
-  public void RobotLoop(){
-    intakeLoop();
-    //turretLoop();
-    shootLoop();
-    driveLoop();
+        //reset states of individual systems
+        mIntakeState = IntakingState.Disabled;
+        mAimState = AimingState.AutoAim;
+
+        //go to sharpshooter mode
+        mRobotState = RobotState.Sharpshooter;
+      }
+    }
+
+    if(mRobotState == RobotState.Sharpshooter){
+      return true;
+    }else{
+      return false;
+    }
   }
 
 
@@ -386,168 +331,165 @@ public class Robot extends TimedRobot {
   */
   public void shootLoop(){
     boolean WantShooterToggle = mOperatorInterface.ToggleShooter();
-    boolean ShooterTogglePressed = mShooterToggle.update(WantShooterToggle);
+    boolean ShooterTogglePressed = mShootTogglePressed.update(WantShooterToggle);
 
-    if(ShooterTogglePressed == true){
-      System.out.println("Shooter Pressed!");
-      if(mShooter.isRunning() == true){
-        //stop the shooter and the storage
+    if(ShooterTogglePressed){
+      if(mShootingState == ShootingState.Enabled ){
+        //Disabling Shooting State
+        System.out.println("Disable Shooting State");
         mShooter.stop();
         mStorage.stop();
-        Shooting = false;
-      }else{
-        //Start up the shooter
-        mShooter.start();
-        Shooting = true;
+      }else if(mShootingState == ShootingState.Disabled){
+        //Enable Shooting State
+        System.out.println("Enable Shooting State");
+        mShootingState = ShootingState.Enabled;
       }
+
     }
 
 
-    //if we are shooting check velocity and begin running storage
-    if(Shooting == true){
-      mStorage.slowMove();
-    }
 
   }
 
-  public void storageLoop(){
-    boolean WantInnerIntakeToggle = mOperatorInterface.ToggleInnerRollers();
-    boolean WantInnerIntakeReverse = mOperatorInterface.ToggleInnerRollersDirection();
-    boolean InnerRollersPressed = mInnerIntakeToggle.update(WantInnerIntakeToggle);
-    boolean InnerRollersFlipped = mInnerIntakeToggle.update(WantInnerIntakeReverse);
-
-    if(InnerRollersPressed == true){
-      if(mStorage.IsRunning()){
-        mStorage.stop();
-      }else{
-        //start intake
-        mStorage.storeBall();
-      }
-    }
-
-    //if intake direction toggle
-    if(InnerRollersFlipped == true){
-      if(mStorage.IsRunning()){
-        mStorage.invert();
-        mStorage.storeBall();
-      }
-    }
-
-  }
 
   /*
     Allow the Driver to Enable/Disable the intake
-
+    Enabling the intake will use current detection to move motors
   */
   public void intakeLoop(){
     boolean WantIntakeToggle = mOperatorInterface.ToggleIntake();
-    boolean IntakePressed = mIntakeToggle.update(WantIntakeToggle);
+    boolean IntakePressed = mIntakeTogglePressed.update(WantIntakeToggle);
 
-
-    //Check if Intake is Pressed
+    //Update the state of our intake enabled
     if(IntakePressed == true){
-      System.out.println("Intake pressed");
-      if(mIntake.IsRunning()){
+      if(mIntakeState == IntakingState.Disabled){
+        System.out.println("Enabled Intake");
+        //Enable the Intake Subsystem
+        mIntakeState = IntakingState.Enabled;
+        mIntake.resetOvercurrentCooldown();
+        mIntake.start(); //start the roller
+
+      }else if(mIntakeState == IntakingState.Enabled){
         System.out.println("Disable Intake");
-        //turn off intake
-        mIntake.stop();       
-      }else{
-        System.out.println("Enable Intake");
-        //start running intake
-        mIntake.start();    
+        //Disable the Intake Subsystem!
+        mIntakeState = IntakingState.Disabled;
+        mIntake.stop(); // stop the roller
       }
     }
 
-    //check for intake current spike
-    //theory is if we are under load
-    //we can use that as an indicator
-    //and then jog the storage a certain distance
-    if(mIntake.isOverCurrent() == true){
-      //move storage up by a set incriment
-      mStorage.storeBall();
-    }
-    mStorage.CheckStore();
 
+    //if the intake system is running..
+    //check for the overcurrent trigger
+    if(mIntakeState == IntakingState.Enabled){
+      //check if we have found a ball
+      //if so, run the storgae system
+      if(mIntake.isBallDetected() == true){
+        //tell the storage to jog up
+        mStorage.storeBall();
+
+        //incriment ball counter
+      }
+    }
   }
 
-
+  //Controls the Turrets Aiming
   public void turretLoop() {
+    boolean WantsAutoAimToggle = mOperatorInterface.ToggleAutoAim();
+    boolean AutoAimChangedToggled = mAutoAimTogglePressed.update(WantsAutoAimToggle);
+
+    //Change Aiming State (if pressed)
+    if(AutoAimChangedToggled == true){
+      if(mAimState == AimingState.AutoAim){
+        mAimState = AimingState.ManualAim;
+      }else if(mAimState == AimingState.ManualAim){
+        mAimState = AimingState.AutoAim;
+      }
+    }
+
+
     switch(mAimState){
-      case AUTO_AIM: {
-        //VIsion Handles Aiming
-        //Rotation2d VisionError = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-        //System.out.println("VISION ERROR: " + VisionError.getDegrees());
-
-       // RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-       /*
-       if(result.HasResult){
-          //We have target information
+      case AutoAim : {
+        //Auto Aiming Turret
+        //Poll Robot Tracker for targeting information
+        RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+        if(result.HasResult){
+          //We have Target Information
         }else{
-          //No target information
-          //our identity will be 0
-          // System.out.println("Auto Error: " + result.getDegrees());
-    
+          //No Results, Don't Rotate
         }
-        */
 
-
-        //            mTurret.setSetpointPositionPID(mCurrentSetpoint.state.turret, mTurretFeedforwardV);
-
-        break;
-      }case MANUAL_AIM: {
-        //operator controls turret
 
         break;
       }
-    };
+      case ManualAim : {
+        System.out.println("Manual Turret Aim");
+        //Poll operator for adjustments
+        double RotateBy = mOperatorInterface.GetAzmithTurn();
+
+        break;
+      }
+      case Disabled : {
+        //Do Nothing
+        break;
+      }
+
+    }
+
+    
   }
 
+
+  /*
+    Handles all driving related logic
+  */
   private void driveLoop(){
     double driveThrottle = mOperatorInterface.getDriveThrottle();
     double driveTurn = mOperatorInterface.getDriveTurn();
-    boolean autoSteer = mOperatorInterface.wantsAutoSteer();
-    Optional<AimingParameters> ball_aiming_parameters;
 
-    if(autoSteer == true){
-      //Auto Steering the robot
-      //Auto Steers to the ball!
-      ball_aiming_parameters = mRobotTracker.getAimingParameters(false, -1, Constants.kMaxGoalTrackAge);
-
-      //proceed if we have aiming parameters
-      //if not continue manual drive
-      if(ball_aiming_parameters.isEmpty() == false){
-        //Get Aiming Parameters, and throttle value
-        Rotation2d rb = ball_aiming_parameters.get().getRobotToGoalRotation();
-        System.out.println("Measured Rotation: " + rb.getDegrees());
-        mDrive.autoSteer(Util.limit(driveThrottle, 0.3), ball_aiming_parameters.get());
-      }else{
-        System.out.println("No Params.. manual drive!");
-        //We don't have aiming parameters, continue manual drive
-        mDrive.setDrive(driveThrottle, driveTurn, false);
-      }
-
-
-
-    }else{
-      //Manual Drive
-      mDrive.setDrive(driveThrottle, driveTurn, false);
-
+    //Set to Auto Steer State if wanted
+    if(mOperatorInterface.wantsAutoSteer()){
+      mDriveState = DrivingState.AutoSteer;
+    }else if(mDriveState == DrivingState.AutoSteer){
+      //If we are currently in auto steer and no longer need it
+      //reset to manual. No need to do this extra
+      mDriveState = DrivingState.ManualDrive;
     }
-    /*
-    //Drive Logic
+
+
     switch(mDriveState){
-      case MANUAL_DRIVE: {
-        System.out.println("Wants Manual Drive");
-        //Manually Drive the robot used
+      case AutoSteer : {
+        System.out.println("Auto Steer");
+
+        //Auto Steering the robot
+        //Auto Steers to the ball!
+        mBall_aiming_parameters = mRobotTracker.getAimingParameters(false, -1, Constants.kMaxGoalTrackAge);
+
+        //proceed if we have aiming parameters
+        //if not continue manual drive
+        if(mBall_aiming_parameters.isEmpty() == false){
+          //Get Aiming Parameters, and throttle value
+          Rotation2d rb = mBall_aiming_parameters.get().getRobotToGoalRotation();
+          System.out.println("AutoSteer - Measured Rotation: " + rb.getDegrees());
+          mDrive.autoSteer(Util.limit(driveThrottle, 0.3), mBall_aiming_parameters.get());
+        }else{
+          System.out.println("No Params - Manual Drive");
+          //We don't have aiming parameters, continue manual drive
+          mDrive.setDrive(driveThrottle, driveTurn, false);
+        }
+
+        break;
+      }
+      case ManualDrive : {
+        //Drive Controlled Drive
+       // System.out.println("Manual Drive");
         mDrive.setDrive(driveThrottle, driveTurn, false);
         break;
       }
-      case AUTO_STEER: {
-        //Allow the Driver to only control the thottle
+      case Disabled : {
+        //no driving
+        break;
       }
-
-    } //End Drive State
-    */
+    }; //end of switch statement
   }
 
 
@@ -557,11 +499,10 @@ public class Robot extends TimedRobot {
   public void RobotLoop2() {
     updateSmartDashboard();
 
-    executeRobotStateMachine();
+  
 
     turretLoop();
 
-    driveTrainLoop();
 
     /*
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
@@ -598,171 +539,9 @@ public class Robot extends TimedRobot {
     }
   }
 
-  private void executeRobotStateMachine() {
-    switch (mState) {
-      case IDLE:
-        SmartDashboard.putString("RobotState", mState.name());
-        break;
-      case INTAKE:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mIntakeState.name());
-        executeIntakeStateMachine();
-        break;
-      case SHOOTING:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mShootingState.name());
-        executeShootingStateMachine();
-        break;
-      case CLIMBING:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mClimingState.name());
-        executeClimbingStateMachine();
-        break;
-      default:
-        mRobotLogger.error("Invalid Robot State");
-        break;
-    }
-  }
 
-  private void executeIntakeStateMachine() {
-    switch (mIntakeState) {
-      case IDLE:
-        mRobotLogger.warn("Intake state is idle");
-        break;
-      case READY_TO_INTAKE:
-        // If the operator issues the intake command, start intake
-        if (mOperatorInterface.getLoadChamber()) {
-          mIntakeState = IntakeState.INTAKE;
-        }
-        break;
-      case INTAKE:
-        // Check transition to shooting before we start intake of a new ball
-        if (!checkTransitionToShooting()) {
-          mIntake.start();
 
-          // If a ball is detected, store it
-          if (mStorage.isBallDetected()) {
-            mIntakeState = IntakeState.STORE_BALL;
-          }
-        }
-        break;
-      case STORE_BALL:
-        mStorage.storeBall();
-        // TODO: may need to delay stopping the intake roller
-        mIntake.stop();
 
-        // If the sensor indicates the ball is stored, complete ball storage
-        if (mStorage.isBallStored()) {
-          mIntakeState = IntakeState.STORAGE_COMPLETE;
-        }
-        break;
-      case STORAGE_COMPLETE:
-        mStorage.addBall();
 
-        // TODO: may need to delay stopping the storage roller
-        mStorage.stop();
-
-        // If the storage is not full, intake another ball
-        if (!mStorage.isFull()) {
-          mIntakeState = IntakeState.INTAKE;
-        }
-
-        // Check transition to shooting after storage of ball
-        checkTransitionToShooting();
-        break;
-      default:
-        mRobotLogger.error("Invalid Intake State");
-        break;
-    }
-  }
-
-  private boolean checkTransitionToShooting() {
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
-      switch (mState) {
-        case INTAKE:
-          mIntake.stop();
-          mStorage.stop();
-          mIntakeState = IntakeState.IDLE;
-          break;
-        default:
-          break;
-      }
-      mState = State.SHOOTING;
-      if (mShootingState == ShootingState.IDLE) {
-        mShootingState = ShootingState.PREPARE_TO_SHOOT;
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /** Returns whether the firing timer has run longer than the duration. */
-  public boolean isBallFired() {
-    if (mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000) {
-      mShooter.stop();
-      mFireTimer.stop();
-      mFireTimer.reset();
-      return true;
-    }
-    return false;
-  }
-
-  private void executeShootingStateMachine() {
-    switch (mShootingState) {
-      case IDLE:
-        mRobotLogger.warn("Shooting state is idle");
-        break;
-      case PREPARE_TO_SHOOT:
-
-        /* Starts roller */
-        mShooter.start();
-
-        // TODO: Placeholder method, replace later.
-        mShooter.target();
-
-        /* If rollers are spun up, changes to next state */
-        if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
-          mShootingState = ShootingState.SHOOT_BALL;
-        }
-        break;
-      case SHOOT_BALL:
-        mStorage.ejectBall();
-
-        /* If finished shooting, changes to next state*/
-        if (isBallFired()) {
-          mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
-        }
-        break;
-      case SHOOT_BALL_COMPLETE:
-        /* Decrements storage */
-        mStorage.removeBall();
-        mStorage.stop();
-
-        /* Goes to complete if storage is empty, otherwise fires again */
-        if (mStorage.isEmpty()) {
-          mShootingState = ShootingState.SHOOTING_COMPLETE;
-        } else {
-          mShootingState = ShootingState.PREPARE_TO_SHOOT;
-        }
-        break;
-      case SHOOTING_COMPLETE:
-
-        /* Stops the roller and returns to intake state */
-        mShooter.stop();
-        mShootingState = ShootingState.IDLE;
-        mState = State.INTAKE;
-        break;
-      default:
-        mRobotLogger.error("Invalid shooting state");
-        break;
-    }
-  }
-
-  private void executeClimbingStateMachine() {
-    switch (mClimingState) {
-      case IDLE:
-        break;
-      default:
-        mRobotLogger.error("Invalid Climbing State");
-        break;
-    }
-  }
+  
 }

@@ -55,7 +55,7 @@ public class Constants {
   //Intake
   public static final int kIntakeRollerPort = 10;
   public static final double kIntakeRollerSpeed = 0.8;
-  public static final double kIntakeCurrentThreshold = 12.0;
+  public static final double kIntakeCurrentThreshold = 1.2;
   public static final int kIntakeOverCurrentMinOccurances = 25;
 
   //Turret
@@ -65,11 +65,17 @@ public class Constants {
   public static final double kPIDController_D;
   public static final int kTurretEncoderA = 4;
   public static final int kTurrentEncoderB = 5;
-
-
+  
   //Storage
   public static final int kStorageLowerTalon = 7;
   public static final int kStorageUpperTalon = 8;
+  public static final double kStorageRollerSpeed = 1.0;
+  public static final double kStorageRollerFactor = 1.25;
+  public static final double kStorageRollerEject = 0.5;
+
+  //Shooter
+  public static final int kShooterMasterTalon = 5;
+  public static final int kShooterSlaveTalon = 6;
 
   //Drive Encoder Port
   public static final int kDriveGyroPort = 0;

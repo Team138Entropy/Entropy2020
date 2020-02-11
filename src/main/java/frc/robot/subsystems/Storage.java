@@ -3,28 +3,22 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Constants;
+import frc.robot.Logger;
 
-import frc.robot.Constants;;
-
-/** Add your docs here. */
 public class Storage extends Subsystem {
 
 
+  private static final int STORAGE_CAPICTY = 4;
 
-  private static final int STORAGE_CAPICTY = 5;
 
-
-  private WPI_TalonSRX mLowerRoller;
-  private WPI_TalonSRX mUpperRoller;
+  private WPI_TalonSRX mBottomRoller;
+  private WPI_TalonSRX mTopRoller;
   private DigitalInput mIntakeSensor;
-  private boolean Running = false;
-
-  private double SpeedModifier = 1.0;
-  
-
-  private int runCount = 0;
 
   private int mBallCount = 0;
+
+  private boolean mWasLineBroke = false;
 
   private static Storage sInstance;
 
@@ -36,17 +30,36 @@ public class Storage extends Subsystem {
   }
 
   private Storage() {
-   mLowerRoller = new WPI_TalonSRX(Constants.kStorageLowerTalon);
-   mUpperRoller = new WPI_TalonSRX(Constants.kStorageUpperTalon);
-
+    mBottomRoller = new WPI_TalonSRX(Constants.kStorageLowerTalon);
+    mTopRoller = new WPI_TalonSRX(Constants.kStorageUpperTalon);
+    //mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
-  public boolean isBallDetected() {
-    return (mIntakeSensor.get());
+  public void init() {
   }
 
   public boolean isBallStored() {
-    return (!mIntakeSensor.get());
+    return mIntakeSensor.get();
+  }
+
+  public boolean wasLineBroke(){
+    // we have 2 modes to determine if we should stop the storage rollers
+    // returning isBallStored() stops the rollers whenever the sensor is broken
+    // the code below that line stops the rollers whenever the sensor is no longer broken
+    return isBallStored();
+    // if(mWasLineBroke && !isBallStored()){
+    //   mWasLineBroke = false;
+    //   return true;
+    // }
+    // if(isBallStored()){
+    //   mWasLineBroke = true;
+    // }
+    // return false;
+  }
+
+  public void barf(){
+    mBottomRoller.set(ControlMode.PercentOutput, -(Constants.kStorageRollerSpeed * Constants.kStorageRollerSpeed));
+    mTopRoller.set(ControlMode.PercentOutput, -(Constants.kStorageRollerSpeed));
   }
 
   public void preloadBalls(int ballCount) {
@@ -73,57 +86,37 @@ public class Storage extends Subsystem {
     return mBallCount == STORAGE_CAPICTY;
   }
 
-  //Store Motors for a set speed
   public void storeBall() {
-    System.out.println("Store Ball");
-    Running = true;
-    mLowerRoller.set(ControlMode.PercentOutput, SpeedModifier * .4);
-    mUpperRoller.set(ControlMode.PercentOutput, SpeedModifier * .5 );
+    mBottomRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed * Constants.kStorageRollerFactor);
+    mTopRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed);
   }
 
-  public void slowMove(){
-    mLowerRoller.set(ControlMode.PercentOutput, SpeedModifier * .2);
-    mUpperRoller.set(ControlMode.PercentOutput, SpeedModifier * .3 );
-  }
-
-  //Acts as a counter that constantly checks to see if we should be done
-  public void CheckStore(){
-    if(runCount >= 20){
-      runCount = 0;
-      stop();
-    }else{
-      runCount++;
-    }
+  public void start(){
+    mBottomRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed * Constants.kStorageRollerFactor);
+    mTopRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed);
   }
 
   /** Stops the roller. */
   public void stop() {
-    Running = false;
-    mLowerRoller.set(ControlMode.PercentOutput, 0);
-    mUpperRoller.set(ControlMode.PercentOutput, 0);
-
-  }
-
-  public void invert(){
-    if(SpeedModifier == -1){
-      SpeedModifier = 1;
-    }else{
-      SpeedModifier = -1;
-    }
+    mBottomRoller.set(ControlMode.PercentOutput, 0);
+    mTopRoller.set(ControlMode.PercentOutput, 0);
   }
 
   public void ejectBall() {
-   // mRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
+    mBottomRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerEject * Constants.kStorageRollerFactor);
+    mTopRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerEject);
   }
-
-  
 
   public int getBallCount() {
     return mBallCount;
   }
 
-  public synchronized boolean IsRunning(){
-    return Running;
+  public void setBottomOutput(double output) {
+    mBottomRoller.set(ControlMode.PercentOutput, output * Constants.kStorageRollerSpeed * Constants.kStorageRollerFactor);
+  }
+
+  public void setTopOutput(double output) {
+    mTopRoller.set(ControlMode.PercentOutput, output * Constants.kStorageRollerSpeed);
   }
 
   @Override

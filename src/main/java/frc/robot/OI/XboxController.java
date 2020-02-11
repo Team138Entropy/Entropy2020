@@ -60,12 +60,12 @@ public class XboxController {
 
   // analog trigger version
   double getTriggerValue(Side side) {
-    return mController.getRawAxis(side == Side.LEFT ? 2 : 3);
+    return mController.getRawAxis(side == Side.LEFT ? 4 : 5);
   }
 
   // boolean trigger version
   boolean getTrigger(Side side) {
-    return mController.getRawAxis(side == Side.LEFT ? 2 : 3) > Constants.kJoystickThreshold;
+    return mController.getRawAxis(side == Side.LEFT ? 4 : 5) > Constants.kJoystickThreshold;
   }
 
   boolean getButton(Button button) {

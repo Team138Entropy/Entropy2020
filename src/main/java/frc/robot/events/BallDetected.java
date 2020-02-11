@@ -10,7 +10,8 @@ public class BallDetected implements Event {
   Logger mLogger = new Logger("ballDetected");
 
   public boolean check() {
-    return (Storage.getInstance().isBallDetected());
+   // return (Storage.getInstance().isBallDetected());
+   return false;
   }
 
   public Command getCommand() {

@@ -3,6 +3,7 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.OI.XboxController.Axis;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -38,7 +39,7 @@ public class OperatorInterface {
     OperatorController = new XboxController(Constants.OperatorControllerPort);
   }
 
-  // Driver
+  // === Driver ===
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
   }
@@ -47,18 +48,41 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
+  //While Held, the Driver is in Auto Steer Mode 
+  //(if we have coordinates) 
   public boolean wantsAutoSteer(){
     return DriverController.getTrigger(XboxController.Side.RIGHT);
   }
 
-  //Driver attempts to enable/disable intake
+  //Driver attempts to enable/disable intaking
   public boolean ToggleIntake(){
-    return DriverController.getButton(XboxController.Button.A);
+    return DriverController.getButton(XboxController.Button.Y);
   }
 
-  //Toggles shooter and begins to run the shooting system
+  //Todo? Drive Macros
+
+  // === Operator === 
+
+  //Disable/Enable Auto Aim
+  //should always stay in auto aim but just in case somehting breaks
+  public boolean ToggleAutoAim(){
+    return OperatorController.getTrigger(XboxController.Side.LEFT);
+  }
+
+  //enables the shooter
+  //the shooter will look to clear out all balls in the chamber
   public boolean ToggleShooter(){
-    return OperatorController.getButton(XboxController.Button.A);
+    return OperatorController.getTrigger(XboxController.Side.RIGHT);
+  }
+
+  //operator has to hit both right back and left back buttons
+  public boolean ToggleRobotMode(){
+    return OperatorController.getButton(XboxController.Button.LB) && OperatorController.getButton(XboxController.Button.RB);
+  }
+ 
+
+  public double GetAzmithTurn(){
+    return OperatorController.getJoystick(XboxController.Side.LEFT, Axis.X);
   }
 
 
