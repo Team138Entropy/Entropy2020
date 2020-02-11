@@ -508,7 +508,7 @@ public class RobotState {
   }
 
   // not sure we need it!
-  public synchronized void outputToSmartDashboard() {}
+  public void outputToSmartDashboard() {}
 
   // Used for shuffleboard stuff only 
   public synchronized boolean getHighGoalLocked() {

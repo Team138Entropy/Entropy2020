@@ -165,7 +165,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("TargetLocked", mRobotState.getHighGoalLocked());
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
-    SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
     SmartDashboard.putString("RobotState", mState.name());
 
     // TODO: cameras will go here eventually

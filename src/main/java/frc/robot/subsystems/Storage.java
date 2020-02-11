@@ -106,11 +106,11 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, output * SPEED_FACTOR);
   }
 
-  public void increaseBallCount() {
+  public synchronized void increaseBallCount() {
     ballsStored++;
   }
 
-  public void decreaseBallCount() {
+  public synchronized void decreaseBallCount() {
     ballsStored--;
   }
 
