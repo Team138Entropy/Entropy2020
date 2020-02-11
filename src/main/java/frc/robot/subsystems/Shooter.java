@@ -19,7 +19,7 @@ public class Shooter extends Subsystem {
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
 
   // TODO: Tune these values
-  private static final int ROLLER_SPEED = 256; // Encoder ticks per 100ms, change this value
+  private static final int ROLLER_SPEED = 128; // Encoder ticks per 100ms, change this value
   private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
