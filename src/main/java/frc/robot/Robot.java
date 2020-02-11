@@ -266,16 +266,24 @@ public class Robot extends TimedRobot {
 
       this mode of operation is designed for rebounding balls in close range
       this mode may not be a good fit, we will find out 
+
+    Climber -
+      *UNLESS WE CAN SHOOT AND CLIMB, then this needs to be changed*
+      disables rotation on the turret, turns off intake rollers
+
   */
   public void RobotLoop(){
-
-    if(isSharpShooter() == true){
+    //Checks if the overall Robot State Mode wants to change
+    //if we change it we perform a bunch of other logic 
+    CheckRobotMode(); 
+    
+    if(mRobotState == RobotState.Sharpshooter){
       //Normal Robot Loop
       //Can't intake, shoot at the same time
       //intake and then shoot
       intakeLoop();
       shootLoop();
-    }else if
+    }else if(mRobotState == RobotState.Rebounder){
       //Rebounder
       //run everything!
       //either driver needs to be smart enough to not enable with balls
@@ -283,6 +291,10 @@ public class Robot extends TimedRobot {
       mShooter.start();
       mIntake.start();
       mStorage.start();
+    }else if(mRobotState == RobotState.Climber){
+      //Climber
+      //keep unnesccary subsystems disabled
+      //expescially the turret, we don't want that swining around
     }
 
 
@@ -293,11 +305,12 @@ public class Robot extends TimedRobot {
 
   //Check for a change in Robot State
   //robot is likely always in sharpshooter mode
-  public boolean isSharpShooter(){
+  public void CheckRobotMode(){
     boolean getTogglePress = mOperatorInterface.ToggleRobotMode();
     boolean WantsToggle = mRobotModeTogglePressed.update(getTogglePress);
 
     //check if state needs to be reset
+    //this is for toggling in between sharpshooter <--> rebounder
     if(WantsToggle){
       if(mRobotState == RobotState.Sharpshooter){
         //go to rebound mode
