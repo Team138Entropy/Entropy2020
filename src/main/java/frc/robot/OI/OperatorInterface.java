@@ -6,6 +6,16 @@ import frc.robot.OI.NykoController.DPad;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
+/*
+===== Operator =====
+Right Stick - Azmith
+Start - Up Shooter Speed
+Select - Down Shooter Speed
+Right Trigger - Manual Shoot
+
+
+
+*/
 
 public class OperatorInterface {
   Logger mLogger;
@@ -13,7 +23,7 @@ public class OperatorInterface {
 
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
-  private final NykoController OperatorController;
+  private final XboxController OperatorController;
 
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
@@ -25,7 +35,7 @@ public class OperatorInterface {
   private OperatorInterface() {
     mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
-    OperatorController = new NykoController(Constants.OperatorControllerPort);
+    OperatorController = new XboxController(Constants.OperatorControllerPort);
   }
 
   // Driver
@@ -41,9 +51,18 @@ public class OperatorInterface {
     return DriverController.getTrigger(XboxController.Side.RIGHT);
   }
 
+  //Driver attempts to enable/disable intake
   public boolean ToggleIntake(){
     return DriverController.getButton(XboxController.Button.A);
   }
+
+  //Toggles shooter and begins to run the shooting system
+  public boolean ToggleShooter(){
+    return OperatorController.getButton(XboxController.Button.A);
+  }
+
+
+  
 
   public boolean ToggleIntakeDirection(){
     return DriverController.getButton(XboxController.Button.Y);
@@ -92,37 +111,45 @@ public class OperatorInterface {
   }
 
   public boolean getTurretAdjustLeft() {
-    return OperatorController.getDPad() == DPad.LEFT;
+    //return OperatorController.getDPad() == DPad.LEFT;
+    return false;
   }
 
   public boolean getTurretAdjustRight() {
-    return OperatorController.getDPad() == DPad.RIGHT;
+    //return OperatorController.getDPad() == DPad.RIGHT;
+    return false;
   }
 
   // Operator
 
   public boolean getHarvestMode() {
-    return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
+   // return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
+   return false;
   }
 
   public double getOperatorThrottle() {
-    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
+    //return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
+    return 0;
   }
 
   public double getOperatorTurn() {
-    return OperatorController.getJoystick(NykoController.Side.RIGHT, NykoController.Axis.X);
+    //return OperatorController.getJoystick(NykoController.Side.RIGHT, NykoController.Axis.X);
+    return 0;
   }
 
   public boolean getCameraSwap() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_4);
+    //return OperatorController.getButton(NykoController.Button.BUTTON_4);
+    return false;
   }
 
   public boolean getShoot() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_3);
+    //return OperatorController.getButton(NykoController.Button.BUTTON_3);
+    return false;
   }
 
   public boolean getLoadChamber() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_1);
+    //return OperatorController.getButton(NykoController.Button.BUTTON_1);
+    return false;
   }
 
   public void setDriverRumble(boolean toggle) {
@@ -131,14 +158,17 @@ public class OperatorInterface {
 
   // Test Mode functions
   public boolean isIntakeRollertest() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+    //return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+    return false;
   }
 
   public boolean isStorageRollerTest() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+   // return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+    return false;
   }
 
   public boolean isShooterTest() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+    //return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+    return false;
   }
 }

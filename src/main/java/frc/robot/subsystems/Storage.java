@@ -3,22 +3,16 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.Config;
-import frc.robot.Config.Key;
+
 import frc.robot.Constants;;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
-  private static final int INTAKE_SENSOR_PORT =
-      Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
+
 
   private static final int STORAGE_CAPICTY = 5;
 
-  // TODO: Tune these values
-  private static final double STORE_SPEED = Config.getInstance().getInt(Key.INTAKE__SENSOR_PORT);
-  private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_PORT);
 
   private WPI_TalonSRX mLowerRoller;
   private WPI_TalonSRX mUpperRoller;
@@ -27,6 +21,8 @@ public class Storage extends Subsystem {
 
   private double SpeedModifier = 1.0;
   
+
+  private int runCount = 0;
 
   private int mBallCount = 0;
 
@@ -40,8 +36,6 @@ public class Storage extends Subsystem {
   }
 
   private Storage() {
-    //mRoller = new WPI_TalonSRX(ROLLER_PORT);
-   // mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
    mLowerRoller = new WPI_TalonSRX(Constants.kStorageLowerTalon);
    mUpperRoller = new WPI_TalonSRX(Constants.kStorageUpperTalon);
 
@@ -79,11 +73,27 @@ public class Storage extends Subsystem {
     return mBallCount == STORAGE_CAPICTY;
   }
 
+  //Store Motors for a set speed
   public void storeBall() {
+    System.out.println("Store Ball");
     Running = true;
     mLowerRoller.set(ControlMode.PercentOutput, SpeedModifier * .4);
     mUpperRoller.set(ControlMode.PercentOutput, SpeedModifier * .5 );
+  }
 
+  public void slowMove(){
+    mLowerRoller.set(ControlMode.PercentOutput, SpeedModifier * .2);
+    mUpperRoller.set(ControlMode.PercentOutput, SpeedModifier * .3 );
+  }
+
+  //Acts as a counter that constantly checks to see if we should be done
+  public void CheckStore(){
+    if(runCount >= 20){
+      runCount = 0;
+      stop();
+    }else{
+      runCount++;
+    }
   }
 
   /** Stops the roller. */

@@ -84,6 +84,7 @@ public class VisionManager extends Subsystem {
     // Exector Thread
     // Packets are processed in this thread!
     private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+    private ThreadPoolExecutor RobotTrackerExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
 
     private VisionManager() {
@@ -137,9 +138,16 @@ public class VisionManager extends Subsystem {
         
                 //System.out.println("Recieved Packet: z: " + ti.getZ() + "  y: " + ti.getY());
 
-                // If we made it to this point we had all the required keys!
-                // Now we need to update RobotState with our new values!
-                mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
+
+                //Pass to executor to not block up this field
+                RobotTrackerExecutor.execute(
+                    new Runnable() {
+                        public void run() {
+                            // If we made it to this point we had all the required keys!
+                            // Now we need to update RobotState with our new values!
+                            mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
+                    }
+                });
 
             } catch (Exception Targ) {
                 // Exception Thrown when Trying to retrieve values from json object

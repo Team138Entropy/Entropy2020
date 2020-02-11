@@ -29,10 +29,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
  * package after creating this project, you must also update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
-  WPI_TalonSRX intakeRoller = new WPI_TalonSRX(10);
-  WPI_TalonSRX upperIntake = new WPI_TalonSRX(8);
-  WPI_TalonSRX lowerIntake = new WPI_TalonSRX(7);
-
   // State variables
   public enum State {
     IDLE, // Default state
@@ -108,6 +104,8 @@ public class Robot extends TimedRobot {
   private LatchedBoolean mInnerIntakeToggle = new LatchedBoolean();
   private LatchedBoolean mInnerIntakeReverse = new LatchedBoolean();
 
+  private LatchedBoolean mShooterToggle = new LatchedBoolean();
+
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
@@ -121,6 +119,9 @@ public class Robot extends TimedRobot {
 
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
+
+
+  boolean Shooting = false;
 
   // Subsystems
   private final VisionManager mVisionManager = VisionManager.getInstance();
@@ -372,10 +373,41 @@ public class Robot extends TimedRobot {
 
 
   public void RobotLoop(){
-    storageLoop();
     intakeLoop();
-    turretLoop();
+    //turretLoop();
+    shootLoop();
     driveLoop();
+  }
+
+
+  /*
+    Allows the driver to enable/disable shooting
+
+  */
+  public void shootLoop(){
+    boolean WantShooterToggle = mOperatorInterface.ToggleShooter();
+    boolean ShooterTogglePressed = mShooterToggle.update(WantShooterToggle);
+
+    if(ShooterTogglePressed == true){
+      System.out.println("Shooter Pressed!");
+      if(mShooter.isRunning() == true){
+        //stop the shooter and the storage
+        mShooter.stop();
+        mStorage.stop();
+        Shooting = false;
+      }else{
+        //Start up the shooter
+        mShooter.start();
+        Shooting = true;
+      }
+    }
+
+
+    //if we are shooting check velocity and begin running storage
+    if(Shooting == true){
+      mStorage.slowMove();
+    }
+
   }
 
   public void storageLoop(){
@@ -403,33 +435,38 @@ public class Robot extends TimedRobot {
 
   }
 
+  /*
+    Allow the Driver to Enable/Disable the intake
+
+  */
   public void intakeLoop(){
     boolean WantIntakeToggle = mOperatorInterface.ToggleIntake();
-    boolean WantIntakeReverse = mOperatorInterface.ToggleIntakeDirection();
     boolean IntakePressed = mIntakeToggle.update(WantIntakeToggle);
-    boolean IntakeFlipped = mIntakeReverse.update(WantIntakeReverse);
-  //System.out.println("Intake Loop");
 
 
-    //if intake press
+    //Check if Intake is Pressed
     if(IntakePressed == true){
+      System.out.println("Intake pressed");
       if(mIntake.IsRunning()){
-        mIntake.stop();
-        
+        System.out.println("Disable Intake");
+        //turn off intake
+        mIntake.stop();       
       }else{
-        //start intake
-        mIntake.start();
-        
+        System.out.println("Enable Intake");
+        //start running intake
+        mIntake.start();    
       }
     }
 
-    //if intake direction toggle
-    if(IntakeFlipped == true){
-      if(mIntake.IsRunning()){
-        mIntake.invert();
-        mIntake.start();
-      }
+    //check for intake current spike
+    //theory is if we are under load
+    //we can use that as an indicator
+    //and then jog the storage a certain distance
+    if(mIntake.isOverCurrent() == true){
+      //move storage up by a set incriment
+      mStorage.storeBall();
     }
+    mStorage.CheckStore();
 
   }
 

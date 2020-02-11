@@ -26,9 +26,6 @@ public class Drive extends Subsystem {
   // Drive Talons
   private final WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
 
-  //Drive Encoders
-  private final Encoder mLeftEncoder, mRightEncoder;
-
   //Robot Gyro
   private final ADXRS450_Gyro mGyro;
 
@@ -82,8 +79,8 @@ public class Drive extends Subsystem {
       mPeriodicIO.left_voltage = mLeftMaster.getMotorOutputVoltage() * mLeftMaster.getBusVoltage();
       mPeriodicIO.right_voltage = mRightMaster.getMotorOutputVoltage() * mRightMaster.getBusVoltage();
 
-      mPeriodicIO.left_position_ticks = mLeftEncoder.get();
-      mPeriodicIO.right_position_ticks = mRightEncoder.get();
+      mPeriodicIO.left_position_ticks = mLeftMaster.getSelectedSensorPosition();
+      mPeriodicIO.right_position_ticks = mRightMaster.getSelectedSensorPosition();
       mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mGyro.getAngle());
 
       double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / Constants.kDriveEncoderPPR)
@@ -94,10 +91,10 @@ public class Drive extends Subsystem {
               * Math.PI;
       mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
 
-      mPeriodicIO.left_velocity_ticks_per_100ms = (int) (mLeftEncoder.getRate()
-              / (10 * mLeftEncoder.getDistancePerPulse()));
-      mPeriodicIO.right_velocity_ticks_per_100ms = (int) (mRightEncoder.getRate()
-              / (10 * mRightEncoder.getDistancePerPulse()));
+      mPeriodicIO.left_velocity_ticks_per_100ms = (int) (mLeftMaster.getSelectedSensorVelocity()
+              / (10 * 1));
+      mPeriodicIO.right_velocity_ticks_per_100ms = (int) (mRightMaster.getSelectedSensorVelocity()
+              / (10 * 1));
 
   }
 
@@ -131,12 +128,12 @@ public class Drive extends Subsystem {
 
     //Encoder Intialization
     //last argument is to reverse directions!
-    mLeftEncoder = new Encoder(Constants.kLeftDriveEncoderPortA, Constants.kLeftDriveEncoderPortB, false);
-    mRightEncoder = new Encoder(Constants.kRightDriveEncoderPortA, Constants.kRightDriveEncoderPortB, true);
+   // mLeftEncoder = new Encoder(Constants.kLeftDriveEncoderPortA, Constants.kLeftDriveEncoderPortB, false);
+    //mRightEncoder = new Encoder(Constants.kRightDriveEncoderPortA, Constants.kRightDriveEncoderPortB, true);
 
     //Configure Distance Per Pulse
-    mLeftEncoder.setDistancePerPulse(Constants.kDriveWheelDiameterInches * Math.PI / Constants.kDriveEncoderPPR);
-    mRightEncoder.setDistancePerPulse(Constants.kDriveWheelDiameterInches * Math.PI / Constants.kDriveEncoderPPR);
+    //mLeftEncoder.setDistancePerPulse(Constants.kDriveWheelDiameterInches * Math.PI / Constants.kDriveEncoderPPR);
+   // mRightEncoder.setDistancePerPulse(Constants.kDriveWheelDiameterInches * Math.PI / Constants.kDriveEncoderPPR);
 
     //Intialize Gyro on RoboRio
     mGyro = new ADXRS450_Gyro();
@@ -181,8 +178,8 @@ public class Drive extends Subsystem {
 
   //Clear Everything and start a new periodic IO container
   public synchronized void resetEncoders() {
-    mLeftEncoder.reset();
-    mRightEncoder.reset();
+    //mLeftEncoder.reset();
+   // mRightEncoder.reset();
     mPeriodicIO = new PeriodicIO();
   }
 
