@@ -329,12 +329,6 @@ public class Robot extends TimedRobot {
         mRobotState = RobotState.Sharpshooter;
       }
     }
-
-    if(mRobotState == RobotState.Sharpshooter){
-      return true;
-    }else{
-      return false;
-    }
   }
 
 
