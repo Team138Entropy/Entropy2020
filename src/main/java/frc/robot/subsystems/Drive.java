@@ -134,15 +134,6 @@ public class Drive extends Subsystem {
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
-    // add a "minimum"
-    if (throttle >= .17) {
-      throttle = .17;
-    }
-
-    if (throttle <= -.17) {
-      throttle = -.17;
-    }
-
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
     // don't have to

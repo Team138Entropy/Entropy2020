@@ -18,6 +18,7 @@ public class Config {
     STORAGE__BOTTOM_ROLLER(8),
     STORAGE__TOP_ROLLER(7),
     SHOOTER__ROLLER(6),
+    SHOOTER__ROLLER_SLAVE(5),
 
     // Sensors
     INTAKE__SENSOR(1),
