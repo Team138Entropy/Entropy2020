@@ -110,6 +110,7 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
+    // TODO: actually set roller velocity
     return true;// mRollerVelocity > TARGET_ROLLER_VELOCITY;
   }
 
