@@ -44,11 +44,13 @@ public class Intake extends Subsystem {
   }
 
   public void start() {
+    mLogger.verbose("Running roller at " + ROLLER_SPEED);
     mRoller.set(ControlMode.PercentOutput, ROLLER_SPEED);
   }
 
   /** Stops the roller. */
   public void stop() {
+    mLogger.verbose("Stopping roller ");
     mRoller.set(ControlMode.PercentOutput, 0);
   }
 

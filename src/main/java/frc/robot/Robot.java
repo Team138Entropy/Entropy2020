@@ -356,6 +356,10 @@ public class Robot extends TimedRobot {
       mRobotLogger.log("Changed state to " + mShootingState);
     }
 
+    // check if we are shooting
+    // TODO: remove this and only allow shooting if you have at least 1 ball
+    checkTransitionToShooting();
+
     turretLoop();
 
     driveTrainLoop();
@@ -431,6 +435,7 @@ public class Robot extends TimedRobot {
         if (mStorage.wasLineBroke()) {
           mIntakeState = IntakeState.STORAGE_COMPLETE;
         }
+
         break;
       case STORAGE_COMPLETE:
         mStorage.addBall();
@@ -455,7 +460,8 @@ public class Robot extends TimedRobot {
   }
 
   private boolean checkTransitionToShooting() {
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
+    // TODO: uncomment this isEmpty when we get ball counting working
+    if (mOperatorInterface.getShoot()/* && (!mStorage.isEmpty())*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
@@ -472,6 +478,7 @@ public class Robot extends TimedRobot {
       }
       return true;
     } else {
+      // mRobotLogger.info("Could not shoot because " + (!mStorage.isEmpty()) + " " + mOperatorInterface.getShoot());
       return false;
     }
   }
@@ -507,6 +514,8 @@ public class Robot extends TimedRobot {
         break;
       case SHOOT_BALL:
         mStorage.ejectBall();
+
+        mShooter.start();
 
         /* If finished shooting, changes to next state*/
         if (isBallFired()) {
