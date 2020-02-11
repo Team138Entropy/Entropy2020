@@ -423,10 +423,11 @@ def findTape(contours, image, centerX, centerY):
 
             mySolidity = float (cntArea)/hullArea
 
+
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
             # Filters contours based off of size
-            if (checkContours(cntArea, hullArea, ratio, mySolidity)):
+            if (checkContours(cntArea, hullArea, ratio, mySolidity, cnt)):
                 # Next three lines are for debugging the contouring
                 # contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 # cv2.imwrite("drawncontours.jpg", contimage)
@@ -547,8 +548,8 @@ def findTape(contours, image, centerX, centerY):
 
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
-def checkContours(cntSize, hullSize, aspRatio, solidity):
-    return cntSize > (image_width / 6) and not (aspRatio < rat_low or aspRatio > rat_high) and (solidity > 0 and solidity < 65)
+def checkContours(cntSize, hullSize, aspRatio, solidity, contour):
+    return cntSize > (image_width / 6) and (len(contour) > 15) #and not (aspRatio < rat_low or aspRatio > rat_high) and (solidity > 0 and solidity < 65)
 
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
