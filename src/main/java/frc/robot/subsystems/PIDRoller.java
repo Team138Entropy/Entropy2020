@@ -11,8 +11,9 @@ class PIDRoller {
   private static final int TIMEOUT_MS = 10;
 
   private WPI_TalonSRX mTalon;
+  private WPI_TalonSRX mTalonSlave;
 
-  PIDRoller(int talonPort, double p, double i, double d) {
+  PIDRoller(int talonPort, int talon2Port, double p, double i, double d) {
     super();
 
     mTalon = new WPI_TalonSRX(talonPort);
@@ -35,6 +36,9 @@ class PIDRoller {
     mTalon.setNeutralMode(NeutralMode.Coast);
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
+
+    mTalonSlave = new WPI_TalonSRX(talonPort);
+    mTalonSlave.follow(mTalon);
   }
 
   void setSpeed(int posPer100Ms) {
