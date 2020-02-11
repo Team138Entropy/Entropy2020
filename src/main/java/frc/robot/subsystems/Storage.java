@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants;
 import frc.robot.Logger;
 
+//temp
+import edu.wpi.first.wpilibj.Timer;
+
 public class Storage extends Subsystem {
 
 
@@ -21,6 +24,9 @@ public class Storage extends Subsystem {
   private boolean mWasLineBroke = false;
 
   private static Storage sInstance;
+
+  private Timer mTempTimer = new Timer();
+  private boolean mRunningStore = false;
 
   public static synchronized Storage getInstance() {
     if (sInstance == null) {
@@ -87,9 +93,20 @@ public class Storage extends Subsystem {
   }
 
   public void storeBall() {
+    mRunningStore = true;
+    mTempTimer.reset(); //tempoary solution before encoders
     mBottomRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed * Constants.kStorageRollerFactor);
     mTopRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed);
   }
+
+  //tempoary solution which stops rollers
+  public void CheckTimer(){
+    if(mTempTimer.hasPeriodPassed(1)){
+      //if 1 second has passed
+      stop();
+    }
+  }
+
 
   public void start(){
     mBottomRoller.set(ControlMode.PercentOutput, Constants.kStorageRollerSpeed * Constants.kStorageRollerFactor);

@@ -396,6 +396,12 @@ public class Robot extends TimedRobot {
 
         //incriment ball counter
       }
+
+      //check if store ball should complete
+      //the store actuion should be via encoder
+      //this is another hacky way to do it
+      mStorage.CheckTimer();
+
     }
   }
 
