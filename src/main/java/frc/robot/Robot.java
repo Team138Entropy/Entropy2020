@@ -154,6 +154,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Ball Stored", mStorage.isBallStored());
 
     SmartDashboard.putString("RobotState", mState.name());
+    SmartDashboard.putString("IntakeState", mIntakeState.name());
+    SmartDashboard.putString("ShootingState", mShootingState.name());
+    SmartDashboard.putString("ClimbingState", mClimingState.name());
   }
 
   @Override
@@ -381,17 +384,20 @@ public class Robot extends TimedRobot {
     switch (mState) {
       case IDLE:
         SmartDashboard.putString("RobotState", mState.name());
+        SmartDashboard.putString("IntakeState", mIntakeState.name());
+        SmartDashboard.putString("ShootingState", mShootingState.name());
+        SmartDashboard.putString("ClimbingState", mClimingState.name());
+        mIntake.stop();
+        mStorage.stop();
+        mShooter.stop();
         break;
       case INTAKE:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mIntakeState.name());
         executeIntakeStateMachine();
         break;
       case SHOOTING:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mShootingState.name());
         executeShootingStateMachine();
         break;
       case CLIMBING:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mClimingState.name());
         executeClimbingStateMachine();
         break;
       default:
@@ -406,6 +412,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
+        mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
         break;
       case READY_TO_INTAKE:
@@ -498,6 +505,7 @@ public class Robot extends TimedRobot {
     switch (mShootingState) {
       case IDLE:
         mRobotLogger.warn("Shooting state is idle");
+        mShooter.stop();
         break;
       case PREPARE_TO_SHOOT:
 

@@ -37,11 +37,16 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-    mTalonSlave = new WPI_TalonSRX(talonPort);
+    mTalonSlave = new WPI_TalonSRX(talon2Port);
     mTalonSlave.follow(mTalon);
   }
 
   void setSpeed(int posPer100Ms) {
-    mTalon.set(ControlMode.Velocity, posPer100Ms);
+    if(posPer100Ms == 0){
+      System.out.println("PID roller");
+      mTalon.set(ControlMode.PercentOutput, 0);
+    }else{
+      mTalon.set(ControlMode.Velocity, -posPer100Ms);
+    }
   }
 }

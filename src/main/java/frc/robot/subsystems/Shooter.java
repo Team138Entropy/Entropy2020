@@ -17,10 +17,10 @@ public class Shooter extends Subsystem {
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE)
+  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int ROLLER_SPEED = 128; // Encoder ticks per 100ms, change this value
+  private static final int ROLLER_SPEED = 1024; // Encoder ticks per 100ms, change this value
   private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
