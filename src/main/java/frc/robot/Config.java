@@ -6,7 +6,6 @@ package frc.robot;
 // @Deprecated
 // public class Constants {
 
-// TODO: Address performance concerns by profiling execution time and trimming calls
 public class Config {
 
   public enum Key {
@@ -19,6 +18,7 @@ public class Config {
     STORAGE__BOTTOM_ROLLER(8),
     STORAGE__TOP_ROLLER(7),
     SHOOTER__ROLLER(6),
+    SHOOTER__ROLLER_SLAVE(5),
 
     // Sensors
     INTAKE__SENSOR(1),
@@ -41,14 +41,15 @@ public class Config {
     ROBOT__HAS_DRIVETRAIN(true),
     ROBOT__HAS_TURRET(false),
     ROBOT__HAS_LEDS(false),
-    ROBOT__HAS_COMPRESSOR(false),
-    ROBOT__HAS_SOLENOID(false),
 
     ROBOT__POT__LOCATION(0),
     ROBOT__POT__RANGE(-6),
     ROBOT__POT__OFFSET(321.8d),
 
     ROBOT__TURRET__TALON_LOCATION(1),
+
+    INTAKE__OVERCURRENT_THRESHOLD(12d),
+    INTAKE__OVERCURRENT_MIN_OCCURENCES(25),
 
     OI__VISION__PID__MAX_SPEED(0.25d);
 

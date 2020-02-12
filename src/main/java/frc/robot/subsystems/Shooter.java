@@ -17,9 +17,10 @@ public class Shooter extends Subsystem {
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
+  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int ROLLER_SPEED = 1; // Encoder ticks per 100ms, change this value
+  private static final int ROLLER_SPEED = 1024; // Encoder ticks per 100ms, change this value
   private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
@@ -66,7 +67,7 @@ public class Shooter extends Subsystem {
   private double mRollerVelocity;
 
   private Shooter() {
-    mRoller = new PIDRoller(ROLLER_PORT, P, I, D);
+    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D);
     mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
@@ -97,17 +98,20 @@ public class Shooter extends Subsystem {
 
   /** Starts the roller. */
   public void start() {
+    System.out.println("Starting roller");
     mRoller.setSpeed(ROLLER_SPEED);
   }
 
   /** Stops the roller. */
   public void stop() {
+    System.out.println("Stopping roller");
     mRoller.setSpeed(0);
   }
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
-    return mRollerVelocity > TARGET_ROLLER_VELOCITY;
+    // TODO: actually set roller velocity
+    return true;// mRollerVelocity > TARGET_ROLLER_VELOCITY;
   }
 
   // Used in TEST mode only

@@ -4,19 +4,19 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Config;
+import frc.robot.Logger;
 import frc.robot.Config.Key;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  // TODO: Need to implement top roller
   private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
   private static final int INTAKE_SENSOR_PORT =
       Config.getInstance().getInt(Key.INTAKE__SENSOR);
 
-  private static final int STORAGE_CAPICTY = 5;
+  private static final int STORAGE_CAPICTY = 4;
 
   private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
@@ -29,8 +29,7 @@ public class Storage extends Subsystem {
 
   private int mBallCount = 0;
 
-  // TODO: Hook this up with Autonomous starting with balls
-  private int ballsStored = 0;
+  private boolean mWasLineBroke = false;
 
   private static Storage sInstance;
 
@@ -50,25 +49,41 @@ public class Storage extends Subsystem {
   public void init() {
   }
 
-  public boolean isBallDetected() {
-    return (mIntakeSensor.get());
-  }
-
   public boolean isBallStored() {
-    return (!mIntakeSensor.get());
+    return mIntakeSensor.get();
   }
 
-  public void preloadBalls(int ballCount) {
+  public boolean wasLineBroke(){
+    // we have 2 modes to determine if we should stop the storage rollers
+    // returning isBallStored() stops the rollers whenever the sensor is broken
+    // the code below that line stops the rollers whenever the sensor is no longer broken
+    return isBallStored();
+    // if(mWasLineBroke && !isBallStored()){
+    //   mWasLineBroke = false;
+    //   return true;
+    // }
+    // if(isBallStored()){
+    //   mWasLineBroke = true;
+    // }
+    // return false;
+  }
+
+  public void barf(){
+    mBottomRoller.set(ControlMode.PercentOutput, -(STORE_SPEED * BOTTOM_SPEED_FACTOR));
+    mTopRoller.set(ControlMode.PercentOutput, -(STORE_SPEED));
+  }
+
+  public synchronized void preloadBalls(int ballCount) {
     mBallCount = ballCount;
   }
 
-  public void addBall() {
+  public synchronized void addBall() {
     if (mBallCount < STORAGE_CAPICTY) {
       mBallCount++;
     }
   }
 
-  public void removeBall() {
+  public synchronized void removeBall() {
     if (mBallCount > 0) {
       mBallCount--;
     }
@@ -106,16 +121,8 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, output * SPEED_FACTOR);
   }
 
-  public synchronized void increaseBallCount() {
-    ballsStored++;
-  }
-
-  public synchronized void decreaseBallCount() {
-    ballsStored--;
-  }
-
   public int getBallCount() {
-    return ballsStored;
+    return mBallCount;
   }
 
   @Override

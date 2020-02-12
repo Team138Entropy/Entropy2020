@@ -38,10 +38,6 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
-  public boolean getDriveShift() {
-    return DriverController.getButton(XboxController.Button.START);
-  }
-
   public boolean getClimb() {
     return DriverController.getButton(XboxController.Button.Y);
   }
@@ -99,12 +95,16 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
 
-  public boolean getLoadChamber() {
+  public boolean startIntake() {
     return OperatorController.getButton(NykoController.Button.BUTTON_1);
   }
 
   public void setDriverRumble(boolean toggle) {
     DriverController.setRumble(toggle);
+  }
+
+  public boolean isBarf() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
 
   // Test Mode functions
