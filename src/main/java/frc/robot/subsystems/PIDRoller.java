@@ -23,11 +23,13 @@ class PIDRoller {
     mTalon.configNominalOutputReverse(0, TIMEOUT_MS);
     mTalon.configPeakOutputForward(1, TIMEOUT_MS);
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
+    // mTalon.configFactoryDefault();
 
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
     mTalon.setSensorPhase(false);
 
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 0, TIMEOUT_MS);
+
 
     mTalon.config_kP(PID_LOOP_INDEX, p);
     mTalon.config_kI(PID_LOOP_INDEX, i);
@@ -36,6 +38,7 @@ class PIDRoller {
     mTalon.setNeutralMode(NeutralMode.Coast);
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
+
 
     mTalonSlave = new WPI_TalonSRX(talon2Port);
     mTalonSlave.follow(mTalon);
