@@ -20,7 +20,7 @@ public class Shooter extends Subsystem {
   private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int ROLLER_SPEED = 1024; // Encoder ticks per 100ms, change this value
+  private static final int ROLLER_SPEED = 480; // Encoder ticks per 100ms, change this value
   private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
@@ -110,6 +110,7 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
+    System.out.println(mRoller.getVelocity());
     // TODO: actually set roller velocity
     return true;// mRollerVelocity > TARGET_ROLLER_VELOCITY;
   }

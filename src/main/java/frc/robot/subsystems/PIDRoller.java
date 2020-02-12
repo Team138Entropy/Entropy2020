@@ -41,6 +41,10 @@ class PIDRoller {
     mTalonSlave.follow(mTalon);
   }
 
+  int getVelocity(){
+    return mTalon.getSelectedSensorVelocity();
+  }
+
   void setSpeed(int posPer100Ms) {
     if(posPer100Ms == 0){
       System.out.println("PID roller");
