@@ -12,7 +12,10 @@ public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
   // Temporary, until default config values are merged
-  private static final double P = 3, I = 0, D = 0;
+  private static final double MAX_SPEED = 2445d;
+  private static final double SPEED_DEADBAND = 30;
+  private static final int SPEED_DEADBAND_DELAY = 5;
+  private static final double F = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
@@ -21,7 +24,6 @@ public class Shooter extends Subsystem {
 
   // TODO: Tune these values
   private static final int ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
-  private static final double TARGET_ROLLER_VELOCITY = 0;
 
   private static class TurretPosition {
     private double mAzimuth, mElevation;
@@ -63,11 +65,10 @@ public class Shooter extends Subsystem {
   private TalonSRX mTestRoller;
   private Turret mTurret;
   private Vision mVision;
-
-  private double mRollerVelocity;
+  private int mDeadbandDelay = 0;
 
   private Shooter() {
-    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D);
+    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, F);
     mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
@@ -81,7 +82,7 @@ public class Shooter extends Subsystem {
                     + ")");
     mVision =
         () -> {
-          System.out.println("Getting dummy vision target");
+          // System.out.println("Getting dummy vision target");
           return new TurretPosition(0, 0);
         };
   }
@@ -97,7 +98,7 @@ public class Shooter extends Subsystem {
   }
 
   /** Starts the roller. */
-  public void start() {
+  public void start() {  
     System.out.println("Starting roller");
     mRoller.setSpeed(ROLLER_SPEED);
   }
@@ -110,9 +111,19 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
-    System.out.println(mRoller.getVelocity());
-    // TODO: actually set roller velocity
-    return true;// mRollerVelocity > TARGET_ROLLER_VELOCITY;
+    // determine if we're at the target velocity by looking at the difference between the actual and expected
+    // and if that difference is less than SPEED_DEADBAND, we are at the velocity
+    boolean isAtVelocity = Math.abs(mRoller.getVelocity() - ROLLER_SPEED) < SPEED_DEADBAND;
+
+    // here's the problem:
+    // the velocity we get often bounces around, causing breif moments when we think we aren't there
+    // 
+    if(isAtVelocity){
+      mDeadbandDelay = SPEED_DEADBAND_DELAY;
+    }else{
+      mDeadbandDelay --;
+    }
+    return mDeadbandDelay > 0;
   }
 
   // Used in TEST mode only

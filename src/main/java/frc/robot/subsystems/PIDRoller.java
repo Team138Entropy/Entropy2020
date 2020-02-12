@@ -13,7 +13,7 @@ class PIDRoller {
   private WPI_TalonSRX mTalon;
   private WPI_TalonSRX mTalonSlave;
 
-  PIDRoller(int talonPort, int talon2Port, double p, double i, double d) {
+  PIDRoller(int talonPort, int talon2Port, double p, double i, double d, double f) {
     super();
 
     mTalon = new WPI_TalonSRX(talonPort);
@@ -34,6 +34,7 @@ class PIDRoller {
     mTalon.config_kP(PID_LOOP_INDEX, p);
     mTalon.config_kI(PID_LOOP_INDEX, i);
     mTalon.config_kD(PID_LOOP_INDEX, d);
+    mTalon.config_kF(PID_LOOP_INDEX, f);
 
     mTalon.setNeutralMode(NeutralMode.Coast);
 
@@ -45,7 +46,7 @@ class PIDRoller {
   }
 
   int getVelocity(){
-    return mTalon.getSelectedSensorVelocity();
+    return -mTalon.getSelectedSensorVelocity();
   }
 
   void setSpeed(int posPer100Ms) {

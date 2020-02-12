@@ -181,6 +181,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    visionLight.set(Relay.Value.kForward);
     mRobotLogger.log("Teleop Init!");
 
     mStorage.preloadBalls(0);
