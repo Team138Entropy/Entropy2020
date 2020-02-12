@@ -73,17 +73,17 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, -(STORE_SPEED));
   }
 
-  public void preloadBalls(int ballCount) {
+  public synchronized void preloadBalls(int ballCount) {
     mBallCount = ballCount;
   }
 
-  public void addBall() {
+  public synchronized void addBall() {
     if (mBallCount < STORAGE_CAPICTY) {
       mBallCount++;
     }
   }
 
-  public void removeBall() {
+  public synchronized void removeBall() {
     if (mBallCount > 0) {
       mBallCount--;
     }
@@ -113,16 +113,16 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
-  public int getBallCount() {
-    return mBallCount;
-  }
-
   public void setBottomOutput(double output) {
     mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * SPEED_FACTOR);
   }
 
   public void setTopOutput(double output) {
     mTopRoller.set(ControlMode.PercentOutput, output * SPEED_FACTOR);
+  }
+
+  public int getBallCount() {
+    return mBallCount;
   }
 
   @Override
