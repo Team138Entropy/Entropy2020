@@ -65,7 +65,7 @@ public class Shooter extends Subsystem {
   private TalonSRX mTestRoller;
   private Turret mTurret;
   private Vision mVision;
-  private int mDeadbandDelay = 0;
+  private int mTimeSinceWeWereAtVelocity = 0;
 
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, F);
@@ -117,13 +117,17 @@ public class Shooter extends Subsystem {
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there
-    // 
+    // add a "delay" where we still consider ourselves to be at the velocity if we were there in the last SPEED_DEADBAND_DELAY ticks
+
     if(isAtVelocity){
-      mDeadbandDelay = SPEED_DEADBAND_DELAY;
+      // reset the time since we were at velocity
+      mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
     }else{
-      mDeadbandDelay --;
+      // decrement
+      mTimeSinceWeWereAtVelocity --;
     }
-    return mDeadbandDelay > 0;
+    // if the time is at least 0, we are "at velocity"
+    return mTimeSinceWeWereAtVelocity > 0;
   }
 
   // Used in TEST mode only
