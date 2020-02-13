@@ -146,12 +146,9 @@ public class Robot extends TimedRobot {
     // TODO: decide if this is necessary and hook it up
     SmartDashboard.putBoolean("ShooterLoaded", false);
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // TODO: also, finally, hook this up.
-    SmartDashboard.putBoolean("TargetLocked", false);
+    SmartDashboard.putBoolean("TargetLocked", mRobotState.getHighGoalLocked());
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
-    
-    SmartDashboard.putBoolean("Ball Stored", mStorage.isBallStored());
 
     SmartDashboard.putString("RobotState", mState.name());
     SmartDashboard.putString("IntakeState", mIntakeState.name());
@@ -367,6 +364,8 @@ public class Robot extends TimedRobot {
     turretLoop();
 
     driveTrainLoop();
+
+    updateSmartDashboard();
 
     // Operator Controls
     if (mOperatorInterface.getTurretAdjustLeft()) {
