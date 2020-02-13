@@ -54,15 +54,13 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallStored() {
-    // we have 2 modes to determine if we should stop the storage rollers
-    // returning isLineBroken() stops the rollers whenever the sensor is broken
-    // the code below that line stops the rollers whenever the sensor is no longer broken
+    // if the last time we checked the line was broken and now it isn't, we've just stored a ball
     if (mWasLineBroke && !isLineBroken()) {
       mWasLineBroke = isLineBroken();
       return true;
+    // otherwise, we need to wait until the sensor line stops being broken
     } else {
       mWasLineBroke = isLineBroken();
-
       return false;
     }
   }
