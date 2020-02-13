@@ -54,7 +54,12 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallStored() {
-    if (!mWasLineBroke || isLineBroken()) {
+    // it wasn't broken the last time we checked
+    if (!mWasLineBroke) {
+      mWasLineBroke = isLineBroken();
+      return false;
+    // it's still broken
+    } else if (isLineBroken()) {
       mWasLineBroke = isLineBroken();
       return false;
     // if the last time we checked the line was broken and now it isn't, we've just stored a ball
