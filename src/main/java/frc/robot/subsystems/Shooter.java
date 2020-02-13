@@ -44,7 +44,7 @@ public class Shooter extends Subsystem {
   /** Stops the roller. */
   public void stop() {
     System.out.println("Stopping roller");
-    mRoller.setSpeed(0);
+    mRoller.Stop();
   }
 
   /** Returns whether roller is at full speed. */

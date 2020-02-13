@@ -4,6 +4,7 @@ import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
 import frc.robot.OI.XboxController.Axis;
+import frc.robot.OI.XboxController.Button;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -80,6 +81,11 @@ public class OperatorInterface {
     return OperatorController.getButton(XboxController.Button.LB) && OperatorController.getButton(XboxController.Button.RB);
   }
  
+  //allow the operator to prefire shooting
+  //allows the operate to spin up the shooter
+  public boolean PrefireShooting(){
+    return OperatorController.getButton(XboxController.Button.A);
+  }
 
   public double GetAzmithTurn(){
     return OperatorController.getJoystick(XboxController.Side.LEFT, Axis.X);

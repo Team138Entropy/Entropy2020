@@ -30,6 +30,8 @@ class PIDRoller {
     //Map the slavef
     mTalonSlave.follow(mTalonMaster);
 
+    mTalonMaster.setNeutralMode(NeutralMode.Coast);
+    mTalonSlave.setNeutralMode(NeutralMode.Coast);
     /*
     // All of this was ripped from the 2019 elevator code
     mTalon.configNominalOutputForward(0, TIMEOUT_MS);
@@ -53,6 +55,13 @@ class PIDRoller {
   }
 
   void setSpeed(int posPer100Ms) {
-    mTalonMaster.set(ControlMode.Velocity, posPer100Ms);
+    mTalonMaster.set(ControlMode.PercentOutput, 1.0);
+
   }
+
+  void Stop(){
+    mTalonMaster.set(ControlMode.PercentOutput, 0);
+  }
+
+
 }

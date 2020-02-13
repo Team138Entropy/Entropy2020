@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -14,15 +13,9 @@ import frc.robot.util.LatchedBoolean;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import frc.robot.util.loops.Looper;
-import frc.robot.Config;
-import frc.robot.Config.Key;
 import frc.robot.util.Util;
-
-
-import java.io.FileWriter;
 import java.util.Optional;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Robot extends TimedRobot {
 
@@ -30,6 +23,7 @@ public class Robot extends TimedRobot {
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
   // Robot Tracker and Robot Update Tracker
+  // Robot Tracker should never be messed with, runs on constructor
   private final RobotTracker mRobotTracker = RobotTracker.getInstance();
   private final RobotTrackerUpdater mRobotTrackerUpdater = RobotTrackerUpdater.getInstance();
 
@@ -106,11 +100,9 @@ public class Robot extends TimedRobot {
   private LatchedBoolean mRobotModeTogglePressed = new LatchedBoolean();
   private LatchedBoolean mAutoAimTogglePressed = new LatchedBoolean();
 
-
   //Auto Steer Aiming Parameters
+  //Updated with aiming parameters from robot state
   private Optional<AimingParameters>  mBall_aiming_parameters;
-
-
 
   private final Logger mRobotLogger = new Logger("robot");
 
@@ -119,10 +111,11 @@ public class Robot extends TimedRobot {
   // teleopInit, teleopPeriodic, testInit, testPeriodic
   @Override
   public void robotInit() {
-    mRobotLogger.log("robot init _ 1");
+    mRobotLogger.log("Robot Intitialized");
 
     //Register the Enabled Looper
     //Used to run background tasks!
+    //Constantly collects information
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
 
     // Zero all nesscary sensors on Robot
@@ -202,36 +195,6 @@ public class Robot extends TimedRobot {
     }
   }
 
-  @Override
-  public void testInit() {
-    mRobotLogger.log("Entropy 138: Test Init");
-
-    mSubsystemManager.checkSubsystems();
-  }
-
-  @Override
-  public void testPeriodic() {
-    // Intake roller ON while button held
-    if (mOperatorInterface.isIntakeRollertest()) {
-      mIntake.start();
-    } else {
-      mIntake.stop();
-    }
-
-    // Storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerTest()) {
-      mStorage.storeBall();
-    } else {
-      mStorage.stop();
-    }
-
-    // Shooter roller ON while button held
-    if (mOperatorInterface.isShooterTest()) {
-      mShooter.start();
-    } else {
-      mShooter.stop();
-    }
-  }
 
   @Override
   public void disabledInit() {
@@ -350,6 +313,7 @@ public class Robot extends TimedRobot {
         //Enable Shooting State
         System.out.println("Enable Shooting State");
         mShootingState = ShootingState.Enabled;
+        mShooter.start();
       }
 
     }
@@ -445,15 +409,14 @@ public class Robot extends TimedRobot {
         //Do Nothing
         break;
       }
-
-    }
-
-    
+    }    
   }
 
 
   /*
     Handles all driving related logic
+    Manual Drive and Auto Steering to Balls
+    Auto Steering should enable intake mode
   */
   private void driveLoop(){
     double driveThrottle = mOperatorInterface.getDriveThrottle();
@@ -471,8 +434,6 @@ public class Robot extends TimedRobot {
 
     switch(mDriveState){
       case AutoSteer : {
-        System.out.println("Auto Steer");
-
         //Auto Steering the robot
         //Auto Steers to the ball!
         mBall_aiming_parameters = mRobotTracker.getAimingParameters(false, -1, Constants.kMaxGoalTrackAge);
@@ -485,7 +446,7 @@ public class Robot extends TimedRobot {
           System.out.println("AutoSteer - Measured Rotation: " + rb.getDegrees());
           mDrive.autoSteer(Util.limit(driveThrottle, 0.3), mBall_aiming_parameters.get());
         }else{
-          System.out.println("No Params - Manual Drive");
+          //No Valid Tracking Packets - Manual Drive
           //We don't have aiming parameters, continue manual drive
           mDrive.setDrive(driveThrottle, driveTurn, false);
         }
@@ -506,53 +467,36 @@ public class Robot extends TimedRobot {
   }
 
 
-  /*
-    Called constantly, houses the main functionality of robot
-  */
-  public void RobotLoop2() {
-    updateSmartDashboard();
+  @Override
+  public void testInit() {
+    mRobotLogger.log("Entropy 138: Test Init");
 
-  
-
-    turretLoop();
-
-
-    /*
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
-      mBallIndicator.checkTimer();
-    }
-    */
-
-    // Climb
-    if (mOperatorInterface.getClimb()) {
-      // climb!
-    }
-
-    // Operator Controls
-    if (mOperatorInterface.getTurretAdjustLeft()) {
-      // manual turret aim
-    } else if (mOperatorInterface.getTurretAdjustRight()) {
-      // manual turret aim
-    }
-
-    // Camera Swap
-    if (mOperatorInterface.getCameraSwap()) {
-      // Swap Camera!
-    }
-
-    // Shoot
-    if (mOperatorInterface.getShoot()) {
-      // Shoot!
-    }
-
-    // Load chamber
-    // NOTE: This may or may not be necessary depending on how our sensor pack turns out
-    if (mOperatorInterface.getLoadChamber()) {
-      // Load chamber!
-    }
+    mSubsystemManager.checkSubsystems();
   }
 
+  @Override
+  public void testPeriodic() {
+    // Intake roller ON while button held
+    if (mOperatorInterface.isIntakeRollertest()) {
+      mIntake.start();
+    } else {
+      mIntake.stop();
+    }
 
+    // Storage rollers ON while button held
+    if (mOperatorInterface.isStorageRollerTest()) {
+      mStorage.storeBall();
+    } else {
+      mStorage.stop();
+    }
+
+    // Shooter roller ON while button held
+    if (mOperatorInterface.isShooterTest()) {
+      mShooter.start();
+    } else {
+      mShooter.stop();
+    }
+  }
 
 
 
