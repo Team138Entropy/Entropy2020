@@ -49,23 +49,22 @@ public class Storage extends Subsystem {
   public void init() {
   }
 
-  public boolean isBallStored() {
+  private boolean isLineBroken() {
     return mIntakeSensor.get();
   }
 
-  public boolean wasLineBroke(){
+  public boolean isBallStored() {
     // we have 2 modes to determine if we should stop the storage rollers
-    // returning isBallStored() stops the rollers whenever the sensor is broken
+    // returning isLineBroken() stops the rollers whenever the sensor is broken
     // the code below that line stops the rollers whenever the sensor is no longer broken
-    return isBallStored();
-    // if(mWasLineBroke && !isBallStored()){
-    //   mWasLineBroke = false;
-    //   return true;
-    // }
-    // if(isBallStored()){
-    //   mWasLineBroke = true;
-    // }
-    // return false;
+    if (mWasLineBroke && !isLineBroken()) {
+      mWasLineBroke = isLineBroken();
+      return true;
+    } else {
+      mWasLineBroke = isLineBroken();
+
+      return false;
+    }
   }
 
   public void barf(){

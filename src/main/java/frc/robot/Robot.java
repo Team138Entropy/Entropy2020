@@ -178,7 +178,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    visionLight.set(Relay.Value.kForward);
     mRobotLogger.log("Teleop Init!");
 
     mStorage.preloadBalls(0);
@@ -439,7 +438,7 @@ public class Robot extends TimedRobot {
         mIntake.stop();
 
         // If the sensor indicates the ball is stored, complete ball storage
-        if (mStorage.wasLineBroke()) {
+        if (mStorage.isBallStored()) {
           mIntakeState = IntakeState.STORAGE_COMPLETE;
         }
 
