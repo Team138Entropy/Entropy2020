@@ -15,7 +15,7 @@ public class Shooter extends Subsystem {
   private static final double MAX_SPEED = 2445d;
   private static final double SPEED_DEADBAND = 30;
   private static final int SPEED_DEADBAND_DELAY = 5;
-  private static final double F = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
+  private static final double FEEDFORWARD = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
@@ -68,7 +68,7 @@ public class Shooter extends Subsystem {
   private int mTimeSinceWeWereAtVelocity = 0;
 
   private Shooter() {
-    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, F);
+    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
     mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
