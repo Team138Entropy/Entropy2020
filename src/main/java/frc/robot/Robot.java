@@ -296,14 +296,15 @@ public class Robot extends TimedRobot {
 
 
   /*
+    Shoot Loop
     Allows the driver to enable/disable shooting
-
   */
   public void shootLoop(){
     boolean WantShooterToggle = mOperatorInterface.ToggleShooter();
     boolean ShooterTogglePressed = mShootTogglePressed.update(WantShooterToggle);
 
     if(ShooterTogglePressed){
+      //SHooting Toggle Button Pressed
       if(mShootingState == ShootingState.Enabled ){
         //Disabling Shooting State
         System.out.println("Disable Shooting State");
@@ -313,17 +314,24 @@ public class Robot extends TimedRobot {
         //Enable Shooting State
         System.out.println("Enable Shooting State");
         mShootingState = ShootingState.Enabled;
+        
+        //Disable the Intake
+        mIntakeState = IntakingState.Disabled;
+
         mShooter.start();
       }
-
     }
 
-
-
+    //If Shooting is enabled..
+    if(mShootingState == ShootingState.Enabled){
+      //poll if we are at velcoity
+      //if at velocity run the motor
+    }
   }
 
 
   /*
+    Intake Loop
     Allow the Driver to Enable/Disable the intake
     Enabling the intake will use current detection to move motors
   */
@@ -333,21 +341,19 @@ public class Robot extends TimedRobot {
 
     //Update the state of our intake enabled
     if(IntakePressed == true){
+      //Intake Button Press Detected
       if(mIntakeState == IntakingState.Disabled){
-        System.out.println("Enabled Intake");
         //Enable the Intake Subsystem
         mIntakeState = IntakingState.Enabled;
         mIntake.resetOvercurrentCooldown();
         mIntake.start(); //start the roller
 
       }else if(mIntakeState == IntakingState.Enabled){
-        System.out.println("Disable Intake");
         //Disable the Intake Subsystem!
         mIntakeState = IntakingState.Disabled;
         mIntake.stop(); // stop the roller
       }
     }
-
 
     //if the intake system is running..
     //check for the overcurrent trigger
@@ -365,7 +371,6 @@ public class Robot extends TimedRobot {
       //the store actuion should be via encoder
       //this is another hacky way to do it
       mStorage.CheckTimer();
-
     }
   }
 
