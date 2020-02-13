@@ -48,11 +48,11 @@ Ball_HSV_Upper = np.array([62, 255, 255])
 
 # ratio values - detects feeder station. Doing and not when doing ratio checks will ignore them
 rat_low = 1.5
-rat_high = 10
+rat_high = 5
 
-hsv_threshold_hue = [55, 75]
-hsv_threshold_saturation = [89, 231]
-hsv_threshold_value = [102, 255]
+hsv_threshold_hue = [70, 121]
+hsv_threshold_saturation = [37, 255]
+hsv_threshold_value = [204, 255]
 
 solidity_threshold = [0, 65]
 
@@ -421,16 +421,22 @@ def findTape(contours, image, centerX, centerY):
             # calculate area of convex hull
             hullArea = cv2.contourArea(hull)
 
-            mySolidity = float (cntArea)/hullArea
+            if cntArea != 0 and hullArea != 0:
+                mySolidity = float (cntArea)/hullArea
+            else:
+                mySolidity = 1000
 
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
+            #cv2.imwrite("1beforeif.jpg", image)
             # Filters contours based off of size
-            if (checkContours(cntArea, hullArea, ratio, mySolidity)):
+            if (mySolidity > .1) and (mySolidity < .7) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
-                # contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
-                # cv2.imwrite("drawncontours.jpg", contimage)
-                # time.sleep(1)
+                contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
+                
+                #cv2.imwrite("1drawncontours.jpg", contimage)
+                #time.sleep(1)
+                #print("writing image")
                 ### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
                 # Gets the centeroids of contour
                 if M["m00"] != 0:
@@ -448,6 +454,7 @@ def findTape(contours, image, centerX, centerY):
                     global run_count
 
                     #fills list to avoid errors
+                    '''
                     if outlierCount >= 5:
                         distanceHoldValues = []
 
@@ -463,8 +470,7 @@ def findTape(contours, image, centerX, centerY):
                         distanceHoldValues.pop()
                         distanceHoldValues.append(myDistFeet)
                         myDistFeet = abs(myDistFeet)
-
-                    ######
+                    '''
 
                     '''
                     run_count = run_count + 1
@@ -472,7 +478,7 @@ def findTape(contours, image, centerX, centerY):
                         starttime = time.time()
                         print(starttime)
                     '''
-                    print(myDistFeet)
+                    #print(myDistFeet)
 
                     sendValues[0] = cx
                     sendValues[1] = cy
@@ -534,7 +540,6 @@ def findTape(contours, image, centerX, centerY):
         # Draws yaw of target + line where center of target is
         cv2.putText(image, "Yaw: " + str(finalTarget[1]), (40, 40), cv2.FONT_HERSHEY_COMPLEX, .6,
                     (255, 255, 255))
-        cv2.line(image, (finalTarget[0], screenHeight), (finalTarget[0], 0), (255, 0, 0), 2)
 
         currentAngleError = finalTarget[1]
 
@@ -543,13 +548,13 @@ def findTape(contours, image, centerX, centerY):
     cv2.line(image, (round(centerX), screenHeight), (round(centerX), 0), (255, 255, 255), 2)
 
     # cv2.imwrite("latest.jpg", image);
+    
     return sendValues
 
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
-def checkContours(cntSize, hullSize, aspRatio, solidity):
-    return cntSize > (image_width / 6) and not (aspRatio < rat_low or aspRatio > rat_high) and (solidity > 0 and solidity < 65)
-
+def checkContours(cntSize, hullSize, aspRatio, contour):
+    return cntSize > (image_width / 6) and (len(contour) > 20) and not (aspRatio < rat_low or aspRatio > rat_high)
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
 def checkBall(cntSize, cntAspectRatio):
@@ -572,7 +577,8 @@ def calculateDistanceFeet(targPixelWidth):
     FOV = 75
     # 8 feet, 2.25 inches, actual height of center goal is 96.25, I think the centroid of the tape is ~87.75 inches
     # tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
-    targetHeightActual = 17
+    #Camera height is 37.5 inches
+    targetHeightActual = 50.25
     camPixelWidth = 640
     # target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
     Tft = 3.27
@@ -707,6 +713,9 @@ def ProcessFrame(frame, tape):
     if (tape == True):
         threshold = threshold_video(lower_green, upper_green, frame)
         processedValues = findTargets(frame, threshold, vals_to_send, centerX, centerY)
+        if processedValues[3] != None:
+            print(processedValues[3])
+
 
         highGoal = {}
         highGoal['x'] = processedValues[0]
