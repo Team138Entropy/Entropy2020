@@ -89,7 +89,6 @@ public class Robot extends TimedRobot {
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
-
   Logger mRobotLogger = new Logger("robot");
 
   // autonomousInit, autonomousPeriodic, disabledInit,
@@ -472,8 +471,7 @@ public class Robot extends TimedRobot {
   }
 
   private boolean checkTransitionToShooting() {
-    // TODO: uncomment this isEmpty when we get ball counting working
-    if (mOperatorInterface.getShoot()/* && (!mStorage.isEmpty())*/) {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
@@ -497,7 +495,8 @@ public class Robot extends TimedRobot {
 
   /** Returns whether the firing timer has run longer than the duration. */
   public boolean isBallFired() {
-    if (mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000) {
+    mRobotLogger.info("mFireTimer: " + mFireTimer.get());
+    if (mFireTimer.get() >= FIRE_DURATION_SECONDS) {
       mShooter.stop();
       mFireTimer.stop();
       mFireTimer.reset();
@@ -520,9 +519,11 @@ public class Robot extends TimedRobot {
         // TODO: Placeholder method, replace later.
         mShooter.target();
 
+
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
           mShootingState = ShootingState.SHOOT_BALL;
+          mFireTimer.start();
         }
         break;
       case SHOOT_BALL:
