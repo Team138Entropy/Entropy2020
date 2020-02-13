@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Config;
@@ -16,7 +17,7 @@ public class Storage extends Subsystem {
   private static final int INTAKE_SENSOR_PORT =
       Config.getInstance().getInt(Key.INTAKE__SENSOR);
 
-  private static final int STORAGE_CAPICTY = 3;
+  private static final int STORAGE_CAPICTY = 4;
 
   private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
@@ -43,6 +44,10 @@ public class Storage extends Subsystem {
   private Storage() {
     mBottomRoller = new WPI_TalonSRX(ROLLER_BOTTOM_PORT);
     mTopRoller = new WPI_TalonSRX(ROLLER_TOP_PORT);
+
+    mTopRoller.setNeutralMode(NeutralMode.Brake);
+    mBottomRoller.setNeutralMode(NeutralMode.Brake);
+
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
@@ -70,8 +75,8 @@ public class Storage extends Subsystem {
   }
 
   public void barf(){
-    mBottomRoller.set(ControlMode.PercentOutput, -(STORE_SPEED * BOTTOM_SPEED_FACTOR));
-    mTopRoller.set(ControlMode.PercentOutput, -(STORE_SPEED));
+    mBottomRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED * BOTTOM_SPEED_FACTOR));
+    mTopRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED));
   }
 
   public synchronized void preloadBalls(int ballCount) {

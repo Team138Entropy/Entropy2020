@@ -107,6 +107,10 @@ public class Shooter extends Subsystem {
     mRoller.setSpeed(0);
   }
 
+  public int getSpeed() {
+    return mRoller.getVelocity();
+  }
+
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
     // determine if we're at the target velocity by looking at the difference between the actual and expected
