@@ -16,12 +16,12 @@ public class Storage extends Subsystem {
   private static final int INTAKE_SENSOR_PORT =
       Config.getInstance().getInt(Key.INTAKE__SENSOR);
 
-  private static final int STORAGE_CAPICTY = 4;
+  private static final int STORAGE_CAPICTY = 3;
 
-  private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
@@ -115,11 +115,11 @@ public class Storage extends Subsystem {
   }
 
   public void setBottomOutput(double output) {
-    mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * SPEED_FACTOR);
+    mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * TEST_SPEED_FACTOR);
   }
 
   public void setTopOutput(double output) {
-    mTopRoller.set(ControlMode.PercentOutput, output * SPEED_FACTOR);
+    mTopRoller.set(ControlMode.PercentOutput, output * TEST_SPEED_FACTOR);
   }
 
   public int getBallCount() {

@@ -36,7 +36,8 @@ public class Robot extends TimedRobot {
     READY_TO_INTAKE,
     INTAKE,
     STORE_BALL,
-    STORAGE_COMPLETE
+    STORAGE_COMPLETE,
+    BARF
   }
 
   public enum ShootingState {
@@ -356,6 +357,10 @@ public class Robot extends TimedRobot {
       mRobotLogger.log("Changed state to " + mShootingState);
     }
 
+    if(mOperatorInterface.isBarf()){
+      mIntakeState = IntakeState.BARF;
+    }
+
     // check if we are shooting
     // TODO: remove this and only allow shooting if you have at least 1 ball
     checkTransitionToShooting();
@@ -434,7 +439,6 @@ public class Robot extends TimedRobot {
         break;
       case STORE_BALL:
         mStorage.storeBall();
-        // TODO: may need to delay stopping the intake roller
         mIntake.stop();
 
         // If the sensor indicates the ball is stored, complete ball storage
@@ -445,8 +449,6 @@ public class Robot extends TimedRobot {
         break;
       case STORAGE_COMPLETE:
         mStorage.addBall();
-
-        // TODO: may need to delay stopping the storage roller
         mStorage.stop();
 
         // If the storage is not full, intake another ball
@@ -458,6 +460,10 @@ public class Robot extends TimedRobot {
         checkTransitionToShooting();
         
         mIntake.resetOvercurrentCooldown();
+        break;
+      case BARF:
+        mIntake.barf();
+        mStorage.barf();
         break;
       default:
         mRobotLogger.error("Invalid Intake State");
