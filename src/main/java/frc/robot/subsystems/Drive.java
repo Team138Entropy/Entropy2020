@@ -55,6 +55,8 @@ public class Drive extends Subsystem {
     public double right_accel;
     public double left_feedforward;
     public double right_feedforward;
+    public double left_old = 0;
+    public double right_old = 0;
   }
 
   public static synchronized Drive getInstance() {
@@ -127,6 +129,23 @@ public class Drive extends Subsystem {
     }
 
     signal.PrintLog();
+
+    // If our acceleration is positive (going away from where we were last time)
+    // Remember that right has to be flipped so the bracket is the other way 'round
+    if (Math.abs(signal.getLeft()) > mPeriodicIO.left_old && Math.abs(signal.getRight()) < mPeriodicIO.right_old) {
+      // Tell the talons to be significantly less epic
+      mLeftMaster.configOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_SPEED));
+      mRightMaster.configOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_SPEED));
+    } else {
+      // don't
+      mLeftMaster.configOpenloopRamp(0);
+      mRightMaster.configOpenloopRamp(0);
+    }
+
+    // Olds are cached as absolute to be useful above
+    mPeriodicIO.left_old = Math.abs(signal.getLeft());
+    mPeriodicIO.right_accel = Math.abs(signal.getRight());
+
     mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
     mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
   }
