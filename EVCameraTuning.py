@@ -20,16 +20,13 @@ import math
 import datetime
 from datetime import datetime
 
-PictureNumber = 1
+PictureNumber = 1 #Used for file naming. Everytime it loops it +='s one.
 
 # Time stuff
-####################################################################
 # datetime object containing current date and time
 now = datetime.now()
-
 # dd/mm/YY H:M:S
 dt_string = now.strftime("%d-%m-%Y_%H-%M")
-####################################################################
 drTitle = dt_string
 
 # Image Camera Size (Pixels)
@@ -65,8 +62,7 @@ class WebcamVideoStream:
         # initialize the thread name
         self.name = name
 
-        # initialize the variable used to indicate if the thread should
-        # be stopped
+        # initialize the variable used to indicate if the thread should be stopped
         self.stopped = False
 
     def start(self):
@@ -79,27 +75,22 @@ class WebcamVideoStream:
     def update(self):
         # keep looping infinitely until the thread is stopped
         while True:
-            # if the thread indicator variable is set, stop the thread
-            if self.stopped:
+            if self.stopped: # if the thread indicator variable is set, stop the thread
                 return
             # Boolean logic we don't keep setting exposure over and over to the same value
             '''
             if self.autoExpose:
-
                 self.webcam.setExposureAuto()
+                
             else:
-
                 self.webcam.setExposureManual(0)
             '''
-            # gets the image and timestamp from cameraserver
-            (self.timestamp, self.img) = self.stream.grabFrame(self.img)
+            (self.timestamp, self.img) = self.stream.grabFrame(self.img) # gets the image and timestamp from cameraserver
 
-    def read(self):
-        # return the frame most recently read
+    def read(self): # return the frame most recently read
         return self.timestamp, self.img
 
-    def stop(self):
-        # indicate that the thread should be stopped
+    def stop(self): # indicate that the thread should be stopped
         self.stopped = True
 
     def getError(self):
@@ -109,6 +100,7 @@ class WebcamVideoStream:
 image_width = 640
 image_height = 480
 
+# Lists to make the program happy
 cameras = []
 streams = []
 webcam = cameras[0]
@@ -120,5 +112,5 @@ while True:
     fileTitle = (drTitle + "/samplePicture" + str(PictureNumber) + ".jpg") # This makes the files not override each other, by having it named.
     PictureNumber += 1
     timestamp, img = cap.read()
-    cv2.imwrite(fileTitle, img)
-    time.sleep(1.5)
+    cv2.imwrite(fileTitle, img) #Makes the picture. Includes directory name as most unix systems will create a directory if it doesnt exist.
+    time.sleep(1.5) # This can be changed
