@@ -504,6 +504,7 @@ def findTape(contours, image, centerX, centerY):
         biggestCnts = sorted(biggestCnts, key=lambda x: x[0])
         # Target Checking
         for i in range(len(biggestCnts) - 1):
+            print("in rotation check")
             # Rotation of two adjacent contours
             tilt1 = biggestCnts[i][2]
             tilt2 = biggestCnts[i + 1][2]
@@ -516,6 +517,7 @@ def findTape(contours, image, centerX, centerY):
             cy2 = biggestCnts[i + 1][1]
             # If contour angles are opposite
             if (np.sign(tilt1) != np.sign(tilt2)):
+                print("In opposite contour angles check")
                 centerOfTarget = math.floor((cx1 + cx2) / 2)
                 # ellipse negative tilt means rotated to right
                 # Note: if using rotated rect (min area rectangle)
@@ -523,13 +525,17 @@ def findTape(contours, image, centerX, centerY):
                 # If left contour rotation is tilted to the left then skip iteration
                 if (tilt1 > 0):
                     if (cx1 < cx2):
+                        print("passed left contour is tilted left")
                         continue
+                        
                 # If left contour rotation is tilted to the left then skip iteration
                 if (tilt2 > 0):
                     if (cx2 < cx1):
+                        print("passed right contour is tilted right")
                         continue
                 # Angle from center of camera to target (what you should pass into gyro)
                 yawToTarget = calculateYaw(centerOfTarget, centerX, H_FOCAL_LENGTH)
+                print("yaw after angle")
                 # Make sure no duplicates, then append
                 if not targets:
                     targets.append([centerOfTarget, yawToTarget])
