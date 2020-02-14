@@ -105,7 +105,7 @@ class WebcamVideoStream:
     def getError(self):
         return self.stream.getError()
 
-# image size ratioed to 16:9
+# image size ratio'ed to 16:9
 image_width = 640
 image_height = 480
 
