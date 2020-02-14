@@ -99,14 +99,16 @@ public class Shooter extends Subsystem {
 
   /** Starts the roller. */
   public void start() {  
-    System.out.println("Starting roller");
     mRoller.setSpeed(ROLLER_SPEED);
   }
 
   /** Stops the roller. */
   public void stop() {
-    System.out.println("Stopping roller");
     mRoller.setSpeed(0);
+  }
+
+  public int getSpeed() {
+    return mRoller.getVelocity();
   }
 
   /** Returns whether roller is at full speed. */

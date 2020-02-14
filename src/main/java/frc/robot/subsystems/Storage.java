@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Config;
@@ -18,10 +19,10 @@ public class Storage extends Subsystem {
 
   private static final int STORAGE_CAPICTY = 4;
 
-  private static final double STORE_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED = Config.getInstance().getInt(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
@@ -43,34 +44,39 @@ public class Storage extends Subsystem {
   private Storage() {
     mBottomRoller = new WPI_TalonSRX(ROLLER_BOTTOM_PORT);
     mTopRoller = new WPI_TalonSRX(ROLLER_TOP_PORT);
+
+    mTopRoller.setNeutralMode(NeutralMode.Brake);
+    mBottomRoller.setNeutralMode(NeutralMode.Brake);
+
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
   public void init() {
   }
 
-  public boolean isBallStored() {
+  private boolean isLineBroken() {
     return mIntakeSensor.get();
   }
 
-  public boolean wasLineBroke(){
-    // we have 2 modes to determine if we should stop the storage rollers
-    // returning isBallStored() stops the rollers whenever the sensor is broken
-    // the code below that line stops the rollers whenever the sensor is no longer broken
-    return isBallStored();
-    // if(mWasLineBroke && !isBallStored()){
-    //   mWasLineBroke = false;
-    //   return true;
-    // }
-    // if(isBallStored()){
-    //   mWasLineBroke = true;
-    // }
-    // return false;
+  public boolean isBallStored() {
+    // it wasn't broken the last time we checked
+    if (!mWasLineBroke) {
+      mWasLineBroke = isLineBroken();
+      return false;
+    // it's still broken
+    } else if (isLineBroken()) {
+      mWasLineBroke = isLineBroken();
+      return false;
+    // if the last time we checked the line was broken and now it isn't, we've just stored a ball
+    } else {
+      mWasLineBroke = isLineBroken();
+      return true;
+    }
   }
 
   public void barf(){
-    mBottomRoller.set(ControlMode.PercentOutput, -(STORE_SPEED * BOTTOM_SPEED_FACTOR));
-    mTopRoller.set(ControlMode.PercentOutput, -(STORE_SPEED));
+    mBottomRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED * BOTTOM_SPEED_FACTOR));
+    mTopRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED));
   }
 
   public synchronized void preloadBalls(int ballCount) {
@@ -114,11 +120,11 @@ public class Storage extends Subsystem {
   }
 
   public void setBottomOutput(double output) {
-    mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * SPEED_FACTOR);
+    mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * TEST_SPEED_FACTOR);
   }
 
   public void setTopOutput(double output) {
-    mTopRoller.set(ControlMode.PercentOutput, output * SPEED_FACTOR);
+    mTopRoller.set(ControlMode.PercentOutput, output * TEST_SPEED_FACTOR);
   }
 
   public int getBallCount() {

@@ -132,6 +132,8 @@ public class VisionManager extends Subsystem {
         ti.SetDistance(((Number) CurrentPacket.get("dis")).doubleValue());
         ti.SetYaw(((Number) CurrentPacket.get("yaw")).doubleValue());
         // ti.SetCameraID(((Number)CurrentPacket.get("id")).intValue());
+
+        // 0 is high goal, 1 is ball
         ti.SetTargetID(((Number) CurrentPacket.get("targid")).intValue());
 
         // If we made it to this point we had all the required keys!
