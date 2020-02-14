@@ -219,6 +219,10 @@ public class Drive extends Subsystem {
     mRightMaster.set(ControlMode.PercentOutput, output);
   }
 
+  public synchronized Rotation2d getHeading() {
+    return mPeriodicIO.gyro_heading;
+  }
+
   // Used only in TEST mode
   public void setOutputRightFront (double output) {
     mRightSlave.set(ControlMode.PercentOutput, output);
