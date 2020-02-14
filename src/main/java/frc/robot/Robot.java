@@ -357,7 +357,7 @@ public class Robot extends TimedRobot {
       mRobotLogger.log("Changed state to " + mShootingState);
     }
 
-    if(mOperatorInterface.isBarf()){
+    if (mOperatorInterface.isBarf()) {
       mIntakeState = IntakeState.STORAGE_EJECT;
       mBarfTimer.reset();
       mBarfTimer.start();
