@@ -729,8 +729,8 @@ def ProcessFrame(frame, tape):
 
 
         highGoal = {}
-        highGoal['x'] = processedValues[0]
-        highGoal['y'] = processedValues[1]
+        highGoal['y'] = processedValues[0]
+        highGoal['z'] = processedValues[1]
         highGoal['yaw'] = processedValues[2]
         if processedValues[3] != None:
             processedValues[3] = abs(round(processedValues[3], 2))
