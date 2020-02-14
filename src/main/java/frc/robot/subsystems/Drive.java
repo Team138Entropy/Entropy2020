@@ -128,19 +128,17 @@ public class Drive extends Subsystem {
     talon.configClosedloopRamp(1);
   }
 
-  public void zeroSensors() {}
+  public void zeroSensors() {
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0,0);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0,0);
+  }
 
   // Temp
   private static final int AUTO_TICKS = 1000;
 
-  public synchronized void setAutoPosition() {
+  public void setAutoPosition() {
     mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
     mRightMaster.set(ControlMode.Position, -AUTO_TICKS);
-  }
-
-  public synchronized void reset() {
-    mLeftMaster.setSelectedSensorPosition(0);
-    mRightMaster.setSelectedSensorPosition(0);
   }
 
   /** Configure talons for open loop control */
@@ -255,6 +253,11 @@ public class Drive extends Subsystem {
 
   public synchronized Rotation2d getRotation() {
     return null;
+  }
+
+  public void zeroEncoders() {
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 0);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0, 0);
   }
 
   // Used only in TEST mode
