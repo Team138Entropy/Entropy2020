@@ -130,6 +130,7 @@ public class VisionManager extends Subsystem {
                     ((Number) CurrentPacket.get("dis")).doubleValue()
                 );
                 
+                
                // ti.SetY(((320/2)- .5) - 40);
                // ti.SetZ((240/2)- .5);
 
