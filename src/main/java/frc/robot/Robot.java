@@ -89,6 +89,7 @@ public class Robot extends TimedRobot {
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
+  private Timer mBarfTimer = new Timer();
   Logger mRobotLogger = new Logger("robot");
 
   // autonomousInit, autonomousPeriodic, disabledInit,
@@ -358,6 +359,8 @@ public class Robot extends TimedRobot {
 
     if(mOperatorInterface.isBarf()){
       mIntakeState = IntakeState.STORAGE_EJECT;
+      mBarfTimer.reset();
+      mBarfTimer.start();
     }
 
     // check if we are shooting
@@ -461,8 +464,11 @@ public class Robot extends TimedRobot {
         mIntake.resetOvercurrentCooldown();
         break;
       case STORAGE_EJECT:
-        mIntake.barf();
+        mIntake.barf();// Ball Acqusition Reverse Functionality (BARF)
         mStorage.barf();
+        if(mBarfTimer.get() > 5){
+          mIntakeState = IntakeState.IDLE;
+        }
         break;
       default:
         mRobotLogger.error("Invalid Intake State");
