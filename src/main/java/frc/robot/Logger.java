@@ -93,7 +93,7 @@ public class Logger {
     // then log it
     if (minLevel == null
         || (minLevel != null
-            && minLevel != "OFF"
+            && !minLevel.equals("OFF")
             && Arrays.asList(SupportedLevels.values()).indexOf(level)
                 <= Arrays.asList(SupportedLevels.values())
                     .indexOf(SupportedLevels.valueOf(minLevel)))) {
