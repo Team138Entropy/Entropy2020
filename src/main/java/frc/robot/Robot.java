@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
     INTAKE,
     STORE_BALL,
     STORAGE_COMPLETE,
-    BARF
+    STORAGE_EJECT
   }
 
   public enum ShootingState {
@@ -357,7 +357,7 @@ public class Robot extends TimedRobot {
     }
 
     if(mOperatorInterface.isBarf()){
-      mIntakeState = IntakeState.BARF;
+      mIntakeState = IntakeState.STORAGE_EJECT;
     }
 
     // check if we are shooting
@@ -460,7 +460,7 @@ public class Robot extends TimedRobot {
         
         mIntake.resetOvercurrentCooldown();
         break;
-      case BARF:
+      case STORAGE_EJECT:
         mIntake.barf();
         mStorage.barf();
         break;
