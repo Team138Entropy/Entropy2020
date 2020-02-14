@@ -79,6 +79,8 @@ public class Robot extends TimedRobot {
   private final Storage mStorage = Storage.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
+  
+  private final RobotTracker mRobotTracker = RobotTracker.getInstance();
 
   public Relay visionLight = new Relay(0);
 
@@ -143,6 +145,16 @@ public class Robot extends TimedRobot {
 
 
   private void updateSmartDashboard() {
+    RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+    
+    SmartDashboard.putBoolean("Has Vision", result.HasResult);
+    if(result.HasResult){
+      mRobotLogger.info(Double.toString(result.distance));
+      SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
+    }else{
+      SmartDashboard.putNumber("Turret Offset Error", 0);
+    }
+
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
@@ -478,7 +490,9 @@ public class Robot extends TimedRobot {
   }
 
   private boolean checkTransitionToShooting() {
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
+    RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+    // result.HasResult ensures that our vision system sees a target
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) && result.HasResult) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:

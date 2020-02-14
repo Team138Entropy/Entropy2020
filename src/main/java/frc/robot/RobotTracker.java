@@ -45,6 +45,7 @@ public class RobotTracker{
         public double angular_component;
         public Rotation2d turret_error;
         public boolean HasResult;
+        public double distance;
 
         public RobotTrackerResult(){
 
@@ -428,6 +429,7 @@ public class RobotTracker{
 
             RobotTrackerResult rtr = new RobotTrackerResult();
             rtr.turret_error = turret_error;
+            rtr.distance = mLatestAimingParameters.get().getRange();
             rtr.HasResult = true;
             Twist2d velocity = getMeasuredVelocity();
             rtr.tangental_component = mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange();
