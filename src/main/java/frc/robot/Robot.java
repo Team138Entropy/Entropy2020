@@ -54,6 +54,7 @@ public class Robot extends TimedRobot {
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
   private final double FIRE_DURATION_SECONDS = 0.5;
+  private final int BARF_TIMER_DURATION = 5;
 
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
@@ -466,7 +467,7 @@ public class Robot extends TimedRobot {
       case STORAGE_EJECT:
         mIntake.barf();// Ball Acqusition Reverse Functionality (BARF)
         mStorage.barf();
-        if(mBarfTimer.get() > 5){
+        if(mBarfTimer.get() >= BARF_TIMER_DURATION){
           mIntakeState = IntakeState.IDLE;
         }
         break;
