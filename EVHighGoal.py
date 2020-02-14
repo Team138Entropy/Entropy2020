@@ -67,6 +67,10 @@ starttime = 0
 # import the necessary packages
 import datetime
 
+#mask for camera when attached on turret ramp
+maskHighGoalCam = np.zeros(shape=(Camera_Image_Width, Camera_Image_Height, 3), dtype=np.uint8)
+cv2.fillPoly(maskHighGoalCam, pts=[[0,360], [640,360], [0,480], [640,480]], color=(0,0,0))
+
 # Queue of Packets
 # Thread Safe.. Packets being sent to robot are placed here!
 PacketQueue = queue.Queue()
@@ -296,6 +300,7 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     image = frame.copy()
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
+        image = cv2.bitwise_and(image, maskHighGoalCam)
         value_array = findTape(contours, image, centerX, centerY)
     else:
         # No Contours!
@@ -430,7 +435,7 @@ def findTape(contours, image, centerX, centerY):
             ratio = float(w) / h
             #cv2.imwrite("1beforeif.jpg", image)
             # Filters contours based off of size
-            if (mySolidity > .1) and (mySolidity < .7) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if (mySolidity > .3) and (mySolidity < .6) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 
@@ -760,14 +765,6 @@ def ProcessFrame(frame, tape):
         someprint = print("end of process frame")
 
         return processedFrame
-
-
-# Link to further explanation: https://docs.google.com/presentation/d/1ediRsI-oR3-kwawFJZ34_ZTlQS2SDBLjZasjzZ-eXbQ/pub?start=false&loop=false&slide=id.g12c083cffa_0_298
-def calculatePitch(pixelY, centerY, vFocalLength):
-    pitch = math.degrees(math.atan((pixelY - centerY) / vFocalLength))
-    # Just stopped working have to do this:
-    pitch *= -1
-    return round(pitch)
 
 
 def getEllipseRotation(image, cnt):
