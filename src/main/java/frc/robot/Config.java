@@ -11,17 +11,17 @@ public class Config {
 
   public enum Key {
     // Motors
-    DRIVE__LEFT_BACK_PORT(2),
-    DRIVE__LEFT_FRONT_PORT(1),
-    DRIVE__RIGHT_BACK_PORT(4),
-    DRIVE__RIGHT_FRONT_PORT(3),
+    DRIVE__LEFT_BACK_PORT(1),
+    DRIVE__LEFT_FRONT_PORT(2),
+    DRIVE__RIGHT_BACK_PORT(3),
+    DRIVE__RIGHT_FRONT_PORT(4),
     INTAKE__ROLLER(10),
     STORAGE__BOTTOM_ROLLER(8),
     STORAGE__TOP_ROLLER(7),
     SHOOTER__ROLLER(6),
 
     // Conversion constants
-    DRIVE__TICKS_PER_METER(64),
+    DRIVE__TICKS_PER_METER(640),
 
     // Sensors
     INTAKE__SENSOR(1),

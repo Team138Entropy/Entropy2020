@@ -143,7 +143,7 @@ public class Drive extends Subsystem {
     mRightMaster.config_kI(0, I);
     mRightMaster.config_kD(0, D);
 
-    talon.configClosedloopRamp(1);
+    //talon.configClosedloopRamp(1);
   }
 
   public void zeroSensors() {
@@ -160,7 +160,7 @@ public class Drive extends Subsystem {
 
   public void setTargetPosition(int position) {
     mLeftMaster.set(ControlMode.Position, position);
-    mRightMaster.set(ControlMode.Position, position);
+    mRightMaster.set(ControlMode.Position, -position);
   }
 
   /** Configure talons for open loop control */
@@ -179,14 +179,14 @@ public class Drive extends Subsystem {
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
-    // add a "minimum"
-    if (throttle >= .17) {
-      throttle = .17;
-    }
+    // // add a "minimum"
+    // if (throttle >= .17) {
+    //   throttle = .17;
+    // }
 
-    if (throttle <= -.17) {
-      throttle = -.17;
-    }
+    // if (throttle <= -.17) {
+    //   throttle = -.17;
+    // }
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -270,7 +270,7 @@ public class Drive extends Subsystem {
   }
 
   public synchronized double getRightEncoderDistance() {
-    return mRightMaster.getSelectedSensorPosition(0);
+    return -mRightMaster.getSelectedSensorPosition(0);
   }
 
   public synchronized Rotation2d getRotation() {
