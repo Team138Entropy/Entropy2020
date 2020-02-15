@@ -18,11 +18,9 @@ public abstract class Subsystem {
 
   public abstract void checkSubsystem();
 
-
-
-  //Optional Design Pattern. which gets called from the looper
-  //part of this design is to avoid over utiuilization of the can
-  //these methods are not abstract so they don't need to implimented
+  // Optional Design Pattern. which gets called from the looper
+  // part of this design is to avoid over utiuilization of the can
+  // these methods are not abstract so they don't need to implimented
 
   public void readPeriodicInputs() {}
 
@@ -30,6 +28,6 @@ public abstract class Subsystem {
 
   public void registerEnabledLoops(ILooper mEnabledLooper) {}
 
-  //called from subsystem manager
+  // called from subsystem manager
   public void stopSubsytem() {}
 }

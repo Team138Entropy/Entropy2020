@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
@@ -20,7 +19,8 @@ public class Shooter extends Subsystem {
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private static final int ROLLER_SLAVE_PORT =
+      Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
   private static final int ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
@@ -98,7 +98,7 @@ public class Shooter extends Subsystem {
   }
 
   /** Starts the roller. */
-  public void start() {  
+  public void start() {
     mRoller.setSpeed(ROLLER_SPEED);
   }
 
@@ -113,20 +113,22 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
-    // determine if we're at the target velocity by looking at the difference between the actual and expected
+    // determine if we're at the target velocity by looking at the difference between the actual and
+    // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
     boolean isAtVelocity = Math.abs(mRoller.getVelocity() - ROLLER_SPEED) < SPEED_DEADBAND;
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there
-    // add a "delay" where we still consider ourselves to be at the velocity if we were there in the last SPEED_DEADBAND_DELAY ticks
+    // add a "delay" where we still consider ourselves to be at the velocity if we were there in the
+    // last SPEED_DEADBAND_DELAY ticks
 
-    if(isAtVelocity){
+    if (isAtVelocity) {
       // reset the time since we were at velocity
       mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
-    }else{
+    } else {
       // decrement
-      mTimeSinceWeWereAtVelocity --;
+      mTimeSinceWeWereAtVelocity--;
     }
     // if the time is at least 0, we are "at velocity"
     return mTimeSinceWeWereAtVelocity > 0;

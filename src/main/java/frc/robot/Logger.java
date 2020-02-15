@@ -62,7 +62,7 @@ public class Logger {
     return "[" + logPath + ":" + thisLogLevel.name() + "] " + message;
   }
 
-    /**
+  /**
    * Logs to a given level
    *
    * @param level The level to log to
@@ -103,16 +103,14 @@ public class Logger {
           DriverStation.reportError(
               getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
         } else {
-          DriverStation.reportError(
-              getLogMsg(mLogPath, level, message), false);
+          DriverStation.reportError(getLogMsg(mLogPath, level, message), false);
         }
       } else if (level == SupportedLevels.WARN) {
         if (stackTrace) {
           DriverStation.reportWarning(
               getLogMsg(mLogPath, level, message), Thread.currentThread().getStackTrace());
         } else {
-          DriverStation.reportWarning(
-              getLogMsg(mLogPath, level, message), false);
+          DriverStation.reportWarning(getLogMsg(mLogPath, level, message), false);
         }
       } else {
         System.out.println(getLogMsg(mLogPath, level, message));
