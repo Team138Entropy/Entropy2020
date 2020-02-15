@@ -44,11 +44,12 @@ public class Robot extends TimedRobot {
     SHOOTING_COMPLETE
   }
 
-  public enum ClimingState {
+  public enum ClimbingState {
     IDLE, // Default state when State is not CLIMBING
     EXTENDING,
     EXTENDING_COMPLETE,
-    RETRACTING
+    RETRACTING,
+    RETRACTING_COMPLETE
   }
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
@@ -68,7 +69,7 @@ public class Robot extends TimedRobot {
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
-  private ClimingState mClimbingState = ClimingState.IDLE;
+  private ClimbingState mClimbingState = ClimbingState.IDLE;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -99,6 +100,9 @@ public class Robot extends TimedRobot {
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
+
+  // Extend and retract timer for climber
+  private Timer mClimbingTimer = new Timer();
 
   Logger mRobotLogger = new Logger("robot");
 
@@ -133,7 +137,7 @@ public class Robot extends TimedRobot {
     // Set the initial Robot State
     mState = State.INTAKE;
     mIntakeState = IntakeState.IDLE;
-    mClimbingState = ClimingState.IDLE;
+    mClimbingState = ClimbingState.IDLE;
     mShootingState = ShootingState.IDLE;
 
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
@@ -197,7 +201,7 @@ public class Robot extends TimedRobot {
     // Set the initial Robot State
     mState = State.INTAKE;
     mIntakeState = IntakeState.IDLE;
-    mClimbingState = ClimingState.IDLE;
+    mClimbingState = ClimbingState.IDLE;
     mShootingState = ShootingState.IDLE;
 
     mStorage.init();
@@ -352,7 +356,7 @@ public class Robot extends TimedRobot {
     
     State prevState = mState;
     IntakeState prevIntakeState = mIntakeState;
-    ClimingState prevClimbState = mClimbingState;
+    ClimbingState prevClimbState = mClimbingState;
     ShootingState prevShootState = mShootingState;
     executeRobotStateMachine();
     if(prevState != mState){
@@ -401,6 +405,7 @@ public class Robot extends TimedRobot {
         mIntake.stop();
         mStorage.stop();
         mShooter.stop();
+        mClimber.stop();
         break;
       case INTAKE:
         executeIntakeStateMachine();
@@ -566,18 +571,34 @@ public class Robot extends TimedRobot {
     }
   }
 
+  private boolean checkTransitionToClimbing() {
+    return false;
+  }
+
   private void executeClimbingStateMachine() {
     switch (mClimbingState) {
       case IDLE:
         mRobotLogger.warn("Climbing state is idle");
         break;
       case EXTENDING:
-        mClimber.extend(CLIMBER_EXTEND_DURATION_SECONDS);
-
+        if (checkTransitionToClimbing()) {
+          mClimbingState = ClimbingState.RETRACTING;
+        }
+        mClimber.extend();
+        if (mClimbingTimer.get() >= CLIMBER_EXTEND_DURATION_SECONDS / 1000) {
+          mClimbingState = ClimbingState.EXTENDING_COMPLETE;
+        }
       case EXTENDING_COMPLETE:
-
+        mClimber.stop();
+        if (checkTransitionToClimbing()) {
+          mClimbingState = ClimbingState.RETRACTING;
+        }
       case RETRACTING:
-
+        mClimber.retract();
+      case RETRACTING_COMPLETE:
+        mClimber.stop();
+        mClimbingState = ClimbingState.IDLE;
+        mState = State.IDLE;
       default:
         mRobotLogger.error("Invalid Climbing State");
         break;

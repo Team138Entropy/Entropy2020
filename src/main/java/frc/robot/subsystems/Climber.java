@@ -1,35 +1,27 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Timer;
-
 public class Climber extends Subsystem {
 
   /** Aggregation */
-  private static Climber instance;
-
-  private Timer mClimbingTimer;
+  private static Climber sInstance;
 
   public Climber() {
-    mClimbingTimer = new Timer();
   }
 
   public static Climber getInstance() {
-    if (instance == null) {
-      instance = new Climber();
+    if (sInstance == null) {
+      sInstance = new Climber();
     }
-    return instance;
+    return sInstance;
   }
 
-  public void extend(double timeMilliseconds) {
-    mClimbingTimer.start();
+  public void extend() {
   }
 
-  public void retract(double timeMilliseconds) {
-    mClimbingTimer.start();
+  public void retract() {
   }
 
-  public boolean isReadyForNextState (double time) {
-    return mClimbingTimer.get() >= time;
+  public void stop() {
   }
 
   @Override

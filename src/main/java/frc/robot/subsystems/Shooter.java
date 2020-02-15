@@ -60,7 +60,7 @@ public class Shooter extends Subsystem {
   // TEMPORARY STUFF ENDS HERE
 
   // Aggregation
-  private static Shooter instance;
+  private static Shooter sInstance;
   private PIDRoller mRoller;
   private TalonSRX mTestRoller;
   private Turret mTurret;
@@ -88,8 +88,8 @@ public class Shooter extends Subsystem {
   }
 
   public static synchronized Shooter getInstance() {
-    if (instance == null) instance = new Shooter();
-    return instance;
+    if (sInstance == null) sInstance = new Shooter();
+    return sInstance;
   }
 
   /** Tells the turret to move to where the vision system says we should be. */
