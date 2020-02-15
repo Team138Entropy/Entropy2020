@@ -13,7 +13,7 @@ public class Shooter extends Subsystem {
   // Temporary, until default config values are merged
   private static final double MAX_SPEED = 2445d;
   private static final double SPEED_DEADBAND = 30;
-  private static final int SPEED_DEADBAND_DELAY = 5;
+  private static final int SPEED_DEADBAND_DELAY = 10;
   private static final double FEEDFORWARD = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
 
   // TODO: Integrate with other subsystems for real

@@ -429,6 +429,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
+        mStorage.init();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
         break;
@@ -475,6 +476,7 @@ public class Robot extends TimedRobot {
         mIntake.resetOvercurrentCooldown();
         break;
       case STORAGE_EJECT:
+        mStorage.init();
         mIntake.barf(); // Ball Acqusition Reverse Functionality (BARF)
         mStorage.barf();
         if (mBarfTimer.get() >= BARF_TIMER_DURATION) {
@@ -491,7 +493,7 @@ public class Robot extends TimedRobot {
   private boolean checkTransitionToShooting() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) && result.HasResult) {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) /*&& result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
