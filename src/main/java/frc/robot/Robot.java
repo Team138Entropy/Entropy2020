@@ -388,6 +388,8 @@ public class Robot extends TimedRobot {
       mShooter.decreaseVelocity();
     } else if (mOperatorInterface.getShooterVelocityTrimUp()) {
       mShooter.increaseVelocity();
+    } else if (mOperatorInterface.getResetVelocityTrim()) {
+      mShooter.resetVelocity();
     }
 
     // Camera Swap

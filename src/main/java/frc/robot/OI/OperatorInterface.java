@@ -81,6 +81,10 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.DOWN;
   }
 
+  public boolean getResetVelocityTrim() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  }
+
   // Operator
 
   public boolean getHarvestMode() {
