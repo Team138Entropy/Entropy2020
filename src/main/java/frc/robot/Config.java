@@ -40,6 +40,7 @@ public class Config {
     OI__VISION__PID__D(0),
 
     ROBOT__HAS_DRIVETRAIN(true),
+    ROBOT__DRIVE_DEBUG(true),
     ROBOT__HAS_TURRET(false),
     ROBOT__HAS_LEDS(false),
 

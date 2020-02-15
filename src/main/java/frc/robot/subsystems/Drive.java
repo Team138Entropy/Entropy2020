@@ -83,6 +83,10 @@ public class Drive extends Subsystem {
   }
 
   public void init() {
+    // Configure slave Talons to follow masters
+    mLeftSlave.follow(mLeftMaster);
+    mRightSlave.follow(mRightMaster);
+    
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
@@ -99,6 +103,22 @@ public class Drive extends Subsystem {
     mLeftMaster.setNeutralMode(NeutralMode.Brake);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
+    mRightMaster.configNominalOutputForward(0., 0);
+    mRightMaster.configNominalOutputReverse(0., 0);
+    mRightMaster.configPeakOutputForward(1, 0);
+    mRightMaster.configPeakOutputReverse(-1, 0);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+
+    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    mRightMaster.setSensorPhase(true);
+    mRightMaster.configNominalOutputForward(0., 0);
+    mRightMaster.configNominalOutputReverse(-0., 0);
+    mRightMaster.configPeakOutputForward(1, 0);
+    mRightMaster.configPeakOutputReverse(-1, 0);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    mRightSlave.setNeutralMode(NeutralMode.Brake);
+
     // Configure Talon gains
     /*
     mLeftMaster.config_kF(0, Drive_Kf,0);
@@ -109,13 +129,9 @@ public class Drive extends Subsystem {
     mRightMaster.config_kP(0, Drive_Kp,0);
     mRightMaster.config_kI(0, Drive_Ki,0);
     mRightMaster.config_kD(0, Drive_Kd,0);
-          */
+    */
 
-    // Configure slave Talons to follow masters
-    mLeftSlave.follow(mLeftMaster);
-    mRightSlave.follow(mRightMaster);
-
-    setOpenLoop(DriveSignal.NEUTRAL);
+    //setOpenLoop(DriveSignal.NEUTRAL);
   }
 
   public void zeroSensors() {}
@@ -188,6 +204,12 @@ public class Drive extends Subsystem {
         Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
     setOpenLoop(
         new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
+  }
+
+  // Very simple drivetrain debug function
+  public synchronized void setDriveTank(double leftThrottle, double rightThrottle) {
+    mLeftMaster.set(ControlMode.PercentOutput, leftThrottle);
+    mRightMaster.set(ControlMode.PercentOutput, rightThrottle * -1);
   }
 
   /*

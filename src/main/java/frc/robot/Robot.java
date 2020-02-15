@@ -299,37 +299,8 @@ public class Robot extends TimedRobot {
 
   public void driveTrainLoop() {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
-      // Check User Inputs
-      double driveThrottle = mOperatorInterface.getDriveThrottle();
-      double driveTurn = mOperatorInterface.getDriveTurn();
-      boolean autoDrive = false;
-      mDrive.setDrive(driveThrottle, driveTurn, false);
-
-      // Quickturn
-      if (autoDrive == false && mOperatorInterface.getQuickturn()) {
-        // Quickturn!
-      }
-
-      // Detect Harvest Mode
-      boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
-      boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
-
-      boolean WantsAutoAim = false;
-
-      // Optional Object that may or may not contain a null value
-      Optional<AimingParameters> BallAimingParameters; // info to aim to the ball
-      Optional<AimingParameters> TargetAimingParameters; // info to aim to the target
-
-      // Continue Driving
-      if (WantsHarvestMode == true) {
-        // Harvest Mode - AutoSteer Functionality
-        // Used for tracking a ball
-        // we may want to limit the speed?
-        // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
-      } else {
-        // Standard Manual Drive
-        mDrive.setDrive(driveThrottle, driveTurn, false);
-      }
+      // yes, this is just for testing purposes
+      mDrive.setDriveTank(mOperatorInterface.getDriveThrottle(), mOperatorInterface.getDriveTankRightThrottle());
     }
   }
 
