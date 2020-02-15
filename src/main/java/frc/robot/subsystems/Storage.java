@@ -60,8 +60,6 @@ public class Storage extends Subsystem {
     
     // if we've hit our encoder distance target
     if(encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS){
-      // System.out.println("The sensor moved more than the position!");
-
       // reset the encoder position
       mStartingEncoderPosition = getEncoder();
       return true;
