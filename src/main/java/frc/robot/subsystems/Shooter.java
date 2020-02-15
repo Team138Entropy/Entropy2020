@@ -23,7 +23,9 @@ public class Shooter extends Subsystem {
       Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
+  private static final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
+  private int mVelocityAdjustment = 0;
+  private static final int VELOCITY_ADJUSTMENT_BUMP = Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
   private static class TurretPosition {
     private double mAzimuth, mDistance;
@@ -98,9 +100,8 @@ public class Shooter extends Subsystem {
   }
 
   /** Starts the roller. */
-  public void start() {  
-    double speed = SpeedLookupTable.getInstance().getSpeedFromDistance(mVision.calcTargetPosition().getDistance());
-    mRoller.setSpeed((int) Math.round(speed));
+  public void start() {
+    mRoller.setSpeed(getAdjustedVelocitySetpoint());
   }
 
   /** Stops the roller. */
@@ -112,12 +113,34 @@ public class Shooter extends Subsystem {
     return mRoller.getVelocity();
   }
 
+  private int getAdjustedVelocitySetpoint() {
+    int speed = (int) Math.round(SpeedLookupTable.getInstance().getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
+    return speed + mVelocityAdjustment;
+  }
+
+  public void increaseVelocity() {
+    mVelocityAdjustment += VELOCITY_ADJUSTMENT_BUMP;
+  }
+
+  public void decreaseVelocity() {
+    mVelocityAdjustment -= VELOCITY_ADJUSTMENT_BUMP;
+  }
+
+  public void resetVelocity() {
+    mVelocityAdjustment = 0;
+  }
+
+  public int getVelocityAdjustment() {
+    return mVelocityAdjustment;
+  }
+
+
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
-    boolean isAtVelocity = Math.abs(mRoller.getVelocity() - ROLLER_SPEED) < SPEED_DEADBAND;
+    boolean isAtVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there

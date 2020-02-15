@@ -90,6 +90,10 @@ public class Robot extends TimedRobot {
   private Timer mBarfTimer = new Timer();
   Logger mRobotLogger = new Logger("robot");
 
+  // Shooter velocity trim state
+  LatchedBoolean mShooterVelocityTrimUp = new LatchedBoolean();
+  LatchedBoolean mShooterVelocityTrimDown = new LatchedBoolean();
+
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
@@ -149,8 +153,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // TODO: haha that was a joke this is the real last one
-    SmartDashboard.putNumber("ElevateTrim", 0.0f);
+    SmartDashboard.putNumber("ElevateTrim", mShooter.getVelocityAdjustment());
 
     SmartDashboard.putString("RobotState", mState.name());
     SmartDashboard.putString("IntakeState", mIntakeState.name());
@@ -391,6 +394,15 @@ public class Robot extends TimedRobot {
       // manual turret aim
     }
 
+    // Shooter velocity trim
+    if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
+      mShooter.decreaseVelocity();
+    } else if (mShooterVelocityTrimUp.update(mOperatorInterface.getShooterVelocityTrimUp())) {
+      mShooter.increaseVelocity();
+    } else if (mOperatorInterface.getResetVelocityTrim()) {
+      mShooter.resetVelocity();
+    }
+
     // Camera Swap
     if (mOperatorInterface.getCameraSwap()) {
       // Swap Camera!
@@ -491,7 +503,7 @@ public class Robot extends TimedRobot {
   private boolean checkTransitionToShooting() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) && result.HasResult) {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())/* && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
