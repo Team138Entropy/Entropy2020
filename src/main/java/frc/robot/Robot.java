@@ -150,8 +150,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // TODO: haha that was a joke this is the real last one
-    SmartDashboard.putNumber("ElevateTrim", 0.0f);
+    SmartDashboard.putNumber("ElevateTrim", mShooter.getVelocityAdjustment());
 
     SmartDashboard.putString("RobotState", mState.name());
     SmartDashboard.putString("IntakeState", mIntakeState.name());
@@ -382,6 +381,13 @@ public class Robot extends TimedRobot {
       // manual turret aim
     } else if (mOperatorInterface.getTurretAdjustRight()) {
       // manual turret aim
+    }
+
+    // Shooter velocity trim
+    if (mOperatorInterface.getShooterVelocityTrimDown()) {
+      mShooter.decreaseVelocity();
+    } else if (mOperatorInterface.getShooterVelocityTrimUp()) {
+      mShooter.increaseVelocity();
     }
 
     // Camera Swap

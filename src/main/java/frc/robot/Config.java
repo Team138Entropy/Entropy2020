@@ -51,6 +51,8 @@ public class Config {
     INTAKE__OVERCURRENT_THRESHOLD(12d),
     INTAKE__OVERCURRENT_MIN_OCCURENCES(25),
 
+    SHOOTER__VELOCITY_ADJUSTMENT(10),
+
     OI__VISION__PID__MAX_SPEED(0.25d);
 
     private Object value;
