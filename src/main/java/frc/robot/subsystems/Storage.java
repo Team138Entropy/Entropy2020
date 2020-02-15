@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 
@@ -14,26 +14,19 @@ public class Storage extends Subsystem {
       Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
-  private static final int INTAKE_SENSOR_PORT = Config.getInstance().getInt(Key.INTAKE__SENSOR);
-
   private static final int STORAGE_CAPICTY = 4;
 
-  private static final double STORE_SPEED =
-      Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
-  private static final double BOTTOM_SPEED_FACTOR =
-      Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double TEST_SPEED_FACTOR =
-      Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED =
-      Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
+  private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
-  private DigitalInput mIntakeSensor;
 
   private int mBallCount = 0;
-
-  private boolean mWasLineBroke = false;
+  private int mStartingEncoderPosition = 0;
 
   private static Storage sInstance;
 
@@ -50,29 +43,30 @@ public class Storage extends Subsystem {
 
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
-
-    mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
-  public void init() {}
+  private int getEncoder(){
+    // return the negative position that the talon gets us because it's hooked up backwards
+    // this will return positive values
+    return -mBottomRoller.getSelectedSensorPosition();
+  }
 
-  private boolean isLineBroken() {
-    return mIntakeSensor.get();
+  public void init() {
+    mStartingEncoderPosition = getEncoder();
   }
 
   public boolean isBallStored() {
-    // it wasn't broken the last time we checked
-    if (!mWasLineBroke) {
-      mWasLineBroke = isLineBroken();
-      return false;
-      // it's still broken
-    } else if (isLineBroken()) {
-      mWasLineBroke = isLineBroken();
-      return false;
-      // if the last time we checked the line was broken and now it isn't, we've just stored a ball
-    } else {
-      mWasLineBroke = isLineBroken();
+    int encoderDistance = mStartingEncoderPosition - getEncoder();
+    System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
+    SmartDashboard.putNumber("Encoder Distance", encoderDistance);
+    
+    // if we've hit our encoder distance target
+    if(encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS){
+      // reset the encoder position
+      mStartingEncoderPosition = getEncoder();
       return true;
+    }else{
+      return false;
     }
   }
 
@@ -108,6 +102,10 @@ public class Storage extends Subsystem {
   public void storeBall() {
     mBottomRoller.set(ControlMode.PercentOutput, STORE_SPEED * BOTTOM_SPEED_FACTOR);
     mTopRoller.set(ControlMode.PercentOutput, STORE_SPEED);
+  }
+
+  public void emptyBalls(){
+    mBallCount = 0;
   }
 
   /** Stops the roller. */
