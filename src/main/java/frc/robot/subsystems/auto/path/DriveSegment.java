@@ -1,28 +1,42 @@
 package frc.robot.subsystems.auto.path;
 
-import frc.robot.Logger;
+import frc.robot.Config;
 import frc.robot.subsystems.Drive;
 
-import javax.annotation.Nonnull;
-
 public class DriveSegment extends Segment {
-  private double meters;
+  private final int PID_LOOP_ID = 0;
+  private int targetPosition;
+  private int acceptableError;
+
   private boolean done;
   private Drive drive;
 
   public DriveSegment(double meters) {
-    this.meters = meters;
     this.drive = Drive.getInstance();
+    this.targetPosition = drive.metersToTicks(meters);
+    this.acceptableError = Config.getInstance().getInt(Config.Key.DRIVE__PID_ACCEPTABLE_ERROR);
   }
 
   @Override
   public void init() {
     logger.info("Initializing drive segment");
+
+    drive.zeroEncoders();
+    drive.setTargetPosition(targetPosition);
   }
 
   @Override
   public void tick() {
-    done = true;
+    final int min = targetPosition - acceptableError;
+    final int max = targetPosition + acceptableError;
+    double avgPos = getAveragePosition();
+
+    logger.verbose("Average position: " + avgPos);
+
+    if (avgPos > min && avgPos < max) {
+      logger.verbose(min + " < " + avgPos + " < " + max);
+      done = true;
+    }
   }
 
   @Override
@@ -31,5 +45,11 @@ public class DriveSegment extends Segment {
     return done;
   }
 
-  private double getDistance;
+  /**
+   * Returns the average of the left and right encoder distances.
+   * @return
+   */
+  private double getAveragePosition() {
+    return (drive.getLeftEncoderDistance() + drive.getRightEncoderDistance()) / 2;
+  }
 }

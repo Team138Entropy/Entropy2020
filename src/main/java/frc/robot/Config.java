@@ -20,6 +20,9 @@ public class Config {
     STORAGE__TOP_ROLLER(7),
     SHOOTER__ROLLER(6),
 
+    // Conversion constants
+    DRIVE__TICKS_PER_METER(64),
+
     // Sensors
     INTAKE__SENSOR(1),
 
@@ -32,11 +35,20 @@ public class Config {
 
     OI__VISION__ENABLED(false),
 
+    // Auto config (temporary)
+    AUTO__SELECTED_PATH("test"),
+
+    // PID Stuff
     OI__VISION__POT__MIN(0),
     OI__VISION__POT__MAX(100d),
     OI__VISION__PID__P(0.3d),
     OI__VISION__PID__I(0.003d),
     OI__VISION__PID__D(0),
+
+    DRIVE__PID_P(1),
+    DRIVE__PID_I(0),
+    DRIVE__PID_D(0),
+    DRIVE__PID_ACCEPTABLE_ERROR(10),
 
     ROBOT__HAS_DRIVETRAIN(true),
     ROBOT__HAS_TURRET(false),

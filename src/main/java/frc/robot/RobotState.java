@@ -79,12 +79,23 @@ public class RobotState {
   private double update_prev_timestamp = -1.0;
   private Rotation2d update_prev_heading = null;
 
+  private boolean auto;
+
   // Constructor for Robot State
   // Called upon RobotState startup, reset everything
   private RobotState() {
     mLogger = new Logger("robotState");
     // At the time of this call, this is our zero point!
     zero(0.0, Pose2d.identity(), Rotation2d.identity());
+    auto = false;
+  }
+
+  public synchronized void setAuto(boolean auto) {
+    this.auto = auto;
+  }
+
+  public boolean getAuto() {
+    return auto;
   }
 
   // Zero out the robot's state

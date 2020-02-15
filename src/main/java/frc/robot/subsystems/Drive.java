@@ -67,6 +67,15 @@ public class Drive extends Subsystem {
     return mInstance;
   }
 
+  public int metersToTicks(double meters) {
+    long roundedVal = Math.round(meters * Config.getInstance().getInt(Key.DRIVE__TICKS_PER_METER));
+    if (roundedVal > Integer.MAX_VALUE) {
+      mDriveLogger.warn("Integer overflow when converting meters to ticks! Something is likely VERY WRONG!");
+    }
+
+    return (int) roundedVal;
+  }
+
   private Drive() {
     mDriveLogger = new Logger("drive");
 
@@ -120,25 +129,38 @@ public class Drive extends Subsystem {
     talon.setNeutralMode(NeutralMode.Brake);
 
     // Configure Talon gains
-    //    talon.config_kF(0, Drive_Kf,0);
-    //    talon.config_kP(0, Drive_Kp,0);
-    //    talon.config_kI(0, Drive_Ki,0);
-    //    talon.config_kD(0, Drive_Kd,0);
+    double P, I, D;
+
+    P = Config.getInstance().getDouble(Config.Key.DRIVE__PID_P);
+    I = Config.getInstance().getDouble(Config.Key.DRIVE__PID_I);
+    D = Config.getInstance().getDouble(Config.Key.DRIVE__PID_D);
+
+    mLeftMaster.config_kP(0, P);
+    mLeftMaster.config_kI(0, I);
+    mLeftMaster.config_kD(0, D);
+
+    mRightMaster.config_kP(0, P);
+    mRightMaster.config_kI(0, I);
+    mRightMaster.config_kD(0, D);
 
     talon.configClosedloopRamp(1);
   }
 
   public void zeroSensors() {
-    mLeftMaster.getSensorCollection().setQuadraturePosition(0,0);
-    mRightMaster.getSensorCollection().setQuadraturePosition(0,0);
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 0);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0, 0);
   }
 
   // Temp
   private static final int AUTO_TICKS = 1000;
-
   public void setAutoPosition() {
     mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
     mRightMaster.set(ControlMode.Position, -AUTO_TICKS);
+  }
+
+  public void setTargetPosition(int position) {
+    mLeftMaster.set(ControlMode.Position, position);
+    mRightMaster.set(ControlMode.Position, position);
   }
 
   /** Configure talons for open loop control */

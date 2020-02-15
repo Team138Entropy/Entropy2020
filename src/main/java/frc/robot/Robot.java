@@ -2,17 +2,16 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.auto.path.Path;
+import frc.robot.subsystems.auto.path.Paths;
 import frc.robot.util.LatchedBoolean;
-import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import java.util.Optional;
 
@@ -78,6 +77,7 @@ public class Robot extends TimedRobot {
   private CameraManager mCameraManager;
 
   private Compressor mCompressor;
+  private ADXRS450_Gyro mGyro;
 
   public Relay visionLight = new Relay(0);
 
@@ -89,6 +89,8 @@ public class Robot extends TimedRobot {
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
+
+  private Path mAutoPath = Paths.NO_OP;
 
   Logger mRobotLogger = new Logger("robot");
 
@@ -135,6 +137,9 @@ public class Robot extends TimedRobot {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator = BallIndicator.getInstance();
     }
+
+    mGyro = new ADXRS450_Gyro();
+    mGyro.calibrate();
   }
 
   /*
@@ -190,14 +195,14 @@ public class Robot extends TimedRobot {
     mShootingState = ShootingState.PREPARE_TO_SHOOT;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
-    // TODO: Delet this
-    mDrive.zeroEncoders();
-    mDrive.setAutoPosition();
+    mRobotState.setAuto(true);
+    mAutoPath = Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
   }
 
   @Override
   public void autonomousPeriodic() {
     mRobotLogger.log("Auto Periodic");
+    mAutoPath.tick();
     mRobotLogger.info(
         "Encoder distances: ("
             + mDrive.getLeftEncoderDistance()
@@ -210,6 +215,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
+    mRobotState.setAuto(false);
 
     mStorage.init();
     mDrive.init();
@@ -301,6 +307,7 @@ public class Robot extends TimedRobot {
       mTurret.disable();
     }
     Config.getInstance().reload();
+    mRobotState.setAuto(false);
   }
 
   @Override
@@ -317,16 +324,16 @@ public class Robot extends TimedRobot {
   }
 
   public void driveTrainLoop() {
+    // TODO: Cache whether or not the robot has a drivetrain. We shouldn't be calling the config system every tick.
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
       double driveTurn = mOperatorInterface.getDriveTurn();
       boolean driveShift = mOperatorInterface.getDriveShift();
-      boolean autoDrive = false;
       mDrive.setDrive(driveThrottle, driveTurn, false);
 
       // Quickturn
-      if (autoDrive == false && mOperatorInterface.getQuickturn()) {
+      if (mOperatorInterface.getQuickturn()) {
         // Quickturn!
       }
 
@@ -343,7 +350,7 @@ public class Robot extends TimedRobot {
       Optional<AimingParameters> TargetAimingParameters; // info to aim to the target
 
       // Continue Driving
-      if (WantsHarvestMode == true) {
+      if (WantsHarvestMode) {
         // Harvest Mode - AutoSteer Functionality
         // Used for tracking a ball
         // we may want to limit the speed?
@@ -546,5 +553,9 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Invalid Climbing State");
         break;
     }
+  }
+
+  public Gyro getGyro() {
+    return mGyro;
   }
 }

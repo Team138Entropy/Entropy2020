@@ -1,18 +1,15 @@
 package frc.robot.subsystems.auto.path;
 
 import frc.robot.Logger;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import javax.annotation.Nullable;
 
-/**
- * Represents a path to be followed.
- */
+/** Represents a path to be followed. */
 public class Path {
   private LinkedList<Segment> segments;
   private ArrayList<Segment> uninitializedSegments;
-  private static Logger logger = new Logger("Path");
+  private static Logger logger = new Logger("path");
 
   protected static Logger getLogger() {
     return logger;
@@ -25,6 +22,7 @@ public class Path {
 
   /**
    * Appends a new segment to the path.
+   *
    * @param segment the segment to be added.
    * @return the path object, so that these calls can be chained together.
    */
@@ -38,9 +36,7 @@ public class Path {
     return segments.peekFirst();
   }
 
-  /**
-   * Does the stuff. Call this periodically.
-   */
+  /** Does the stuff. Call this periodically. */
   public void tick() {
     Segment segment = getCurrentSegment();
     if (segment != null) {
@@ -56,5 +52,4 @@ public class Path {
       }
     }
   }
-
 }
