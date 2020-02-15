@@ -49,7 +49,6 @@ class PIDRoller {
 
   void setSpeed(int posPer100Ms) {
     if (posPer100Ms == 0) {
-      System.out.println("PID roller");
       mTalon.set(ControlMode.PercentOutput, 0);
     } else {
       mTalon.set(ControlMode.Velocity, -posPer100Ms);

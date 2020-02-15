@@ -10,9 +10,9 @@
         "hgap": 8.0,
         "vgap": 8.0,
         "tiles": {
-          "5,5": {
+          "7,5": {
             "size": [
-              6,
+              5,
               2
             ],
             "content": {
@@ -25,7 +25,7 @@
           },
           "0,2": {
             "size": [
-              5,
+              4,
               2
             ],
             "content": {
@@ -36,9 +36,9 @@
               "Colors/Color when false": "#800000FF"
             }
           },
-          "5,0": {
+          "7,0": {
             "size": [
-              6,
+              5,
               5
             ],
             "content": {
@@ -54,7 +54,7 @@
           },
           "0,0": {
             "size": [
-              5,
+              4,
               2
             ],
             "content": {
@@ -68,9 +68,9 @@
               "Visuals/Show text": true
             }
           },
-          "21,0": {
+          "22,0": {
             "size": [
-              5,
+              4,
               5
             ],
             "content": {
@@ -90,18 +90,18 @@
                 },
                 {
                   "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/ClimbingState",
-                  "_title": "Climbing State"
+                  "_source0": "network_table:///SmartDashboard/ShootingState",
+                  "_title": "Shooting State"
                 },
                 {
                   "_type": "Text View",
-                  "_source0": "network_table:///SmartDashboard/ShootingState",
-                  "_title": "Shooting State"
+                  "_source0": "network_table:///SmartDashboard/ClimbingState",
+                  "_title": "Climbing State"
                 }
               ]
             }
           },
-          "13,0": {
+          "14,0": {
             "size": [
               4,
               2
@@ -117,7 +117,7 @@
               "Visuals/Show text": true
             }
           },
-          "17,2": {
+          "18,2": {
             "size": [
               4,
               2
@@ -133,7 +133,7 @@
               "Visuals/Show text": true
             }
           },
-          "17,0": {
+          "18,0": {
             "size": [
               4,
               2
@@ -146,7 +146,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "11,3": {
+          "12,3": {
             "size": [
               6,
               4
@@ -159,7 +159,7 @@
               "Visuals/Show velocity vectors": true
             }
           },
-          "11,2": {
+          "12,2": {
             "size": [
               6,
               1
@@ -170,7 +170,7 @@
               "_title": "/FMSInfo/EventName"
             }
           },
-          "11,0": {
+          "12,0": {
             "size": [
               2,
               2
@@ -183,7 +183,7 @@
               "Colors/Color when false": "#0000FFFF"
             }
           },
-          "17,4": {
+          "18,4": {
             "size": [
               4,
               1
@@ -191,7 +191,87 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///LiveWindow/Ungrouped/Relay[0]/Value",
-              "_title": "/LiveWindow/Ungrouped/Relay[0]/Value"
+              "_title": "Light Relay"
+            }
+          },
+          "0,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Intake Spinning Up",
+              "_title": "Intake Spinning Up",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "2,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Intake Overcurrent",
+              "_title": "Intake Overcurrent",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "0,6": {
+            "size": [
+              4,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Intake Overcurrent Debounced",
+              "_title": "Intake Overcurrent Debounced",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "4,2": {
+            "size": [
+              3,
+              3
+            ],
+            "content": {
+              "_type": "Simple Dial",
+              "_source0": "network_table:///SmartDashboard/Intake Current",
+              "_title": "Intake Current",
+              "Range/Min": 0.0,
+              "Range/Max": 16.0,
+              "Visuals/Show value": true
+            }
+          },
+          "4,5": {
+            "size": [
+              3,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Intake Current Countdown",
+              "_title": "Intake Current Countdown"
+            }
+          },
+          "4,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Number Bar",
+              "_source0": "network_table:///SmartDashboard/Encoder Distance",
+              "_title": "Storage Encoder Distance",
+              "Range/Min": 0.0,
+              "Range/Max": 300.0,
+              "Range/Center": 0.0,
+              "Visuals/Num tick marks": 7,
+              "Visuals/Show text": true
             }
           }
         }
@@ -283,6 +363,15 @@
                   "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [6]",
                   "_title": "Talon SRX [6]",
                   "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Gyro",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/ADXRS450_Gyro[0]",
+                  "_title": "ADXRS450_Gyro[0]",
+                  "Visuals/Major tick spacing": 45.0,
+                  "Visuals/Starting angle": 180.0,
+                  "Visuals/Show tick mark ring": true,
+                  "Visuals/Counter clockwise": false
                 }
               ]
             }
@@ -292,9 +381,9 @@
     }
   ],
   "windowGeometry": {
-    "x": -8.0,
-    "y": -8.0,
-    "width": 1936.0,
-    "height": 1056.0
+    "x": -6.0,
+    "y": 0.0,
+    "width": 1932.0,
+    "height": 1047.0
   }
 }

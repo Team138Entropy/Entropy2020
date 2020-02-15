@@ -28,19 +28,19 @@ public class Shooter extends Subsystem {
   private static final int VELOCITY_ADJUSTMENT_BUMP = Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
   private static class TurretPosition {
-    private double mAzimuth, mElevation;
+    private double mAzimuth, mDistance;
 
-    public TurretPosition(double azimuth, double elevation) {
+    public TurretPosition(double azimuth, double distance) {
       mAzimuth = azimuth;
-      mElevation = elevation;
+      mDistance = distance;
     }
 
     public double getAzimuth() {
       return mAzimuth;
     }
 
-    public double getElevation() {
-      return mElevation;
+    public double getDistance() {
+      return mDistance;
     }
   }
 
@@ -80,12 +80,12 @@ public class Shooter extends Subsystem {
                 "Setting dummy turret position to ("
                     + position.getAzimuth()
                     + ", "
-                    + position.getElevation()
+                    + position.getDistance()
                     + ")");
     mVision =
         () -> {
           // System.out.println("Getting dummy vision target");
-          return new TurretPosition(0, 0);
+          return new TurretPosition(0, MAX_SPEED);
         };
   }
 
@@ -114,7 +114,8 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
-    return DEFAULT_ROLLER_SPEED + mVelocityAdjustment;
+    int speed = (int) Math.round(SpeedLookupTable.getInstance().getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
+    return speed + mVelocityAdjustment;
   }
 
   public void increaseVelocity() {

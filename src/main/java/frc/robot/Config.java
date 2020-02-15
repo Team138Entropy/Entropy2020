@@ -20,9 +20,6 @@ public class Config {
     SHOOTER__ROLLER(6),
     SHOOTER__ROLLER_SLAVE(5),
 
-    // Sensors
-    INTAKE__SENSOR(1),
-
     // Speeds
     INTAKE__ROLLER_SPEED(1d),
     STORAGE__ROLLER_STORE_SPEED(1d),
@@ -52,6 +49,8 @@ public class Config {
     INTAKE__OVERCURRENT_MIN_OCCURENCES(25),
 
     SHOOTER__VELOCITY_ADJUSTMENT(100),
+
+    STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS(2000d),
 
     OI__VISION__PID__MAX_SPEED(0.25d);
 
