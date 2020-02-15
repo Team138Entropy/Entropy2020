@@ -51,6 +51,8 @@ public class Path {
         logger.info("Segment finished");
         segments.removeFirst();
       }
+    } else {
+      logger.info("Path finished");
     }
   }
 
