@@ -8,14 +8,18 @@
 # This is meant to be used in conjuction with WPILib Raspberry Pi image: https://github.com/wpilibsuite/FRCVision-pi-gen
 # ----------------------------------------------------------------------------
 
-import os # Needs this for folder manipulation.
+import os
+import json
 import time
 import sys
 from threading import Thread
+import socket
+import queue
 import threading
 from cscore import CameraServer, VideoSource
 import cv2
 import numpy as np
+from numpy import mean
 import math
 import datetime
 from datetime import datetime
@@ -42,6 +46,12 @@ DiagonalAspect = math.hypot(HorizontalAspect, VerticalAspect)
 hsv_threshold_hue = [55, 75]
 hsv_threshold_saturation = [89, 231]
 hsv_threshold_value = [102, 255]
+
+cameras = []
+streams = []
+cameraConfigs = []
+class CameraConfig: pass
+
 
 class WebcamVideoStream:
     def __init__(self, camera, cameraServer, frameWidth, frameHeight, name="WebcamVideoStream"):
@@ -100,9 +110,95 @@ class WebcamVideoStream:
 image_width = 640
 image_height = 480
 
-# Lists to make the program happy
-cameras = []
-streams = []
+def readCameraConfig(config):
+    cam = cameraConfig()
+
+    # name
+    try:
+        cam.name = config["name"]
+    except KeyError:
+        parseError("could not read camera name")
+        return False
+
+    # path
+    try:
+        cam.path = config["path"]
+    except KeyError:
+        parseError("camera '{}': could not read path".format(cam.name))
+        return False
+
+    cam.config = config
+
+    cameraConfigs.append(cam)
+    return True
+
+def readConfig():
+    global team
+    global server
+
+    # parse file
+    try:
+        with open(configFile, "rt") as f:
+            j = json.load(f)
+    except OSError as err:
+        print("could not open '{}': {}".format(configFile, err), file=sys.stderr)
+        return False
+
+    # top level must be an object
+    if not isinstance(j, dict):
+        parseError("must be JSON object")
+        return False
+
+    # team number
+    try:
+        team = j["team"]
+    except KeyError:
+        parseError("could not read team number")
+        return False
+
+    # ntmode (optional)
+    if "ntmode" in j:
+        str = j["ntmode"]
+        if str.lower() == "client":
+            server = False
+        elif str.lower() == "server":
+            server = True
+        else:
+            parseError("could not understand ntmode value '{}'".format(str))
+
+    # cameras
+    try:
+        cameras = j["cameras"]
+    except KeyError:
+        parseError("could not read cameras")
+        return False
+    for camera in cameras:
+        if not readCameraConfig(camera):
+            return False
+
+    return True
+
+def startCamera(config):
+    print("Starting camera '{}' on {}".format(config.name, config.path))
+    cs = CameraServer.getInstance()
+    camera = cs.startAutomaticCapture(name=config.name, path=config.path)
+    config.config['pixel format'] = 'yuyv'
+    print(config.config)
+    camera.setConfigJson(json.dumps(config.config))
+
+    return cs, camera
+readCameraConfig()
+readConfig()
+startCamera()
+
+# for adding to streams and cameras list
+for cameraConfig in cameraConfigs:
+        print (cs,camera)
+        cs, cameraCapture = startCamera(cameraConfig)
+        streams.append(cs)
+        cameras.append(cameraCapture)
+
+# Selecting the cameras within the list
 webcam = cameras[0]
 cameraServer = streams[0]
 
