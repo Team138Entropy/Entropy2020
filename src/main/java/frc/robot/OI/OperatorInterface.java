@@ -73,6 +73,18 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
 
+  public boolean getShooterVelocityTrimUp() {
+    return OperatorController.getDPad() == DPad.UP;
+  }
+
+  public boolean getShooterVelocityTrimDown() {
+    return OperatorController.getDPad() == DPad.DOWN;
+  }
+
+  public boolean getResetVelocityTrim() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  }
+
   // Operator
 
   public boolean getHarvestMode() {

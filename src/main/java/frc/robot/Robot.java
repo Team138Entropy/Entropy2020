@@ -90,6 +90,10 @@ public class Robot extends TimedRobot {
   private Timer mBarfTimer = new Timer();
   Logger mRobotLogger = new Logger("robot");
 
+  // Shooter velocity trim state
+  LatchedBoolean mShooterVelocityTrimUp = new LatchedBoolean();
+  LatchedBoolean mShooterVelocityTrimDown = new LatchedBoolean();
+
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
@@ -149,8 +153,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // TODO: haha that was a joke this is the real last one
-    SmartDashboard.putNumber("ElevateTrim", 0.0f);
+    SmartDashboard.putNumber("ElevateTrim", mShooter.getVelocityAdjustment());
 
     SmartDashboard.putString("RobotState", mState.name());
     SmartDashboard.putString("IntakeState", mIntakeState.name());
@@ -389,6 +392,15 @@ public class Robot extends TimedRobot {
       // manual turret aim
     } else if (mOperatorInterface.getTurretAdjustRight()) {
       // manual turret aim
+    }
+
+    // Shooter velocity trim
+    if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
+      mShooter.decreaseVelocity();
+    } else if (mShooterVelocityTrimUp.update(mOperatorInterface.getShooterVelocityTrimUp())) {
+      mShooter.increaseVelocity();
+    } else if (mOperatorInterface.getResetVelocityTrim()) {
+      mShooter.resetVelocity();
     }
 
     // Camera Swap
