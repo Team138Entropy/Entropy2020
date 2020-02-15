@@ -20,9 +20,6 @@ public class Config {
     SHOOTER__ROLLER(6),
     SHOOTER__ROLLER_SLAVE(5),
 
-    // Sensors
-    INTAKE__SENSOR(1),
-
     // Speeds
     INTAKE__ROLLER_SPEED(1d),
     STORAGE__ROLLER_STORE_SPEED(1d),

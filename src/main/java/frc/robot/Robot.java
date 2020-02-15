@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
-      mRobotLogger.info(Double.toString(result.distance));
+      // mRobotLogger.info(Double.toString(result.distance));
       SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
     } else {
       SmartDashboard.putNumber("Turret Offset Error", 0);
@@ -185,6 +185,8 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
 
+    Config.getInstance().reload();
+
     mStorage.preloadBalls(0);
 
     // Set the initial Robot State
@@ -195,8 +197,14 @@ public class Robot extends TimedRobot {
 
     mStorage.init();
     mDrive.init();
-
-    Config.getInstance().reload();
+    
+    // updated in Intake.java
+    SmartDashboard.putBoolean("Intake Spinning Up", false);
+    SmartDashboard.putBoolean("Intake Overcurrent", false);
+    SmartDashboard.putBoolean("Intake Overcurrent Debounced", false);
+    SmartDashboard.putNumber("Intake Current", 0);
+    SmartDashboard.putNumber("Intake Current Countdown", 0);
+    SmartDashboard.putNumber("Encoder Distance", 0);
   }
 
   @Override
