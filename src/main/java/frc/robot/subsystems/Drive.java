@@ -142,7 +142,7 @@ public class Drive extends Subsystem {
     }
 
     // This is just a convoluted way to do a deadband.
-    if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
+    if (Util.epsilonEquals(wheel, 0.0, 0.020)) {
       wheel = 0.0;
     }
 
