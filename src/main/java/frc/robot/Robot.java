@@ -90,6 +90,10 @@ public class Robot extends TimedRobot {
   private Timer mBarfTimer = new Timer();
   Logger mRobotLogger = new Logger("robot");
 
+  // Shooter velocity trim state
+  LatchedBoolean mShooterVelocityTrimUp;
+  LatchedBoolean mShooterVelocityTrimDown;
+
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
@@ -384,9 +388,9 @@ public class Robot extends TimedRobot {
     }
 
     // Shooter velocity trim
-    if (mOperatorInterface.getShooterVelocityTrimDown()) {
+    if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
       mShooter.decreaseVelocity();
-    } else if (mOperatorInterface.getShooterVelocityTrimUp()) {
+    } else if (mShooterVelocityTrimUp.update(mOperatorInterface.getShooterVelocityTrimUp())) {
       mShooter.increaseVelocity();
     } else if (mOperatorInterface.getResetVelocityTrim()) {
       mShooter.resetVelocity();
@@ -491,7 +495,7 @@ public class Robot extends TimedRobot {
   private boolean checkTransitionToShooting() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) && result.HasResult) {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())/* && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
