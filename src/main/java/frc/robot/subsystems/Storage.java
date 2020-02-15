@@ -23,12 +23,14 @@ public class Storage extends Subsystem {
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
   private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
   private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
   private DigitalInput mIntakeSensor;
 
   private int mBallCount = 0;
+  private int mStartingEncoderPosition = 0;
 
   private boolean mWasLineBroke = false;
 
@@ -52,6 +54,7 @@ public class Storage extends Subsystem {
   }
 
   public void init() {
+    mStartingEncoderPosition = mBottomRoller.getSelectedSensorPosition();
   }
 
   private boolean isLineBroken() {
@@ -59,6 +62,10 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallStored() {
+    if(mBottomRoller.getSelectedSensorPosition() - mStartingEncoderPosition > BALL_DISTANCE_IN_ENCODER_TICKS){
+      System.out.println("The sensor moved more than the position!");
+    }
+
     // it wasn't broken the last time we checked
     if (!mWasLineBroke) {
       mWasLineBroke = isLineBroken();
