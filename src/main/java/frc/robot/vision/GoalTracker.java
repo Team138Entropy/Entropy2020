@@ -101,11 +101,15 @@ public class GoalTracker {
   }
 
   // List of Currrent goals being tracked
-  List<GoalTrack> mCurrentTracks = new ArrayList<>();
+  private List<GoalTrack> mCurrentTracks = new ArrayList<>();
 
   int mNextTrackID = 0;
 
-  public GoalTracker() {}
+  int TrackerID = 0;
+
+  public GoalTracker(int tid) {
+    TrackerID = tid;
+  }
 
   // Clear out all goal tracks!
   public synchronized void reset() {

@@ -4,11 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
 import frc.robot.Config.Key;
-import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
@@ -205,22 +203,26 @@ public class Drive extends Subsystem {
   }
 
   // Used only in TEST mode
-  public void setOutputLeftBack (double output) {
+  public void setOutputLeftBack(double output) {
     mLeftMaster.set(ControlMode.PercentOutput, output);
   }
 
   // Used only in TEST mode
-  public void setOutputLeftFront (double output) {
+  public void setOutputLeftFront(double output) {
     mLeftSlave.set(ControlMode.PercentOutput, output);
   }
 
   // Used only in TEST mode
-  public void setOutputRightBack (double output) {
+  public void setOutputRightBack(double output) {
     mRightMaster.set(ControlMode.PercentOutput, output);
   }
 
+  public synchronized Rotation2d getHeading() {
+    return mPeriodicIO.gyro_heading;
+  }
+
   // Used only in TEST mode
-  public void setOutputRightFront (double output) {
+  public void setOutputRightFront(double output) {
     mRightSlave.set(ControlMode.PercentOutput, output);
   }
 
