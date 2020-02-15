@@ -1,6 +1,5 @@
 package frc.robot.subsystems.auto.path;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Optional;
 

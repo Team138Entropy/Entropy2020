@@ -22,6 +22,16 @@ public class DriveSegment extends Segment {
     logger.info("Initializing drive segment");
 
     drive.zeroEncoders();
+    try {
+      Thread.sleep(1000);
+    } catch(Exception e) {}
+    logger.info(
+    "Encoder distances: ("
+        + drive.getLeftEncoderDistance()
+        + ", "
+        + drive.getLeftEncoderDistance()
+        + ")");
+
     drive.setTargetPosition(targetPosition);
   }
 
@@ -31,7 +41,15 @@ public class DriveSegment extends Segment {
     final int max = targetPosition + acceptableError;
     double avgPos = getAveragePosition();
 
-    logger.verbose("Average position: " + avgPos);
+    logger.info(
+    "Encoder distances: ("
+        + drive.getLeftEncoderDistance()
+        + ", "
+        + drive.getRightEncoderDistance()
+        + ")" + "Average position: " + avgPos);
+
+    // logger.verbose("Average position: " + avgPos);
+    
 
     if (avgPos > min && avgPos < max) {
       logger.verbose(min + " < " + avgPos + " < " + max);

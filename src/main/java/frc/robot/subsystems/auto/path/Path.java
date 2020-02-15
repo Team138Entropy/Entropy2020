@@ -40,7 +40,7 @@ public class Path {
   public void tick() {
     Segment segment = getCurrentSegment();
     if (segment != null) {
-      if (!uninitializedSegments.contains(segment)) {
+      if (uninitializedSegments.contains(segment)) {
         segment.init();
         uninitializedSegments.remove(segment);
       }
