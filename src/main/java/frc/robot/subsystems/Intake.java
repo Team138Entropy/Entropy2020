@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -60,9 +59,9 @@ public class Intake extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, output);
   }
 
-  public void updateSmartDashboard(){
+  public void updateSmartDashboard() {
     SmartDashboard.putNumber("Intake Current Countdown", mOverCurrentCountdown);
-    double current = mRoller.getStatorCurrent();    
+    double current = mRoller.getStatorCurrent();
     SmartDashboard.putNumber("Intake Current", current);
     SmartDashboard.putBoolean("Intake Spinning Up", false);
     SmartDashboard.putBoolean("Intake Overcurrent", false);
@@ -71,8 +70,6 @@ public class Intake extends Subsystem {
 
   public boolean isBallDetected() {
     updateSmartDashboard();
-      
-    
 
     // this counts down to account for the fact that the roller will overcurrent when spinning up
     if (mOverCurrentCountdown > 0) {
