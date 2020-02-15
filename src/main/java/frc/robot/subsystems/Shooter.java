@@ -100,7 +100,7 @@ public class Shooter extends Subsystem {
   /** Starts the roller. */
   public void start() {  
     double speed = SpeedLookupTable.getInstance().getSpeedFromDistance(mVision.calcTargetPosition().getDistance());
-    mRoller.setSpeed(speed);
+    mRoller.setSpeed(Math.round(speed));
   }
 
   /** Stops the roller. */
