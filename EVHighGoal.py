@@ -67,9 +67,7 @@ starttime = 0
 # import the necessary packages
 import datetime
 
-#mask for camera when attached on turret ramp
-maskHighGoalCam = np.zeros(shape=(Camera_Image_Width, Camera_Image_Height, 3), dtype=np.uint8)
-cv2.fillPoly(maskHighGoalCam, pts=[[0,360], [640,360], [0,480], [640,480]], color=(0,0,0))
+
 
 # Queue of Packets
 # Thread Safe.. Packets being sent to robot are placed here!
@@ -300,8 +298,11 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     image = frame.copy()
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
-        image = cv2.bitwise_and(image, maskHighGoalCam)
-        value_array = findTape(contours, image, centerX, centerY)
+        
+        #Blocking out parts of the robot
+        rect1 = cv2.rectangle(img, (0, 360), (640, 480), (0,0,0), -1)
+        rect2 = cv2.rectangle(rect1, (550, 0), (640, 105), (0,0,0), -1)
+        value_array = findTape(contours, rect2, centerX, centerY)
     else:
         # No Contours!
         pass
@@ -354,7 +355,7 @@ def findBall(contours, image, centerX, centerY):
                     cv2.drawContours(image, [box], 0, (23, 184, 80), 3)
 
                     # Draws a vertical white line passing through center of contour
-                    cv2.line(image, (cx, screenHeight), (cx, 0), (255, 255, 255))
+                    #cv2.line(image, (cx, screenHeight), (cx, 0), (255, 255, 255))
                     # Draws a white circle at center of contour
                     cv2.circle(image, (cx, cy), 6, (255, 255, 255))
 
@@ -393,11 +394,11 @@ def findBall(contours, image, centerX, centerY):
             # Draws yaw of target + line where center of target is
             cv2.putText(image, "Yaw: " + str(finalTarget), (40, 40), cv2.FONT_HERSHEY_COMPLEX, .6,
                         (255, 255, 255))
-            cv2.line(image, (int(xCoord), screenHeight), (int(xCoord), 0), (255, 0, 0), 2)
+            #cv2.line(image, (int(xCoord), screenHeight), (int(xCoord), 0), (255, 0, 0), 2)
 
             currentAngleError = finalTarget
 
-        cv2.line(image, (int(centerX), screenHeight), (int(centerX), 0), (255, 255, 255), 2)
+        #cv2.line(image, (int(centerX), screenHeight), (int(centerX), 0), (255, 255, 255), 2)
 
         return image
 
@@ -435,13 +436,12 @@ def findTape(contours, image, centerX, centerY):
             ratio = float(w) / h
             #cv2.imwrite("1beforeif.jpg", image)
             # Filters contours based off of size
-            if (mySolidity > .3) and (mySolidity < .6) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if (mySolidity > .1) and (mySolidity < .7) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
-                contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
-                
+                #contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 #cv2.imwrite("1drawncontours.jpg", contimage)
                 #time.sleep(1)
-                #print("writing image")
+                print("writing image")
                 ### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
                 # Gets the centeroids of contour
                 if M["m00"] != 0:
@@ -503,6 +503,7 @@ def findTape(contours, image, centerX, centerY):
         # Sorts array based on coordinates (leftmost to rightmost) to make sure contours are adjacent
         biggestCnts = sorted(biggestCnts, key=lambda x: x[0])
         # Target Checking
+        print("before rotation checking")
         for i in range(len(biggestCnts) - 1):
             print("in rotation check")
             # Rotation of two adjacent contours
@@ -523,14 +524,14 @@ def findTape(contours, image, centerX, centerY):
                 # Note: if using rotated rect (min area rectangle)
                 #      negative tilt means rotated to left
                 # If left contour rotation is tilted to the left then skip iteration
-                if (tilt1 > 0):
-                    if (cx1 < cx2):
+                if (tilt1 < 0):
+                    if (cx1 > cx2):
                         print("passed left contour is tilted left")
                         continue
                         
                 # If left contour rotation is tilted to the left then skip iteration
-                if (tilt2 > 0):
-                    if (cx2 < cx1):
+                if (tilt2 < 0):
+                    if (cx2 > cx1):
                         print("passed right contour is tilted right")
                         continue
                 # Angle from center of camera to target (what you should pass into gyro)
@@ -556,7 +557,7 @@ def findTape(contours, image, centerX, centerY):
 
     # print("TapeYaw: " + str(currentAngleError))
 
-    cv2.line(image, (round(centerX), screenHeight), (round(centerX), 0), (255, 255, 255), 2)
+    #cv2.line(image, (round(centerX), screenHeight), (round(centerX), 0), (255, 255, 255), 2)
 
     # cv2.imwrite("latest.jpg", image);
     
