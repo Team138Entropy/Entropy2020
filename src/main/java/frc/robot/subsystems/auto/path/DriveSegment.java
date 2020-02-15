@@ -25,7 +25,7 @@ public class DriveSegment extends Segment {
 
     drive.zeroEncoders();
     try {
-      Thread.sleep(1000);
+      Thread.sleep(1000); // This is to weed out timing errors
     } catch(Exception e) {}
     logger.info(
     "Encoder distances: ("
@@ -48,7 +48,7 @@ public class DriveSegment extends Segment {
         + drive.getLeftEncoderDistance()
         + ", "
         + drive.getRightEncoderDistance()
-        + ")" + "Average position: " + avgPos);
+        + ")" + " Average position: " + avgPos);
 
     // logger.verbose("Average position: " + avgPos);
     

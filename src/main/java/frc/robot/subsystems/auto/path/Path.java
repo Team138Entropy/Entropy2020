@@ -41,6 +41,7 @@ public class Path {
     Segment segment = getCurrentSegment();
     if (segment != null) {
       if (uninitializedSegments.contains(segment)) {
+        logger.info("Segments: " + segments.toString());
         segment.init();
         uninitializedSegments.remove(segment);
       }
