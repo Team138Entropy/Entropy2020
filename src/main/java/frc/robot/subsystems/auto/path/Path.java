@@ -48,8 +48,21 @@ public class Path {
       segment.tick();
 
       if (segment.finished()) {
+        logger.info("Segment finished");
         segments.removeFirst();
       }
     }
+  }
+
+  /**
+   * Returns a copy of this path.
+   * @return the copy.
+   */
+  public Path copy() {
+    Path p = new Path();
+    for (Segment s : segments) {
+      p.append(s.copy());
+    }
+    return p;
   }
 }

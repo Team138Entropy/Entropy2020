@@ -5,6 +5,7 @@ import frc.robot.subsystems.Drive;
 
 public class DriveSegment extends Segment {
   private final int PID_LOOP_ID = 0;
+  private double meters; // For cloning
   private int targetPosition;
   private int acceptableError;
 
@@ -12,8 +13,9 @@ public class DriveSegment extends Segment {
   private Drive drive;
 
   public DriveSegment(double meters) {
+    this.meters = meters;
     this.drive = Drive.getInstance();
-    this.targetPosition = drive.metersToTicks(meters);
+    this.targetPosition = drive.metersToTicks(this.meters);
     this.acceptableError = Config.getInstance().getInt(Config.Key.DRIVE__PID_ACCEPTABLE_ERROR);
   }
 
@@ -45,9 +47,14 @@ public class DriveSegment extends Segment {
     return done;
   }
 
+  @Override
+  public Segment copy() {
+    return new DriveSegment(meters);
+  }
+
   /**
    * Returns the average of the left and right encoder distances.
-   * @return
+   * @return the average of the encoder distances.
    */
   private double getAveragePosition() {
     return (drive.getLeftEncoderDistance() + drive.getRightEncoderDistance()) / 2;

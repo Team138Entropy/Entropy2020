@@ -18,6 +18,12 @@ public class Paths {
   }
 
   public static Optional<Path> find(String pathName) {
-    return Optional.ofNullable(paths.get(pathName));
+    Path path = paths.get(pathName);
+    if (path == null) {
+      return Optional.empty();
+    } else {
+      // We probably don't want to modify the original path
+      return Optional.of(path.copy());
+    }
   }
 }

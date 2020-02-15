@@ -23,4 +23,9 @@ public class TurnSegment extends Segment {
     if (done) logger.info("Turn segment finished");
     return done;
   }
+
+  @Override
+  public Segment copy() {
+    return new TurnSegment(degrees);
+  }
 }
