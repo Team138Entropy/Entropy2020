@@ -8,6 +8,7 @@ public class DriveSegment extends Segment {
   private double meters; // For cloning
   private int targetPosition;
   private int acceptableError;
+  private int min, max;
 
   private boolean done;
   private Drive drive;
@@ -17,11 +18,15 @@ public class DriveSegment extends Segment {
     this.drive = Drive.getInstance();
     this.targetPosition = drive.metersToTicks(this.meters);
     this.acceptableError = Config.getInstance().getInt(Config.Key.DRIVE__PID_ACCEPTABLE_ERROR);
+    this.min = targetPosition - acceptableError;
+    this.max = targetPosition + acceptableError;
   }
 
   @Override
   public void init() {
     logger.info("Initializing drive segment");
+    logger.info("Target: " + targetPosition);
+    logger.info("Min, Max: " + min + ", " + max);
 
     drive.zeroEncoders();
     try {
@@ -51,7 +56,7 @@ public class DriveSegment extends Segment {
         + ")" + " Average position: " + avgPos);
 
     // logger.verbose("Average position: " + avgPos);
-    
+    drive.setTargetPosition(targetPosition);
 
     if (avgPos > min && avgPos < max) {
       logger.verbose(min + " < " + avgPos + " < " + max);
