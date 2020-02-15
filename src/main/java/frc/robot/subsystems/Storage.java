@@ -56,6 +56,11 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallStored() {
+    // this allows us to fit a 5th ball
+    if(sInstance.getBallCount() == 4){
+      return true;
+    }
+
     int encoderDistance = mStartingEncoderPosition - getEncoder();
     System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
