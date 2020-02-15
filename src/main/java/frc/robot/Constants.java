@@ -18,7 +18,7 @@ public class Constants {
   public static final int kCameraRingId = 0;
 
   // Drive Constants
-  public static final double kJoystickThreshold = 0.2;
+  public static final double kJoystickThreshold = 0.15;
   
   
   //22 is too low, 100 is too high
