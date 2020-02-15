@@ -45,7 +45,9 @@ public class Storage extends Subsystem {
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
   }
 
-  int getEncoder(){
+  private int getEncoder(){
+    // return the negative position that the talon gets us because it's hooked up backwards
+    // this will return positive values
     return -mBottomRoller.getSelectedSensorPosition();
   }
 
