@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
     EventWatcherThread.getInstance().start();
 
     // prepare the network table
-    NetworkTableInstan  ce inst = NetworkTableInstance.getDefault();
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
     // mCameraManager = CameraManager.getInstance();
     // mCameraManager.init();
