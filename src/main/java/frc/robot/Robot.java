@@ -480,6 +480,7 @@ public class Robot extends TimedRobot {
         mStorage.barf();
         if (mBarfTimer.get() >= BARF_TIMER_DURATION) {
           mIntakeState = IntakeState.IDLE;
+          mStorage.emptyBalls();
         }
         break;
       default:

@@ -104,6 +104,10 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, STORE_SPEED);
   }
 
+  public void emptyBalls(){
+    mBallCount = 0;
+  }
+
   /** Stops the roller. */
   public void stop() {
     mBottomRoller.set(ControlMode.PercentOutput, 0);
