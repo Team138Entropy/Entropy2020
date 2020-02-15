@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Config;
-import frc.robot.Logger;
 import frc.robot.Config.Key;
+import frc.robot.Logger;
 
 /** Add your docs here. */
 public class Intake extends Subsystem {
@@ -35,11 +35,11 @@ public class Intake extends Subsystem {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
   }
 
-  public void barf(){
+  public void barf() {
     mRoller.set(ControlMode.PercentOutput, -ROLLER_SPEED);
   }
 
-  public void resetOvercurrentCooldown(){
+  public void resetOvercurrentCooldown() {
     mOverCurrentCountdown = 30;
   }
 
@@ -58,38 +58,43 @@ public class Intake extends Subsystem {
   public void setOutput(double output) {
     mRoller.set(ControlMode.PercentOutput, output);
   }
-  
-  public boolean isBallDetected(){
-    mLogger.verbose("Input current: " + mRoller.getSupplyCurrent() + ", Output current: " + mRoller.getStatorCurrent());
+
+  public boolean isBallDetected() {
+    mLogger.verbose(
+        "Input current: "
+            + mRoller.getSupplyCurrent()
+            + ", Output current: "
+            + mRoller.getStatorCurrent());
 
     // this counts down to account for the fact that the roller will overcurrent when spinning up
-    if(mOverCurrentCountdown > 0){
-      mOverCurrentCountdown --;
+    if (mOverCurrentCountdown > 0) {
+      mOverCurrentCountdown--;
       return false;
     }
-    
+
     double current = mRoller.getSupplyCurrent();
 
     // if our current is at the threshold that's considered overcurrent...
-    if (current >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)){
+    if (current >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)) {
       // ...increment a counter
       mOverCurrentCount++;
       mLogger.log("debounce overcurrent " + mOverCurrentCount);
-    }else{
+    } else {
       // if not, reset it
       mOverCurrentCount = 0;
     }
 
     // if we've been at overcurrent for the last few occurences, we can return true
-    if (mOverCurrentCount >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)){
+    if (mOverCurrentCount
+        >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)) {
       mLogger.log("Overcurrent!");
       mOverCurrentCount = 0;
       return true;
-    }else{
+    } else {
       return false;
     }
   }
-  
+
   @Override
   public void zeroSensors() {}
 

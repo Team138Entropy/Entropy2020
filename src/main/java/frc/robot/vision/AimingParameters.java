@@ -39,6 +39,10 @@ public class AimingParameters {
     return robot_to_goal;
   }
 
+  public Pose2d getFieldToGoal() {
+    return field_to_goal;
+  }
+
   public double getRange() {
     return range;
   }

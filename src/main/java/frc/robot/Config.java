@@ -106,9 +106,7 @@ public class Config {
 
       if (valueFromConfig == null) {
         mLogger.warn(
-            "Didn't find key "
-                + key.name()
-                + " in the configuration file. Using a default.");
+            "Didn't find key " + key.name() + " in the configuration file. Using a default.");
       }
     }
   }
@@ -125,10 +123,7 @@ public class Config {
     try {
       value = cfg.getString(key.name());
     } catch (Exception exception) {
-      mLogger.warn(
-        "Key "
-            + key.name()
-            + " was not found in the config file! Using default value.");
+      mLogger.warn("Key " + key.name() + " was not found in the config file! Using default value.");
       value = (String) key.value;
     }
     return value;
@@ -139,10 +134,7 @@ public class Config {
     try {
       value = cfg.getFloat(key.name());
     } catch (Exception exception) {
-      mLogger.warn(
-          "Key "
-              + key.name()
-              + " was not found in the config file! Using default value.");
+      mLogger.warn("Key " + key.name() + " was not found in the config file! Using default value.");
       value = (Float) key.value;
     }
     return value;
@@ -153,10 +145,7 @@ public class Config {
     try {
       value = cfg.getDouble(key.name());
     } catch (Exception exception) {
-      mLogger.warn(
-          "Key "
-              + key.name()
-              + " was not found in the config file! Using default value.");
+      mLogger.warn("Key " + key.name() + " was not found in the config file! Using default value.");
       value = (Double) key.value;
     }
     return value;
@@ -167,11 +156,8 @@ public class Config {
     try {
       value = cfg.getInt(key.name());
     } catch (Exception exception) {
-      mLogger.warn(
-        "Key "
-            + key.name()
-            + " was not found in the config file! Using default value.");
-    value = (Integer) key.value;
+      mLogger.warn("Key " + key.name() + " was not found in the config file! Using default value.");
+      value = (Integer) key.value;
     }
     return value;
   }
@@ -181,10 +167,7 @@ public class Config {
     try {
       value = cfg.getBoolean(key.name());
     } catch (Exception exception) {
-      mLogger.warn(
-        "Key "
-            + key.name()
-            + " was not found in the config file! Using default value.");
+      mLogger.warn("Key " + key.name() + " was not found in the config file! Using default value.");
       value = (Boolean) key.value;
     }
     return value;
