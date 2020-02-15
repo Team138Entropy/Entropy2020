@@ -5,24 +5,27 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Config;
-import frc.robot.Logger;
 import frc.robot.Config.Key;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
+  private static final int ROLLER_BOTTOM_PORT =
+      Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
-  private static final int INTAKE_SENSOR_PORT =
-      Config.getInstance().getInt(Key.INTAKE__SENSOR);
+  private static final int INTAKE_SENSOR_PORT = Config.getInstance().getInt(Key.INTAKE__SENSOR);
 
   private static final int STORAGE_CAPICTY = 4;
 
-  private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
-  private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double STORE_SPEED =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double BOTTOM_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
+  private static final double TEST_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
@@ -51,8 +54,7 @@ public class Storage extends Subsystem {
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
-  public void init() {
-  }
+  public void init() {}
 
   private boolean isLineBroken() {
     return mIntakeSensor.get();
@@ -63,18 +65,18 @@ public class Storage extends Subsystem {
     if (!mWasLineBroke) {
       mWasLineBroke = isLineBroken();
       return false;
-    // it's still broken
+      // it's still broken
     } else if (isLineBroken()) {
       mWasLineBroke = isLineBroken();
       return false;
-    // if the last time we checked the line was broken and now it isn't, we've just stored a ball
+      // if the last time we checked the line was broken and now it isn't, we've just stored a ball
     } else {
       mWasLineBroke = isLineBroken();
       return true;
     }
   }
 
-  public void barf(){
+  public void barf() {
     mBottomRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED * BOTTOM_SPEED_FACTOR));
     mTopRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED));
   }

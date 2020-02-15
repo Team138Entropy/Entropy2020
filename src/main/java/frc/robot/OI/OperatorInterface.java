@@ -139,6 +139,4 @@ public class OperatorInterface {
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
-
-
 }
