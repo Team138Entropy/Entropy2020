@@ -19,8 +19,9 @@ public class Constants {
 
   // Drive Constants
   public static final double kJoystickThreshold = 0.2;
-  public static final double kDriveWheelTrackWidthInches = 22.75;
-  public static final double kDriveWheelDiameterInches = 3.938;
+  // WARNING: this is supposed to be an accurate measurement, but we increased it to improve performance
+  public static final double kDriveWheelTrackWidthInches = 60;
+  public static final double kDriveWheelDiameterInches = 6;
   public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
   public static final double kDriveWheelTrackRadiusWidthMeters =
       kDriveWheelTrackWidthInches / 2.0 * 0.0254;
