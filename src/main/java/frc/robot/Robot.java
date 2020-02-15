@@ -91,8 +91,8 @@ public class Robot extends TimedRobot {
   Logger mRobotLogger = new Logger("robot");
 
   // Shooter velocity trim state
-  LatchedBoolean mShooterVelocityTrimUp;
-  LatchedBoolean mShooterVelocityTrimDown;
+  LatchedBoolean mShooterVelocityTrimUp = new LatchedBoolean();
+  LatchedBoolean mShooterVelocityTrimDown = new LatchedBoolean();
 
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
