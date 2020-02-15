@@ -92,7 +92,7 @@ public class Logger {
     // and our level is higher-up or equal to the minimum specified,
     // then log it
     if (minLevel == null
-        || (!minLevel.equals("OFF")
+        || (!minLevel.toString().equals("OFF")
             && Arrays.asList(SupportedLevels.values()).indexOf(level)
                 <= Arrays.asList(SupportedLevels.values())
                     .indexOf(SupportedLevels.valueOf(minLevel)))) {

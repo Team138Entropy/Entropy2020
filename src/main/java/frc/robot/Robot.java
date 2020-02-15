@@ -66,9 +66,6 @@ public class Robot extends TimedRobot {
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
-  // Robot State
-  // private final RobotState mRobotState = RobotState.getInstance();
-
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
@@ -105,6 +102,8 @@ public class Robot extends TimedRobot {
 
     mRobotLogger.log("robot init _ 1");
 
+    mRobotTracker.reset();
+
     // Zero all nesscary sensors on Robot
     mSubsystemManager.zeroSensors();
     visionLight.set(Relay.Value.kForward);
@@ -118,10 +117,6 @@ public class Robot extends TimedRobot {
     mTable = inst.getTable("SmartDashboard");
     // mCameraManager = CameraManager.getInstance();
     // mCameraManager.init();
-    
-    // Reset Robot State
-    // Wherever the Robot is now is the starting position
-    // mRobotState.reset();
 
     // Set the initial Robot State
     mState = State.INTAKE;
@@ -158,7 +153,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // SmartDashboard.putBoolean("TargetLocked", mRobotState.getHighGoalLocked());
     // TODO: haha that was a joke this is the real last one
     SmartDashboard.putNumber("ElevateTrim", 0.0f);
 
