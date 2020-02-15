@@ -441,7 +441,7 @@ def findTape(contours, image, centerX, centerY):
                 #contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 #cv2.imwrite("1drawncontours.jpg", contimage)
                 #time.sleep(1)
-                print("writing image")
+                #print("writing image")
                 ### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
                 # Gets the centeroids of contour
                 if M["m00"] != 0:
@@ -459,7 +459,7 @@ def findTape(contours, image, centerX, centerY):
                     global run_count
 
                     #fills list to avoid errors
-                    '''
+                    
                     if outlierCount >= 5:
                         distanceHoldValues = []
 
@@ -475,35 +475,23 @@ def findTape(contours, image, centerX, centerY):
                         distanceHoldValues.pop()
                         distanceHoldValues.append(myDistFeet)
                         myDistFeet = abs(myDistFeet)
-                    '''
-
-                    '''
-                    run_count = run_count + 1
-                    if run_count % 100 == 0:
-                        starttime = time.time()
-                        print(starttime)
-                    '''
+                    
+                    
                     #print(myDistFeet)
 
                     sendValues[0] = cx
                     sendValues[1] = cy
                     sendValues[3] = myDistFeet
+                    rotation = getEllipseRotation(image, cnt)
+                    biggestCnts.append([cx, cy, rotation])
                 else:
                     cx, cy = 0, 0
-                if (len(biggestCnts) < 13):
-                    #### CALCULATES ROTATION OF CONTOUR BY FITTING ELLIPSE ##########
-                    rotation = getEllipseRotation(image, cnt)
 
-                    # Appends important info to array
-                    if not biggestCnts:
-                        biggestCnts.append([cx, cy, rotation])
-                    elif [cx, cy, rotation] not in biggestCnts:
-                        biggestCnts.append([cx, cy, rotation])
 
         # Sorts array based on coordinates (leftmost to rightmost) to make sure contours are adjacent
         biggestCnts = sorted(biggestCnts, key=lambda x: x[0])
         # Target Checking
-        print("before rotation checking")
+        #print("before rotation checking")
         for i in range(len(biggestCnts) - 1):
             print("in rotation check")
             # Rotation of two adjacent contours
@@ -524,8 +512,10 @@ def findTape(contours, image, centerX, centerY):
                 # Note: if using rotated rect (min area rectangle)
                 #      negative tilt means rotated to left
                 # If left contour rotation is tilted to the left then skip iteration
-                if (tilt1 < 0):
-                    if (cx1 > cx2):
+                print("tilt1", tilt1)
+                print("tilt2", tilt2)
+                if (tilt1 > 0):
+                    if (cx1 < cx2):
                         print("passed left contour is tilted left")
                         continue
                         
@@ -542,6 +532,8 @@ def findTape(contours, image, centerX, centerY):
                     targets.append([centerOfTarget, yawToTarget])
                 elif [centerOfTarget, yawToTarget] not in targets:
                     targets.append([centerOfTarget, yawToTarget])
+                    
+        #print("after rotation check")
     # Check if there are targets seen
     if len(targets) > 0:
         # Sorts targets based on x coords to break any angle tie
