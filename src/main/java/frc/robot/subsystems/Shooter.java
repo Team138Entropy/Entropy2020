@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
@@ -13,7 +15,7 @@ public class Shooter extends Subsystem {
   // Temporary, until default config values are merged
   private static final double MAX_SPEED = 2445d;
   private static final double SPEED_DEADBAND = 30;
-  private static final int SPEED_DEADBAND_DELAY = 10;
+  private static final int SPEED_DEADBAND_DELAY = 100;
   private static final double FEEDFORWARD = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
 
   // TODO: Integrate with other subsystems for real
@@ -67,7 +69,7 @@ public class Shooter extends Subsystem {
   private TalonSRX mTestRoller;
   private Turret mTurret;
   private Vision mVision;
-  private int mTimeSinceWeWereAtVelocity = 0;
+  private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
 
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
@@ -147,15 +149,17 @@ public class Shooter extends Subsystem {
     // add a "delay" where we still consider ourselves to be at the velocity if we were there in the
     // last SPEED_DEADBAND_DELAY ticks
 
+    SmartDashboard.putNumber("Velocity Countdown", mTimeSinceWeWereAtVelocity);
+
     if (isAtVelocity) {
-      // reset the time since we were at velocity
-      mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
-    } else {
       // decrement
       mTimeSinceWeWereAtVelocity--;
+    } else {
+      // reset the time since we were at velocity
+      mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
     }
     // if the time is at least 0, we are "at velocity"
-    return mTimeSinceWeWereAtVelocity > 0;
+    return mTimeSinceWeWereAtVelocity <= 0;
   }
 
   // Used in TEST mode only

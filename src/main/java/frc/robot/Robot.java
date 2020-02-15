@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
   }
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
-  private final double FIRE_DURATION_SECONDS = 0.5;
+  private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
 
   private State mState = State.IDLE;
