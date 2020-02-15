@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Logger;
@@ -44,7 +46,6 @@ public class Intake extends Subsystem {
   }
 
   public void start() {
-    mLogger.verbose("Running roller at " + ROLLER_SPEED);
     mRoller.set(ControlMode.PercentOutput, ROLLER_SPEED);
   }
 
@@ -59,26 +60,35 @@ public class Intake extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, output);
   }
 
+  public void updateSmartDashboard(){
+    SmartDashboard.putNumber("Intake Current Countdown", mOverCurrentCountdown);
+    double current = mRoller.getStatorCurrent();    
+    SmartDashboard.putNumber("Intake Current", current);
+    SmartDashboard.putBoolean("Intake Spinning Up", false);
+    SmartDashboard.putBoolean("Intake Overcurrent", false);
+    SmartDashboard.putBoolean("Intake Overcurrent Debounced", false);
+  }
+
   public boolean isBallDetected() {
-    mLogger.verbose(
-        "Input current: "
-            + mRoller.getSupplyCurrent()
-            + ", Output current: "
-            + mRoller.getStatorCurrent());
+    updateSmartDashboard();
+      
+    
 
     // this counts down to account for the fact that the roller will overcurrent when spinning up
     if (mOverCurrentCountdown > 0) {
+      SmartDashboard.putBoolean("Intake Spinning Up", true);
       mOverCurrentCountdown--;
       return false;
     }
 
-    double current = mRoller.getSupplyCurrent();
+    double current = mRoller.getStatorCurrent();
 
     // if our current is at the threshold that's considered overcurrent...
     if (current >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)) {
       // ...increment a counter
       mOverCurrentCount++;
       mLogger.log("debounce overcurrent " + mOverCurrentCount);
+      SmartDashboard.putBoolean("Intake Overcurrent", true);
     } else {
       // if not, reset it
       mOverCurrentCount = 0;
@@ -89,6 +99,7 @@ public class Intake extends Subsystem {
         >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)) {
       mLogger.log("Overcurrent!");
       mOverCurrentCount = 0;
+      SmartDashboard.putBoolean("Intake Overcurrent Debounced", true);
       return true;
     } else {
       return false;
