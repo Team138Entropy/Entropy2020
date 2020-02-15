@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
     EventWatcherThread.getInstance().start();
 
     // prepare the network table
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTableInstan  ce inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
     // mCameraManager = CameraManager.getInstance();
     // mCameraManager.init();
@@ -141,7 +141,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
-      // mRobotLogger.info(Double.toString(result.distance));
       SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
     } else {
       SmartDashboard.putNumber("Turret Offset Error", 0);
