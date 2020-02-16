@@ -49,6 +49,7 @@ public class Config {
     DRIVE__PID_I(0),
     DRIVE__PID_D(0),
     DRIVE__PID_ACCEPTABLE_ERROR(10),
+    DRIVE__PID_RAMP(0.2),
 
     ROBOT__HAS_DRIVETRAIN(true),
     ROBOT__HAS_TURRET(false),
