@@ -54,15 +54,11 @@ public class Robot extends TimedRobot {
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
 
-  //TODO: Give these real values
-
+  //TODO: Tune these values
   /** Temporary values start here. */
 
   /** How long it takes the shooter to fire */
-  private final double FIRE_DURATION_SECONDS = 0.5D;
-
-  /** The time is takes to extend the climber to the normal generator height in seconds. */
-  private final static double CLIMBER_EXTEND_DURATION_SECONDS = 0D;
+  private final double FIRE_DURATION_SECONDS = 0.5d;
 
   /** Temporary values end here. */
 
@@ -100,9 +96,6 @@ public class Robot extends TimedRobot {
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
-
-  // Extend and retract timer for climber
-  private Timer mClimbingTimer = new Timer();
 
   Logger mRobotLogger = new Logger("robot");
 
@@ -571,30 +564,29 @@ public class Robot extends TimedRobot {
     }
   }
 
-  private boolean checkTransitionToClimbing() {
-    return false;
-  }
-
   private void executeClimbingStateMachine() {
     switch (mClimbingState) {
       case IDLE:
         mRobotLogger.warn("Climbing state is idle");
         break;
       case EXTENDING:
-        if (checkTransitionToClimbing()) {
+        if (mOperatorInterface.getClimb()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
         mClimber.extend();
-        if (mClimbingTimer.get() >= CLIMBER_EXTEND_DURATION_SECONDS / 1000) {
+        if (mClimber.checkOvercurrent()) {
           mClimbingState = ClimbingState.EXTENDING_COMPLETE;
         }
       case EXTENDING_COMPLETE:
         mClimber.stop();
-        if (checkTransitionToClimbing()) {
+        if (mOperatorInterface.getClimb()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
       case RETRACTING:
         mClimber.retract();
+        if (mClimber.checkOvercurrent()) {
+          mClimbingState = ClimbingState.RETRACTING_COMPLETE;
+        }
       case RETRACTING_COMPLETE:
         mClimber.stop();
         mClimbingState = ClimbingState.IDLE;
