@@ -25,7 +25,7 @@ public class Storage extends Subsystem {
   private static final double BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
   
-  private static final int INTAKE_SENSOR_PORT = Config.getInstance().getInt(0);
+  private static final int INTAKE_SENSOR_PORT = 0;
   
   private DigitalInput mIntakeSensor;
 
@@ -64,7 +64,7 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallStored() {
-    SmartDashboard.putBoolean("Garage Door", mIntakeSensor);
+    SmartDashboard.putBoolean("Garage Door", mIntakeSensor.get());
     // this allows us to fit a 5th ball
     if(sInstance.getBallCount() == 4){
       return true;
