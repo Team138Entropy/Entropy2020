@@ -190,7 +190,6 @@ public class Robot extends TimedRobot {
     mShootingState = ShootingState.PREPARE_TO_SHOOT;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
-    mRobotState.setAuto(true);
     mAutoPath = Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
   }
 
@@ -210,7 +209,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
-    mRobotState.setAuto(false);
 
     Config.getInstance().reload();
 
@@ -321,7 +319,6 @@ public class Robot extends TimedRobot {
       mTurret.disable();
     }
     Config.getInstance().reload();
-    mRobotState.setAuto(false);
   }
 
   @Override
