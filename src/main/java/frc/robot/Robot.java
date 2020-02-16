@@ -231,6 +231,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+    if(mOperatorInterface.getStateReset()){
+      mState = State.INTAKE;
+      mIntakeState = IntakeState.IDLE;
+      mClimingState = ClimingState.IDLE;
+      mShootingState = ShootingState.IDLE;
+      if(mState == State.SHOOTING){
+        mShootingState = ShootingState.SHOOTING_COMPLETE;
+      }
+      if(mState == State.INTAKE){
+        mIntakeState = IntakeState.STORAGE_COMPLETE;
+      }
+    }
+
     // Intake roller ON while button held
     if (mOperatorInterface.isIntakeRollerTest()) {
       mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
