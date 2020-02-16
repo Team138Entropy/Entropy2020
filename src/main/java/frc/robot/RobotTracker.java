@@ -164,7 +164,7 @@ public class RobotTracker {
     mField_to_Robot.put(new InterpolatingDouble(timestamp), observation);
   }
 
-  // Store information about turrets roation
+  // Store information about turrets rotation
   public synchronized void addRobotToTurretObservation(double timestamp, Rotation2d observation) {
     mRobot_to_Turret.put(new InterpolatingDouble(timestamp), observation);
   }
