@@ -63,8 +63,15 @@ public class Storage extends Subsystem {
     mStartingEncoderPosition = getEncoder();
   }
 
+  public boolean getIntakeSensor(){
+    return mIntakeSensor.get();
+  }
+
+  public boolean isBallDetected(){
+    return getIntakeSensor();
+  }
+
   public boolean isBallStored() {
-    SmartDashboard.putBoolean("Garage Door", mIntakeSensor.get());
     // this allows us to fit a 5th ball
     if(sInstance.getBallCount() == 4){
       return true;

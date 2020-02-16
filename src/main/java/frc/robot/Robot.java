@@ -159,6 +159,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("IntakeState", mIntakeState.name());
     SmartDashboard.putString("ShootingState", mShootingState.name());
     SmartDashboard.putString("ClimbingState", mClimingState.name());
+    
+    SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
 
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
   }
@@ -473,7 +475,7 @@ public class Robot extends TimedRobot {
           mIntake.start();
 
           // If a ball is detected, store it
-          if (mIntake.isBallDetected()) {
+          if (mStorage.isBallDetected()) {
             mIntakeState = IntakeState.STORE_BALL;
           }
         }
