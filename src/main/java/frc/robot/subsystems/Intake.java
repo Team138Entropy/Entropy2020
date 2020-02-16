@@ -51,7 +51,6 @@ public class Intake extends Subsystem {
 
   /** Stops the roller. */
   public void stop() {
-    mLogger.verbose("Stopping roller ");
     mRoller.set(ControlMode.PercentOutput, 0);
   }
 
@@ -67,43 +66,6 @@ public class Intake extends Subsystem {
     SmartDashboard.putBoolean("Intake Spinning Up", false);
     SmartDashboard.putBoolean("Intake Overcurrent", false);
     SmartDashboard.putBoolean("Intake Overcurrent Debounced", false);
-  }
-
-  public boolean isBallDetected() {
-    updateSmartDashboard();
-      
-    
-
-    // this counts down to account for the fact that the roller will overcurrent when spinning up
-    if (mOverCurrentCountdown > 0) {
-      SmartDashboard.putBoolean("Intake Spinning Up", true);
-      mOverCurrentCountdown--;
-      return false;
-    }
-
-    double current = mRoller.getStatorCurrent();
-
-    // if our current is at the threshold that's considered overcurrent...
-    if (current >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_THRESHOLD)) {
-      // ...increment a counter
-      mOverCurrentCount++;
-      mLogger.log("debounce overcurrent " + mOverCurrentCount);
-      SmartDashboard.putBoolean("Intake Overcurrent", true);
-    } else {
-      // if not, reset it
-      mOverCurrentCount = 0;
-    }
-
-    // if we've been at overcurrent for the last few occurences, we can return true
-    if (mOverCurrentCount
-        >= Config.getInstance().getDouble(Key.INTAKE__OVERCURRENT_MIN_OCCURENCES)) {
-      mLogger.log("Overcurrent!");
-      mOverCurrentCount = 0;
-      SmartDashboard.putBoolean("Intake Overcurrent Debounced", true);
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @Override

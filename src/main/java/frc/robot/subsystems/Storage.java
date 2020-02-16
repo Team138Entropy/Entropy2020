@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -21,6 +23,11 @@ public class Storage extends Subsystem {
   private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
   private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
   private static final double BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
+
+  
+  private static final int INTAKE_SENSOR_PORT = 0;
+  
+  private DigitalInput mIntakeSensor;
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
@@ -43,6 +50,7 @@ public class Storage extends Subsystem {
 
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
+    mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
   private int getEncoder(){
@@ -55,9 +63,22 @@ public class Storage extends Subsystem {
     mStartingEncoderPosition = getEncoder();
   }
 
+  public boolean getIntakeSensor(){
+    return mIntakeSensor.get();
+  }
+
+  public boolean isBallDetected(){
+    return getIntakeSensor();
+  }
+
   public boolean isBallStored() {
+    // this allows us to fit a 5th ball
+    if(sInstance.getBallCount() == 4){
+      return true;
+    }
+
     int encoderDistance = mStartingEncoderPosition - getEncoder();
-    System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
+    // System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
     
     // if we've hit our encoder distance target
