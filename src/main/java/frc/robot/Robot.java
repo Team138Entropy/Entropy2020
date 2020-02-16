@@ -32,6 +32,7 @@ public class Robot extends TimedRobot {
   public enum IntakeState {
     IDLE, // Default state, when State is not INTAKE
     READY_TO_INTAKE,
+    INTAKE_WAITING,
     INTAKE,
     STORE_BALL,
     STORAGE_COMPLETE,
@@ -469,6 +470,13 @@ public class Robot extends TimedRobot {
           mIntakeState = IntakeState.INTAKE;
         }
         break;
+      // we wait until the garage door sensor is clear before moving to real intake
+      case INTAKE_WAITING:
+        mIntake.start();
+        if (!mStorage.isBallDetected()) {
+          mIntakeState = IntakeState.INTAKE;
+        }
+        break;
       case INTAKE:
         // Check transition to shooting before we start intake of a new ball
         if (!checkTransitionToShooting()) {
@@ -496,7 +504,7 @@ public class Robot extends TimedRobot {
 
         // If the storage is not full, intake another ball
         if (!mStorage.isFull()) {
-          mIntakeState = IntakeState.INTAKE;
+          mIntakeState = IntakeState.INTAKE_WAITING;
         }
 
         // Check transition to shooting after storage of ball

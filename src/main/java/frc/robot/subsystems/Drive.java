@@ -165,6 +165,7 @@ public class Drive extends Subsystem {
     // Either the bigger of the two drive signals or 1, whichever is bigger.
     double scaling_factor =
         Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
+    
     setOpenLoop(
         new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
   }

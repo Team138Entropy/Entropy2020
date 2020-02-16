@@ -78,7 +78,7 @@ public class Storage extends Subsystem {
     }
 
     int encoderDistance = mStartingEncoderPosition - getEncoder();
-    System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
+    // System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
     
     // if we've hit our encoder distance target
