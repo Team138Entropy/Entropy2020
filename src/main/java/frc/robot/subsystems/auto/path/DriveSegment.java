@@ -37,6 +37,8 @@ public class DriveSegment extends Segment {
   @Override
   public void init() {
     logger.info("Initializing drive segment");
+    logger.info("Target: " + targetPosition);
+    logger.info("Min, Max: " + min + ", " + max);
 
     drive.zeroEncoders();
     try {
