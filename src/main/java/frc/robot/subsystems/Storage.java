@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
@@ -29,9 +28,8 @@ public class Storage extends Subsystem {
   private static final double BALL_DISTANCE_IN_ENCODER_TICKS =
       Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
-  
   private static final int INTAKE_SENSOR_PORT = 0;
-  
+
   private DigitalInput mIntakeSensor;
 
   private WPI_TalonSRX mBottomRoller;
@@ -68,17 +66,17 @@ public class Storage extends Subsystem {
     mStartingEncoderPosition = getEncoder();
   }
 
-  public boolean getIntakeSensor(){
+  public boolean getIntakeSensor() {
     return mIntakeSensor.get();
   }
 
-  public boolean isBallDetected(){
+  public boolean isBallDetected() {
     return getIntakeSensor();
   }
 
   public boolean isBallStored() {
     // this allows us to fit a 5th ball
-    if(sInstance.getBallCount() == 4){
+    if (sInstance.getBallCount() == 4) {
       return true;
     }
 

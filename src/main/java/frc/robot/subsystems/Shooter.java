@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -74,15 +73,15 @@ public class Shooter extends Subsystem {
   private Turret mTurret;
   private Vision mVision;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
-  private void x(){}
+
+  private void x() {}
+
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
     mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
-    mTurret =
-        position -> 
-            x();
+    mTurret = position -> x();
     mVision =
         () -> {
           // System.out.println("Getting dummy vision target");
@@ -168,7 +167,7 @@ public class Shooter extends Subsystem {
     return isAtVelocityDebounced;
   }
 
-  public boolean isBallFired(){
+  public boolean isBallFired() {
     return Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (SPEED_DEADBAND + 50);
   }
 
