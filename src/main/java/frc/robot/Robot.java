@@ -231,18 +231,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    if(mOperatorInterface.getStateReset()){
-      mState = State.INTAKE;
-      mIntakeState = IntakeState.IDLE;
-      mClimingState = ClimingState.IDLE;
-      mShootingState = ShootingState.IDLE;
-      if(mState == State.SHOOTING){
-        mShootingState = ShootingState.SHOOTING_COMPLETE;
-      }
-      if(mState == State.INTAKE){
-        mIntakeState = IntakeState.STORAGE_COMPLETE;
-      }
-    }
 
     // Intake roller ON while button held
     if (mOperatorInterface.isIntakeRollerTest()) {
@@ -382,6 +370,20 @@ public class Robot extends TimedRobot {
     }
     if (prevShootState != mShootingState) {
       mRobotLogger.log("Changed state to " + mShootingState);
+    }
+
+    
+    if(mOperatorInterface.getStateReset()){
+      mState = State.INTAKE;
+      mIntakeState = IntakeState.IDLE;
+      mClimingState = ClimingState.IDLE;
+      mShootingState = ShootingState.IDLE;
+      if(mState == State.SHOOTING){
+        mShootingState = ShootingState.SHOOTING_COMPLETE;
+      }
+      if(mState == State.INTAKE){
+        mIntakeState = IntakeState.IDLE;
+      }
     }
 
     if (mOperatorInterface.isBarf()) {
@@ -541,18 +543,6 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /** Returns whether the firing timer has run longer than the duration. */
-  public boolean isBallFired() {
-    mRobotLogger.info("mFireTimer: " + mFireTimer.get());
-    if (mFireTimer.get() >= FIRE_DURATION_SECONDS) {
-      mShooter.stop();
-      mFireTimer.stop();
-      mFireTimer.reset();
-      return true;
-    }
-    return false;
-  }
-
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
@@ -560,6 +550,7 @@ public class Robot extends TimedRobot {
         mShooter.stop();
         break;
       case PREPARE_TO_SHOOT:
+
 
         /* Starts roller */
         mShooter.start();
@@ -579,7 +570,7 @@ public class Robot extends TimedRobot {
         mShooter.start();
 
         /* If finished shooting, changes to next state*/
-        if (isBallFired()) {
+        if (mShooter.isBallFired()) {
           mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
         }
         break;

@@ -51,7 +51,6 @@ public class Intake extends Subsystem {
 
   /** Stops the roller. */
   public void stop() {
-    mLogger.verbose("Stopping roller ");
     mRoller.set(ControlMode.PercentOutput, 0);
   }
 

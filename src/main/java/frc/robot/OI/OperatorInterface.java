@@ -112,7 +112,7 @@ public class OperatorInterface {
   }
 
   public boolean startIntake() {
-    return DriverController.getButton(XboxController.Button.RB);
+    return OperatorController.getButton(NykoController.Button.BUTTON_1);
   }
 
   public void setDriverRumble(boolean toggle) {
@@ -120,7 +120,7 @@ public class OperatorInterface {
   }
 
   public boolean isBarf() {
-    return DriverController.getButton(XboxController.Button.LB);
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
 
   // Test Mode functions

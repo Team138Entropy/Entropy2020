@@ -29,6 +29,8 @@ public class Shooter extends Subsystem {
   private int mVelocityAdjustment = 0;
   private static final int VELOCITY_ADJUSTMENT_BUMP = Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
+  private boolean mHasHadCurrentDrop = false;
+
   private static class TurretPosition {
     private double mAzimuth, mDistance;
 
@@ -70,20 +72,15 @@ public class Shooter extends Subsystem {
   private Turret mTurret;
   private Vision mVision;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
-
+  private void x(){}
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
     mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
     mTurret =
-        position ->
-            System.out.println(
-                "Setting dummy turret position to ("
-                    + position.getAzimuth()
-                    + ", "
-                    + position.getDistance()
-                    + ")");
+        position -> 
+            x();
     mVision =
         () -> {
           // System.out.println("Getting dummy vision target");
@@ -136,7 +133,6 @@ public class Shooter extends Subsystem {
     return mVelocityAdjustment;
   }
 
-
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
     // determine if we're at the target velocity by looking at the difference between the actual and
@@ -150,6 +146,7 @@ public class Shooter extends Subsystem {
     // last SPEED_DEADBAND_DELAY ticks
 
     SmartDashboard.putNumber("Velocity Countdown", mTimeSinceWeWereAtVelocity);
+    SmartDashboard.putBoolean("Has Had Current Drop", mHasHadCurrentDrop);
 
     if (isAtVelocity) {
       // decrement
@@ -159,7 +156,13 @@ public class Shooter extends Subsystem {
       mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
     }
     // if the time is at least 0, we are "at velocity"
-    return mTimeSinceWeWereAtVelocity <= 0;
+    boolean isAtVelocityDebounced = mTimeSinceWeWereAtVelocity <= 0;
+
+    return isAtVelocityDebounced;
+  }
+
+  public boolean isBallFired(){
+    return Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (SPEED_DEADBAND + 50);
   }
 
   // Used in TEST mode only
