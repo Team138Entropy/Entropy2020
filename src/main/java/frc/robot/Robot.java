@@ -118,8 +118,9 @@ public class Robot extends TimedRobot {
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
-    // mCameraManager = CameraManager.getInstance();
-    // mCameraManager.init();
+
+    mCameraManager = CameraManager.getInstance();
+    mCameraManager.init();
 
     // Set the initial Robot State
     mState = State.INTAKE;
