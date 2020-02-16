@@ -131,9 +131,9 @@ public class Drive extends Subsystem {
     // Configure Talon gains
     double P, I, D;
 
-    P = Config.getInstance().getDouble(Config.Key.DRIVE__PID_P);
-    I = Config.getInstance().getDouble(Config.Key.DRIVE__PID_I);
-    D = Config.getInstance().getDouble(Config.Key.DRIVE__PID_D);
+    P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
 
     mLeftMaster.config_kP(0, P);
     mLeftMaster.config_kI(0, I);
@@ -147,8 +147,7 @@ public class Drive extends Subsystem {
   }
 
   public void zeroSensors() {
-    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 0);
-    mRightMaster.getSensorCollection().setQuadraturePosition(0, 0);
+    zeroEncoders();
   }
 
   // Temp
