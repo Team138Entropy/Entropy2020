@@ -65,6 +65,7 @@ public class Turret extends PIDSubsystem {
     // gets the POT value, rounded to 2 decimal places
 
     // TODO: is this even needed?
+    // This gave me one (1) AID - Will
     double potValue = Double.parseDouble(String.format("%.2f", this.mPot.get()));
     mTurretLogger.verbose("pot value " + potValue);
     return potValue;
