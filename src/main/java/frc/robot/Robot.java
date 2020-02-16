@@ -77,7 +77,12 @@ public class Robot extends TimedRobot {
   private CameraManager mCameraManager;
 
   private Compressor mCompressor;
-  private ADXRS450_Gyro mGyro;
+
+  /**
+   * The robot's gyro. Don't use this for absolute measurements. See {@link #getGyro()} for more details.
+   * @see #getGyro()
+   */
+  private static ADXRS450_Gyro sGyro = new ADXRS450_Gyro();
 
   public Relay visionLight = new Relay(0);
 
@@ -138,8 +143,7 @@ public class Robot extends TimedRobot {
       mBallIndicator = BallIndicator.getInstance();
     }
 
-    mGyro = new ADXRS450_Gyro();
-    mGyro.calibrate();
+    sGyro.calibrate();
   }
 
   /*
@@ -555,7 +559,13 @@ public class Robot extends TimedRobot {
     }
   }
 
-  public Gyro getGyro() {
-    return mGyro;
+  /**
+   * Returns the robot's gyro. It should be noted that this gyro object's reported heading will often <bold>not</bold>
+   * reflect the actual heading of the robot. This is because it is reset at the beginning of every autonomous turn
+   * segment in order to allow relative turning.
+   * @return the gyro
+   */
+  public static Gyro getGyro() {
+    return sGyro;
   }
 }

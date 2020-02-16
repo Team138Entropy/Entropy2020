@@ -18,6 +18,7 @@ public class Paths {
 
   public static Optional<Path> find(String pathName) {
     Path path = paths.get(pathName);
+
     if (path == null) {
       return Optional.empty();
     } else {

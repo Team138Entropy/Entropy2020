@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.annotation.Nullable;
 
-/** Represents a path to be followed. */
+/**
+ * Represents a path to be followed.
+ * TODO: Make everything immutable so we don't have to do the scuffed cloning thing
+ */
 public class Path {
   private LinkedList<Segment> segments;
   private ArrayList<Segment> uninitializedSegments;

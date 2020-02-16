@@ -13,24 +13,28 @@ public class DriveSegment extends Segment {
   private int min, max;
   private double P, I, D;
   private double integral = 0, previousError = 0;
+  private double previousOutput = 0;
 
-  private boolean done;
+  private boolean done = false;
   private Drive drive;
   private Timer timer;
+
+  // This allows us to only log the encoder positions once every five ticks
+  private int loggingCount = 0;
 
   public DriveSegment(double meters) {
     this.meters = meters;
     this.drive = Drive.getInstance();
     this.targetPosition = drive.metersToTicks(meters);
-    int acceptableError = Config.getInstance().getInt(Config.Key.DRIVE__PID_ACCEPTABLE_ERROR);
+    int acceptableError = Config.getInstance().getInt(Config.Key.AUTO__DRIVE_PID_ACCEPTABLE_ERROR);
     this.min = targetPosition - acceptableError;
     this.max = targetPosition + acceptableError;
 
-    this.P = Config.getInstance().getDouble(Config.Key.DRIVE__PID_P);
-    this.I = Config.getInstance().getDouble(Config.Key.DRIVE__PID_I);
-    this.D = Config.getInstance().getDouble(Config.Key.DRIVE__PID_D);
+    this.P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    this.I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    this.D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
 
-    this.ramp = Config.getInstance().getDouble(Config.Key.DRIVE__PID_RAMP);
+    this.ramp = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_RAMP);
     this.timer = new Timer();
   }
 
@@ -38,11 +42,11 @@ public class DriveSegment extends Segment {
   public void init() {
     logger.info("Initializing drive segment");
     logger.info("Target: " + targetPosition);
-    logger.info("Min, Max: " + min + ", " + max);
 
     drive.zeroEncoders();
     try {
-      Thread.sleep(1000); // This is to weed out synchronization errors
+      // TODO: Change the calls in zeroEncoders() so that they block until it's done so we don't need this
+      Thread.sleep(500);
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -55,12 +59,15 @@ public class DriveSegment extends Segment {
 
     double avgPos = getAveragePosition();
 
-    logger.info(
-    "Encoder distances: ("
-        + drive.getLeftEncoderDistance()
-        + ", "
-        + drive.getRightEncoderDistance()
-        + ")," + " Average position: " + avgPos);
+    if (++loggingCount > 5) {
+      logger.info(
+        "Encoder distances: ("
+          + drive.getLeftEncoderDistance()
+          + ", "
+          + drive.getRightEncoderDistance()
+          + ")," + " Average position: " + avgPos);
+      loggingCount = 0;
+    }
 
     if (avgPos > min && avgPos < max) {
       logger.verbose(min + " < " + avgPos + " < " + max);
@@ -76,14 +83,21 @@ public class DriveSegment extends Segment {
     timer.stop();
     this.integral += (error * timer.get());
     double derivative = (error - previousError) / timer.get();
-    double out = P*error + I*integral + D*derivative;
+    double inc = P*error + I*integral + D*derivative;
     this.previousError = error;
 
-    if (out > ramp) out = ramp;
+    double out = previousOutput + inc;
+    if ((previousOutput + inc) > ramp) out = previousOutput + ramp;
+
+    if (out > 1) {
+      logger.warn("Output was greater than one! Limiting to one so the robot doesn't shit itself");
+      out = 1;
+    }
+
+    previousOutput = out;
 
     drive.setOpenLoop(new DriveSignal(out, out));
     timer.reset(); // Does not stop the timer
-
   }
 
   @Override
