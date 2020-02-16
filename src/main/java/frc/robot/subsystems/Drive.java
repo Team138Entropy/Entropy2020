@@ -4,11 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
 import frc.robot.Config.Key;
-import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
@@ -20,9 +18,6 @@ public class Drive extends Subsystem {
 
   // Drive Talons
   private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
-
-  private Solenoid mGearSolenoid; // Gear Shifting Solenoid
-  // private final Solenoid mShifter;
 
   // Drive is plummed to default to high gear
   private boolean mHighGear = true;
@@ -79,9 +74,6 @@ public class Drive extends Subsystem {
   private Drive() {
     mDriveLogger = new Logger("drive");
 
-    // Shifter Solenoid
-    // mShifter = new Solenoid(Constants.kPCMId, Constants.kShifterSolenoidId);
-
     mLeftMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_BACK_PORT));
     // configureSpark(mLeftMaster, true, true);
 
@@ -93,10 +85,6 @@ public class Drive extends Subsystem {
 
     mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
-
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
-      mGearSolenoid = new Solenoid(Constants.kShifterSolenoidId);
-    }
   }
 
   public void init() {
@@ -197,7 +185,7 @@ public class Drive extends Subsystem {
     }
 
     // This is just a convoluted way to do a deadband.
-    if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
+    if (Util.epsilonEquals(wheel, 0.0, 0.020)) {
       wheel = 0.0;
     }
 
@@ -241,25 +229,6 @@ public class Drive extends Subsystem {
   }
 
   /*
-      SwitchGears
-      Toggles the current gear
-  */
-  public synchronized void switchGears() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_SOLENOID)) {
-      mHighGear = !mHighGear;
-      mGearSolenoid.set(mHighGear);
-    }
-  }
-
-  /*
-      SetGear
-      TODO: This may be the incorrect polarity. Verfiy this.
-  */
-  public synchronized void setGear(boolean highGear) {
-    mGearSolenoid.set(highGear);
-  }
-
-  /*
       Test all Sensors in the Subsystem
   */
   public void checkSubsystem() {}
@@ -294,6 +263,10 @@ public class Drive extends Subsystem {
   // Used only in TEST mode
   public void setOutputRightBack(double output) {
     mRightMaster.set(ControlMode.PercentOutput, output);
+  }
+
+  public synchronized Rotation2d getHeading() {
+    return mPeriodicIO.gyro_heading;
   }
 
   // Used only in TEST mode

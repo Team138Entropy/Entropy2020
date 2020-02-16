@@ -4,6 +4,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
@@ -34,7 +37,8 @@ public class Robot extends TimedRobot {
     READY_TO_INTAKE,
     INTAKE,
     STORE_BALL,
-    STORAGE_COMPLETE
+    STORAGE_COMPLETE,
+    STORAGE_EJECT
   }
 
   public enum ShootingState {
@@ -51,6 +55,7 @@ public class Robot extends TimedRobot {
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
   private final double FIRE_DURATION_SECONDS = 0.5;
+  private final int BARF_TIMER_DURATION = 3;
 
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
@@ -61,9 +66,6 @@ public class Robot extends TimedRobot {
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
-
-  // Robot State
-  private final RobotState mRobotState = RobotState.getInstance();
 
   // Subsystem Manager
   private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
@@ -76,7 +78,7 @@ public class Robot extends TimedRobot {
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
-  private Compressor mCompressor;
+  private final RobotTracker mRobotTracker = RobotTracker.getInstance();
 
   /**
    * The robot's gyro. Don't use this for absolute measurements. See {@link #getGyro()} for more details.
@@ -94,10 +96,15 @@ public class Robot extends TimedRobot {
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
+  private Timer mBarfTimer = new Timer();
 
   private Path mAutoPath = Paths.NO_OP;
 
   Logger mRobotLogger = new Logger("robot");
+
+  // Shooter velocity trim state
+  LatchedBoolean mShooterVelocityTrimUp = new LatchedBoolean();
+  LatchedBoolean mShooterVelocityTrimDown = new LatchedBoolean();
 
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
@@ -109,8 +116,10 @@ public class Robot extends TimedRobot {
 
     mRobotLogger.log("robot init _ 1");
 
+    mRobotTracker.reset();
+
     // Zero all nesscary sensors on Robot
-    ZeroSensors();
+    mSubsystemManager.zeroSensors();
     visionLight.set(Relay.Value.kForward);
 
     // Reset Robot State - Note starting position of the Robot
@@ -120,15 +129,14 @@ public class Robot extends TimedRobot {
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
-    mCameraManager = CameraManager.getInstance();
-    mCameraManager.init();
-
-    // Reset Robot State
-    // Wherever the Robot is now is the starting position
-    mRobotState.reset();
+    // mCameraManager = CameraManager.getInstance();
+    // mCameraManager.init();
 
     // Set the initial Robot State
     mState = State.INTAKE;
+    mIntakeState = IntakeState.IDLE;
+    mClimingState = ClimingState.IDLE;
+    mShootingState = ShootingState.IDLE;
 
     // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
@@ -146,44 +154,27 @@ public class Robot extends TimedRobot {
     sGyro.calibrate();
   }
 
-  /*
-    Returns true if the pressure switch reads "low", an undefined value we have no control over.
-    Cool!
-  */
-  public boolean getLowPSI() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_COMPRESSOR)) {
-      return mCompressor.getPressureSwitchValue();
-    } else {
-      return false;
-    }
-  }
-
-  /*
-    Called on bootup, Zero all Sensors
-  */
-  private void ZeroSensors() {
-    mRobotLogger.log("Zeroing sensors...");
-    mSubsystemManager.zeroSensors();
-    mRobotLogger.log("Zeroed sensors");
-  }
-
   private void updateSmartDashboard() {
-    SmartDashboard.putString("BallCounter", "BallValue" + mStorage.getBallCount());
-    // TODO: change this to the real boolean
-    SmartDashboard.putBoolean("ShooterFull", false);
-    // TODO: decide if this is necessary and hook it up
-    SmartDashboard.putBoolean("ShooterLoaded", false);
-    SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
-    // TODO: also, finally, hook this up.
-    SmartDashboard.putBoolean("TargetLocked", false);
-    // TODO: haha that was a joke this is the real last one
-    SmartDashboard.putNumber("ElevateTrim", 0.0f);
+    RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
 
-    SmartDashboard.putBoolean("StorageSensor", mStorage.isBallDetected());
+    SmartDashboard.putBoolean("Has Vision", result.HasResult);
+    if (result.HasResult) {
+      SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
+    } else {
+      SmartDashboard.putNumber("Turret Offset Error", 0);
+    }
+
+    SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
+    SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
+    SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
+    SmartDashboard.putNumber("ElevateTrim", mShooter.getVelocityAdjustment());
 
     SmartDashboard.putString("RobotState", mState.name());
+    SmartDashboard.putString("IntakeState", mIntakeState.name());
+    SmartDashboard.putString("ShootingState", mShootingState.name());
+    SmartDashboard.putString("ClimbingState", mClimingState.name());
 
-    // TODO: cameras will go here eventually
+    SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
   }
 
   @Override
@@ -221,13 +212,26 @@ public class Robot extends TimedRobot {
     mRobotLogger.log("Teleop Init!");
     mRobotState.setAuto(false);
 
+    Config.getInstance().reload();
+
+    mStorage.preloadBalls(0);
+
+    // Set the initial Robot State
+    mState = State.INTAKE;
+    mIntakeState = IntakeState.IDLE;
+    mClimingState = ClimingState.IDLE;
+    mShootingState = ShootingState.IDLE;
+
     mStorage.init();
     mDrive.init();
 
-    Config.getInstance().reload();
-
-    mState = State.INTAKE;
-    mIntakeState = IntakeState.READY_TO_INTAKE;
+    // updated in Intake.java
+    SmartDashboard.putBoolean("Intake Spinning Up", false);
+    SmartDashboard.putBoolean("Intake Overcurrent", false);
+    SmartDashboard.putBoolean("Intake Overcurrent Debounced", false);
+    SmartDashboard.putNumber("Intake Current", 0);
+    SmartDashboard.putNumber("Intake Current Countdown", 0);
+    SmartDashboard.putNumber("Encoder Distance", 0);
   }
 
   @Override
@@ -255,22 +259,28 @@ public class Robot extends TimedRobot {
     // Intake roller ON while button held
     if (mOperatorInterface.isIntakeRollerTest()) {
       mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
+    } else if (mOperatorInterface.isBarf()) {
+      mIntake.barf();
     } else {
       mIntake.stop();
     }
 
-    // Bottom storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerBottomTest()) {
-      mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
+    if (mOperatorInterface.isBarf()) {
+      mStorage.barf();
     } else {
-      mStorage.setBottomOutput(0);
-    }
+      // Bottom storage rollers ON while button held
+      if (mOperatorInterface.isStorageRollerBottomTest()) {
+        mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
+      } else {
+        mStorage.setBottomOutput(0);
+      }
 
-    // Top storage rollers ON while button held
-    if (mOperatorInterface.isStorageRollerTopTest()) {
-      mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
-    } else {
-      mStorage.setTopOutput(0);
+      // Top storage rollers ON while button held
+      if (mOperatorInterface.isStorageRollerTopTest()) {
+        mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
+      } else {
+        mStorage.setTopOutput(0);
+      }
     }
 
     // Shooter roller ON while button held
@@ -333,15 +343,12 @@ public class Robot extends TimedRobot {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
       double driveTurn = mOperatorInterface.getDriveTurn();
-      boolean driveShift = mOperatorInterface.getDriveShift();
       mDrive.setDrive(driveThrottle, driveTurn, false);
 
       // Quickturn
       if (mOperatorInterface.getQuickturn()) {
         // Quickturn!
       }
-
-      if (driveShift) mDrive.switchGears();
 
       // Detect Harvest Mode
       boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
@@ -372,17 +379,54 @@ public class Robot extends TimedRobot {
   public void RobotLoop() {
     updateSmartDashboard();
 
+    State prevState = mState;
+    IntakeState prevIntakeState = mIntakeState;
+    ClimingState prevClimbState = mClimingState;
+    ShootingState prevShootState = mShootingState;
     executeRobotStateMachine();
+    if (prevState != mState) {
+      mRobotLogger.log("Changed state to " + mState);
+    }
+    if (prevIntakeState != mIntakeState) {
+      mRobotLogger.log("Changed state to " + mIntakeState);
+    }
+    if (prevClimbState != mClimingState) {
+      mRobotLogger.log("Changed state to " + mClimingState);
+    }
+    if (prevShootState != mShootingState) {
+      mRobotLogger.log("Changed state to " + mShootingState);
+    }
+
+    if (mOperatorInterface.isBarf()) {
+      mIntakeState = IntakeState.STORAGE_EJECT;
+      mBarfTimer.reset();
+      mBarfTimer.start();
+    }
+
+    // check if we are shooting
+    // TODO: remove this and only allow shooting if you have at least 1 ball
+    checkTransitionToShooting();
 
     turretLoop();
 
     driveTrainLoop();
+
+    updateSmartDashboard();
 
     // Operator Controls
     if (mOperatorInterface.getTurretAdjustLeft()) {
       // manual turret aim
     } else if (mOperatorInterface.getTurretAdjustRight()) {
       // manual turret aim
+    }
+
+    // Shooter velocity trim
+    if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
+      mShooter.decreaseVelocity();
+    } else if (mShooterVelocityTrimUp.update(mOperatorInterface.getShooterVelocityTrimUp())) {
+      mShooter.increaseVelocity();
+    } else if (mOperatorInterface.getResetVelocityTrim()) {
+      mShooter.resetVelocity();
     }
 
     // Camera Swap
@@ -395,17 +439,20 @@ public class Robot extends TimedRobot {
     switch (mState) {
       case IDLE:
         SmartDashboard.putString("RobotState", mState.name());
+        SmartDashboard.putString("IntakeState", mIntakeState.name());
+        SmartDashboard.putString("ShootingState", mShootingState.name());
+        SmartDashboard.putString("ClimbingState", mClimingState.name());
+        mIntake.stop();
+        mStorage.stop();
+        mShooter.stop();
         break;
       case INTAKE:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mIntakeState.name());
         executeIntakeStateMachine();
         break;
       case SHOOTING:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mShootingState.name());
         executeShootingStateMachine();
         break;
       case CLIMBING:
-        SmartDashboard.putString("RobotState", mState.name() + ": " + mClimingState.name());
         executeClimbingStateMachine();
         break;
       default:
@@ -418,10 +465,15 @@ public class Robot extends TimedRobot {
     switch (mIntakeState) {
       case IDLE:
         mRobotLogger.warn("Intake state is idle");
+        mIntake.stop();
+        mStorage.stop();
+        mShooter.stop();
+        mIntakeState = IntakeState.READY_TO_INTAKE;
         break;
       case READY_TO_INTAKE:
         // If the operator issues the intake command, start intake
-        if (mOperatorInterface.getLoadChamber()) {
+        if (mOperatorInterface.startIntake()) {
+          mIntake.resetOvercurrentCooldown();
           mIntakeState = IntakeState.INTAKE;
         }
         break;
@@ -431,25 +483,23 @@ public class Robot extends TimedRobot {
           mIntake.start();
 
           // If a ball is detected, store it
-          if (mStorage.isBallDetected()) {
+          if (mIntake.isBallDetected()) {
             mIntakeState = IntakeState.STORE_BALL;
           }
         }
         break;
       case STORE_BALL:
         mStorage.storeBall();
-        // TODO: may need to delay stopping the intake roller
         mIntake.stop();
 
         // If the sensor indicates the ball is stored, complete ball storage
         if (mStorage.isBallStored()) {
           mIntakeState = IntakeState.STORAGE_COMPLETE;
         }
+
         break;
       case STORAGE_COMPLETE:
         mStorage.addBall();
-
-        // TODO: may need to delay stopping the storage roller
         mStorage.stop();
 
         // If the storage is not full, intake another ball
@@ -459,6 +509,16 @@ public class Robot extends TimedRobot {
 
         // Check transition to shooting after storage of ball
         checkTransitionToShooting();
+
+        mIntake.resetOvercurrentCooldown();
+        break;
+      case STORAGE_EJECT:
+        mIntake.barf(); // Ball Acqusition Reverse Functionality (BARF)
+        mStorage.barf();
+        if (mBarfTimer.get() >= BARF_TIMER_DURATION) {
+          mIntakeState = IntakeState.IDLE;
+          mStorage.emptyBalls();
+        }
         break;
       default:
         mRobotLogger.error("Invalid Intake State");
@@ -467,7 +527,10 @@ public class Robot extends TimedRobot {
   }
 
   private boolean checkTransitionToShooting() {
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())) {
+    RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+    // result.HasResult ensures that our vision system sees a target
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())/* && result.HasResult*/) {
+      mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
           mIntake.stop();
@@ -483,13 +546,16 @@ public class Robot extends TimedRobot {
       }
       return true;
     } else {
+      // mRobotLogger.info("Could not shoot because " + (!mStorage.isEmpty()) + " " +
+      // mOperatorInterface.getShoot());
       return false;
     }
   }
 
   /** Returns whether the firing timer has run longer than the duration. */
   public boolean isBallFired() {
-    if (mFireTimer.get() >= FIRE_DURATION_SECONDS * 1000) {
+    mRobotLogger.info("mFireTimer: " + mFireTimer.get());
+    if (mFireTimer.get() >= FIRE_DURATION_SECONDS) {
       mShooter.stop();
       mFireTimer.stop();
       mFireTimer.reset();
@@ -502,6 +568,7 @@ public class Robot extends TimedRobot {
     switch (mShootingState) {
       case IDLE:
         mRobotLogger.warn("Shooting state is idle");
+        mShooter.stop();
         break;
       case PREPARE_TO_SHOOT:
 
@@ -514,10 +581,13 @@ public class Robot extends TimedRobot {
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
           mShootingState = ShootingState.SHOOT_BALL;
+          mFireTimer.start();
         }
         break;
       case SHOOT_BALL:
         mStorage.ejectBall();
+
+        mShooter.start();
 
         /* If finished shooting, changes to next state*/
         if (isBallFired()) {

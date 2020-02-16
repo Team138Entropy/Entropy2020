@@ -12,6 +12,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.Logger;
 
 // camera subsystem
@@ -33,20 +35,19 @@ public class CameraManager extends Subsystem {
   private CameraManager() {}
 
   public void init() {
-    return;
-    // try {
-    //   // front camera
-    //   frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
-    //   // resolution set
-    //   frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+    try {
+      // front camera
+      frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
+      // resolution set
+      frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
 
-    //   // back camera
-    //   backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
-    //   // another resolution set
-    //   backCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
-    // } catch (Exception exception) {
-    //   mLogger.error("Camera Initialization failed");
-    // }
+      // back camera
+      backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
+      // another resolution set
+      backCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+    } catch (Exception exception) {
+      mLogger.error("Camera Initialization failed");
+    }
   }
 
   @Override
