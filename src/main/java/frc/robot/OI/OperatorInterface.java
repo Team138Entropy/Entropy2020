@@ -107,6 +107,10 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
 
+  public boolean getStateReset() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_2);
+  }
+
   public boolean startIntake() {
     return OperatorController.getButton(NykoController.Button.BUTTON_1);
   }
