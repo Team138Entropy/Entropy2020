@@ -8,12 +8,12 @@ public class Paths {
   public static final Path NO_OP = new Path();
 
   static {
-    paths.put("test",
+    paths.put(
+        "test",
         new Path()
             .append(new DriveSegment(2))
             .append(new TurnSegment(45))
-            .append(new DriveSegment(1))
-    );
+            .append(new DriveSegment(1)));
   }
 
   public static Optional<Path> find(String pathName) {

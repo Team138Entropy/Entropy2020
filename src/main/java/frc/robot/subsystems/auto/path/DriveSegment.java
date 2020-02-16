@@ -45,15 +45,17 @@ public class DriveSegment extends Segment {
 
     drive.zeroEncoders();
     try {
-      // TODO: Change the calls in zeroEncoders() so that they block until it's done so we don't need this
+      // TODO: Change the calls in zeroEncoders() so that they block until it's done so we don't
+      // need this
       Thread.sleep(500);
-    } catch(Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
 
     timer.start();
   }
 
+  @SuppressWarnings("DuplicatedCode") // Marks some code as duplicate of code in TurnSegment.tick()
   @Override
   public void tick() {
 
@@ -61,11 +63,13 @@ public class DriveSegment extends Segment {
 
     if (++loggingCount > 5) {
       logger.info(
-        "Encoder distances: ("
-          + drive.getLeftEncoderDistance()
-          + ", "
-          + drive.getRightEncoderDistance()
-          + ")," + " Average position: " + avgPos);
+          "Encoder distances: ("
+              + drive.getLeftEncoderDistance()
+              + ", "
+              + drive.getRightEncoderDistance()
+              + "),"
+              + " Average position: "
+              + avgPos);
       loggingCount = 0;
     }
 
@@ -83,7 +87,7 @@ public class DriveSegment extends Segment {
     timer.stop();
     this.integral += (error * timer.get());
     double derivative = (error - previousError) / timer.get();
-    double inc = P*error + I*integral + D*derivative;
+    double inc = (P * error) + (I * integral) + (D * derivative);
     this.previousError = error;
 
     double out = previousOutput + inc;
@@ -91,6 +95,7 @@ public class DriveSegment extends Segment {
 
     if (out > 1) {
       logger.warn("Output was greater than one! Limiting to one so the robot doesn't shit itself");
+      logger.warn("out: " + out);
       out = 1;
     }
 
@@ -118,6 +123,7 @@ public class DriveSegment extends Segment {
 
   /**
    * Returns the average of the left and right encoder distances.
+   *
    * @return the average of the encoder distances.
    */
   private double getAveragePosition() {

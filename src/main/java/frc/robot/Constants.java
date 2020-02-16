@@ -19,11 +19,9 @@ public class Constants {
 
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
-  
-  
-  //22 is too low, 100 is too high
-  public static final double kDriveWheelTrackWidthInches = 75;
 
+  // 22 is too low, 100 is too high
+  public static final double kDriveWheelTrackWidthInches = 75;
 
   public static final double kDriveWheelDiameterInches = 3.938;
   public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;

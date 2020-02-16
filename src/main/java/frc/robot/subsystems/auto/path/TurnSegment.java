@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import frc.robot.Config;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drive;
+import frc.robot.util.DriveSignal;
 
 public class TurnSegment extends Segment {
   private double degrees;
@@ -19,14 +20,17 @@ public class TurnSegment extends Segment {
   private Gyro gyro;
   private Timer timer;
 
+  // This allows us to only log the encoder positions once every five ticks
+  private int loggingCount = 0;
 
   public TurnSegment(double degrees) {
-    this.degrees = degrees;
+    this.degrees = degrees % 360;
     this.drive = Drive.getInstance();
     this.gyro = Robot.getGyro();
-    double acceptableError = Config.getInstance().getDouble(Config.Key.AUTO__TURN_PID_ACCEPTABLE_ERROR);
-    this.minAcceptable = degrees - acceptableError;
-    this.maxAcceptable = degrees + acceptableError;
+    double acceptableError =
+        Config.getInstance().getDouble(Config.Key.AUTO__TURN_PID_ACCEPTABLE_ERROR);
+    this.minAcceptable = this.degrees - acceptableError;
+    this.maxAcceptable = this.degrees + acceptableError;
 
     this.P = Config.getInstance().getDouble(Config.Key.AUTO__TURN_PID_P);
     this.I = Config.getInstance().getDouble(Config.Key.AUTO__TURN_PID_I);
@@ -39,14 +43,43 @@ public class TurnSegment extends Segment {
   @Override
   public void init() {
     logger.info("Initializing turn segment");
-    logger.info("Target: " + degrees + "deg (clockwise)");
+    logger.info("Target: " + degrees + "deg");
 
     gyro.reset();
+    timer.start();
   }
 
+  @SuppressWarnings("DuplicatedCode") // Marks some code as duplicate of code in DriveSegment.tick()
   @Override
   public void tick() {
-    done = true;
+    double heading = gyro.getAngle() % 360;
+
+    if (++loggingCount > 5) {
+      logger.info("Relative heading: " + heading + "deg");
+      loggingCount = 0;
+    }
+
+    if (heading > minAcceptable && heading < maxAcceptable) {
+      logger.verbose(minAcceptable + " < " + heading + " < " + maxAcceptable);
+      done = true;
+      return;
+    }
+
+    double error = degrees - heading;
+    timer.stop();
+    this.integral += (error * timer.get());
+    double derivative = (error - previousError) / timer.get();
+    double out = (P * error) + (I * integral) + (D * derivative);
+
+    if (out > maxOutput) out = maxOutput;
+
+    if (out > 1) {
+      logger.warn("Output was greater than one! Limiting to one so the robot doesn't shit itself");
+      logger.warn("out: " + out);
+      out = 1;
+    }
+
+    drive.setOpenLoop(new DriveSignal(-out, out));
   }
 
   @Override

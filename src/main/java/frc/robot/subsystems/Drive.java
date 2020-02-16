@@ -65,7 +65,8 @@ public class Drive extends Subsystem {
   public int metersToTicks(double meters) {
     long roundedVal = Math.round(meters * Config.getInstance().getInt(Key.DRIVE__TICKS_PER_METER));
     if (roundedVal > Integer.MAX_VALUE) {
-      mDriveLogger.warn("Integer overflow when converting meters to ticks! Something is likely VERY WRONG!");
+      mDriveLogger.warn(
+          "Integer overflow when converting meters to ticks! Something is likely VERY WRONG!");
     }
 
     return (int) roundedVal;
@@ -131,7 +132,7 @@ public class Drive extends Subsystem {
     mRightMaster.config_kI(0, I);
     mRightMaster.config_kD(0, D);
 
-    //talon.configClosedloopRamp(1);
+    // talon.configClosedloopRamp(1);
   }
 
   public void zeroSensors() {
@@ -140,6 +141,7 @@ public class Drive extends Subsystem {
 
   // Temp
   private static final int AUTO_TICKS = 1000;
+
   public void setAutoPosition() {
     mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
     mRightMaster.set(ControlMode.Position, -AUTO_TICKS);

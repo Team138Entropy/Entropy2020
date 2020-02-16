@@ -16,11 +16,16 @@ public class Storage extends Subsystem {
 
   private static final int STORAGE_CAPICTY = 4;
 
-  private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
-  private static final double BOTTOM_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
-  private static final double BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
+  private static final double STORE_SPEED =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double BOTTOM_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
+  private static final double TEST_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double BALL_DISTANCE_IN_ENCODER_TICKS =
+      Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
   private WPI_TalonSRX mBottomRoller;
   private WPI_TalonSRX mTopRoller;
@@ -45,7 +50,7 @@ public class Storage extends Subsystem {
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
   }
 
-  private int getEncoder(){
+  private int getEncoder() {
     // return the negative position that the talon gets us because it's hooked up backwards
     // this will return positive values
     return -mBottomRoller.getSelectedSensorPosition();
@@ -57,15 +62,16 @@ public class Storage extends Subsystem {
 
   public boolean isBallStored() {
     int encoderDistance = mStartingEncoderPosition - getEncoder();
-    System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
+    System.out.println(
+        "Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
-    
+
     // if we've hit our encoder distance target
-    if(encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS){
+    if (encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS) {
       // reset the encoder position
       mStartingEncoderPosition = getEncoder();
       return true;
-    }else{
+    } else {
       return false;
     }
   }
@@ -104,7 +110,7 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, STORE_SPEED);
   }
 
-  public void emptyBalls(){
+  public void emptyBalls() {
     mBallCount = 0;
   }
 

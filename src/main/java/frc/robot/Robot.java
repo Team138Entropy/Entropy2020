@@ -3,10 +3,10 @@ package frc.robot;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
@@ -81,7 +81,9 @@ public class Robot extends TimedRobot {
   private final RobotTracker mRobotTracker = RobotTracker.getInstance();
 
   /**
-   * The robot's gyro. Don't use this for absolute measurements. See {@link #getGyro()} for more details.
+   * The robot's gyro. Don't use this for absolute measurements. See {@link #getGyro()} for more
+   * details.
+   *
    * @see #getGyro()
    */
   private static ADXRS450_Gyro sGyro = new ADXRS450_Gyro();
@@ -190,7 +192,8 @@ public class Robot extends TimedRobot {
     mShootingState = ShootingState.PREPARE_TO_SHOOT;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
-    mAutoPath = Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
+    mAutoPath =
+        Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
   }
 
   @Override
@@ -328,7 +331,8 @@ public class Robot extends TimedRobot {
   }
 
   public void driveTrainLoop() {
-    // TODO: Cache whether or not the robot has a drivetrain. We shouldn't be calling the config system every tick.
+    // TODO: Cache whether or not the robot has a drivetrain. We shouldn't be calling the config
+    // system every tick.
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
@@ -519,7 +523,7 @@ public class Robot extends TimedRobot {
   private boolean checkTransitionToShooting() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty())/* && result.HasResult*/) {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) /* && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
@@ -620,9 +624,10 @@ public class Robot extends TimedRobot {
   }
 
   /**
-   * Returns the robot's gyro. It should be noted that this gyro object's reported heading will often <bold>not</bold>
-   * reflect the actual heading of the robot. This is because it is reset at the beginning of every autonomous turn
-   * segment in order to allow relative turning.
+   * Returns the robot's gyro. It should be noted that this gyro object's reported heading will
+   * often <bold>not</bold> reflect the actual heading of the robot. This is because it is reset at
+   * the beginning of every autonomous turn segment in order to allow relative turning.
+   *
    * @return the gyro
    */
   public static Gyro getGyro() {
