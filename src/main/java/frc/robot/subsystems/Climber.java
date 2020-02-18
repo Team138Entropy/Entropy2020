@@ -59,7 +59,7 @@ public class Climber extends Subsystem {
     mMotor.stopMotor();
   }
 
-  /** Checks whether the motor is overcurrenting, signalling that it's done climbing*/
+  /** Checks whether current is at threshold, signalling that it's done climbing*/
   public boolean checkOvercurrent() {
     mLogger.verbose("Input current: " + mMotor.getSupplyCurrent() + ", Output current: " + mMotor.getStatorCurrent());
 

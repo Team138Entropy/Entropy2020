@@ -163,7 +163,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("RobotState", mState.name());
     SmartDashboard.putString("IntakeState", mIntakeState.name());
     SmartDashboard.putString("ShootingState", mShootingState.name());
-    SmartDashboard.putString("ClimbingState", mClimingState.name());
+    SmartDashboard.putString("ClimbingState", mClimbingState.name());
     
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
 
@@ -372,8 +372,8 @@ public class Robot extends TimedRobot {
     if (prevIntakeState != mIntakeState) {
       mRobotLogger.log("Changed state to " + mIntakeState);
     }
-    if (prevClimbState != mClimingState) {
-      mRobotLogger.log("Changed state to " + mClimingState);
+    if (prevClimbState != mClimbingState) {
+      mRobotLogger.log("Changed state to " + mClimbingState);
     }
     if (prevShootState != mShootingState) {
       mRobotLogger.log("Changed state to " + mShootingState);
@@ -383,7 +383,7 @@ public class Robot extends TimedRobot {
     if(mOperatorInterface.getStateReset()){
       mState = State.INTAKE;
       mIntakeState = IntakeState.IDLE;
-      mClimingState = ClimingState.IDLE;
+      mClimbingState = ClimbingState.IDLE;
       mShootingState = ShootingState.IDLE;
       if(mState == State.SHOOTING){
         mShootingState = ShootingState.SHOOTING_COMPLETE;
