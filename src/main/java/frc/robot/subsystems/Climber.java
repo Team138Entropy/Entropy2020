@@ -11,15 +11,15 @@ public class Climber extends Subsystem {
 
   //TODO: Tune ALL of these values
   /** Speed of motor in % of maximum output*/
-  private final double EXTEND_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER_EXTEND_SPEED);
-  private final double RETRACT_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER_RETRACT_SPEED);
+  private final double EXTEND_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER__EXTEND_SPEED);
+  private final double RETRACT_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACT_SPEED);
 
   /** Overcurrent constants */
-  private final double OVERCURRENT_THRESHOLD = Config.getInstance().getDouble(Config.Key.CLIMBER_OVERCURRENT_THRESHOLD);
-  private final double OVERCURRENT_MIN_OCCURENCES = Config.getInstance().getDouble(Config.Key.CLIMBER_OVERCURRENT_MIN_OCCURENCES);
-  private final double OVERCURRENT_COUNTDOWN_LENGTH = Config.getInstance().getDouble(Config.Key.CLIMBER_OVERCURRENT_COUNTDOWN_LENGTH);
+  private final double OVERCURRENT_THRESHOLD = Config.getInstance().getDouble(Config.Key.CLIMBER__OVERCURRENT_THRESHOLD);
+  private final double OVERCURRENT_MIN_OCCURENCES = Config.getInstance().getDouble(Config.Key.CLIMBER__OVERCURRENT_MIN_OCCURENCES);
+  private final double OVERCURRENT_COUNTDOWN_LENGTH = Config.getInstance().getDouble(Config.Key.CLIMBER__OVERCURRENT_COUNTDOWN_LENGTH);
 
-  private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER_MOTOR);
+  private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER__MOTOR);
 
   /** Aggregation */
   private static Climber sInstance;
