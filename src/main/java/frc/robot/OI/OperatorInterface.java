@@ -15,6 +15,8 @@ public class OperatorInterface {
   private final XboxController DriverController;
   private final NykoController OperatorController;
 
+  private boolean mIntakeWasPressedWhenWeLastChecked = false;
+
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
       mInstance = new OperatorInterface();
@@ -112,7 +114,14 @@ public class OperatorInterface {
   }
 
   public boolean startIntake() {
-    return DriverController.getButton(XboxController.Button.RB);
+    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
+    if(mIntakeWasPressedWhenWeLastChecked && !buttonValue){
+      mIntakeWasPressedWhenWeLastChecked = false;
+      return true;
+    }else{
+      mIntakeWasPressedWhenWeLastChecked = buttonValue;
+      return false;
+    }
   }
 
   public void setDriverRumble(boolean toggle) {
