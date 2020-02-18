@@ -73,6 +73,18 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
 
+  public boolean getShooterVelocityTrimUp() {
+    return OperatorController.getDPad() == DPad.UP;
+  }
+
+  public boolean getShooterVelocityTrimDown() {
+    return OperatorController.getDPad() == DPad.DOWN;
+  }
+
+  public boolean getResetVelocityTrim() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  }
+
   // Operator
 
   public boolean getHarvestMode() {
@@ -93,6 +105,10 @@ public class OperatorInterface {
 
   public boolean getShoot() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
+  }
+
+  public boolean getStateReset() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_2);
   }
 
   public boolean startIntake() {
@@ -139,6 +155,4 @@ public class OperatorInterface {
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
-
-
 }

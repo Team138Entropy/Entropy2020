@@ -30,7 +30,6 @@ class PIDRoller {
 
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 0, TIMEOUT_MS);
 
-
     mTalon.config_kP(PID_LOOP_INDEX, p);
     mTalon.config_kI(PID_LOOP_INDEX, i);
     mTalon.config_kD(PID_LOOP_INDEX, d);
@@ -40,20 +39,18 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-
     mTalonSlave = new WPI_TalonSRX(talon2Port);
     mTalonSlave.follow(mTalon);
   }
 
-  int getVelocity(){
+  int getVelocity() {
     return -mTalon.getSelectedSensorVelocity();
   }
 
   void setSpeed(int posPer100Ms) {
-    if(posPer100Ms == 0){
-      System.out.println("PID roller");
+    if (posPer100Ms == 0) {
       mTalon.set(ControlMode.PercentOutput, 0);
-    }else{
+    } else {
       mTalon.set(ControlMode.Velocity, -posPer100Ms);
     }
   }

@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import frc.robot.Logger;
-import frc.robot.RobotState;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.RobotTracker;
 import frc.robot.vision.TargetInfo;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -10,14 +10,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 // UDP Reciever used in vision manager
 class UDPReciever {
   DatagramSocket recieveSocket = null;
   byte[] receiveData = new byte[2048];
   DatagramPacket recievePacket = null;
-  Logger mLogger;
 
   /**
    * Constructor for the UDP reciever. Sets up internal memory structures in prep to start listening
@@ -28,13 +26,12 @@ class UDPReciever {
    *     whitepaper. Must match whatever port the coprocessor is sending information to.
    */
   public UDPReciever(String listen_from_addr_in, int listen_on_port_in) {
-    mLogger = new Logger("visionManager");
     try {
       recieveSocket = new DatagramSocket(listen_on_port_in);
       recievePacket = new DatagramPacket(receiveData, receiveData.length);
       recieveSocket.setSoTimeout(10);
     } catch (IOException e) {
-      mLogger.log("Error: Cannot set up UDP reciever socket: " + e.getMessage());
+      System.out.println("Error: Cannot set up UDP reciever socket: " + e.getMessage());
       recieveSocket = null;
     }
   }
@@ -60,7 +57,6 @@ class UDPReciever {
    Runs in its own thread
 */
 public class VisionManager extends Subsystem {
-  Logger mLogger;
   private static VisionManager mInstance;
 
   public static synchronized VisionManager getInstance() {
@@ -76,19 +72,16 @@ public class VisionManager extends Subsystem {
   // Lock that protects the parser and allows one user at a time
   private final Object ParserLock = new Object();
 
-  // Reference to RobotState
-  private RobotState mRobotState = RobotState.getInstance();
+  // Reference to RobotTracker
+  private RobotTracker mRobotTracker = RobotTracker.getInstance();
 
   // Exector Thread
   // Packets are processed in this thread!
   private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+  private ThreadPoolExecutor RobotTrackerExecutor =
+      (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
 
   private VisionManager() {
-    mLogger = new Logger("visionManager");
-
-    mLogger.log("Vision Manager Init!");
-    mLogger.log("^^$$$^^^");
-
     // Start a Socket to listen to UDP Packet
     // Each thread pass to a processer which
     PacketReciever = new UDPReciever("127.0.0.1", 5800);
@@ -99,9 +92,7 @@ public class VisionManager extends Subsystem {
             new Runnable() {
               @Override
               public void run() {
-                mLogger.verbose("DEBUG: Listener Thread Process!");
-                processPacket();
-                mLogger.verbose("DEBUG: end of listener thread loop");
+                ProcessPacket();
               }
             });
 
@@ -111,9 +102,7 @@ public class VisionManager extends Subsystem {
     listenerThread.start();
   }
 
-  private void parsePacket(String packet) {
-    if (packet.isEmpty()) return; // if the packet has a length of 0, don't parse it
-
+  private void ParsePacket(String packet) {
     try {
       JSONObject CurrentPacket;
 
@@ -125,42 +114,59 @@ public class VisionManager extends Subsystem {
 
       // Attempt to form target info object
       // is possible this fails!
-      TargetInfo ti = new TargetInfo();
+      TargetInfo ti;
       try {
-        ti.SetY(((Number) CurrentPacket.get("x")).doubleValue());
-        ti.SetZ(((Number) CurrentPacket.get("y")).doubleValue());
-        ti.SetDistance(((Number) CurrentPacket.get("dis")).doubleValue());
-        ti.SetYaw(((Number) CurrentPacket.get("yaw")).doubleValue());
-        // ti.SetCameraID(((Number)CurrentPacket.get("id")).intValue());
-        ti.SetTargetID(((Number) CurrentPacket.get("targid")).intValue());
+        // Parse Target Info
+        ti =
+            new TargetInfo(
+                ((Number) CurrentPacket.get("targid")).intValue(),
+                ((Number) CurrentPacket.get("y")).doubleValue(),
+                ((Number) CurrentPacket.get("z")).doubleValue(),
+                ((Number) CurrentPacket.get("dis")).doubleValue());
 
-        // If we made it to this point we had all the required keys!
-        // Now we need to update RobotState with our new values!
-        mRobotState.AddVisionObservation(ti);
+        // ti.SetY(((320/2)- .5) - 40);
+        // ti.SetZ((240/2)- .5);
+
+        // Reconvert Field information
+        ti.CalculateFields();
+
+        // System.out.println("Recieved Packet: z: " + ti.getZ() + "  y: " + ti.getY());
+
+        // Pass to executor to not block up this field
+        RobotTrackerExecutor.execute(
+            new Runnable() {
+              public void run() {
+                // If we made it to this point we had all the required keys!
+                // Now we need to update RobotState with our new values!
+                mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
+              }
+            });
 
       } catch (Exception Targ) {
         // Exception Thrown when Trying to retrieve values from json object
-        mLogger.warn("Packet Storing Exception: " + Targ.getMessage());
-        // CurrentPacket.get("Target Serialization Exception: " + Targ.getMessage());
+        // System.out.println("Packet Storing Exception: " + Targ.getMessage());
+        return;
       }
-
-    } catch (ParseException pe) {
-      // Exception with the Parser
-      mLogger.warn("Parser Exception: " + pe.getMessage());
     } catch (Exception e) {
       // Other Exception
-      mLogger.warn("Parse Packet Exception: " + e.getMessage());
+      System.out.println("Parse Packet Exception: " + e.getMessage());
     }
   }
 
   /*
       Process every single packet
   */
-  private void processPacket() {
+  private void ProcessPacket() {
 
     while (true) {
       try {
         String PacketResult = PacketReciever.getPacket();
+
+        // make sure this packet has size
+        if (PacketResult.length() == 0) {
+          continue; // null packet.. see ya!
+        }
+
         try {
 
           // Pass call to a Runnable Object
@@ -168,12 +174,12 @@ public class VisionManager extends Subsystem {
           executor.execute(
               new Runnable() {
                 public void run() {
-                  parsePacket(PacketResult);
+                  ParsePacket(PacketResult);
                 }
               });
 
         } catch (Exception e) {
-          mLogger.warn("Error: Cannot parse recieved UDP json data: " + e.toString());
+          System.out.println("Error: Cannot parse recieved UDP json data: " + e.toString());
           e.printStackTrace();
         }
       } catch (Exception e) {
@@ -184,7 +190,7 @@ public class VisionManager extends Subsystem {
 
   public void zeroSensors() {}
 
-  public void updateActiveCamera(int value) {
+  public void UpdateActiveCamera(int value) {
     // mActiveCamera = mCameras.get(value);
   }
 
@@ -192,4 +198,7 @@ public class VisionManager extends Subsystem {
       Test all Sensors in the Subsystem
   */
   public void checkSubsystem() {}
+
+  @Override
+  public void stopSubsytem() {}
 }
