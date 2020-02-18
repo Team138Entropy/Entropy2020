@@ -40,7 +40,6 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private final Drive mDrive = Drive.getInstance();
-  private Turret2 mTurret = Turret2.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -97,8 +96,11 @@ public class Robot extends TimedRobot {
   //so we accidently don't trigger a press event twice 
   private LatchedBoolean mIntakeTogglePressed = new LatchedBoolean();
   private LatchedBoolean mShootTogglePressed = new LatchedBoolean();
-  private LatchedBoolean mRobotModeTogglePressed = new LatchedBoolean();
   private LatchedBoolean mAutoAimTogglePressed = new LatchedBoolean();
+  private LatchedBoolean mRobotModeSharpshooterPressed = new LatchedBoolean();
+  private LatchedBoolean mRobotModeClimberPressed = new LatchedBoolean();
+  private LatchedBoolean mRobotModeRebounderPressed = new LatchedBoolean();
+
 
   //Auto Steer Aiming Parameters
   //Updated with aiming parameters from robot state
@@ -257,9 +259,8 @@ public class Robot extends TimedRobot {
     }else if(mRobotState == RobotState.Climber){
       //Climber
       //keep unnesccary subsystems disabled
-      //expescially the turret, we don't want that swining around
+      //Turret, Shooter will be disabled
     }
-
 
     //Turret and Drive are indepdent of intake and shoot
     turretLoop();
@@ -268,29 +269,22 @@ public class Robot extends TimedRobot {
 
   //Check for a change in Robot State
   //robot is likely always in sharpshooter mode
+  //but the driver has the ability to change to climber, rebounder
   public void CheckRobotMode(){
-    boolean getTogglePress = mOperatorInterface.ToggleRobotMode();
-    boolean WantsToggle = mRobotModeTogglePressed.update(getTogglePress);
+    //Get Status of mode change buttons
+    boolean WantsSharpshooter = mRobotModeSharpshooterPressed.update(mOperatorInterface.GetSharpshooterMode());
+    boolean WantsRebounder = mRobotModeRebounderPressed.update(mOperatorInterface.GetRebounderMode());
+    boolean WantsClimber = mRobotModeClimberPressed.update(mOperatorInterface.GetClimberMode());
 
-    //check if state needs to be reset
-    //this is for toggling in between sharpshooter <--> rebounder
-    if(WantsToggle){
-      if(mRobotState == RobotState.Sharpshooter){
-        //go to rebound mode
-        mRobotState = RobotState.Rebounder;
-      }else if(mRobotState == RobotState.Rebounder){
-        //disable all running elements from being in rebounder
-        mShooter.stop();
-        mIntake.stop();
-        mStorage.stop();
-
-        //reset states of individual systems
-        mIntakeState = IntakingState.Disabled;
-        mAimState = AimingState.AutoAim;
-
-        //go to sharpshooter mode
-        mRobotState = RobotState.Sharpshooter;
-      }
+    if(WantsSharpshooter == true){
+      //Change to Sharpshooter Mode
+      mRobotState = RobotState.Sharpshooter;
+    }else if(WantsRebounder == true){
+      //Change to Rebounder Mode
+      mRobotState = RobotState.Rebounder;
+    }else if(WantsClimber == true){
+      //Change to Climber Mode
+      mRobotState = RobotState.Climber;
     }
   }
 

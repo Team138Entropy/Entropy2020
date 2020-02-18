@@ -1,7 +1,6 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
-import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
 import frc.robot.OI.XboxController.Axis;
 import frc.robot.OI.XboxController.Button;
@@ -20,7 +19,7 @@ Right Trigger - Manual Shoot
 */
 
 public class OperatorInterface {
-  Logger mLogger;
+
   private static OperatorInterface mInstance;
 
   // Instances of the Driver and Operator Controller
@@ -35,7 +34,6 @@ public class OperatorInterface {
   }
 
   private OperatorInterface() {
-    mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new XboxController(Constants.OperatorControllerPort);
   }
@@ -52,7 +50,9 @@ public class OperatorInterface {
   //While Held, the Driver is in Auto Steer Mode 
   //(if we have coordinates) 
   public boolean wantsAutoSteer(){
-    return DriverController.getTrigger(XboxController.Side.RIGHT);
+    return (
+      DriverController.getButton(XboxController.Button.LB) || 
+      DriverController.getButton(XboxController.Button.RB));
   }
 
   //Driver attempts to enable/disable intaking
@@ -92,7 +92,21 @@ public class OperatorInterface {
   }
 
 
-  
+  //Mode Toggles
+  //Toggles for Sharpshooter, Climber, Rebounder
+  public boolean GetSharpshooterMode(){
+    return OperatorController.getButton(XboxController.Button.START);
+  }
+
+  public boolean GetRebounderMode(){
+    return OperatorController.getButton(XboxController.Button.BACK);
+  }
+
+  public boolean GetClimberMode(){
+    return OperatorController.getButton(XboxController.Button.Y);
+  }
+
+
 
   public boolean ToggleIntakeDirection(){
     return DriverController.getButton(XboxController.Button.Y);
@@ -121,24 +135,8 @@ public class OperatorInterface {
     return DriverController.getButton(XboxController.Button.RB);
   }
 
-  // Returns if we are in low gear, sets to low gear as well
-  public boolean CheckLowGear(boolean previous) {
-    boolean LowGear = previous;
-    // Check if Low Gear is Toggled
-    if (DriverController.getButton(XboxController.Button.START)) {
-      if (LowGear == false) {
-        mLogger.verbose("Y PRESSED ON");
 
-      } else {
-        mLogger.verbose("Y PRESSED OFF");
-      }
-      LowGear = !LowGear;
-    }
-
-    // if lowgear value has checked
-    DriverController.setRumble(LowGear);
-    return LowGear;
-  }
+  
 
   public boolean getTurretAdjustLeft() {
     //return OperatorController.getDPad() == DPad.LEFT;

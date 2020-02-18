@@ -4,7 +4,6 @@ import java.lang.Math;
 
 import frc.robot.Config.Key;
 import frc.robot.util.geometry.*;
-import frc.robot.subsystems.ServoMotorSubsystem.ServoMotorSubsystemConstants;
 /*
   Constants
   Any thing used throughout the classes that dosen't need to be changed
@@ -125,53 +124,7 @@ public class Constants {
 
   //Constants for Server Motor System
   public static final int kCANTimeoutMs = 10; // use for important on the fly updates
-  public static final int kLongCANTimeoutMs = 100; // use for constructors
-
-  //turret constants
-  // turret
-  public static final ServoMotorSubsystemConstants kTurretConstants = new ServoMotorSubsystemConstants();
-  static {
-      kTurretConstants.kName = "Turret";
-
-      kTurretConstants.kMasterConstants.id = 9;
-      kTurretConstants.kMasterConstants.invert_motor = false;
-      kTurretConstants.kMasterConstants.invert_sensor_phase = true;
-
-      // Unit == Degrees
-      kTurretConstants.kHomePosition = 0.0;  // CCW degrees from forward
-      kTurretConstants.kTicksPerUnitDistance = 4096.0 * 72.0 / 18.0 * 54.0 / 16.0 / 360.0;
-      kTurretConstants.kKp = 2.0;
-      kTurretConstants.kKi = 0;
-      kTurretConstants.kKd = 10.0;
-      kTurretConstants.kKf = 0.08;
-      kTurretConstants.kKa = 0.0;
-      kTurretConstants.kMaxIntegralAccumulator = 0;
-      kTurretConstants.kIZone = 0; // Ticks
-      kTurretConstants.kDeadband = 0; // Ticks
-
-      kTurretConstants.kPositionKp = 0.35;
-      kTurretConstants.kPositionKi = 0.0;
-      kTurretConstants.kPositionKd = 0.0;
-      kTurretConstants.kPositionKf = 0.0;
-      kTurretConstants.kPositionMaxIntegralAccumulator = 0;
-      kTurretConstants.kPositionIZone = 0; // Ticks
-      kTurretConstants.kPositionDeadband = 0; // Ticks
-
-      kTurretConstants.kMinUnitsLimit = -135.0;
-      kTurretConstants.kMaxUnitsLimit = 315.0;
-
-      kTurretConstants.kCruiseVelocity = 5000; // Ticks / 100ms
-      kTurretConstants.kAcceleration = 16000; // Ticks / 100ms / s
-      kTurretConstants.kRampRate = 0.0; // s
-      kTurretConstants.kContinuousCurrentLimit = 20; // amps
-      kTurretConstants.kPeakCurrentLimit = 30; // amps
-      kTurretConstants.kPeakCurrentDuration = 10; // milliseconds
-      kTurretConstants.kMaxVoltage = 12.0;
-
-     // kTurretConstants.kStatusFrame8UpdateRate = 50;
-      kTurretConstants.kRecoverPositionOnReset = true;
-  }
-
+  public static final int kLongCANTimeoutMs = 100; // use for constructor
 
 
   //Constant Intialization!
