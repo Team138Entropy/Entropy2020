@@ -163,7 +163,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("ClimbingState", mClimingState.name());
     
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
-
+    System.out.println(mShooter.getSpeed());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
   }
 

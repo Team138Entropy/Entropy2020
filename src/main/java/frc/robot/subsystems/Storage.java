@@ -51,8 +51,6 @@ public class Storage extends Subsystem {
 
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
-    
-    mBottomRoller.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, 5);
 
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
@@ -76,6 +74,7 @@ public class Storage extends Subsystem {
   }
 
   public boolean isBallStored() {
+    System.out.println(getEncoder());
     // this allows us to fit a 5th ball
     if(sInstance.getBallCount() == 4){
       return true;
