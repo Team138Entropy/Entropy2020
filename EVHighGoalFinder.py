@@ -26,16 +26,25 @@ from datetime import datetime
 
 PictureNumber = 1 #Used for file naming. Everytime it loops it +='s one.
 
-# Time stuff
 # datetime object containing current date and time
 now = datetime.now()
+#set path
+path = "/year"
+
 # dd/mm/YY H:M:S
-dt_string = now.strftime("%d-%m-%Y_%H-%M")
-drTitle = dt_string
+drTitle = now.strftime("%d-%m-%Y_%H-%M-%S")
+path = drTitle
+isFile = os.path.isfile(drTitle)
+if isFile is False:
+    #os.mkdir(drTitle)
+    print("Thats a thing, but directory code isnt in yet kek")
 
 # Image Camera Size (Pixels)
 Camera_Image_Width = 640
 Camera_Image_Height = 480
+
+image_width = 640
+image_height = 480
 
 # Aspect Ratio
 HorizontalAspect = 4
@@ -47,12 +56,6 @@ hsv_threshold_hue = [55, 75]
 hsv_threshold_saturation = [89, 231]
 hsv_threshold_value = [102, 255]
 
-cameras = []
-streams = []
-cameraConfigs = []
-class CameraConfig: pass
-
-
 class WebcamVideoStream:
     def __init__(self, camera, cameraServer, frameWidth, frameHeight, name="WebcamVideoStream"):
         # initialize the video camera stream and read the first frame
@@ -63,6 +66,10 @@ class WebcamVideoStream:
         # print("SETTING EXPOSURE ")
         # print(self.webcame.exposure)
 
+        # self.webcam.setExposureManual(0)
+        # Some booleans so that we don't keep setting exposure over and over to the same value
+        # self.autoExpose = False
+        # self.prevValue = self.autoExpose
         # Make a blank image to write on
         self.img = np.zeros(shape=(frameWidth, frameHeight, 3), dtype=np.uint8)
         # Gets the video
@@ -72,7 +79,8 @@ class WebcamVideoStream:
         # initialize the thread name
         self.name = name
 
-        # initialize the variable used to indicate if the thread should be stopped
+        # initialize the variable used to indicate if the thread should
+        # be stopped
         self.stopped = False
 
     def start(self):
@@ -85,37 +93,53 @@ class WebcamVideoStream:
     def update(self):
         # keep looping infinitely until the thread is stopped
         while True:
-            if self.stopped: # if the thread indicator variable is set, stop the thread
+            # if the thread indicator variable is set, stop the thread
+            if self.stopped:
                 return
             # Boolean logic we don't keep setting exposure over and over to the same value
             '''
             if self.autoExpose:
+
                 self.webcam.setExposureAuto()
-                
             else:
+
                 self.webcam.setExposureManual(0)
             '''
-            (self.timestamp, self.img) = self.stream.grabFrame(self.img) # gets the image and timestamp from cameraserver
+            # gets the image and timestamp from cameraserver
+            (self.timestamp, self.img) = self.stream.grabFrame(self.img)
 
-    def read(self): # return the frame most recently read
+    def read(self):
+        # return the frame most recently read
         return self.timestamp, self.img
 
-    def stop(self): # indicate that the thread should be stopped
+    def stop(self):
+        # indicate that the thread should be stopped
         self.stopped = True
 
     def getError(self):
         return self.stream.getError()
 
-# image size ratio'ed to 16:9
-image_width = 640
-image_height = 480
+configFile = "/boot/frc.json"
 
-def readCameraConfig(config):
-    cam = cameraConfig()
+
+class CameraConfig: pass
+
+
+team = None
+server = False
+cameraConfigs = []
+
+def parseError(str):
+    print("config error in '" + configFile + "': " + str, file=sys.stderr)
+
+
+def readCameraConfig(config): 
+    cam = CameraConfig()
 
     # name
     try:
         cam.name = config["name"]
+
     except KeyError:
         parseError("could not read camera name")
         return False
@@ -131,6 +155,8 @@ def readCameraConfig(config):
 
     cameraConfigs.append(cam)
     return True
+
+
 
 def readConfig():
     global team
@@ -178,6 +204,7 @@ def readConfig():
 
     return True
 
+
 def startCamera(config):
     print("Starting camera '{}' on {}".format(config.name, config.path))
     cs = CameraServer.getInstance()
@@ -187,26 +214,30 @@ def startCamera(config):
     camera.setConfigJson(json.dumps(config.config))
 
     return cs, camera
-readCameraConfig()
-readConfig()
-startCamera()
 
-# for adding to streams and cameras list
+if len(sys.argv) >= 2:
+    configFile = sys.argv[1]
+# read configuration
+if not readConfig():
+    sys.exit(1)
+
+
+# start cameras
+cameras = []
+streams = []
 for cameraConfig in cameraConfigs:
-        print (cs,camera)
-        cs, cameraCapture = startCamera(cameraConfig)
-        streams.append(cs)
-        cameras.append(cameraCapture)
+    cs, cameraCapture = startCamera(cameraConfig)
+    streams.append(cs)
+    cameras.append(cameraCapture)
 
-# Selecting the cameras within the list
 webcam = cameras[0]
 cameraServer = streams[0]
-
 cap = WebcamVideoStream(webcam, cameraServer, image_width, image_height).start()
 
 while True:
-    fileTitle = (drTitle + "/samplePicture" + str(PictureNumber) + ".jpg") # This makes the files not override each other, by having it named.
+    fileTitle = (drTitle + "/samplePicture" + str(PictureNumber) + ".jpg") # This makes the files not override each other, by having it named with numbers increasing.
     PictureNumber += 1
     timestamp, img = cap.read()
     cv2.imwrite(fileTitle, img) #Makes the picture. Includes directory name as most unix systems will create a directory if it doesnt exist.
+    #print("THE IMAGE WAS SAVED KEK")
     time.sleep(1.5) # This can be changed
