@@ -12,7 +12,7 @@ public abstract class Segment {
   public abstract void tick();
 
   /**
-   * Tell the caller whether or not this segment has completed.
+   * Tell the caller whether or not this segment has completed. It is safe to assume this will run after every tick.
    *
    * @return whether or not the segment has completed.
    */

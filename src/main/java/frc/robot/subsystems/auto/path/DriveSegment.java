@@ -8,16 +8,11 @@ import frc.robot.util.DriveSignal;
 public class DriveSegment extends Segment {
   private double meters; // For cloning
 
-  private double ramp;
   private int targetPosition;
   private int min, max;
-  private double P, I, D;
-  private double integral = 0, previousError = 0;
-  private double previousOutput = 0;
 
   private boolean done = false;
   private Drive drive;
-  private Timer timer;
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
@@ -29,13 +24,6 @@ public class DriveSegment extends Segment {
     int acceptableError = Config.getInstance().getInt(Config.Key.AUTO__DRIVE_PID_ACCEPTABLE_ERROR);
     this.min = targetPosition - acceptableError;
     this.max = targetPosition + acceptableError;
-
-    this.P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
-    this.I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
-    this.D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
-
-    this.ramp = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_RAMP);
-    this.timer = new Timer();
   }
 
   @Override
@@ -52,7 +40,6 @@ public class DriveSegment extends Segment {
       e.printStackTrace();
     }
 
-    timer.start();
   }
 
   @SuppressWarnings("DuplicatedCode") // Marks some code as duplicate of code in TurnSegment.tick()
@@ -76,41 +63,14 @@ public class DriveSegment extends Segment {
     if (avgPos > min && avgPos < max) {
       logger.verbose(min + " < " + avgPos + " < " + max);
       done = true;
-      return;
+      drive.setOpenLoop(DriveSignal.BRAKE);
     }
-
-    /*
-    PID stuff.
-    We're doing manual PID here because the talon's integrated PID was causing problems.
-     */
-    double error = targetPosition - avgPos;
-    timer.stop();
-    this.integral += (error * timer.get());
-    double derivative = (error - previousError) / timer.get();
-    double inc = (P * error) + (I * integral) + (D * derivative);
-    this.previousError = error;
-
-    double out = previousOutput + inc;
-    if ((previousOutput + inc) > ramp) out = previousOutput + ramp;
-
-    if (out > 1) {
-      logger.warn("Output was greater than one! Limiting to one so the robot doesn't shit itself");
-      logger.warn("out: " + out);
-      out = 1;
-    }
-
-    previousOutput = out;
-
-    drive.setOpenLoop(new DriveSignal(out, out));
-    timer.reset(); // Does not stop the timer
   }
 
   @Override
   public boolean finished() {
     if (done) {
       logger.info("Drive segment finished");
-      timer.stop();
-      timer.reset();
     }
 
     return done;
