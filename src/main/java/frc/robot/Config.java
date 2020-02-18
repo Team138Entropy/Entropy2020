@@ -19,8 +19,8 @@ public class Config {
     STORAGE__TOP_ROLLER(7),
     SHOOTER__ROLLER(6),
     SHOOTER__ROLLER_SLAVE(5),
-    CLIMBER_ROLLER(11),
-    TURRET_ROLELR(9),
+    CLIMBER_MOTOR(11),
+    TURRET_ROLLER(9),
 
     // Sensors
     INTAKE__SENSOR(1),

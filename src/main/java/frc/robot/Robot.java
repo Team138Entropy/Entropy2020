@@ -570,26 +570,37 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Climbing state is idle");
         break;
       case EXTENDING:
+        //TODO: Decide if climb and retract should be the same button
+        /** Checks if the climb button has been hit again, signalling it to retract */
         if (mOperatorInterface.getClimb()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
         mClimber.extend();
+
+        /** Checks if the motor is overcurrenting, signalling it's done climbing */
         if (mClimber.checkOvercurrent()) {
           mClimbingState = ClimbingState.EXTENDING_COMPLETE;
         }
       case EXTENDING_COMPLETE:
         mClimber.stop();
+
+        /** Checks if the climb button has been hit again, signalling it to retract */
         if (mOperatorInterface.getClimb()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
       case RETRACTING:
         mClimber.retract();
+
+        /** Checks if the motor is overcurrenting, signalling it's done retracting */
         if (mClimber.checkOvercurrent()) {
           mClimbingState = ClimbingState.RETRACTING_COMPLETE;
         }
       case RETRACTING_COMPLETE:
         mClimber.stop();
         mClimbingState = ClimbingState.IDLE;
+
+        //TODO: Decide whether the robot go idle after it's done climbing
+        /** Changes the robot state to idle */
         mState = State.IDLE;
       default:
         mRobotLogger.error("Invalid Climbing State");

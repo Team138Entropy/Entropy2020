@@ -9,17 +9,17 @@ import frc.robot.Logger;
 
 public class Climber extends Subsystem {
 
-  //TODO: Tune climber config values
+  //TODO: Tune ALL of these values
   /** Speed of motor in % of maximum output*/
   private final double EXTEND_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER_EXTEND_SPEED);
   private final double RETRACT_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER_RETRACT_SPEED);
 
+  /** Overcurrent constants */
   private final double OVERCURRENT_THRESHOLD = Config.getInstance().getDouble(Config.Key.CLIMBER_OVERCURRENT_THRESHOLD);
   private final double OVERCURRENT_MIN_OCCURENCES = Config.getInstance().getDouble(Config.Key.CLIMBER_OVERCURRENT_MIN_OCCURENCES);
   private final double OVERCURRENT_COUNTDOWN_LENGTH = Config.getInstance().getDouble(Config.Key.CLIMBER_OVERCURRENT_COUNTDOWN_LENGTH);
 
-  //TODO: Check if this is the right roller port
-  private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER_ROLLER);
+  private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER_MOTOR);
 
   /** Aggregation */
   private static Climber sInstance;
@@ -59,19 +59,28 @@ public class Climber extends Subsystem {
     mMotor.stopMotor();
   }
 
+  /** Checks whether the motor is overcurrenting, signalling that it's done climbing*/
   public boolean checkOvercurrent() {
     mLogger.verbose("Input current: " + mMotor.getSupplyCurrent() + ", Output current: " + mMotor.getStatorCurrent());
+
+    /** A countdown since the motor overcurrents while spinning up */
     if (mOverCurrentCountdown > 0){
       mOverCurrentCountdown --;
       return false;
     }
+
+    /** The motor's current */
     double current = mMotor.getSupplyCurrent();
+
+    /** If the motor is at threshold, increment a counter, otherwise, reset it. */
     if (current > OVERCURRENT_THRESHOLD) {
       mOverCurrentCount++;
       mLogger.log("Debounce overcurrent " + mOverCurrentCount);
     } else {
       resetOvercurrentCount();
     }
+
+    /** If the motor has been at threshold long enough, return true */
     if (mOverCurrentCount > OVERCURRENT_MIN_OCCURENCES) {
       mLogger.log("Overcurrent!");
       resetOvercurrentCount();
