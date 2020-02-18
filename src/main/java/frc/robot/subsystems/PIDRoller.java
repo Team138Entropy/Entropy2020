@@ -26,7 +26,7 @@ class PIDRoller {
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
     // mTalon.configFactoryDefault();
 
-    // mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, 5);
+    mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, 5);
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
     mTalon.setSensorPhase(false);
 
