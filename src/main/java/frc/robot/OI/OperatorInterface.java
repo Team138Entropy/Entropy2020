@@ -199,4 +199,23 @@ public class OperatorInterface {
     //return OperatorController.getButton(NykoController.Button.MIDDLE_11);
     return false;
   }
+
+
+  public boolean testA(){
+    return DriverController.getButton(XboxController.Button.A);
+  }
+
+  public boolean testB(){
+    return DriverController.getButton(XboxController.Button.B);
+  }
+
+  public boolean testY(){
+    return DriverController.getButton(XboxController.Button.Y);
+  }
+
+
+  public boolean testX(){
+    return DriverController.getButton(XboxController.Button.X);
+  }
+
 }

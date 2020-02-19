@@ -396,6 +396,9 @@ public class RobotTracker{
             report.field_to_target,
             report.field_to_target.getRotation()
         );
+
+
+
         return Optional.of(params);
     }
 
@@ -432,6 +435,9 @@ public class RobotTracker{
             Twist2d velocity = getMeasuredVelocity();
             rtr.tangental_component = mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange();
             double angular_component = Units.radians_to_degrees(velocity.dtheta);
+
+
+            //System.out.println("REQ DEG: " + rtr.turret_error.getDegrees());
 
             return rtr;
 

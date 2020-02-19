@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private final Drive mDrive = Drive.getInstance();
+  private final Turret mTurret = Turret.getInstance();
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -126,13 +127,11 @@ public class Robot extends TimedRobot {
     //Enabled Vision Light
     visionLight.set(Relay.Value.kForward);
 
-    EventWatcherThread.getInstance().start();
 
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
-    mCameraManager = CameraManager.getInstance();
-    mCameraManager.init();
+
     
     // Reset Robot State
     // Wherever the Robot is now is the starting position
@@ -237,7 +236,60 @@ public class Robot extends TimedRobot {
       disables rotation on the turret, turns off intake rollers
 
   */
+  int mInt = 0;
   public void RobotLoop(){
+    boolean WantsSharpshooter = mRobotModeSharpshooterPressed.update(mOperatorInterface.testA());
+
+    if(Math.abs(mTurret.getVelocity()) < 4){
+      RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+      if(result.HasResult){
+        //We have Target Information
+        double angle = result.turret_error.getDegrees();
+        angle = -1 * angle;
+        System.out.println("Rotate By: " + angle);
+        mTurret.RotateByDegrees(angle);
+      }
+    }
+
+    /*
+    if(WantsSharpshooter){
+          RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+        if(result.HasResult){
+          //We have Target Information
+          double angle = result.turret_error.getDegrees();
+          angle = -1 * angle;
+          System.out.println("Rotate By: " + angle);
+          mTurret.RotateByDegrees(angle);
+
+          /*
+          if(mInt == 0){
+              int s1 = 0;
+              double angle = result.turret_error.getDegrees();
+              angle = -1 * angle;
+              System.out.println("\nCamera Angle: " + angle);
+              mTurret.RotateByDegrees(angle);
+              int i = 0;
+            
+            mInt++;
+          }else if(mInt >= 50){
+            mInt = 0;
+          }else{
+            mInt++;
+          }
+          */
+      
+
+ 
+    if(mOperatorInterface.testA()){
+     // mTurret.SetOutput(1.0);
+    }else if(mOperatorInterface.testB()){
+     // mTurret.SetOutput(-1.0);
+    }else{
+     // mTurret.SetOutput(0);
+    }
+
+
+    /*
     //Checks if the overall Robot State Mode wants to change
     //if we change it we perform a bunch of other logic 
     CheckRobotMode(); 
@@ -265,6 +317,7 @@ public class Robot extends TimedRobot {
     //Turret and Drive are indepdent of intake and shoot
     turretLoop();
     driveLoop();
+    */
   }
 
   //Check for a change in Robot State

@@ -20,14 +20,13 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT =
-      Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private static final int ROLLER_PORT = 19;
+  private static final int ROLLER_SLAVE_PORT = 18;
 
   // TODO: Tune these values
   private static final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
-  private static final int VELOCITY_ADJUSTMENT_BUMP = Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
+  private static final int VELOCITY_ADJUSTMENT_BUMP = 0;
 
   private boolean mHasHadCurrentDrop = false;
 
@@ -175,4 +174,7 @@ public class Shooter extends Subsystem {
 
   @Override
   public void checkSubsystem() {}
+
+  @Override
+  public void stopSubsytem(){}
 }
