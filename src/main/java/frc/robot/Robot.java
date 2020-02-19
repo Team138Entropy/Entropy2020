@@ -163,7 +163,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("ClimbingState", mClimingState.name());
     
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
-
+    System.out.println(mShooter.getSpeed());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
   }
 
@@ -481,11 +481,16 @@ public class Robot extends TimedRobot {
       case INTAKE:
         // Check transition to shooting before we start intake of a new ball
         if (!checkTransitionToShooting()) {
+
           mIntake.start();
 
           // If a ball is detected, store it
           if (mStorage.isBallDetected()) {
             mIntakeState = IntakeState.STORE_BALL;
+          }
+
+          if(mOperatorInterface.startIntake()){
+            mIntakeState = IntakeState.IDLE;
           }
         }
         break;
@@ -531,7 +536,7 @@ public class Robot extends TimedRobot {
   private boolean checkTransitionToShooting() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) /*&& result.HasResult*/) {
+    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) /* && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
