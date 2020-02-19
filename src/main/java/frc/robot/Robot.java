@@ -11,7 +11,6 @@ import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
-import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import java.util.Optional;
 
