@@ -399,10 +399,10 @@ public class Robot extends TimedRobot {
       mBarfTimer.start();
     }
 
+    // TODO: REMOVE THIS IT SHOULDNT BE HERE
     // check if we are shooting
     // TODO: remove this and only allow shooting if you have at least 1 ball
     checkTransitionToShooting();
-    checkTransitionToClimbing();
 
     turretLoop();
 
@@ -461,6 +461,7 @@ public class Robot extends TimedRobot {
 
   private void executeIntakeStateMachine() {
     switch (mIntakeState) {
+      // TODO: Make this not a transitionary state
       case IDLE:
         mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
@@ -468,8 +469,11 @@ public class Robot extends TimedRobot {
         mStorage.init();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
+        checkTransitionToClimbing();
         break;
       case READY_TO_INTAKE:
+        checkTransitionToClimbing();
+
         // If the operator issues the intake command, start intake
         if (mOperatorInterface.startIntake()) {
           mIntake.resetOvercurrentCooldown();
@@ -484,8 +488,8 @@ public class Robot extends TimedRobot {
         }
         break;
       case INTAKE:
-        // Check transition to shooting and climbing before we start intake of a new ball
-        if (!checkTransitionToShooting() && !checkTransitionToClimbing()) {
+        // Check transition to shooting before we start intake of a new ball
+        if (!checkTransitionToShooting()) {
           mIntake.start();
 
           // If a ball is detected, store it
@@ -519,7 +523,6 @@ public class Robot extends TimedRobot {
 
         // Check transition to shooting after storage of ball
         checkTransitionToShooting();
-        checkTransitionToClimbing();
 
         mIntake.resetOvercurrentCooldown();
         break;
@@ -598,6 +601,7 @@ public class Robot extends TimedRobot {
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
+        checkTransitionToClimbing();
         mRobotLogger.warn("Shooting state is idle");
         mShooter.stop();
         break;

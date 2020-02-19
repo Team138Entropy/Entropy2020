@@ -3,6 +3,7 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -15,8 +16,8 @@ public class OperatorInterface {
   private final XboxController DriverController;
   private final NykoController OperatorController;
 
-  private boolean mIntakeWasPressedWhenWeLastChecked = false;
-  private boolean mClimbWasPressedWhenWeLastChecked = false;
+  private LatchedBoolean mIntakeWasPressed;
+  private LatchedBoolean mClimbWasPressed;
 
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
@@ -29,6 +30,8 @@ public class OperatorInterface {
     mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new NykoController(Constants.OperatorControllerPort);
+    mIntakeWasPressed = new LatchedBoolean();
+    mClimbWasPressed = new LatchedBoolean();
   }
 
   // Driver
@@ -43,14 +46,8 @@ public class OperatorInterface {
 
   public boolean startClimb() {
     boolean buttonValue = DriverController.getButton(XboxController.Button.Y);
-    if(mClimbWasPressedWhenWeLastChecked && !buttonValue){
-      mClimbWasPressedWhenWeLastChecked = false;
-      return true;
-    }else{
-      mClimbWasPressedWhenWeLastChecked = buttonValue;
-      return false;
+    return mClimbWasPressed.update(buttonValue);
     }
-  }
 
   public boolean getQuickturn() {
     return DriverController.getButton(XboxController.Button.RB);
@@ -123,13 +120,7 @@ public class OperatorInterface {
 
   public boolean startIntake() {
     boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
-    if(mIntakeWasPressedWhenWeLastChecked && !buttonValue){
-      mIntakeWasPressedWhenWeLastChecked = false;
-      return true;
-    }else{
-      mIntakeWasPressedWhenWeLastChecked = buttonValue;
-      return false;
-    }
+    return mIntakeWasPressed.update(buttonValue);
   }
 
   public void setDriverRumble(boolean toggle) {
