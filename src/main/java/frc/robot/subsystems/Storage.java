@@ -16,7 +16,7 @@ public class Storage extends Subsystem {
   private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
-  private static final int STORAGE_CAPICTY = 4;
+  private static final int STORAGE_CAPICTY = 5;
 
   private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
   private static final double BOTTOM_SPEED_FACTOR = Config.getInstance()
@@ -43,6 +43,10 @@ public class Storage extends Subsystem {
       sInstance = new Storage();
     }
     return sInstance;
+  }
+
+  public int getCapacity(){
+    return STORAGE_CAPICTY;
   }
 
   private Storage() {

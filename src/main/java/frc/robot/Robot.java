@@ -486,6 +486,9 @@ public class Robot extends TimedRobot {
 
           // If a ball is detected, store it
           if (mStorage.isBallDetected()) {
+            if(mStorage.getBallCount() == mStorage.getCapacity() + 1){
+              mIntakeState = IntakeState.STORAGE_COMPLETE;
+            }
             mIntakeState = IntakeState.STORE_BALL;
           }
 
