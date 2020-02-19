@@ -570,7 +570,7 @@ public class Robot extends TimedRobot {
 
   private boolean checkTransitionToClimbing() {
     //TODO: Remove the check that climber is enabled
-    if (mOperatorInterface.getClimb() && Config.getInstance().getBoolean(Key.CLIMBER__ENABLED)) {
+    if (mOperatorInterface.startClimb() && Config.getInstance().getBoolean(Key.CLIMBER__ENABLED)) {
       mRobotLogger.log("Changing to climbing");
 
       /** Disables intake if transitioning from intake */
@@ -660,7 +660,7 @@ public class Robot extends TimedRobot {
       case EXTENDING:
         //TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
-        if (mOperatorInterface.getClimb()) {
+        if (mOperatorInterface.startClimb()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
         mClimber.extend();
@@ -673,7 +673,7 @@ public class Robot extends TimedRobot {
         mClimber.stop();
 
         /** Checks if the climb button has been hit again, signalling it to retract */
-        if (mOperatorInterface.getClimb()) {
+        if (mOperatorInterface.startClimb()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
       case RETRACTING:

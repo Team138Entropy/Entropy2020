@@ -16,6 +16,7 @@ public class OperatorInterface {
   private final NykoController OperatorController;
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
+  private boolean mClimbWasPressedWhenWeLastChecked = false;
 
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
@@ -40,8 +41,15 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
-  public boolean getClimb() {
-    return DriverController.getButton(XboxController.Button.Y);
+  public boolean startClimb() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.Y);
+    if(mClimbWasPressedWhenWeLastChecked && !buttonValue){
+      mClimbWasPressedWhenWeLastChecked = false;
+      return true;
+    }else{
+      mClimbWasPressedWhenWeLastChecked = buttonValue;
+      return false;
+    }
   }
 
   public boolean getQuickturn() {
