@@ -488,7 +488,7 @@ public class Robot extends TimedRobot {
             mIntakeState = IntakeState.STORE_BALL;
           }
 
-          if(mOperatorInterface.startIntake()){
+          if (mOperatorInterface.startIntake()) {
             mIntakeState = IntakeState.IDLE;
           }
         }
