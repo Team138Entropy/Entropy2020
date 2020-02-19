@@ -50,6 +50,10 @@ class PIDRoller {
     return -mTalon.getSelectedSensorVelocity();
   }
 
+  void setPercentOutput(double output){
+    mTalon.set(ControlMode.PercentOutput, output);
+  }
+
   void setSpeed(int posPer100Ms) {
     if (posPer100Ms == 0) {
       mTalon.set(ControlMode.PercentOutput, 0);
