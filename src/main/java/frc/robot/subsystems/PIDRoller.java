@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 class PIDRoller {
@@ -25,6 +26,7 @@ class PIDRoller {
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
     // mTalon.configFactoryDefault();
 
+    mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, 5);
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
     mTalon.setSensorPhase(false);
 
