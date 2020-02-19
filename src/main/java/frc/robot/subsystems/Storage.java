@@ -2,9 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
@@ -13,18 +11,22 @@ import frc.robot.Config.Key;
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
+  private static final int ROLLER_BOTTOM_PORT =
+      Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
   private static final int STORAGE_CAPICTY = 4;
 
-  private static final double STORE_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
-  private static final double BOTTOM_SPEED_FACTOR = Config.getInstance()
-      .getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double TEST_SPEED_FACTOR = Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED = Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
-  private static final double BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance()
-      .getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
+  private static final double STORE_SPEED =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
+  private static final double BOTTOM_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
+  private static final double TEST_SPEED_FACTOR =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
+  private static final double EJECT_SPEED =
+      Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
+  private static final double BALL_DISTANCE_IN_ENCODER_TICKS =
+      Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
   private static final int INTAKE_SENSOR_PORT = 0;
 
@@ -55,7 +57,7 @@ public class Storage extends Subsystem {
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
   }
 
-  private int getEncoder(){
+  private int getEncoder() {
     // return the negative position that the talon gets us because it's hooked up backwards
     // this will return positive values
     return -mBottomRoller.getSelectedSensorPosition();
@@ -65,31 +67,30 @@ public class Storage extends Subsystem {
     mStartingEncoderPosition = getEncoder();
   }
 
-  public boolean getIntakeSensor(){
+  public boolean getIntakeSensor() {
     return mIntakeSensor.get();
   }
 
-  public boolean isBallDetected(){
+  public boolean isBallDetected() {
     return getIntakeSensor();
   }
 
   public boolean isBallStored() {
     System.out.println(getEncoder());
     // this allows us to fit a 5th ball
-    if(sInstance.getBallCount() == 4){
+    if (sInstance.getBallCount() == 4) {
       return true;
     }
 
     int encoderDistance = mStartingEncoderPosition - getEncoder();
-    // System.out.println("Got sensor position: " + encoderDistance + " > " + BALL_DISTANCE_IN_ENCODER_TICKS);
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
-    
+
     // if we've hit our encoder distance target
-    if(encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS){
+    if (encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS) {
       // reset the encoder position
       mStartingEncoderPosition = getEncoder();
       return true;
-    }else{
+    } else {
       return false;
     }
   }
@@ -128,7 +129,7 @@ public class Storage extends Subsystem {
     mTopRoller.set(ControlMode.PercentOutput, STORE_SPEED);
   }
 
-  public void emptyBalls(){
+  public void emptyBalls() {
     mBallCount = 0;
   }
 

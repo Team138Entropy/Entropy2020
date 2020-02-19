@@ -161,7 +161,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("IntakeState", mIntakeState.name());
     SmartDashboard.putString("ShootingState", mShootingState.name());
     SmartDashboard.putString("ClimbingState", mClimingState.name());
-    
+
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
     System.out.println(mShooter.getSpeed());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
@@ -203,7 +203,7 @@ public class Robot extends TimedRobot {
 
     mStorage.init();
     mDrive.init();
-    
+
     // updated in Intake.java
     SmartDashboard.putBoolean("Intake Spinning Up", false);
     SmartDashboard.putBoolean("Intake Overcurrent", false);
@@ -376,16 +376,15 @@ public class Robot extends TimedRobot {
       mRobotLogger.log("Changed state to " + mShootingState);
     }
 
-    
-    if(mOperatorInterface.getStateReset()){
+    if (mOperatorInterface.getStateReset()) {
       mState = State.INTAKE;
       mIntakeState = IntakeState.IDLE;
       mClimingState = ClimingState.IDLE;
       mShootingState = ShootingState.IDLE;
-      if(mState == State.SHOOTING){
+      if (mState == State.SHOOTING) {
         mShootingState = ShootingState.SHOOTING_COMPLETE;
       }
-      if(mState == State.INTAKE){
+      if (mState == State.INTAKE) {
         mIntakeState = IntakeState.IDLE;
       }
     }
@@ -471,7 +470,7 @@ public class Robot extends TimedRobot {
           mIntakeState = IntakeState.INTAKE;
         }
         break;
-      // we wait until the garage door sensor is clear before moving to real intake
+        // we wait until the garage door sensor is clear before moving to real intake
       case INTAKE_WAITING:
         mIntake.start();
         if (!mStorage.isBallDetected()) {
@@ -489,7 +488,7 @@ public class Robot extends TimedRobot {
             mIntakeState = IntakeState.STORE_BALL;
           }
 
-          if(mOperatorInterface.startIntake()){
+          if (mOperatorInterface.startIntake()) {
             mIntakeState = IntakeState.IDLE;
           }
         }
@@ -566,7 +565,6 @@ public class Robot extends TimedRobot {
         mShooter.stop();
         break;
       case PREPARE_TO_SHOOT:
-
 
         /* Starts roller */
         mShooter.start();
