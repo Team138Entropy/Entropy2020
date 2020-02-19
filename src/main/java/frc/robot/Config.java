@@ -32,6 +32,7 @@ public class Config {
     CLIMBER__RETRACT_SPEED(-1d),
 
     OI__VISION__ENABLED(false),
+    CLIMBER__ENABLED(false),
 
     OI__VISION__POT__MIN(0),
     OI__VISION__POT__MAX(100d),
