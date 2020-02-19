@@ -13,8 +13,8 @@ import frc.robot.Config.Key;
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
-  private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
+  private static final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
+  private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   private static final int STORAGE_CAPICTY = 5;
 
