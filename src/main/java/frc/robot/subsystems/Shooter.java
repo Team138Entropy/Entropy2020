@@ -21,8 +21,7 @@ public class Shooter extends Subsystem {
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
   private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT =
-      Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private static final int ROLLER_SLAVE_PORT = 5;
 
   // TODO: Tune these values
   private static final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
@@ -74,7 +73,7 @@ public class Shooter extends Subsystem {
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
   private void x(){}
   private Shooter() {
-    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
+    mRoller = new PIDRoller(ROLLER_PORT, 5, P, I, D, FEEDFORWARD);
     mTestRoller = new TalonSRX(ROLLER_PORT);
 
     // TODO: Replace these with real subsystems
