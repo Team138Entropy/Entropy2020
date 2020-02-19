@@ -31,7 +31,7 @@ public class Drive extends Subsystem {
 
   private DriveControlState mDriveControlState;
 
-  private PeriodicIO mPeriodicIO;
+  private PeriodicIO mPeriodicIO = new PeriodicIO();
   private Logger mDriveLogger;
 
   public static class PeriodicIO {
@@ -83,12 +83,12 @@ public class Drive extends Subsystem {
   }
 
   public void init() {
+    mLeftMaster.configFactoryDefault();
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
     mLeftMaster.configPeakOutputForward(1, 0);
     mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
+    mLeftMaster.configOpenloopRamp(0);
 
     mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     mLeftMaster.setSensorPhase(true);
@@ -98,6 +98,22 @@ public class Drive extends Subsystem {
     mLeftMaster.configPeakOutputReverse(-1, 0);
     mLeftMaster.setNeutralMode(NeutralMode.Brake);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
+
+    mRightMaster.configFactoryDefault();
+    mRightMaster.configNominalOutputForward(0., 0);
+    mRightMaster.configNominalOutputReverse(0., 0);
+    mRightMaster.configPeakOutputForward(1, 0);
+    mRightMaster.configPeakOutputReverse(-1, 0);
+    mRightMaster.configOpenloopRamp(0);
+
+    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    mRightMaster.setSensorPhase(true);
+    mRightMaster.configNominalOutputForward(0., 0);
+    mRightMaster.configNominalOutputReverse(-0., 0);
+    mRightMaster.configPeakOutputForward(1, 0);
+    mRightMaster.configPeakOutputReverse(-1, 0);
+    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    mRightSlave.setNeutralMode(NeutralMode.Brake);
 
     // Configure Talon gains
     /*
@@ -115,6 +131,7 @@ public class Drive extends Subsystem {
     mLeftSlave.follow(mLeftMaster);
     mRightSlave.follow(mRightMaster);
 
+    // TODO: figure out what this does and make it work
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
@@ -131,21 +148,28 @@ public class Drive extends Subsystem {
     signal.PrintLog();
 
     // If our acceleration is positive (going away from where we were last time)
-    // Remember that right has to be flipped so the bracket is the other way 'round
+    // Remember that right has to be flipped down below so the bracket is the other way 'round
+    mDriveLogger.log(signal.getLeft() + " + " + mPeriodicIO.left_old);
     if (Math.abs(signal.getLeft()) > mPeriodicIO.left_old && Math.abs(signal.getRight()) < mPeriodicIO.right_old) {
+      mDriveLogger.log("setting ramp to number not zero");
       // Tell the talons to be significantly less epic
       mLeftMaster.configOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_SPEED));
       mRightMaster.configOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_SPEED));
-    } else {
-      // don't
+    }
+    // If the opposite is true, e.g. our velocity is decreasing, let us stop as fast as we want. Note that this
+    // "inverse case" is here because, if it wasn't, acceleration would only be capped while jerk is positive.
+    else if (Math.abs(signal.getLeft()) < mPeriodicIO.left_old && Math.abs(signal.getRight()) > mPeriodicIO.right_old) {
+      mDriveLogger.log("setting ramp to zero");
       mLeftMaster.configOpenloopRamp(0);
       mRightMaster.configOpenloopRamp(0);
     }
+    // In the case that our joystick value is somehow the same as it was last time, nothing happens to our ramp
 
     // Olds are cached as absolute to be useful above
     mPeriodicIO.left_old = Math.abs(signal.getLeft());
     mPeriodicIO.right_accel = Math.abs(signal.getRight());
 
+    // then we set our master talons, remembering that right is backwards
     mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
     mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
   }
