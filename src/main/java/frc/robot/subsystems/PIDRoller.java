@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 class PIDRoller {
@@ -25,11 +26,11 @@ class PIDRoller {
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
     // mTalon.configFactoryDefault();
 
+    mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, 5);
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
     mTalon.setSensorPhase(false);
 
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 0, TIMEOUT_MS);
-
 
     mTalon.config_kP(PID_LOOP_INDEX, p);
     mTalon.config_kI(PID_LOOP_INDEX, i);
@@ -40,20 +41,18 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-
     mTalonSlave = new WPI_TalonSRX(talon2Port);
     mTalonSlave.follow(mTalon);
   }
 
-  int getVelocity(){
+  int getVelocity() {
     return -mTalon.getSelectedSensorVelocity();
   }
 
   void setSpeed(int posPer100Ms) {
-    if(posPer100Ms == 0){
-      System.out.println("PID roller");
+    if (posPer100Ms == 0) {
       mTalon.set(ControlMode.PercentOutput, 0);
-    }else{
+    } else {
       mTalon.set(ControlMode.Velocity, -posPer100Ms);
     }
   }

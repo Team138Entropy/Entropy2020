@@ -1,5 +1,9 @@
 package frc.robot;
 
+import frc.robot.util.geometry.Pose2d;
+import frc.robot.util.geometry.Rotation2d;
+import frc.robot.util.geometry.Translation2d;
+
 // Any Sort of Constant or 'Magic Number' should be defined here
 @Deprecated
 public class Constants {
@@ -14,8 +18,11 @@ public class Constants {
   public static final int kCameraRingId = 0;
 
   // Drive Constants
-  public static final double kJoystickThreshold = 0.2;
-  public static final double kDriveWheelTrackWidthInches = 22.75;
+  public static final double kJoystickThreshold = 0.15;
+
+  // 22 is too low, 100 is too high
+  public static final double kDriveWheelTrackWidthInches = 75;
+
   public static final double kDriveWheelDiameterInches = 3.938;
   public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
   public static final double kDriveWheelTrackRadiusWidthMeters =
@@ -42,4 +49,32 @@ public class Constants {
 
   // Field Related Constants
   public static final double kHighGoalHeight = 96.25; // Center Goal Height
+
+  // Camera Specific Information
+  public static final double kCameraDiagonalView = Math.toRadians(75);
+  public static final double kCameraHorizontalAspect = 4;
+  public static final double kCameraVerticalAspect = 3;
+  public static final double kDiagonalAspect =
+      Math.hypot(kCameraHorizontalAspect, kCameraVerticalAspect);
+  public static final double kCameraHorizontalView =
+      Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView))
+          * 2;
+  public static final double kCameraVerticalView =
+      Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView))
+          * 2;
+  public static final Rotation2d kShooterCameraHorizontalPlaneToLens =
+      Rotation2d.fromDegrees(0); // Shooter should sit pretty flat
+  public static final Rotation2d kBallCameraHorizontalPlaneToLens =
+      Rotation2d.fromDegrees(-5); // camera is angled downards
+  public static final double kShooterCameraHeight = 40; // shooter camera height on robot (inches)
+  public static final double kBallCameraHeight = 12; // ball camera height
+
+  // Offsets from our center point
+  public static final Pose2d kTurrentToLens =
+      new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0));
+  public static final Pose2d kWheelsToLens =
+      new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0));
+
+  // Field Related Constants
+  public static final double kBallHeight = 5; // ball height (inches)
 }
