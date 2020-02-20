@@ -94,6 +94,10 @@ public class Climber extends Subsystem {
     mMotor.stopMotor();
   }
 
+  public boolean readyForNextState() {
+    return true;
+  }
+
   public void jog(int direction, double speed) {
     mMotor.set(ControlMode.PercentOutput, speed * direction);
   }

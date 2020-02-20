@@ -670,7 +670,7 @@ public class Robot extends TimedRobot {
         mClimber.extend();
 
         /** Checks if the motor is overcurrenting, signalling it's done climbing */
-        if (mClimber.checkOvercurrent()) {
+        if (mClimber.readyForNextState()) {
           mClimbingState = ClimbingState.EXTENDING_COMPLETE;
         }
       case EXTENDING_COMPLETE:
@@ -684,7 +684,7 @@ public class Robot extends TimedRobot {
         mClimber.retract();
 
         /** Checks if the motor is overcurrenting, signalling it's done retracting */
-        if (mClimber.checkOvercurrent()) {
+        if (mClimber.readyForNextState()) {
           mClimbingState = ClimbingState.RETRACTING_COMPLETE;
         }
       case RETRACTING_COMPLETE:
