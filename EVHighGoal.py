@@ -50,9 +50,9 @@ Ball_HSV_Upper = np.array([62, 255, 255])
 rat_low = 1.5
 rat_high = 5
 
-hsv_threshold_hue = [70, 121]
-hsv_threshold_saturation = [37, 255]
-hsv_threshold_value = [204, 255]
+hsv_threshold_hue = [68, 106]
+hsv_threshold_saturation = [117, 255]
+hsv_threshold_value = [179, 255]
 
 solidity_threshold = [0, 65]
 
@@ -413,10 +413,11 @@ def findTape(contours, image, centerX, centerY):
     screenHeight, screenWidth, channels = image.shape;
     # Seen vision targets (correct angle, adjacent to each other)
     targets = []
+    biggestCnts = []
     if len(contours) >= 2:
         # Sort contours by area size (biggest to smallest)
         cntsSorted = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
-        biggestCnts = []
+        
         for cnt in cntsSorted:
             # Get moments of contour; mainly for centroid
             M = cv2.moments(cnt)
@@ -436,7 +437,7 @@ def findTape(contours, image, centerX, centerY):
             ratio = float(w) / h
             #cv2.imwrite("1beforeif.jpg", image)
             # Filters contours based off of size
-            if (mySolidity > .1) and (mySolidity < .7) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if  (w >= 20) and (h >= 19) and (mySolidity > .1) and (mySolidity < .6) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 #contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 #cv2.imwrite("1drawncontours.jpg", contimage)
@@ -484,19 +485,27 @@ def findTape(contours, image, centerX, centerY):
                     sendValues[3] = myDistFeet
                     rotation = getEllipseRotation(image, cnt)
                     biggestCnts.append([cx, cy, rotation])
+                    
                 else:
                     cx, cy = 0, 0
+        
+        
 
 
         # Sorts array based on coordinates (leftmost to rightmost) to make sure contours are adjacent
         biggestCnts = sorted(biggestCnts, key=lambda x: x[0])
         # Target Checking
         #print("before rotation checking")
+        #print("Biggest contours len:" , len(biggestCnts))
+        
         for i in range(len(biggestCnts) - 1):
-            print("in rotation check")
+            print("in for loop")
             # Rotation of two adjacent contours
             tilt1 = biggestCnts[i][2]
             tilt2 = biggestCnts[i + 1][2]
+            
+            print('tilt1: ' , tilt1)
+            print('tilt2: ', tilt2)
 
             # x coords of contours
             cx1 = biggestCnts[i][0]
@@ -505,6 +514,9 @@ def findTape(contours, image, centerX, centerY):
             cy1 = biggestCnts[i][1]
             cy2 = biggestCnts[i + 1][1]
             # If contour angles are opposite
+            if (np.sign(tilt1) == np.sign(tilt2)):
+                print("angles equal")
+            
             if (np.sign(tilt1) != np.sign(tilt2)):
                 print("In opposite contour angles check")
                 centerOfTarget = math.floor((cx1 + cx2) / 2)
@@ -532,10 +544,13 @@ def findTape(contours, image, centerX, centerY):
                     targets.append([centerOfTarget, yawToTarget])
                 elif [centerOfTarget, yawToTarget] not in targets:
                     targets.append([centerOfTarget, yawToTarget])
+        
+        
                     
         #print("after rotation check")
     # Check if there are targets seen
     if len(targets) > 0:
+        print('in len targets > 0')
         # Sorts targets based on x coords to break any angle tie
         targets.sort(key=lambda x: math.fabs(x[0]))
         finalTarget = min(targets, key=lambda x: math.fabs(x[1]))
@@ -544,8 +559,10 @@ def findTape(contours, image, centerX, centerY):
         # Draws yaw of target + line where center of target is
         cv2.putText(image, "Yaw: " + str(finalTarget[1]), (40, 40), cv2.FONT_HERSHEY_COMPLEX, .6,
                     (255, 255, 255))
+        
 
         currentAngleError = finalTarget[1]
+        
 
     # print("TapeYaw: " + str(currentAngleError))
 
@@ -558,7 +575,7 @@ def findTape(contours, image, centerX, centerY):
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
 def checkContours(cntSize, hullSize, aspRatio, contour):
-    return cntSize > (image_width / 6) and (len(contour) > 20) and not (aspRatio < rat_low or aspRatio > rat_high)
+    return cntSize > (image_width / 6) and (len(contour) > 25) and not (aspRatio < rat_low or aspRatio > rat_high) and (hullSize > 10)
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
 def checkBall(cntSize, cntAspectRatio):
@@ -717,9 +734,7 @@ def ProcessFrame(frame, tape):
     if (tape == True):
         threshold = threshold_video(lower_green, upper_green, frame)
         processedValues = findTargets(frame, threshold, vals_to_send, centerX, centerY)
-        if processedValues[3] != None:
-            print(processedValues[3])
-
+        
 
         highGoal = {}
         highGoal['y'] = processedValues[0]
