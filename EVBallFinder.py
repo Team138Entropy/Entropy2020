@@ -39,11 +39,11 @@ if isFile is False: # This will never be true as the PI cannot restart in <1 sec
     os.mkdir(drTitle)
 
 # Image Camera Size (Pixels)
-Camera_Image_Width = 640
-Camera_Image_Height = 480
+Camera_Image_Width = 320
+Camera_Image_Height = 240
 
-image_width = 640
-image_height = 480
+image_width = 320
+image_height = 240
 
 # Aspect Ratio
 HorizontalAspect = 4
@@ -234,7 +234,7 @@ cameraServer = streams[0]
 cap = WebcamVideoStream(webcam, cameraServer, image_width, image_height).start()
 
 while True:
-    fileTitle = (drTitle + "/highSamplePicture" + str(PictureNumber) + ".jpg") # This makes the files not override each other, by having it named with numbers increasing.
+    fileTitle = (drTitle + "/samplePicture" + str(PictureNumber) + ".jpg") # This makes the files not override each other, by having it named with numbers increasing.
     PictureNumber += 1
     timestamp, img = cap.read()
     cv2.imwrite(fileTitle, img) #Makes the picture. Includes directory name as most unix systems will create a directory if it doesnt exist.
