@@ -1,40 +1,46 @@
 package frc.robot.subsystems;
 
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import javax.naming.ldap.Control;
+
 import frc.robot.Config;
 import frc.robot.Logger;
 
 
 public class Climber extends Subsystem {
-
-  //TODO: Tune ALL of these values
-  /** Speed of motor in % of maximum output*/
-  private final double EXTEND_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER__EXTEND_SPEED);
-  private final double RETRACT_SPEED = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACT_SPEED);
-
-  /** Overcurrent constants */
-  private final double OVERCURRENT_THRESHOLD = Config.getInstance().getDouble(Config.Key.CLIMBER__OVERCURRENT_THRESHOLD);
-  private final double OVERCURRENT_MIN_OCCURENCES = Config.getInstance().getDouble(Config.Key.CLIMBER__OVERCURRENT_MIN_OCCURENCES);
-  private final double OVERCURRENT_COUNTDOWN_LENGTH = Config.getInstance().getDouble(Config.Key.CLIMBER__OVERCURRENT_COUNTDOWN_LENGTH);
-
   private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER__MOTOR);
+
+  //TODO: Tune these values
+  private final double HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
+  private final double RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
+  private final double HOMING_SPEED_PERCENT = -.2d;
+
+  // Talon SRX/ Victor SPX will support multiple (cascaded) PID loops
+  // For now we just want the primary one.
+  public static final int kClimberPIDLoopIndex = 0;
+
+  // climber motion command timeout
+  public static final int kClimberTimeoutMs = 10;
+
+  // Servo Loop Gains
+  double mClimberKf = 0.2;
+  double mClimberKp = 5;
+  double mClimberKi = 0.01;
+  double mClimberKd = 10;
 
   /** Aggregation */
   private static Climber sInstance;
   private WPI_TalonSRX mMotor;
   private Logger mLogger;
 
-  /** For checking overcurrent */
-  private double mOverCurrentCountdown;
-  private int mOverCurrentCount;
-
   private Climber() {
     mMotor = new WPI_TalonSRX(PORT_NUMBER);
-    mOverCurrentCountdown = OVERCURRENT_COUNTDOWN_LENGTH;
-    mOverCurrentCount = 0;
-    mLogger = new Logger("climber");
+    mLogger = new Logger("m");
   }
 
   public static Climber getInstance() {
@@ -44,14 +50,43 @@ public class Climber extends Subsystem {
     return sInstance;
   }
 
+  public void init() {
+
+    /* set the peak and nominal outputs, 12V means full */
+    mMotor.configNominalOutputForward(0, kClimberTimeoutMs);
+    mMotor.configNominalOutputReverse(0, kClimberTimeoutMs);
+    mMotor.configPeakOutputForward(1, kClimberTimeoutMs);
+    mMotor.configPeakOutputReverse(-1, kClimberTimeoutMs);
+
+    mMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kClimberPIDLoopIndex, kClimberTimeoutMs);
+    mMotor.setSensorPhase(false);
+
+    /* set the allowable closed-loop error,
+     * Closed-Loop output will be neutral within this range.
+     * See Table in Section 17.2.1 for native units per rotation.
+     */
+    mMotor.configAllowableClosedloopError(0, kClimberPIDLoopIndex, kClimberTimeoutMs); /* always servo */
+
+    mMotor.config_kF(kClimberPIDLoopIndex, mClimberKf, kClimberTimeoutMs);
+    mMotor.config_kP(kClimberPIDLoopIndex, mClimberKp, kClimberTimeoutMs);
+    mMotor.config_kI(kClimberPIDLoopIndex, mClimberKi, kClimberTimeoutMs);
+    mMotor.config_kD(kClimberPIDLoopIndex, mClimberKd, kClimberTimeoutMs);
+
+    // Set brake mode to hold at position
+    mMotor.setNeutralMode(NeutralMode.Brake);
+
+    // Integral control only applies when the error is small; this avoids integral windup
+    mMotor.config_IntegralZone(0, 200, kClimberTimeoutMs);
+  }
+
   public void extend() {
-    mLogger.verbose("Extending climber at " + EXTEND_SPEED + "% speed");
-    mMotor.set(ControlMode.PercentOutput, EXTEND_SPEED);
+    mLogger.verbose("Extending climber to " + HEIGHT_IN_ENCODER_TICKS);
+    mMotor.set(ControlMode.Position, HEIGHT_IN_ENCODER_TICKS);
   }
 
   public void retract() {
-    mLogger.verbose("Retracting the climber at " + RETRACT_SPEED + "% speed");
-    mMotor.set(ControlMode.PercentOutput, RETRACT_SPEED);
+    mLogger.verbose("Retracting the climber to " + RETRACTED_HEIGHT_IN_ENCODER_TICKS);
+    mMotor.set(ControlMode.Position, RETRACTED_HEIGHT_IN_ENCODER_TICKS);
   }
 
   public void stop() {
@@ -59,46 +94,19 @@ public class Climber extends Subsystem {
     mMotor.stopMotor();
   }
 
-  /** Checks whether current is at threshold, signalling that it's done climbing*/
-  public boolean checkOvercurrent() {
-    mLogger.verbose("Input current: " + mMotor.getSupplyCurrent() + ", Output current: " + mMotor.getStatorCurrent());
-
-    /** A countdown since the motor overcurrents while spinning up */
-    if (mOverCurrentCountdown > 0){
-      mOverCurrentCountdown --;
-      return false;
-    }
-
-    /** The motor's current */
-    double current = mMotor.getSupplyCurrent();
-
-    /** If the motor is at threshold, increment a counter, otherwise, reset it. */
-    if (current > OVERCURRENT_THRESHOLD) {
-      mOverCurrentCount++;
-      mLogger.log("Debounce overcurrent " + mOverCurrentCount);
-    } else {
-      resetOvercurrentCount();
-    }
-
-    /** If the motor has been at threshold long enough, return true */
-    if (mOverCurrentCount > OVERCURRENT_MIN_OCCURENCES) {
-      mLogger.log("Overcurrent!");
-      resetOvercurrentCount();
-      return true;
-    } else {
-      return false;
-    }
+  public void jog(int direction, double speed) {
+    mMotor.set(ControlMode.PercentOutput, speed * direction);
   }
 
-  private void resetOvercurrentCountdown() {
-    mOverCurrentCountdown = OVERCURRENT_COUNTDOWN_LENGTH;
+  public void home() {
+    mMotor.set(ControlMode.PercentOutput, HOMING_SPEED_PERCENT);
   }
 
-  private void resetOvercurrentCount() {
-    mOverCurrentCount = 0;
+  public void stopHoming() {
+    mMotor.stopMotor();
+    mMotor.setSelectedSensorPosition(0, 0, 0);
   }
 
-  @Override
   public void zeroSensors() {}
 
   @Override
