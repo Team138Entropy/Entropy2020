@@ -15,6 +15,8 @@ public class OperatorInterface {
   private final XboxController DriverController;
   private final NykoController OperatorController;
 
+  private boolean mIntakeWasPressedWhenWeLastChecked = false;
+
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
       mInstance = new OperatorInterface();
@@ -73,6 +75,18 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
 
+  public boolean getShooterVelocityTrimUp() {
+    return OperatorController.getDPad() == DPad.UP;
+  }
+
+  public boolean getShooterVelocityTrimDown() {
+    return OperatorController.getDPad() == DPad.DOWN;
+  }
+
+  public boolean getResetVelocityTrim() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_9);
+  }
+
   // Operator
 
   public boolean getHarvestMode() {
@@ -95,8 +109,19 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
 
+  public boolean getStateReset() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_2);
+  }
+
   public boolean startIntake() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_1);
+    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
+    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
+      mIntakeWasPressedWhenWeLastChecked = false;
+      return true;
+    } else {
+      mIntakeWasPressedWhenWeLastChecked = buttonValue;
+      return false;
+    }
   }
 
   public void setDriverRumble(boolean toggle) {
@@ -104,7 +129,7 @@ public class OperatorInterface {
   }
 
   public boolean isBarf() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+    return DriverController.getButton(XboxController.Button.START);
   }
 
   // Test Mode functions
@@ -139,6 +164,4 @@ public class OperatorInterface {
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
-
-
 }
