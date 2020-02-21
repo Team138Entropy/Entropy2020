@@ -39,15 +39,39 @@ public class RobotTracker{
         return mInstance;
     }
 
-    //Result Object that is used to return
+    //Result Class
+    //Used to return values from the Robot Tracker
+    //Particularly with Vision Tracking
+    //as well as target distance
     public class RobotTrackerResult {
-        public double tangental_component;
-        public double angular_component;
-        public Rotation2d turret_error;
-        public boolean HasResult;
+        public final double tangental_component;
+        public final double angular_component;
+        public final Rotation2d turret_error;
+        public final double distance;
+        public final boolean HasResult;
 
+        public RobotTrackerResult(
+           double t_tangental_component,
+           double t_angular_component,
+           Rotation2d t_turret_error,
+           double t_distance,
+           boolean t_HasResult
+        ){
+            this.tangental_component = t_tangental_component;
+            this.angular_component = t_angular_component;
+            this.turret_error = t_turret_error;
+            this.distance = t_distance;
+            this.HasResult = t_HasResult;
+        }
+
+        //Empty constructor!
+        //Resultless Robot Tracker Object
         public RobotTrackerResult(){
-
+            this.HasResult = false;   
+            this.tangental_component = 0;
+            this.angular_component = 0;
+            this.turret_error = null;
+            this.distance = 0;         
         }
 
 
@@ -429,7 +453,10 @@ public class RobotTracker{
             Rotation2d turret_error = getRobotToTurret(timestamp).getRotation().inverse().rotateBy(mLatestAimingParameters.get().getRobotToGoalRotation());
 
 
-            RobotTrackerResult rtr = new RobotTrackerResult();
+            RobotTrackerResult rtr = new RobotTrackerResult(
+
+
+            );
             rtr.turret_error = turret_error;
             rtr.HasResult = true;
             Twist2d velocity = getMeasuredVelocity();
@@ -444,7 +471,14 @@ public class RobotTracker{
         }else{
             //We don't have aiming parameters!
             //don't move the turret!
-            RobotTrackerResult rtr = new RobotTrackerResult();
+            RobotTrackerResult rtr = new RobotTrackerResult(
+                null,
+                null,
+                null,
+                null,
+                false
+
+            );
             rtr.turret_error = Rotation2d.identity();
             rtr.HasResult = false;
             return rtr; //0 rotation

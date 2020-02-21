@@ -175,8 +175,24 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
   }
 
+  //vision code throughput test
+  //test removal code
+  public void ThroughputTest(){
+
+    //Throughput test
+    //testing the throughput on a single packet throught the vision system
+    long startTime = System.nanoTime();
+    //get back packet measurement
+    long endTime = System.nanoTime();
+
+    long duration = (endTime - startTime);
+    duration = duration/ 1000000; //milliseconds
+  }
+
   @Override
   public void teleopInit() {
+
+
 
     //Start background looper
     //collections information periodically
