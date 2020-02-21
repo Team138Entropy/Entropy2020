@@ -47,10 +47,9 @@ public class Robot extends TimedRobot {
   private static NetworkTable mTable;
 
   // Relays
-  public Relay visionLight = new Relay(0); //Controls Vision Light
+  public final Relay visionLight = new Relay(0); //Controls Vision Light
 
   // Robot States
-  // each state is small and simple
   enum RobotState {
     Sharpshooter,
     Rebounder,
@@ -102,6 +101,9 @@ public class Robot extends TimedRobot {
   private LatchedBoolean mRobotModeClimberPressed = new LatchedBoolean();
   private LatchedBoolean mRobotModeRebounderPressed = new LatchedBoolean();
 
+  //Shooter Velocity Trim Presses
+  LatchedBoolean mShooterVelocityTrimUpPressed = new LatchedBoolean();
+  LatchedBoolean mShooterVelocityTrimDownPressed = new LatchedBoolean();
 
   //Auto Steer Aiming Parameters
   //Updated with aiming parameters from robot state
@@ -178,6 +180,9 @@ public class Robot extends TimedRobot {
   //vision code throughput test
   //test removal code
   public void ThroughputTest(){
+    //start sending a set amount of packets
+    //want to simulate what happens when packets lock up
+
 
     //Throughput test
     //testing the throughput on a single packet throught the vision system
@@ -252,60 +257,7 @@ public class Robot extends TimedRobot {
       disables rotation on the turret, turns off intake rollers
 
   */
-  int mInt = 0;
   public void RobotLoop(){
-    boolean WantsSharpshooter = mRobotModeSharpshooterPressed.update(mOperatorInterface.testA());
-
-    if(Math.abs(mTurret.getVelocity()) < 4){
-      RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-      if(result.HasResult){
-        //We have Target Information
-        double angle = result.turret_error.getDegrees();
-        angle = -1 * angle;
-        System.out.println("Rotate By: " + angle);
-        mTurret.RotateByDegrees(angle);
-      }
-    }
-
-    /*
-    if(WantsSharpshooter){
-          RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-        if(result.HasResult){
-          //We have Target Information
-          double angle = result.turret_error.getDegrees();
-          angle = -1 * angle;
-          System.out.println("Rotate By: " + angle);
-          mTurret.RotateByDegrees(angle);
-
-          /*
-          if(mInt == 0){
-              int s1 = 0;
-              double angle = result.turret_error.getDegrees();
-              angle = -1 * angle;
-              System.out.println("\nCamera Angle: " + angle);
-              mTurret.RotateByDegrees(angle);
-              int i = 0;
-            
-            mInt++;
-          }else if(mInt >= 50){
-            mInt = 0;
-          }else{
-            mInt++;
-          }
-          */
-      
-
- 
-    if(mOperatorInterface.testA()){
-     // mTurret.SetOutput(1.0);
-    }else if(mOperatorInterface.testB()){
-     // mTurret.SetOutput(-1.0);
-    }else{
-     // mTurret.SetOutput(0);
-    }
-
-
-    /*
     //Checks if the overall Robot State Mode wants to change
     //if we change it we perform a bunch of other logic 
     CheckRobotMode(); 
@@ -330,10 +282,9 @@ public class Robot extends TimedRobot {
       //Turret, Shooter will be disabled
     }
 
-    //Turret and Drive are indepdent of intake and shoot
+    //Turret and Drive are indepedent of intake and shoot
     turretLoop();
     driveLoop();
-    */
   }
 
   //Check for a change in Robot State

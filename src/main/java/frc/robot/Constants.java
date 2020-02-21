@@ -18,6 +18,9 @@ public class Constants {
   public static final int OperatorControllerPort = 1;
   public static final int DriverControllerPort = 0;
 
+  // Common Talon Variables
+  public static final int kTalonTimeout = 20; //ms
+
   // Drive Talon Variables
   public static final int kLeftDriveMasterId = 1;
   public static final int kLeftDriveSlaveId = 2;
@@ -59,11 +62,9 @@ public class Constants {
 
   //Turret
   public static final int kTurretTalonMotorPort;
-  public static final double kPIDController_P;
-  public static final double kPIDController_I;
-  public static final double kPIDController_D;
-  public static final int kTurretEncoderA = 4;
-  public static final int kTurrentEncoderB = 5;
+  public static final double kTurretAimAngleDeadband = 1.5; 
+  public static final double kTicksPerDegee = 140;
+
   
   //Storage
   public static final int kStorageLowerTalon = 7;
@@ -120,6 +121,7 @@ public class Constants {
   public static final double kBallHeight = 5; //ball height (inches)
 
   //Looper System
+  //period at which the looper runs at
   public static final double kLooperDt = 0.01;
 
   //Constants for Server Motor System
@@ -143,10 +145,8 @@ public class Constants {
     //kIntakeRollerPort = mConfig.getInt(Key.INTAKE__ROLLER_PORT);
 
     //Turret
-    kTurretTalonMotorPort = 7;
-    kPIDController_P = mConfig.getDouble(Key.OI__VISION__PID__P);
-    kPIDController_I = mConfig.getDouble(Key.OI__VISION__PID__I);
-    kPIDController_D = mConfig.getDouble(Key.OI__VISION__PID__D);
+    kTurretTalonMotorPort = 21;
+
 
 
   };

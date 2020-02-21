@@ -54,14 +54,13 @@ public class RobotTracker{
            double t_tangental_component,
            double t_angular_component,
            Rotation2d t_turret_error,
-           double t_distance,
-           boolean t_HasResult
+           double t_distance
         ){
             this.tangental_component = t_tangental_component;
             this.angular_component = t_angular_component;
             this.turret_error = t_turret_error;
             this.distance = t_distance;
-            this.HasResult = t_HasResult;
+            this.HasResult = true;
         }
 
         //Empty constructor!
@@ -452,17 +451,22 @@ public class RobotTracker{
 
             Rotation2d turret_error = getRobotToTurret(timestamp).getRotation().inverse().rotateBy(mLatestAimingParameters.get().getRobotToGoalRotation());
 
+            /*
+           double t_tangental_component,
+           double t_angular_component,
+           Rotation2d t_turret_error,
+           double t_distance,
+           boolean t_HasResult
 
-            RobotTrackerResult rtr = new RobotTrackerResult(
+            */
 
-
-            );
-            rtr.turret_error = turret_error;
-            rtr.HasResult = true;
             Twist2d velocity = getMeasuredVelocity();
-            rtr.tangental_component = mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange();
-            double angular_component = Units.radians_to_degrees(velocity.dtheta);
-
+            RobotTrackerResult rtr = new RobotTrackerResult(
+                mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange(),
+                Units.radians_to_degrees(velocity.dtheta),
+                turret_error,
+                0
+            );
 
             //System.out.println("REQ DEG: " + rtr.turret_error.getDegrees());
 
@@ -471,16 +475,8 @@ public class RobotTracker{
         }else{
             //We don't have aiming parameters!
             //don't move the turret!
-            RobotTrackerResult rtr = new RobotTrackerResult(
-                null,
-                null,
-                null,
-                null,
-                false
-
-            );
-            rtr.turret_error = Rotation2d.identity();
-            rtr.HasResult = false;
+            //empty object.. no results!
+            RobotTrackerResult rtr = new RobotTrackerResult();
             return rtr; //0 rotation
         }
     }

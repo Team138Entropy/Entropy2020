@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.RobotState;
 import frc.robot.util.geometry.*;
 import frc.robot.util.loops.*;
 import frc.robot.RobotTracker;

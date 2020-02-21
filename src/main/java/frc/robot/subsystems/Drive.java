@@ -12,7 +12,6 @@ import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import frc.robot.RobotTracker;
 
@@ -47,6 +46,8 @@ public class Drive extends Subsystem {
 
 
   //Class containing information for periodic updates
+  //values get periodically updated in the looper
+  //this is to avoid hammering the can bus
   public static class PeriodicIO {
     // INPUTS
     public double timestamp;

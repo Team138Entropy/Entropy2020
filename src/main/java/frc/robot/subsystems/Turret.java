@@ -21,20 +21,35 @@ import edu.wpi.first.wpilibj.Timer;
  * This Turret singleton extends WPILIB's PID subsystem via @Overriding methods use enable(),
  * disable() and setSetpoint() to control the PID. loop() should be run every tick
  */
-public class Turret {
+public class Turret extends Subsystem {
   private static Turret sInstance;
 
   private final WPI_TalonSRX mTurretTalon;
+  private final double TicksPerDegree = Constants.kTicksPerDegee;
 
-  private Timer mTimer = new Timer();
+  enum TurretState {
+    AUTO_AIM,
+    HOMING,
+    MANUAL_AIM
+  };
 
+  //Default to Aiming State
+  private TurretState mCurrentState = TurretState.AUTO_AIM;
 
+  protected PeriodicIO mPeriodicIO = new PeriodicIO();
+  
+  //Class of values that are periodically updated
+  public static class PeriodicIO {
+    //Inputs
+    public double timestamp;
+    public double CurrentPosition;
 
+    //Outputs
+    public double demand; //motor output, could be a position, or percent
+    public double angle;
+    public double feedforward;
+  };
 
-  // the target position (on a scale from 0 to 100)
-  private double mManualTargetPos = 50;
-  private double mLastSetpoint;
-  private final double TicksPerDegree = 140.0;
 
   public static Turret getInstance() {
     if (sInstance == null) {
@@ -46,55 +61,88 @@ public class Turret {
 
   /** Set up our talon, logger and potentiometer */
   private Turret() {
-
-   mTurretTalon = new WPI_TalonSRX(21);
-   mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 20);
-   mTurretTalon.config_kF(0, 0);
+   mTurretTalon = new WPI_TalonSRX(Constants.kTurretTalonMotorPort);
+   mTurretTalon.configFactoryDefault();
+   mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTurretTalonMotorPort);
+   mTurretTalon.config_kF(0, 0); //MUST BE 0 in Position mode
    mTurretTalon.config_kP(0, .7);
    mTurretTalon.config_kI(0, 0);
    mTurretTalon.config_kD(0, 0);
    mTurretTalon.config_IntegralZone(0, 50);
    mTurretTalon.setNeutralMode(NeutralMode.Brake);
 
-   mTimer.reset();
-    mTimer.start();
-
 
 
 
   }
 
-  public void SetOutput(double value){
-    mTurretTalon.set(ControlMode.PercentOutput, value);
+
+
+  //peridocally read inputs
+  @Override
+  public synchronized void readPeriodicInputs() {
+    //store current encoder position
+    mPeriodicIO.CurrentPosition = mTurretTalon.getSelectedSensorPosition();
+
+
   }
 
-  public void RotateByDegrees(double angle){
-
-    if(Math.abs(angle) < 1.5){
-      return;
+  //periodically write outputs
+  @Override
+  public synchronized void writePeriodicOutputs() {
+    //Control Turret Based on State
+    if(mCurrentState == TurretState.AUTO_AIM){
+      //Perform Auto Aim!
+      //deadband: Angle error must be greater than 1 degree
+      if(Math.abs(mPeriodicIO.angle) > 1){
+        mTurretTalon.set(ControlMode.Position, mPeriodicIO.demand);
+      }
+    }else if(mCurrentState == TurretState.HOMING){
+      //homing..
+    }else if(mCurrentState == TurretState.MANUAL_AIM){
+      //Manual Control
+      mTurretTalon.set(ControlMode.PercentOutput, mPeriodicIO.demand);
     }
+  }
 
-    double setpoint = mTurretTalon.getSelectedSensorPosition() + (angle * TicksPerDegree);
-    mLastSetpoint = setpoint;
-    //System.out.println("Target Setpoint: " + setpoint);
 
-    if(mTimer.hasPeriodPassed(.05)){
-      mTurretTalon.set(ControlMode.Position, setpoint);
-
+  //Operator Driven Manual Control
+  public synchronized void SetManualOutput(double value){
+    mPeriodicIO.demand = value;
+    //Force correct control mode
+    if(mCurrentState != TurretState.MANUAL_AIM){
+      //change pid slot if needed
+      mCurrentState = TurretState.MANUAL_AIM;
     }
   }
 
-  public double getSetPoint(){
-    return mLastSetpoint;
+
+  //Vision Aim System
+  public synchronized void SetAimError(double angle){
+    mPeriodicIO.angle = angle;
+    double setpoint = mPeriodicIO.CurrentPosition + (angle * TicksPerDegree);
+    mPeriodicIO.demand = setpoint;
+    mPeriodicIO.feedforward = 0;
+
+    if(mCurrentState != TurretState.AUTO_AIM){
+      //change pid slot if needed
+      mCurrentState = TurretState.AUTO_AIM;
+    }
   }
 
-  public int getPosition(){
-    return mTurretTalon.getSelectedSensorPosition();
+
+
+  public void zeroSensors() {
   }
 
-  public int getVelocity(){
-    return mTurretTalon.getSelectedSensorVelocity();
+    /*
+      Test all Sensors in the Subsystem
+  */
+  public void checkSubsystem() {
+
   }
 
+  @Override
+  public void stopSubsytem(){}
  
 }
