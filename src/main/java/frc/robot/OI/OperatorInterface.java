@@ -115,10 +115,10 @@ public class OperatorInterface {
 
   public boolean startIntake() {
     boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
-    if(mIntakeWasPressedWhenWeLastChecked && !buttonValue){
+    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
       mIntakeWasPressedWhenWeLastChecked = false;
       return true;
-    }else{
+    } else {
       mIntakeWasPressedWhenWeLastChecked = buttonValue;
       return false;
     }

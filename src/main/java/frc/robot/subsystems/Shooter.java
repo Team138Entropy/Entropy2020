@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -35,9 +34,11 @@ public class Shooter extends Subsystem {
   private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
+  private static final int DEFAULT_ROLLER_SPEED =
+      2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
-  private static final int VELOCITY_ADJUSTMENT_BUMP = Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
+  private static final int VELOCITY_ADJUSTMENT_BUMP =
+      Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
   private boolean mHasHadCurrentDrop = false;
 
@@ -82,14 +83,14 @@ public class Shooter extends Subsystem {
   private Turret mTurret;
   private Vision mVision;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
-  private void x(){}
+
+  private void x() {}
+
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
 
     // TODO: Replace these with real subsystems
-    mTurret =
-        position -> 
-            x();
+    mTurret = position -> x();
     mVision =
         () -> {
           // System.out.println("Getting dummy vision target");
@@ -123,7 +124,11 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
-    int speed = (int) Math.round(SpeedLookupTable.getInstance().getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
+    int speed =
+        (int)
+            Math.round(
+                SpeedLookupTable.getInstance()
+                    .getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
     return speed + mVelocityAdjustment;
   }
 
@@ -150,7 +155,8 @@ public class Shooter extends Subsystem {
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
-    boolean isAtVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
+    boolean isAtVelocity =
+        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there
@@ -173,11 +179,16 @@ public class Shooter extends Subsystem {
     return isAtVelocityDebounced;
   }
 
+<<<<<<< HEAD
   public boolean isBallFired(){
     boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity && mShotCountdown >= MIN_SHOT_COUNTDOWN;
     if(ballFired) mShotCountdown = 0;
     return ballFired;
+=======
+  public boolean isBallFired() {
+    return Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (SPEED_DEADBAND + 50);
+>>>>>>> a37b422526ac76b5dc83863b7ada66d51484e527
   }
 
   // Used in TEST mode only
