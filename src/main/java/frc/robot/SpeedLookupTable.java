@@ -13,12 +13,12 @@ public class SpeedLookupTable {
   // note: This MUST be sorted by lowest distance first
   double[][] mLookupTable = {
     // {distance in meters, speed in whatever our system uses}
-    {10d, 2200d},
-    {20d, 2200d},
-    {30d, 2200d},
-    {40d, 2200d},
-    {50d, 2200d},
-    {60d, 2200d}
+    {10d, 2600d},
+    {20d, 2600d},
+    {30d, 2600d},
+    {40d, 2600d},
+    {50d, 2600d},
+    {60d, 2600d}
   };
 
   SpeedLookupTable() {}

@@ -12,11 +12,22 @@ import frc.robot.SpeedLookupTable;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  // Temporary, until default config values are merged
-  private static final double MAX_SPEED = 2445d;
-  private static final double SPEED_DEADBAND = 30;
+  private static final double MAX_SPEED = 2550d;
+  // private static final double SPEED_DEADBAND = 20;
+  private static final double SPEED_DEADBAND = 75;
+  private static final double DROP_DEADBAND = 250;
   private static final int SPEED_DEADBAND_DELAY = 10;
-  private static final double FEEDFORWARD = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
+  private static final double FEEDFORWARD = 1023d / MAX_SPEED;
+  // private static final double P = (.3 * 1023) / 50;
+  // private static final double I = 0.2;
+  // private static final double D = 0.1;
+  private static final double P = 0;
+  private static final double I = 0;
+  private static final double D = 0;
+
+  // a minimum acountdown
+  private static final int MIN_SHOT_COUNTDOWN = 10;
+  private int mShotCountdown = 0;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
@@ -99,6 +110,7 @@ public class Shooter extends Subsystem {
   /** Starts the roller. */
   public void start() {
     mRoller.setSpeed(getAdjustedVelocitySetpoint());
+    // mRoller.setPercentOutput(1);
   }
 
   /** Stops the roller. */
@@ -133,6 +145,8 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
+    mShotCountdown ++;
+    SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
@@ -160,7 +174,10 @@ public class Shooter extends Subsystem {
   }
 
   public boolean isBallFired(){
-    return Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (SPEED_DEADBAND + 50);
+    boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
+    boolean ballFired = didDropVelocity && mShotCountdown >= MIN_SHOT_COUNTDOWN;
+    if(ballFired) mShotCountdown = 0;
+    return ballFired;
   }
 
   // Used in TEST mode only
