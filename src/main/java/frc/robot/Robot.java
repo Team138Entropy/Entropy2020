@@ -410,6 +410,7 @@ public class Robot extends TimedRobot {
         RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
         if(result.HasResult){
           //We have Target Information
+          mTurret.SetAimError(result.turret_error.getDegrees());
         }else{
           //No Results, Don't Rotate
         }
@@ -421,7 +422,7 @@ public class Robot extends TimedRobot {
         System.out.println("Manual Turret Aim");
         //Poll operator for adjustments
         double RotateBy = mOperatorInterface.GetAzmithTurn();
-
+        mTurret.SetManualOutput(RotateBy);
         break;
       }
       case Disabled : {
