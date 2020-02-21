@@ -149,7 +149,7 @@ public class Drive extends Subsystem {
     // mDriveLogger.log("Right: " + signal.getRight() + " + " + mPeriodicIO.right_old);
     if ((Math.abs(signal.getLeft()) > mPeriodicIO.left_old) && (Math.abs(signal.getRight()) > mPeriodicIO.right_old)) {
       // Tell the talons to be significantly less epic
-      setOpenloopRamp(Config.getInstance.getDouble(Key.DRIVE__ACCEL_RAMP_TIME_SECONDS));
+      setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_TIME_SECONDS));
     }
     // If the opposite is true, e.g. our velocity is decreasing, let us stop as fast as we want. Note that this
     // "inverse case" is here because, if it wasn't, acceleration would only be capped while jerk is positive.
