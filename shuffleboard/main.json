@@ -125,7 +125,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///FMSInfo/EventName",
-              "_title": "/FMSInfo/EventName"
+              "_title": "Event Name"
             }
           },
           "8,0": {

@@ -26,7 +26,7 @@ class PIDRoller {
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
     // mTalon.configFactoryDefault();
 
-    mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms, 5);
+    // mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms, 5);
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
     mTalon.setSensorPhase(false);
 
@@ -52,7 +52,7 @@ class PIDRoller {
 
   void setPercentOutput(double output){
     System.out.println(getVelocity() + " velocity at output " + output);
-    mTalon.set(ControlMode.PercentOutput, output);
+    mTalon.set(ControlMode.PercentOutput, - output);
   }
 
   void setSpeed(int posPer100Ms) {

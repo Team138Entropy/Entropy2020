@@ -20,8 +20,8 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
-  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
+  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
+  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
   private static final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
