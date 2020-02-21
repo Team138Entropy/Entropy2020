@@ -50,9 +50,9 @@ Ball_HSV_Upper = np.array([62, 255, 255])
 rat_low = 1.5
 rat_high = 5
 
-hsv_threshold_hue = [68, 106]
-hsv_threshold_saturation = [117, 255]
-hsv_threshold_value = [179, 255]
+hsv_threshold_hue = [15, 180]
+hsv_threshold_saturation = [0, 111]
+hsv_threshold_value = [161, 255]
 
 solidity_threshold = [0, 65]
 
@@ -742,6 +742,7 @@ def ProcessFrame(frame, tape):
         highGoal['yaw'] = processedValues[2]
         if processedValues[3] != None:
             processedValues[3] = abs(round(processedValues[3], 2))
+            print(processedValues[3])
         highGoal['dis'] = processedValues[3]
         highGoal['targid'] = 0
 
