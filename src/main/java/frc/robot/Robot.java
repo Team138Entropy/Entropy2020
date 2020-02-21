@@ -670,7 +670,7 @@ public class Robot extends TimedRobot {
         mClimber.extend();
 
         /** Checks if the motor is overcurrenting, signalling it's done climbing */
-        if (mClimber.readyForNextState()) {
+        if (mClimber.isExtended()) {
           mClimbingState = ClimbingState.EXTENDING_COMPLETE;
         }
       case EXTENDING_COMPLETE:
@@ -684,16 +684,9 @@ public class Robot extends TimedRobot {
         mClimber.retract();
 
         /** Checks if the motor is overcurrenting, signalling it's done retracting */
-        if (mClimber.readyForNextState()) {
-          mClimbingState = ClimbingState.RETRACTING_COMPLETE;
+        if (mClimber.isExtended()) {
+          mClimbingState = ClimbingState.IDLE;
         }
-      case RETRACTING_COMPLETE:
-        mClimber.stop();
-        mClimbingState = ClimbingState.IDLE;
-
-        //TODO: Decide whether the robot should go idle after it's done climbing
-        /** Changes the robot state to idle */
-        mState = State.IDLE;
       default:
         mRobotLogger.error("Invalid Climbing State");
         break;

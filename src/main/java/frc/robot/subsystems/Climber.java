@@ -18,7 +18,7 @@ public class Climber extends Subsystem {
   //TODO: Tune these values
   private final double HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
   private final double RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
-  private final double HOMING_SPEED_PERCENT = -.2d;
+  private final double HOMING_SPEED_PERCENT = -.2;
 
   // Talon SRX/ Victor SPX will support multiple (cascaded) PID loops
   // For now we just want the primary one.
@@ -40,7 +40,7 @@ public class Climber extends Subsystem {
 
   private Climber() {
     mMotor = new WPI_TalonSRX(PORT_NUMBER);
-    mLogger = new Logger("m");
+    mLogger = new Logger("climber");
   }
 
   public static Climber getInstance() {
@@ -94,7 +94,7 @@ public class Climber extends Subsystem {
     mMotor.stopMotor();
   }
 
-  public boolean readyForNextState() {
+  public boolean isExtended() {
     return true;
   }
 
