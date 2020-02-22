@@ -68,13 +68,24 @@ public class OperatorInterface {
     DriverController.setRumble(LowGear);
     return LowGear;
   }
-
-  public boolean getTurretAdjustLeft() {
+  
+  public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
+  }
+  
+  public boolean getBallCounterAdjustUp() {
+    return OperatorController.getDPad() == DPad.RIGHT;
+  }
+
+  // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
+  public boolean getTurretAdjustLeft() {
+    // return OperatorController.getDPad() == DPad.LEFT;
+    return false;
   }
 
   public boolean getTurretAdjustRight() {
-    return OperatorController.getDPad() == DPad.RIGHT;
+    // return OperatorController.getDPad() == DPad.RIGHT;
+    return false;
   }
 
   public boolean getShooterVelocityTrimUp() {
