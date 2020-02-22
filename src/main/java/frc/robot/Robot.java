@@ -629,6 +629,11 @@ public class Robot extends TimedRobot {
           mShootingState = ShootingState.SHOOT_BALL;
           mFireTimer.start();
         }
+
+        if(mOperatorInterface.getShoot()){
+          mShootingState = ShootingState.SHOOTING_COMPLETE;
+          mStorage.stop();
+        }
         break;
       case SHOOT_BALL:
         mStorage.ejectBall();
