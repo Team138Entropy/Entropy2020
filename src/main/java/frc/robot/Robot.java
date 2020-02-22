@@ -8,17 +8,20 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
-import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.vision.AimingParameters;
 import java.util.Optional;
 
-/**
- * The VM is configured to automatically run this class. If you change the name of this class or the
- * package after creating this project, you must also update the build.gradle file in the project.
- */
 public class Robot extends TimedRobot {
+
+
+  // Modes
+  public enum Mode {
+    Sharpshooter,
+    Rebounder,
+    Climber
+  };
 
   // State variables
   public enum State {
@@ -54,6 +57,7 @@ public class Robot extends TimedRobot {
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
 
+  private Mode mMode = Mode.Sharpshooter;
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
@@ -104,15 +108,15 @@ public class Robot extends TimedRobot {
 
     mRobotLogger.log("robot init _ 1");
 
-    mRobotTracker.reset();
 
     // Zero all nesscary sensors on Robot
     mSubsystemManager.zeroSensors();
     visionLight.set(Relay.Value.kForward);
 
-    // Reset Robot State - Note starting position of the Robot
+    // Reset Robot Tracker - Note starting position of the Robot
     // This starting Rotation, X, Y is now the Zero Point
-    EventWatcherThread.getInstance().start();
+    mRobotTracker.reset();
+
 
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
