@@ -146,9 +146,9 @@ public class Drive extends Subsystem {
     signal.PrintLog();
 
     // Very first step is to update our negative magnitude checker
-    if (signal.getLeft() < 0 && signal.getRight() < 0) {
+    if ((signal.getLeft() < 0) && ((signal.getRight() * -1) < 0)) {
       mPeriodicDriveData.wasReversing = true;
-    } else if (signal.getLeft() > 0 && signal.getRight() > 0) {
+    } else if ((signal.getLeft() > 0) && ((signal.getRight() * -1) > 0)) {
       mPeriodicDriveData.wasReversing = false;
     }
 
@@ -159,6 +159,7 @@ public class Drive extends Subsystem {
     if ((Math.abs(signal.getLeft()) > mPeriodicDriveData.left_old) && (Math.abs(signal.getRight()) > mPeriodicDriveData.right_old) && !mPeriodicDriveData.quickturn) {
       // Tell the talons to be significantly less epic
       setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_TIME_SECONDS));
+      mDriveLogger.log("Setting ramp to speed up state because of first clause");
     }
     // If the opposite is true, e.g. our velocity is decreasing, let us stop as fast as we want. Note that this
     // "inverse case" is here because, if it wasn't, acceleration would only be capped while jerk is positive.
@@ -167,18 +168,22 @@ public class Drive extends Subsystem {
       // magnitudes of left and right drive signals
       if (mPeriodicDriveData.wasReversing = true) {
         setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__BACK_SLOW_RAMP_TIME_SECONDS));
+        mDriveLogger.log("Setting ramp to back speed because wasReversing in second clause");
       } else {
         // If we are going forwards, we can stop as fast as we want.
         setOpenloopRamp(0);
+        mDriveLogger.log("Setting ramp to zero because of false wasReversing in second check clause");
       }
-    }
-    // In the case that our joystick value is zero, disable our shit as it was last time, nothing happens to our ramp
-    else if (signal.getLeft() == 0 && signal.getRight() == 0 && mPeriodicDriveData.wasReversing == false) {
-      setOpenloopRamp(0);
     }
     // At this point this is just getting ridiculous. Hopefully this is self-evident.
     else if (mPeriodicDriveData.quickturn) {
       setOpenloopRamp(0);
+      mDriveLogger.log("Setting ramp to zero because of quickturn");
+    }
+    // In the case that our joystick value is zero, disable our shit as it was last time, nothing happens to our ramp
+    else if (signal.getLeft() == 0 && signal.getRight() == 0 && mPeriodicDriveData.wasReversing == false) {
+      setOpenloopRamp(0);
+      mDriveLogger.log("Setting ramp to zero because of two zeroes and false wasReversing");
     }
 
     // Olds are cached as absolute to be useful above
@@ -193,8 +198,6 @@ public class Drive extends Subsystem {
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
-    mPeriodicDriveData.quickturn = quickTurn;
-
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
     // don't have to
@@ -203,6 +206,8 @@ public class Drive extends Subsystem {
       throttle = 0.0;
       quickTurn = true;
     }
+
+    mPeriodicDriveData.quickturn = quickTurn;
 
     // This is just a convoluted way to do a deadband.
     if (Util.epsilonEquals(wheel, 0.0, 0.020)) {
@@ -255,7 +260,6 @@ public class Drive extends Subsystem {
   // }
 
   public void setOpenloopRamp(double speed) {
-    mDriveLogger.log("setting ramp to " + speed);
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
   }
