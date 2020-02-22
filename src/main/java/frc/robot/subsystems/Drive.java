@@ -29,10 +29,10 @@ public class Drive extends Subsystem {
 
   private DriveControlState mDriveControlState;
 
-  private PeriodicIO mPeriodicIO = new PeriodicIO();
+  private PeriodicDriveData mPeriodicDriveData = new PeriodicDriveData();
   private Logger mDriveLogger;
 
-  public static class PeriodicIO {
+  public static class PeriodicDriveData {
     // INPUTS
     public double timestamp;
     public double left_voltage;
@@ -53,6 +53,8 @@ public class Drive extends Subsystem {
     public double right_feedforward;
     public double left_old = 0;
     public double right_old = 0;
+    public boolean wasReversing = false;
+    public boolean quickturn = false;
   }
 
   public static synchronized Drive getInstance() {
@@ -143,24 +145,45 @@ public class Drive extends Subsystem {
 
     signal.PrintLog();
 
+    // Very first step is to update our negative magnitude checker
+    if (signal.getLeft() < 0 && signal.getRight() < 0) {
+      mPeriodicDriveData.wasReversing = true;
+    } else if (signal.getLeft() > 0 && signal.getRight() > 0) {
+      mPeriodicDriveData.wasReversing = false;
+    }
+
     // If our acceleration is positive (going away from where we were last time)
     // Remember that right has to be flipped down below so the bracket is the other way 'round
-    // mDriveLogger.log("Left: " + signal.getLeft() + " + " + mPeriodicIO.left_old);
-    // mDriveLogger.log("Right: " + signal.getRight() + " + " + mPeriodicIO.right_old);
-    if ((Math.abs(signal.getLeft()) > mPeriodicIO.left_old) && (Math.abs(signal.getRight()) > mPeriodicIO.right_old)) {
+    // mDriveLogger.log("Left: " + signal.getLeft() + " + " + mPeriodicDriveData.left_old);
+    // mDriveLogger.log("Right: " + signal.getRight() + " + " + mPeriodicDriveData.right_old);
+    if ((Math.abs(signal.getLeft()) > mPeriodicDriveData.left_old) && (Math.abs(signal.getRight()) > mPeriodicDriveData.right_old) && !mPeriodicDriveData.quickturn) {
       // Tell the talons to be significantly less epic
       setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_TIME_SECONDS));
     }
     // If the opposite is true, e.g. our velocity is decreasing, let us stop as fast as we want. Note that this
     // "inverse case" is here because, if it wasn't, acceleration would only be capped while jerk is positive.
-    else if (Math.abs(signal.getLeft()) < mPeriodicIO.left_old && Math.abs(signal.getRight()) < mPeriodicIO.right_old) {
+    else if (Math.abs(signal.getLeft()) < mPeriodicDriveData.left_old && Math.abs(signal.getRight()) < mPeriodicDriveData.right_old && !mPeriodicDriveData.quickturn) {
+      // Actually don't stop as fast as we can, first check if we are going backwards by comparing the
+      // magnitudes of left and right drive signals
+      if (mPeriodicDriveData.wasReversing = true) {
+        setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__BACK_SLOW_RAMP_TIME_SECONDS));
+      } else {
+        // If we are going forwards, we can stop as fast as we want.
+        setOpenloopRamp(0);
+      }
+    }
+    // In the case that our joystick value is zero, disable our shit as it was last time, nothing happens to our ramp
+    else if (signal.getLeft() == 0 && signal.getRight() == 0 && mPeriodicDriveData.wasReversing == false) {
       setOpenloopRamp(0);
     }
-    // In the case that our joystick value is somehow the same as it was last time, nothing happens to our ramp
+    // At this point this is just getting ridiculous. Hopefully this is self-evident.
+    else if (mPeriodicDriveData.quickturn) {
+      setOpenloopRamp(0);
+    }
 
     // Olds are cached as absolute to be useful above
-    mPeriodicIO.left_old = Math.abs(signal.getLeft());
-    mPeriodicIO.right_old = Math.abs(signal.getRight());
+    mPeriodicDriveData.left_old = Math.abs(signal.getLeft());
+    mPeriodicDriveData.right_old = Math.abs(signal.getRight());
 
     // then we set our master talons, remembering that right is backwards
     mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
@@ -169,6 +192,8 @@ public class Drive extends Subsystem {
 
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
+
+    mPeriodicDriveData.quickturn = quickTurn;
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -219,15 +244,15 @@ public class Drive extends Subsystem {
       allows driver to control throttle
       this will be called with the ball as a target
   */
-  public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
-    double timestamp = Timer.getFPGATimestamp();
-    final double kAutosteerAlignmentPointOffset = 15.0; //
-    /*
-    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    setBrakeMode(true);
-    */
+  // public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
+  //   double timestamp = Timer.getFPGATimestamp();
+  //   final double kAutosteerAlignmentPointOffset = 15.0; //
+  //   /*
+  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+  //   setBrakeMode(true);
+  //   */
 
-  }
+  // }
 
   public void setOpenloopRamp(double speed) {
     mDriveLogger.log("setting ramp to " + speed);
@@ -268,7 +293,7 @@ public class Drive extends Subsystem {
   }
 
   public synchronized Rotation2d getHeading() {
-    return mPeriodicIO.gyro_heading;
+    return mPeriodicDriveData.gyro_heading;
   }
 
   // Used only in TEST mode
