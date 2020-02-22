@@ -241,6 +241,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Intake Current", 0);
     SmartDashboard.putNumber("Intake Current Countdown", 0);
     SmartDashboard.putNumber("Encoder Distance", 0);
+    SmartDashboard.putNumber("Encoder Distance Raw", 0);
   }
 
   @Override
@@ -323,6 +324,8 @@ public class Robot extends TimedRobot {
     } else {
       mDrive.setOutputRightFront(0);
     }
+
+    System.out.println(mStorage.getEncoder());
   }
 
   @Override
@@ -505,7 +508,6 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
-        mStorage.updateEncoderPosition();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
         break;
@@ -524,7 +526,6 @@ public class Robot extends TimedRobot {
         }
         break;
       case INTAKE:
-        mStorage.updateEncoderPosition();
         // Check transition to shooting before we start intake of a new ball
         if (!checkTransitionToShooting()) {
 
@@ -535,6 +536,7 @@ public class Robot extends TimedRobot {
             if(mStorage.getBallCount() == mStorage.getCapacity() + 1){
               mIntakeState = IntakeState.STORAGE_COMPLETE;
             }
+            mStorage.updateEncoderPosition();
             mIntakeState = IntakeState.STORE_BALL;
           }
 
