@@ -15,8 +15,6 @@ class PIDRoller {
   private WPI_TalonSRX mTalonSlave;
 
   PIDRoller(int talonPort, int talon2Port, double p, double i, double d, double f) {
-    super();
-
     mTalon = new WPI_TalonSRX(talonPort);
 
     // All of this was ripped from the 2019 elevator code

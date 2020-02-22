@@ -59,20 +59,6 @@ public class Shooter extends Subsystem {
     }
   }
 
-  @FunctionalInterface
-  private interface Turret {
-    void set(TurretPosition position);
-  }
-
-  @FunctionalInterface
-  private interface Vision {
-    TurretPosition calcTargetPosition();
-  }
-
-  @FunctionalInterface
-  private interface Intake {
-    void shoveANodeIntoTheThing();
-  }
 
   // TEMPORARY STUFF ENDS HERE
 
@@ -81,7 +67,6 @@ public class Shooter extends Subsystem {
   private PIDRoller mRoller;
   private TalonSRX mTestRoller;
   private Turret mTurret;
-  private Vision mVision;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
 
   private void x() {}
@@ -89,13 +74,7 @@ public class Shooter extends Subsystem {
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
 
-    // TODO: Replace these with real subsystems
-    mTurret = position -> x();
-    mVision =
-        () -> {
-          // System.out.println("Getting dummy vision target");
-          return new TurretPosition(0, MAX_SPEED);
-        };
+
   }
 
   public static synchronized Shooter getInstance() {
@@ -105,7 +84,6 @@ public class Shooter extends Subsystem {
 
   /** Tells the turret to move to where the vision system says we should be. */
   public void target() {
-    mTurret.set(mVision.calcTargetPosition());
   }
 
   /** Starts the roller. */
@@ -124,11 +102,14 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
+    /*
     int speed =
         (int)
             Math.round(
                 SpeedLookupTable.getInstance()
                     .getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
+    */
+    int speed = 0;
     return speed + mVelocityAdjustment;
   }
 

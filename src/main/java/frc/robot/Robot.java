@@ -392,6 +392,7 @@ public class Robot extends TimedRobot {
   */
   public void RobotLoop() {
     updateSmartDashboard();
+    turretLoop(); //update turret loop
 
     State prevState = mState;
     IntakeState prevIntakeState = mIntakeState;
@@ -434,7 +435,6 @@ public class Robot extends TimedRobot {
     // TODO: remove this and only allow shooting if you have at least 1 ball
     checkTransitionToShooting();
 
-    turretLoop();
 
     driveTrainLoop();
 
