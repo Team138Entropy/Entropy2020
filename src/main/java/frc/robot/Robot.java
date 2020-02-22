@@ -499,10 +499,6 @@ public class Robot extends TimedRobot {
   }
 
   private void executeIntakeStateMachine() {
-
-
-
-
     switch (mIntakeState) {
       case IDLE:
         mRobotLogger.warn("Intake state is idle");

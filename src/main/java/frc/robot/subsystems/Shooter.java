@@ -25,8 +25,8 @@ public class Shooter extends Subsystem {
   private static final double D = 0;
 
   // a minimum acountdown
-  private static final int MIN_SHOT_COUNTDOWN = 10;
-  private int mShotCountdown = 0;
+  private static final int MIN_SHOT_COUNTDOWN = 100;
+  private int mShotCountdown = MIN_SHOT_COUNTDOWN;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
@@ -150,7 +150,6 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
-    mShotCountdown ++;
     SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
@@ -181,8 +180,7 @@ public class Shooter extends Subsystem {
 
   public boolean isBallFired(){
     boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
-    boolean ballFired = didDropVelocity && mShotCountdown >= MIN_SHOT_COUNTDOWN;
-    if(ballFired) mShotCountdown = 0;
+    boolean ballFired = didDropVelocity;
     return ballFired;
   }
 
