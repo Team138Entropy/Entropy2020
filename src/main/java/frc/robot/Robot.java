@@ -607,6 +607,11 @@ public class Robot extends TimedRobot {
         }
         break;
       case SHOOT_BALL:
+        //Change this to a constant feedback loop
+        //instead of leaving the shooting state
+
+
+
         mStorage.ejectBall();
 
         mShooter.start();
