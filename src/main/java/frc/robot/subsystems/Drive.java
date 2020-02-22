@@ -17,10 +17,8 @@ public class Drive extends Subsystem {
   private static Drive mInstance;
 
   // Drive Talons
-  private WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
+  private final WPI_TalonSRX mLeftMaster, mRightMaster, mLeftSlave, mRightSlave;
 
-  // Drive is plummed to default to high gear
-  private boolean mHighGear = true;
 
   public enum DriveControlState {
     OPEN_LOOP, // open loop voltage control
