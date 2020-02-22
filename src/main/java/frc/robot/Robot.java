@@ -89,14 +89,17 @@ public class Robot extends TimedRobot {
   //Looper - Running on a set period
   private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
 
-
-  private BallIndicator mBallIndicator;
-  private CameraManager mCameraManager;
+  //Drive Feedback Cameras - Not for Vision Targeting
+  private final CameraManager mCameraManager = CameraManager.getInstance();
 
   private final RobotTracker mRobotTracker = RobotTracker.getInstance();
   private final RobotTrackerUpdater mRobotTrackerUpdater = RobotTrackerUpdater.getInstance();
 
+  //Vision Targeting Light
   public Relay visionLight = new Relay(0);
+
+  //Distance Value - value is -1 if no measurement
+  private double mDistanceMeasurement = -1;
 
   // Control Variables
   private LatchedBoolean AutoAim = new LatchedBoolean();
@@ -142,7 +145,6 @@ public class Robot extends TimedRobot {
     mTable = inst.getTable("SmartDashboard");
 
 
-    mCameraManager = CameraManager.getInstance();
     mCameraManager.init();
 
     // Set the initial Robot State
@@ -151,9 +153,6 @@ public class Robot extends TimedRobot {
     mClimingState = ClimingState.IDLE;
     mShootingState = ShootingState.IDLE;
 
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
-      mBallIndicator = BallIndicator.getInstance();
-    }
   }
 
   
@@ -339,9 +338,11 @@ public class Robot extends TimedRobot {
       RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
         if(result.HasResult){
           //We have Target Information
+          mDistanceMeasurement = result.distance;
           mTurret.SetAimError(result.turret_error.getDegrees());
         }else{
           //No Results, Don't Rotate
+          mDistanceMeasurement = -1; //no distance measurement
         }
     }else{
       //Command the Turret Manually

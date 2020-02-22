@@ -106,7 +106,6 @@ public class OperatorInterface {
   }
 
   // Operator
-
   public boolean getHarvestMode() {
     return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
   }
