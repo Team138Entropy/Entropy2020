@@ -12,6 +12,9 @@ import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.vision.AimingParameters;
 import java.util.Optional;
+import frc.robot.util.loops.Looper;
+import frc.robot.util.Util;
+
 
 public class Robot extends TimedRobot {
 
@@ -53,6 +56,11 @@ public class Robot extends TimedRobot {
     IDLE
   }
 
+  public enum TurretState {
+    AUTO_AIM,
+    MANUAL
+  }
+
   private final int AUTONOMOUS_BALL_COUNT = 3;
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
@@ -62,7 +70,7 @@ public class Robot extends TimedRobot {
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
-
+  private TurretState mTurretState = TurretState.AUTO_AIM;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -77,6 +85,10 @@ public class Robot extends TimedRobot {
   private final Storage mStorage = Storage.getInstance();
   private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
+
+  //Looper - Running on a set period
+  private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
+
 
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
@@ -108,6 +120,12 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
 
     mRobotLogger.log("robot init _ 1");
+
+    
+    //Register the Enabled Looper
+    //Used to run background tasks!
+    //Constantly collects information
+    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
 
 
     // Zero all nesscary sensors on Robot
@@ -165,6 +183,9 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     mRobotLogger.log("Auto Init Called");
 
+    //Start background looper
+    //collections information periodically
+    mEnabledLooper.start();
 
     Config.getInstance().reload();
 
@@ -175,13 +196,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    mRobotLogger.log("Auto Periodic");
     updateSmartDashboard();
   }
 
   @Override
   public void teleopInit() {
     mRobotLogger.log("Teleop Init!");
+
+    //Start background looper
+    //collections information periodically
+    mEnabledLooper.start();
 
     Config.getInstance().reload();
 
@@ -287,27 +311,33 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mTurret.disable();
-    }
+
     Config.getInstance().reload();
   }
 
   @Override
   public void disabledPeriodic() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mRobotLogger.verbose("got pot value of " + mTurret.getPotValue());
-    }
+
   }
 
+  //turret loop
+  //constantly commands the turret with vision or manual controls
   public void turretLoop() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mTurret.loop();
+
+    if(mTurretState == TurretState.AUTO_AIM){
+      //Command the Turret with vision set points
+    }else{
+      //Command the Turret Manually
+        // Operator Controls
+        if (mOperatorInterface.getTurretAdjustLeft()) {
+          // manual turret aim
+        } else if (mOperatorInterface.getTurretAdjustRight()) {
+          // manual turret aim
+        }
     }
   }
 
   public void driveTrainLoop() {
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
       double driveTurn = mOperatorInterface.getDriveTurn();
@@ -339,7 +369,6 @@ public class Robot extends TimedRobot {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);
       }
-    }
   }
 
   /*
@@ -395,12 +424,7 @@ public class Robot extends TimedRobot {
 
     updateSmartDashboard();
 
-    // Operator Controls
-    if (mOperatorInterface.getTurretAdjustLeft()) {
-      // manual turret aim
-    } else if (mOperatorInterface.getTurretAdjustRight()) {
-      // manual turret aim
-    }
+ 
 
     // Shooter velocity trim
     if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
@@ -444,6 +468,10 @@ public class Robot extends TimedRobot {
   }
 
   private void executeIntakeStateMachine() {
+
+
+
+
     switch (mIntakeState) {
       case IDLE:
         mRobotLogger.warn("Intake state is idle");
