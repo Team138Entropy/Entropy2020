@@ -46,15 +46,53 @@ DiagonalAspect = math.hypot(HorizontalAspect, VerticalAspect)
 Ball_HSV_Lower = np.array([13, 67, 188])
 Ball_HSV_Upper = np.array([62, 255, 255])
 
+#Non changing distance variables
+#PSEYE WIDE ANGLE FOV = 75, CLOSE ANGLE = 56
+FOV = 75
+
+# High goal height = 8 feet, 2.25 inches, actual height of center goal is 96.25,
+# Centroid of the tape is ~87.75 inches (center of height of tape)
+# tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
+
+#Camera height is 37.5 inches
+targetHeightInches = 50.25
+
+camPixelWidth = 640
+# target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
+Tft = 3.27
+
+# theta = 1/2 FOV,
+tanFOV = math.tan(FOV / 2)
+
+
+
+#Constraint values
 # ratio values - detects feeder station. Doing and not when doing ratio checks will ignore them
 rat_low = 1.5
 rat_high = 5
 
-hsv_threshold_hue = [70, 121]
-hsv_threshold_saturation = [37, 255]
-hsv_threshold_value = [204, 255]
+#Solitity compares the hull vs contour, and looks at the difference in filled area
+#Works on a system of %
+solidity_low = .1
+solidity_high = .6
 
-solidity_threshold = [0, 65]
+#Vertices is acts as "length"
+minArea = 10
+minWidth = 20
+maxWidth = 1000
+minHeight = 20
+maxHeight = 1000
+maxVertices = 60
+minVertices = 25
+
+
+
+
+hsv_threshold_hue = [24, 142]
+hsv_threshold_saturation = [23, 169]
+hsv_threshold_value = [165, 255]
+
+
 
 # List will go in order [x of target position, y of target position, yaw, distance, ]
 sendValues = np.array([None] * 4)
@@ -296,7 +334,11 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     image = frame.copy()
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
-        value_array = findTape(contours, image, centerX, centerY)
+        #Blocking out parts of the robot
+        rect1 = cv2.rectangle(img, (0, 300), (640, 480), (0,0,0), -1)
+        
+        
+        value_array = findTape(contours, rect1, centerX, centerY)
     else:
         # No Contours!
         pass
@@ -428,15 +470,15 @@ def findTape(contours, image, centerX, centerY):
 
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
-            #cv2.imwrite("1beforeif.jpg", image)
             # Filters contours based off of size
-            if (mySolidity > .1) and (mySolidity < .7) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (x > minWidth) and (x < maxWidth) and (y > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 
                 #cv2.imwrite("1drawncontours.jpg", contimage)
                 #time.sleep(1)
                 #print("writing image")
+                
                 ### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
                 # Gets the centeroids of contour
                 if M["m00"] != 0:
@@ -554,7 +596,7 @@ def findTape(contours, image, centerX, centerY):
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
 def checkContours(cntSize, hullSize, aspRatio, contour):
-    return cntSize > (image_width / 6) and (len(contour) > 20) and not (aspRatio < rat_low or aspRatio > rat_high)
+    return cntSize > (image_width / 6) and (len(contour) > minVertices) and (len(contour) < maxVertices) and not (aspRatio < rat_low or aspRatio > rat_high)
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
 def checkBall(cntSize, cntAspectRatio):
@@ -571,24 +613,14 @@ def translateRotation(rotation, width, height):
     return round(rotation)
 
 
-def calculateDistanceFeet(targPixelWidth):
+def calculateDistanceFeet(targetPixelWidth):
     # d = Tft*FOVpixel/(2*Tpixel*tanΘ)
-
-    FOV = 75
-    # 8 feet, 2.25 inches, actual height of center goal is 96.25, I think the centroid of the tape is ~87.75 inches
-    # tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
-    #Camera height is 37.5 inches
-    targetHeightActual = 50.25
-    camPixelWidth = 640
-    # target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
-    Tft = 3.27
-    # theta = 1/2 FOV,
-    tanFOV = math.tan(FOV / 2)
-
-    distEst = Tft * camPixelWidth / (2 * targPixelWidth * tanFOV)
+    #Target width in feet * 
+    distEst = Tft * camPixelWidth / (2 * targetPixelWidth * tanFOV)
+    
     # Unsure as to what measurement distEst is producing in the above line, but multiplying it by .32 will return your distance in feet
     distEstFeet = distEst * .32
-    # distEstInches = distEstFeet *.32*12
+    #distEstInches = distEstFeet *.32*12
     return (distEstFeet)
 
 
