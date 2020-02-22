@@ -28,7 +28,7 @@ public class Config {
     STORAGE__ROLLER_EJECT_SPEED(1d),
     DRIVE__ACCEL_RAMP_TIME_SECONDS(1d),
     // TODO: make this a good number
-    DRIVE__BACK_SLOW_RAMP_TIME_SECONDS(1d),
+    DRIVE__BACK_SLOW_RAMP_TIME_SECONDS(0d),
 
     OI__VISION__ENABLED(false),
 

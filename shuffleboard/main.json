@@ -181,15 +181,15 @@
           "6,0": {
             "size": [
               10,
-              10
+              9
             ],
             "content": {
               "_type": "Camera Stream",
               "_source0": "camera_server://frontCamera",
               "_title": "frontCamera",
-              "Crosshair/Show crosshair": true,
+              "Crosshair/Show crosshair": false,
               "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": true,
+              "Controls/Show controls": false,
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
