@@ -474,19 +474,18 @@ public class Robot extends TimedRobot {
   }
 
   private void executeIntakeStateMachine() {
+    //Idle PreCheck - allow same loop
+    if(mIntakeState == IntakeState.IDLE){
+      mRobotLogger.warn("Intake state is idle");
+      mIntake.stop();
+      mStorage.stop();
+      mStorage.updateEncoderPosition();
+      mShooter.stop();
+      mIntakeState = IntakeState.READY_TO_INTAKE;
+    }
 
-
-
-
+    //Proceed to rest of state machine
     switch (mIntakeState) {
-      case IDLE:
-        mRobotLogger.warn("Intake state is idle");
-        mIntake.stop();
-        mStorage.stop();
-        mStorage.updateEncoderPosition();
-        mShooter.stop();
-        mIntakeState = IntakeState.READY_TO_INTAKE;
-        break;
       case READY_TO_INTAKE:
         // If the operator issues the intake command, start intake
         if (mOperatorInterface.startIntake()) {
@@ -586,11 +585,13 @@ public class Robot extends TimedRobot {
   }
 
   private void executeShootingStateMachine() {
+    //Precheck for Idle State
+    if(mShootingState == ShootingState.IDLE){
+      mRobotLogger.warn("Shooting state is idle");
+      mShooter.stop();
+    }
+
     switch (mShootingState) {
-      case IDLE:
-        mRobotLogger.warn("Shooting state is idle");
-        mShooter.stop();
-        break;
       case PREPARE_TO_SHOOT:
 
         /* Starts roller */
