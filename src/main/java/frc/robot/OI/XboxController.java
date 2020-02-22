@@ -1,6 +1,7 @@
 package frc.robot.OI;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
 import frc.robot.Constants;
@@ -44,10 +45,15 @@ public class XboxController {
   private boolean Rumble = false;
 
   // Pass in the port of the Controller
-  public  XboxController(int portArg) {
+  public XboxController(int portArg) {
     mController = new Joystick(portArg);
-    System.out.println("Xbox " + mController.getName());
-    System.out.println("Xbox " + mController.getPort());
+    checkNameAndPort();
+  }
+
+  public void checkNameAndPort(){
+    if(!mController.getName().equals("Controller (Xbox One For Windows)") || mController.getPort() != 0){
+      DriverStation.reportError("Xbox Controller not found in port 0! Got name " + mController.getName() + " in port " + mController.getPort(), new Error().getStackTrace());
+    }
   }
 
   double getJoystick(Side side, Axis axis) {

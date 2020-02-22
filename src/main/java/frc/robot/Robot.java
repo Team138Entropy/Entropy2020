@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
+    mOperatorInterface.checkControllers();
 
     mRobotLogger.log("robot init _ 1");
 
@@ -167,6 +168,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    mOperatorInterface.checkControllers();
+    
     mRobotLogger.log("Auto Init Called");
 
     mStorage.init();
@@ -192,6 +195,8 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
 
     mStorage.preloadBalls(0);
+
+    mOperatorInterface.checkControllers();
 
     // Set the initial Robot State
     mState = State.INTAKE;

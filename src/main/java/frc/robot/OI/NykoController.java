@@ -1,5 +1,6 @@
 package frc.robot.OI;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Constants;
 
@@ -53,8 +54,15 @@ public class NykoController {
   // Pass in the port of the Controller
   public NykoController(int portArg) {
     mController = new Joystick(portArg);
-    System.out.println(mController.getName());
-    System.out.println(mController.getPort());
+    checkNameAndPort();
+  }
+
+  public void checkNameAndPort(){
+    // for some stupid reason, the 300iq people at nyko thought it would be cool and epic to put a tab character after the name of the controller that is reported. the driver station then passes this on to us, so we get something that makes no sense and is bad to debug. is it one space? ten? a tab? something else stupid? we trim the string anyway
+    String name = mController.getName().trim();
+    if(!name.equals("AIRFLO") || mController.getPort() != 1){
+      DriverStation.reportError("Airflo Controller not found in port 1! Got name " + mController.getName() + " in port " + mController.getPort(), new Error().getStackTrace());
+    }
   }
 
   double getJoystick(Side side, Axis axis) {
