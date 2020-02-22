@@ -1,11 +1,7 @@
 package frc.robot.subsystems.auto.path;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import frc.robot.Config;
-import frc.robot.Robot;
 import frc.robot.subsystems.Drive;
-import frc.robot.util.DriveSignal;
 
 public class TurnSegment extends Segment {
   private double degrees; // For cloning
