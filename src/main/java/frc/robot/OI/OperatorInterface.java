@@ -16,6 +16,7 @@ public class OperatorInterface {
   private final XboxController DriverController;
   private final NykoController OperatorController;
   private LatchedBoolean mBarfLatch = new LatchedBoolean();
+  private LatchedBoolean mShootLatch = new LatchedBoolean();
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -119,7 +120,7 @@ public class OperatorInterface {
   }
 
   public boolean getShoot() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_3);
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.BUTTON_3));
   }
 
   public boolean getStateReset() {

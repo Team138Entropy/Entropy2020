@@ -592,12 +592,21 @@ public class Robot extends TimedRobot {
       case SHOOT_BALL_COMPLETE:
         /* Decrements storage */
         mStorage.removeBall();
-        mStorage.stop();
 
-        /* Goes to complete if storage is empty, otherwise fires again */
-        if (mStorage.isEmpty()) {
+        // We are gonna continue shooting until 
+        // /* Goes to complete if storage is empty, otherwise fires again */
+        // if (mStorage.isEmpty()) {
+        //   mShootingState = ShootingState.SHOOTING_COMPLETE;
+        // } else {
+        //   mShootingState = ShootingState.PREPARE_TO_SHOOT;
+        // }
+
+        
+        // shooting is a toggle
+        if(mOperatorInterface.getShoot()){
           mShootingState = ShootingState.SHOOTING_COMPLETE;
-        } else {
+          mStorage.stop();
+        }else{
           mShootingState = ShootingState.PREPARE_TO_SHOOT;
         }
         break;
