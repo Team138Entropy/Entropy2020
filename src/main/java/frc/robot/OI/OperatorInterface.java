@@ -35,6 +35,10 @@ public class OperatorInterface {
 
   // Driver
 
+  public boolean checkControllers(){
+    return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
+  }
+
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
   }
