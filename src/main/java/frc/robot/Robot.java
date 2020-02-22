@@ -103,6 +103,8 @@ public class Robot extends TimedRobot {
   private LatchedBoolean HarvestAim = new LatchedBoolean();
   static NetworkTable mTable;
 
+  private boolean mIsSpinningUp = false;
+
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
   private Timer mBarfTimer = new Timer();
@@ -187,6 +189,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    mIsSpinningUp = false;
     mOperatorInterface.checkControllers();
     
     mRobotLogger.log("Auto Init Called");
@@ -209,6 +212,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    visionLight.set(Relay.Value.kForward);
+    mIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
 
     //Start background looper
@@ -321,6 +326,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    visionLight.set(Relay.Value.kForward);
 
     Config.getInstance().reload();
   }
@@ -439,6 +445,16 @@ public class Robot extends TimedRobot {
 
     updateSmartDashboard();
 
+
+    if(mOperatorInterface.getSpinUp()){
+      mIsSpinningUp = !mIsSpinningUp;
+    }
+
+    if(mIsSpinningUp){
+      mShooter.start();
+    }else if(mState != State.SHOOTING){
+      mShooter.stop();
+    }
  
 
     // Shooter velocity trim
@@ -539,6 +555,7 @@ public class Robot extends TimedRobot {
         }
 
         break;
+      // we just stored a ball
       case STORAGE_COMPLETE:
         mStorage.addBall();
         mStorage.stop();
@@ -557,9 +574,10 @@ public class Robot extends TimedRobot {
         mStorage.updateEncoderPosition();
         mIntake.barf(); // Ball Acqusition Reverse Functionality (BARF)
         mStorage.barf();
+        mStorage.emptyBalls();
+
         if (mBarfTimer.get() >= BARF_TIMER_DURATION) {
           mIntakeState = IntakeState.IDLE;
-          mStorage.emptyBalls();
         }
         break;
       default:
@@ -601,9 +619,11 @@ public class Robot extends TimedRobot {
         mShooter.stop();
         break;
       case PREPARE_TO_SHOOT:
+        mStorage.stop();
 
         /* Starts roller */
         mShooter.start();
+        mIsSpinningUp = false;
 
         // TODO: Placeholder method, replace later.
         mShooter.target();
