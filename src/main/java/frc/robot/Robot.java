@@ -524,6 +524,7 @@ public class Robot extends TimedRobot {
         }
         break;
       case INTAKE:
+        mStorage.updateEncoderPosition();
         // Check transition to shooting before we start intake of a new ball
         if (!checkTransitionToShooting()) {
 
