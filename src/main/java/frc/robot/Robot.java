@@ -360,12 +360,10 @@ public class Robot extends TimedRobot {
       // Detect Harvest Mode
       boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
       boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
-
       boolean WantsAutoAim = false;
 
       // Optional Object that may or may not contain a null value
       Optional<AimingParameters> BallAimingParameters; // info to aim to the ball
-      Optional<AimingParameters> TargetAimingParameters; // info to aim to the target
 
       // Continue Driving
       if (WantsHarvestMode == true) {
