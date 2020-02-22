@@ -37,7 +37,7 @@ public class Storage extends Subsystem {
   private WPI_TalonSRX mTopRoller;
 
   private int mBallCount = 0;
-  private int mStartingEncoderPosition = 0;
+  
 
   private static Storage sInstance;
 
@@ -60,6 +60,7 @@ public class Storage extends Subsystem {
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
     
     mBottomRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+    mBottomRoller.setSensorPhase(false);
 
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
     updateEncoderPosition();
@@ -68,7 +69,7 @@ public class Storage extends Subsystem {
   public synchronized int getEncoder() {
     // return the negative position that the talon gets us because it's hooked up backwards
     // this will return positive values
-    return -mBottomRoller.getSelectedSensorPosition();
+    return mBottomRoller.getSelectedSensorPosition();
   }
 
   public synchronized void updateEncoderPosition() {
@@ -92,14 +93,12 @@ public class Storage extends Subsystem {
       return true;
     }
 
-    int encoderDistance = mStartingEncoderPosition - getEncoder();
+    int encoderDistance = getEncoder();
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
     SmartDashboard.putNumber("Encoder Distance Raw", getEncoder());
 
     // if we've hit our encoder distance target
     if (encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS) {
-      // reset the encoder position
-      mStartingEncoderPosition = getEncoder();
       return true;
     } else {
       return false;
