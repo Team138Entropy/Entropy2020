@@ -94,6 +94,7 @@ public class Robot extends TimedRobot {
   private CameraManager mCameraManager;
 
   private final RobotTracker mRobotTracker = RobotTracker.getInstance();
+  private final RobotTrackerUpdater mRobotTrackerUpdater = RobotTrackerUpdater.getInstance();
 
   public Relay visionLight = new Relay(0);
 
@@ -326,6 +327,13 @@ public class Robot extends TimedRobot {
 
     if(mTurretState == TurretState.AUTO_AIM){
       //Command the Turret with vision set points
+      RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+        if(result.HasResult){
+          //We have Target Information
+          mTurret.SetAimError(result.turret_error.getDegrees());
+        }else{
+          //No Results, Don't Rotate
+        }
     }else{
       //Command the Turret Manually
         // Operator Controls
