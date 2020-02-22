@@ -11,7 +11,7 @@ public class Paths {
     paths.put(
         "test",
         new Path()
-            .append(new DriveSegment(2))
+            .append(new DriveSegment(10))
             .append(new TurnSegment(45))
             .append(new DriveSegment(1)));
   }

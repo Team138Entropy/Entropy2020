@@ -11,7 +11,7 @@ public class Config {
 
   public enum Key {
     // Physical qualities of robot
-    ROBOT__REAL_TRACK_WIDTH(0.58), // Meters, 0.58 is about 23"
+    ROBOT__REAL_TRACK_WIDTH(0.58d), // Meters, 0.58 is about 23"
     DRIVE__TICKS_PER_METER(640),
 
     // Motors,

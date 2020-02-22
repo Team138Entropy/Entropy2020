@@ -62,8 +62,8 @@ public class Drive extends Subsystem {
     return mInstance;
   }
 
-  public int metersToTicks(double meters) {
-    long roundedVal = Math.round(meters * Config.getInstance().getInt(Key.DRIVE__TICKS_PER_METER));
+  public int feetToTicks(double feet) {
+    long roundedVal = Math.round(feet * 1228.615 /*Config.getInstance().getInt(Key.DRIVE__TICKS_PER_METER)*/);
     if (roundedVal > Integer.MAX_VALUE) {
       mDriveLogger.warn(
           "Integer overflow when converting meters to ticks! Something is likely VERY WRONG!");
@@ -125,13 +125,24 @@ public class Drive extends Subsystem {
     D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
     ramp = Config.getInstance().getDouble(Key.AUTO__DRIVE_PID_RAMP);
 
+    mDriveLogger.info("PID values: " + P + ", " + I + ", " + D);
+    try {
+      Thread.sleep(1000);
+    } catch (Exception ignored) {}
+
     mLeftMaster.config_kP(0, P);
     mLeftMaster.config_kI(0, I);
     mLeftMaster.config_kD(0, D);
+    mLeftMaster.configClosedloopRamp(0.5, 0);
+    mLeftMaster.configClosedLoopPeakOutput(0, 0.5);
+
 
     mRightMaster.config_kP(0, P);
     mRightMaster.config_kI(0, I);
     mRightMaster.config_kD(0, D);
+    mRightMaster.configClosedloopRamp(0.5, 0);
+    mRightMaster.configClosedLoopPeakOutput(0, 0.5);
+
 
     // talon.configClosedloopRamp(1);
   }

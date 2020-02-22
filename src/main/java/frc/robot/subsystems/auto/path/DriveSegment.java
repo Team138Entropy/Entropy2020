@@ -1,11 +1,14 @@
 package frc.robot.subsystems.auto.path;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.subsystems.Drive;
 import frc.robot.util.DriveSignal;
 
 public class DriveSegment extends Segment {
-  private double meters; // For cloning
+  private final int acceptableError = 50;
+
+  private double feet; // For cloning
 
   private int targetPosition;
   private int min, max;
@@ -15,12 +18,13 @@ public class DriveSegment extends Segment {
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
+  // private int debounceCount = 
 
-  public DriveSegment(double meters) {
-    this.meters = meters;
+  public DriveSegment(double feet) {
+    this.feet = feet;
     this.drive = Drive.getInstance();
-    this.targetPosition = drive.metersToTicks(meters);
-    int acceptableError = Config.getInstance().getInt(Config.Key.AUTO__DRIVE_PID_ACCEPTABLE_ERROR);
+    this.targetPosition = drive.feetToTicks(feet);
+    // int acceptableError = 10; // Config.getInstance().getInt(Config.Key.AUTO__DRIVE_PID_ACCEPTABLE_ERROR);
     this.min = targetPosition - acceptableError;
     this.max = targetPosition + acceptableError;
   }
@@ -38,6 +42,8 @@ public class DriveSegment extends Segment {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
+    drive.setTargetPosition(targetPosition);
   }
 
   @Override
@@ -57,11 +63,13 @@ public class DriveSegment extends Segment {
       loggingCount = 0;
     }
 
-    if (avgPos > min && avgPos < max) {
-      logger.verbose(min + " < " + avgPos + " < " + max);
-      done = true;
-      drive.setOpenLoop(DriveSignal.BRAKE);
-    }
+    SmartDashboard.putNumber("Average encoder value", avgPos);
+
+    // if (avgPos > min && avgPos < max) {
+    //   logger.verbose(min + " < " + avgPos + " < " + max);
+    //   done = true;
+    //   drive.setOpenLoop(DriveSignal.BRAKE);
+    // }
   }
 
   @Override
@@ -75,7 +83,7 @@ public class DriveSegment extends Segment {
 
   @Override
   public Segment copy() {
-    return new DriveSegment(meters);
+    return new DriveSegment(feet);
   }
 
   /**
