@@ -179,16 +179,11 @@ public class Shooter extends Subsystem {
     return isAtVelocityDebounced;
   }
 
-<<<<<<< HEAD
   public boolean isBallFired(){
     boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity && mShotCountdown >= MIN_SHOT_COUNTDOWN;
     if(ballFired) mShotCountdown = 0;
     return ballFired;
-=======
-  public boolean isBallFired() {
-    return Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (SPEED_DEADBAND + 50);
->>>>>>> a37b422526ac76b5dc83863b7ada66d51484e527
   }
 
   // Used in TEST mode only
