@@ -232,6 +232,12 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     try {
       RobotLoop();
+      mRobotLogger.info(
+          "Encoder distances: ("
+              + mDrive.getLeftEncoderDistance()
+              + ", "
+              + mDrive.getRightEncoderDistance()
+              + ")");
     } catch (Exception e) {
       mRobotLogger.log("RobotLoop Exception: " + e.getMessage());
 

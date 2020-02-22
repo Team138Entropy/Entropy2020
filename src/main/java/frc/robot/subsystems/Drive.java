@@ -118,11 +118,12 @@ public class Drive extends Subsystem {
     talon.setNeutralMode(NeutralMode.Brake);
 
     // Configure Talon gains
-    double P, I, D;
+    double P, I, D, ramp;
 
     P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
     I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
     D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
+    ramp = Config.getInstance().getDouble(Key.AUTO__DRIVE_PID_RAMP);
 
     mLeftMaster.config_kP(0, P);
     mLeftMaster.config_kI(0, I);

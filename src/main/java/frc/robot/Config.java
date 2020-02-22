@@ -10,7 +10,11 @@ package frc.robot;
 public class Config {
 
   public enum Key {
-    // Motors
+    // Physical qualities of robot
+    ROBOT__REAL_TRACK_WIDTH(0.58), // Meters, 0.58 is about 23"
+    DRIVE__TICKS_PER_METER(640),
+
+    // Motors,
     DRIVE__LEFT_BACK_PORT(1),
     DRIVE__LEFT_FRONT_PORT(2),
     DRIVE__RIGHT_BACK_PORT(3),
@@ -21,8 +25,6 @@ public class Config {
     SHOOTER__ROLLER(6),
     SHOOTER__ROLLER_SLAVE(5),
 
-    // Conversion constants
-    DRIVE__TICKS_PER_METER(640),
 
     // Sensors
     INTAKE__SENSOR(1),

@@ -1,6 +1,5 @@
 package frc.robot.subsystems.auto.path;
 
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
 import frc.robot.subsystems.Drive;
 import frc.robot.util.DriveSignal;
@@ -39,10 +38,8 @@ public class DriveSegment extends Segment {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
   }
 
-  @SuppressWarnings("DuplicatedCode") // Marks some code as duplicate of code in TurnSegment.tick()
   @Override
   public void tick() {
 
