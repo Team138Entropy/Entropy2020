@@ -119,8 +119,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
-
-    mRobotLogger.log("robot init _ 1");
+    SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
 
     
     //Register the Enabled Looper
@@ -142,6 +141,7 @@ public class Robot extends TimedRobot {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
 
+
     mCameraManager = CameraManager.getInstance();
     mCameraManager.init();
 
@@ -156,9 +156,14 @@ public class Robot extends TimedRobot {
     }
   }
 
+  
+  @Override
+  public void robotPeriodic() {}
+
   private void updateSmartDashboard() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
 
+    SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
       SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
@@ -182,6 +187,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    mOperatorInterface.checkControllers();
+    
     mRobotLogger.log("Auto Init Called");
 
     //Start background looper
@@ -211,6 +218,8 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
 
     mStorage.preloadBalls(0);
+
+    mOperatorInterface.checkControllers();
 
     // Set the initial Robot State
     mState = State.INTAKE;

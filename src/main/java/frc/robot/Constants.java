@@ -6,9 +6,12 @@ import frc.robot.util.geometry.Translation2d;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
 public class Constants {
+
   // Controller Ports
-  public static final int OperatorControllerPort = 1;
   public static final int DriverControllerPort = 0;
+  public static final String DriverControllerName = "Controller (Xbox One For Windows)";
+  public static final int OperatorControllerPort = 1;
+  public static final String OperatorControllerName = "AIRFLO";
 
   // PWM
   public static final int kCameraRingId = 0;

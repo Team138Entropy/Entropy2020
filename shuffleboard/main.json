@@ -136,7 +136,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///FMSInfo/IsRedAlliance",
-              "_title": "/FMSInfo/IsRedAlliance",
+              "_title": "Alliance",
               "Colors/Color when true": "#FF0000FF",
               "Colors/Color when false": "#0000FFFF"
             }
@@ -332,6 +332,19 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Intake Current",
               "_title": "Intake Current"
+            }
+          },
+          "16,7": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Correct Controllers",
+              "_title": "Correct Controllers",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }
@@ -759,6 +772,19 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Velocity Countdown",
               "_title": "Velocity Countdown"
+            }
+          },
+          "4,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Correct Controllers",
+              "_title": "Correct Controllers",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }
