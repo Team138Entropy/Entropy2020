@@ -297,8 +297,8 @@ public class Robot extends TimedRobot {
       mDrive.setOutputRightFront(0);
     }
 
-    if (mOperatorInterface.isJogClimber()) {
-      mClimber.jog(Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED));
+    if (mOperatorInterface.getClimberJogSpeed() != 0) {
+      mClimber.jog(mOperatorInterface.getClimberJogSpeed() * Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED));
     } else if (mOperatorInterface.isHomeClimber()) {
       mClimber.home();
     } else {

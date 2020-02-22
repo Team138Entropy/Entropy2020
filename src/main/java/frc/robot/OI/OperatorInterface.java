@@ -165,8 +165,12 @@ public class OperatorInterface {
   }
 
   //TODO: Decide on climber jog and home buttons
-  public boolean isJogClimber() {
-    return true;
+  public double getClimberJogSpeed() {
+    if (OperatorController.getButton(NykoController.Button.LEFT_BUMPER)) {
+      return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
+    } else {
+      return 0;
+    }
   }
 
   public boolean isHomeClimber() {

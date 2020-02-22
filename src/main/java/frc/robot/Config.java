@@ -30,7 +30,8 @@ public class Config {
     STORAGE__ROLLER_EJECT_SPEED(1d),
     CLIMBER__EXTEND_SPEED(1d),
     CLIMBER__RETRACT_SPEED(-1d),
-    CLIMBER__JOG_SPEED(1d),
+    CLIMBER__JOG_SPEED(.5d),
+    CLIMBER__HOME_SPEED(.5d),
 
     OI__VISION__ENABLED(false),
     CLIMBER__ENABLED(false),
@@ -62,7 +63,14 @@ public class Config {
     CLIMBER__HEIGHT_IN_ENCODER_TICKS(2000d),
     CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS(0d),
 
-    OI__VISION__PID__MAX_SPEED(0.25d);
+    OI__VISION__PID__MAX_SPEED(0.25d),
+
+    CLIMBER__PID_LOOP_INDEX(0),
+    CLIMBER__TIMEOUT_MS(10),
+    CLIMBER__KF(.2d),
+    CLIMBER__KP(5d),
+    CLIMBER__KI(.01d),
+    CLIMBER__KD(10d);
 
     private Object value;
 
