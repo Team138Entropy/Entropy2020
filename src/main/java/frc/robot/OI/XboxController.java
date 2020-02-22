@@ -44,8 +44,10 @@ public class XboxController {
   private boolean Rumble = false;
 
   // Pass in the port of the Controller
-  public XboxController(int portArg) {
+  public  XboxController(int portArg) {
     mController = new Joystick(portArg);
+    System.out.println("Xbox " + mController.getName());
+    System.out.println("Xbox " + mController.getPort());
   }
 
   double getJoystick(Side side, Axis axis) {

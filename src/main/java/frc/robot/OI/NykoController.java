@@ -53,6 +53,8 @@ public class NykoController {
   // Pass in the port of the Controller
   public NykoController(int portArg) {
     mController = new Joystick(portArg);
+    System.out.println(mController.getName());
+    System.out.println(mController.getPort());
   }
 
   double getJoystick(Side side, Axis axis) {
