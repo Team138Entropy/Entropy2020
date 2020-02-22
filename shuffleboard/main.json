@@ -346,6 +346,19 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "19,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Manual Spin-up",
+              "_title": "Manual Spin-up",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
           }
         }
       }
@@ -445,6 +458,12 @@
                   "Visuals/Starting angle": 180.0,
                   "Visuals/Show tick mark ring": true,
                   "Visuals/Counter clockwise": false
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [20]",
+                  "_title": "Talon SRX [20]",
+                  "Visuals/Orientation": "HORIZONTAL"
                 }
               ]
             }
@@ -754,16 +773,21 @@
           },
           "22,5": {
             "size": [
-              3,
-              1
+              4,
+              2
             ],
             "content": {
-              "_type": "Text View",
+              "_type": "Number Bar",
               "_source0": "network_table:///SmartDashboard/Shot Countdown",
-              "_title": "Shot Countdown"
+              "_title": "Shot Countdown",
+              "Range/Min": -1.0,
+              "Range/Max": 1.0,
+              "Range/Center": 0.0,
+              "Visuals/Num tick marks": 5,
+              "Visuals/Show text": true
             }
           },
-          "22,6": {
+          "22,7": {
             "size": [
               3,
               1
@@ -783,6 +807,19 @@
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Correct Controllers",
               "_title": "Correct Controllers",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "7,7": {
+            "size": [
+              5,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Manual Spin-up",
+              "_title": "Manual Spin-up",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -824,7 +861,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/ShooterSpunUp",
-              "_title": "SmartDashboard/ShooterSpunUp",
+              "_title": "ShooterSpunUp",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -853,6 +890,22 @@
               "Range/Max": 5.0,
               "Range/Center": 0.0,
               "Visuals/Num tick marks": 6,
+              "Visuals/Show text": true
+            }
+          },
+          "12,3": {
+            "size": [
+              4,
+              2
+            ],
+            "content": {
+              "_type": "Number Bar",
+              "_source0": "network_table:///SmartDashboard/Velocity Countdown",
+              "_title": "SmartDashboard/Velocity Countdown",
+              "Range/Min": 0.0,
+              "Range/Max": 100.0,
+              "Range/Center": 0.0,
+              "Visuals/Num tick marks": 5,
               "Visuals/Show text": true
             }
           }
