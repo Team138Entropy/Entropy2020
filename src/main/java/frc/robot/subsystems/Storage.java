@@ -11,24 +11,24 @@ import frc.robot.Config.Key;
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private static final int ROLLER_BOTTOM_PORT =
+  private final int ROLLER_BOTTOM_PORT =
       Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
-  private static final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
+  private final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
-  private static final int STORAGE_CAPICTY = 5;
+  private final int STORAGE_CAPICTY = 5;
 
-  private static final double STORE_SPEED =
+  private final double STORE_SPEED =
       Config.getInstance().getDouble(Key.STORAGE__ROLLER_STORE_SPEED);
-  private static final double BOTTOM_SPEED_FACTOR =
+  private final double BOTTOM_SPEED_FACTOR =
       Config.getInstance().getDouble(Key.STORAGE__ROLLER_BOTTOM_SPEED_FACTOR);
-  private static final double TEST_SPEED_FACTOR =
+  private final double TEST_SPEED_FACTOR =
       Config.getInstance().getDouble(Key.STORAGE__ROLLER_SPEED_FACTOR);
-  private static final double EJECT_SPEED =
+  private final double EJECT_SPEED =
       Config.getInstance().getDouble(Key.STORAGE__ROLLER_EJECT_SPEED);
-  private static final double BALL_DISTANCE_IN_ENCODER_TICKS =
+  private final double BALL_DISTANCE_IN_ENCODER_TICKS =
       Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS);
 
-  private static final int INTAKE_SENSOR_PORT = 0;
+  private final int INTAKE_SENSOR_PORT = 0;
 
   private DigitalInput mIntakeSensor;
 
@@ -59,6 +59,7 @@ public class Storage extends Subsystem {
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
 
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
+    updateEncoderPosition();
   }
 
   private int getEncoder() {
@@ -67,7 +68,7 @@ public class Storage extends Subsystem {
     return -mBottomRoller.getSelectedSensorPosition();
   }
 
-  public void init() {
+  public void updateEncoderPosition() {
     mStartingEncoderPosition = getEncoder();
   }
 

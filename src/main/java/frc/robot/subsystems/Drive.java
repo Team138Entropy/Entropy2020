@@ -78,9 +78,7 @@ public class Drive extends Subsystem {
 
     mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
-  }
 
-  public void init() {
     mLeftMaster.configFactoryDefault();
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);

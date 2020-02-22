@@ -165,8 +165,6 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     mRobotLogger.log("Auto Init Called");
 
-    mStorage.init();
-    mDrive.init();
 
     Config.getInstance().reload();
 
@@ -195,8 +193,6 @@ public class Robot extends TimedRobot {
     mClimingState = ClimingState.IDLE;
     mShootingState = ShootingState.IDLE;
 
-    mStorage.init();
-    mDrive.init();
 
     // updated in Intake.java
     SmartDashboard.putBoolean("Intake Spinning Up", false);
@@ -453,7 +449,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
-        mStorage.init();
+        mStorage.updateEncoderPosition();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
         break;
@@ -515,7 +511,7 @@ public class Robot extends TimedRobot {
         mIntake.resetOvercurrentCooldown();
         break;
       case STORAGE_EJECT:
-        mStorage.init();
+        mStorage.updateEncoderPosition();
         mIntake.barf(); // Ball Acqusition Reverse Functionality (BARF)
         mStorage.barf();
         if (mBarfTimer.get() >= BARF_TIMER_DURATION) {
