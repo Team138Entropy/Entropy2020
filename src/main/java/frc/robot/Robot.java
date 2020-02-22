@@ -584,6 +584,11 @@ public class Robot extends TimedRobot {
 
         mShooter.start();
 
+        if(mOperatorInterface.getShoot()){
+          mShootingState = ShootingState.SHOOTING_COMPLETE;
+          mStorage.stop();
+        }
+
         /* If finished shooting, changes to next state*/
         if (mShooter.isBallFired()) {
           mShootingState = ShootingState.SHOOT_BALL_COMPLETE;
@@ -603,12 +608,7 @@ public class Robot extends TimedRobot {
 
         
         // shooting is a toggle
-        if(mOperatorInterface.getShoot()){
-          mShootingState = ShootingState.SHOOTING_COMPLETE;
-          mStorage.stop();
-        }else{
-          mShootingState = ShootingState.PREPARE_TO_SHOOT;
-        }
+        mShootingState = ShootingState.PREPARE_TO_SHOOT;
         break;
       case SHOOTING_COMPLETE:
 
