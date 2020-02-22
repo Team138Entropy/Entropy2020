@@ -101,9 +101,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
-    mOperatorInterface.checkControllers();
-
-    mRobotLogger.log("robot init _ 1");
+    SmartDashboard.putBoolean("Correct Controllerss", mOperatorInterface.checkControllers());
 
     mRobotTracker.reset();
 
@@ -118,6 +116,7 @@ public class Robot extends TimedRobot {
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
+
 
     mCameraManager = CameraManager.getInstance();
     mCameraManager.init();
@@ -142,9 +141,14 @@ public class Robot extends TimedRobot {
     }
   }
 
+  
+  @Override
+  public void robotPeriodic() {}
+
   private void updateSmartDashboard() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
 
+    SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
       SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());

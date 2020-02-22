@@ -50,10 +50,12 @@ public class XboxController {
     checkNameAndPort();
   }
 
-  public void checkNameAndPort(){
+  public boolean checkNameAndPort(){
     if(!mController.getName().equals("Controller (Xbox One For Windows)") || mController.getPort() != 0){
       DriverStation.reportError("Xbox Controller not found in port 0! Got name " + mController.getName() + " in port " + mController.getPort(), new Error().getStackTrace());
+      return false;
     }
+    return true;
   }
 
   double getJoystick(Side side, Axis axis) {

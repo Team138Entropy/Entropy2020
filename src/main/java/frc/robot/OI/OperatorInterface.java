@@ -35,9 +35,8 @@ public class OperatorInterface {
 
   // Driver
 
-  public void checkControllers(){
-    DriverController.checkNameAndPort();
-    OperatorController.checkNameAndPort();
+  public boolean checkControllers(){
+    return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
   }
 
   public double getDriveThrottle() {
