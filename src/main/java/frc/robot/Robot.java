@@ -11,7 +11,6 @@ import frc.robot.OI.OperatorInterface;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
-import frc.robot.util.geometry.*;
 import frc.robot.vision.AimingParameters;
 import java.util.Optional;
 
@@ -163,7 +162,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("ClimbingState", mClimingState.name());
 
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
-    System.out.println(mShooter.getSpeed());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
   }
 
@@ -485,6 +483,9 @@ public class Robot extends TimedRobot {
 
           // If a ball is detected, store it
           if (mStorage.isBallDetected()) {
+            if(mStorage.getBallCount() == mStorage.getCapacity() + 1){
+              mIntakeState = IntakeState.STORAGE_COMPLETE;
+            }
             mIntakeState = IntakeState.STORE_BALL;
           }
 
@@ -535,7 +536,7 @@ public class Robot extends TimedRobot {
   private boolean checkTransitionToShooting() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
-    if (mOperatorInterface.getShoot() && (!mStorage.isEmpty()) /* && result.HasResult*/) {
+    if (mOperatorInterface.getShoot() /* && (!mStorage.isEmpty()) && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
         case INTAKE:
