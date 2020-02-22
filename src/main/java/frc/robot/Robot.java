@@ -165,6 +165,7 @@ public class Robot extends TimedRobot {
   private void updateSmartDashboard() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
 
+    SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
