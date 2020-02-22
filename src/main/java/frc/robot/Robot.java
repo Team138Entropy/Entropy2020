@@ -63,7 +63,6 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
 
-  private Drive mDrive;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -76,6 +75,9 @@ public class Robot extends TimedRobot {
   private final Shooter mShooter = Shooter.getInstance();
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
+  private final Turret mTurret = Turret.getInstance();
+  private final Drive mDrive = Drive.getInstance();
+
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -86,7 +88,6 @@ public class Robot extends TimedRobot {
   // Control Variables
   private LatchedBoolean AutoAim = new LatchedBoolean();
   private LatchedBoolean HarvestAim = new LatchedBoolean();
-  private Turret mTurret;
   static NetworkTable mTable;
 
   // Fire timer for shooter
@@ -130,15 +131,6 @@ public class Robot extends TimedRobot {
     mIntakeState = IntakeState.IDLE;
     mClimingState = ClimingState.IDLE;
     mShootingState = ShootingState.IDLE;
-
-    // TODO: remove HAS_TURRET and HAS_DRIVETRAIN
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_TURRET)) {
-      mTurret = Turret.getInstance();
-    }
-
-    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
-      mDrive = Drive.getInstance();
-    }
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator = BallIndicator.getInstance();
