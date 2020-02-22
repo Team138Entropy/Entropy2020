@@ -119,7 +119,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
-    SmartDashboard.putBoolean("Correct Controllerss", mOperatorInterface.checkControllers());
+    SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
 
     
     //Register the Enabled Looper
