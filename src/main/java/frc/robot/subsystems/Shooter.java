@@ -11,33 +11,33 @@ import frc.robot.SpeedLookupTable;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private static final double MAX_SPEED = 2550d;
+  private final double MAX_SPEED = 2550d;
   // private static final double SPEED_DEADBAND = 20;
-  private static final double SPEED_DEADBAND = 75;
-  private static final double DROP_DEADBAND = 250;
-  private static final int SPEED_DEADBAND_DELAY = 10;
-  private static final double FEEDFORWARD = 1023d / MAX_SPEED;
+  private final double SPEED_DEADBAND = 75;
+  private final double DROP_DEADBAND = 250;
+  private final int SPEED_DEADBAND_DELAY = 10;
+  private final double FEEDFORWARD = 1023d / MAX_SPEED;
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
   // private static final double D = 0.1;
-  private static final double P = 0;
-  private static final double I = 0;
-  private static final double D = 0;
+  private final double P = 0;
+  private final double I = 0;
+  private final double D = 0;
 
   // a minimum acountdown
-  private static final int MIN_SHOT_COUNTDOWN = 10;
+  private final int MIN_SHOT_COUNTDOWN = 10;
   private int mShotCountdown = 0;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
+  private final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int DEFAULT_ROLLER_SPEED =
+  private final int DEFAULT_ROLLER_SPEED =
       2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
-  private static final int VELOCITY_ADJUSTMENT_BUMP =
+  private final int VELOCITY_ADJUSTMENT_BUMP =
       Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
   private boolean mHasHadCurrentDrop = false;
@@ -132,24 +132,24 @@ public class Shooter extends Subsystem {
     return speed + mVelocityAdjustment;
   }
 
-  public void increaseVelocity() {
+  public synchronized void increaseVelocity() {
     mVelocityAdjustment += VELOCITY_ADJUSTMENT_BUMP;
   }
 
-  public void decreaseVelocity() {
+  public synchronized void decreaseVelocity() {
     mVelocityAdjustment -= VELOCITY_ADJUSTMENT_BUMP;
   }
 
-  public void resetVelocity() {
+  public synchronized void resetVelocity() {
     mVelocityAdjustment = 0;
   }
 
-  public int getVelocityAdjustment() {
+  public synchronized int getVelocityAdjustment() {
     return mVelocityAdjustment;
   }
 
   /** Returns whether roller is at full speed. */
-  public boolean isAtVelocity() {
+  public synchronized boolean isAtVelocity() {
     mShotCountdown ++;
     SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
@@ -179,7 +179,7 @@ public class Shooter extends Subsystem {
     return isAtVelocityDebounced;
   }
 
-  public boolean isBallFired(){
+  public synchronized boolean isBallFired(){
     boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity && mShotCountdown >= MIN_SHOT_COUNTDOWN;
     if(ballFired) mShotCountdown = 0;
