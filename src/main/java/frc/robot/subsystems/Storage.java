@@ -62,25 +62,25 @@ public class Storage extends Subsystem {
     updateEncoderPosition();
   }
 
-  private int getEncoder() {
+  private synchronized int getEncoder() {
     // return the negative position that the talon gets us because it's hooked up backwards
     // this will return positive values
     return -mBottomRoller.getSelectedSensorPosition();
   }
 
-  public void updateEncoderPosition() {
+  public synchronized void updateEncoderPosition() {
     mStartingEncoderPosition = getEncoder();
   }
 
-  public boolean getIntakeSensor() {
+  public synchronized boolean getIntakeSensor() {
     return mIntakeSensor.get();
   }
 
-  public boolean isBallDetected() {
+  public synchronized boolean isBallDetected() {
     return getIntakeSensor();
   }
 
-  public boolean isBallStored() {
+  public synchronized boolean isBallStored() {
     System.out.println(getEncoder());
     // this allows us to fit a 5th ball
     if (sInstance.getBallCount() == 4) {
@@ -100,7 +100,7 @@ public class Storage extends Subsystem {
     }
   }
 
-  public void barf() {
+  public synchronized void barf() {
     mBottomRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED * BOTTOM_SPEED_FACTOR));
     mTopRoller.set(ControlMode.PercentOutput, -(EJECT_SPEED));
   }
@@ -121,43 +121,43 @@ public class Storage extends Subsystem {
     }
   }
 
-  public boolean isEmpty() {
+  public synchronized boolean isEmpty() {
     return mBallCount == 0;
   }
 
-  public boolean isFull() {
+  public synchronized boolean isFull() {
     return mBallCount == STORAGE_CAPICTY;
   }
 
-  public void storeBall() {
+  public synchronized void storeBall() {
     mBottomRoller.set(ControlMode.PercentOutput, STORE_SPEED * BOTTOM_SPEED_FACTOR);
     mTopRoller.set(ControlMode.PercentOutput, STORE_SPEED);
   }
 
-  public void emptyBalls() {
+  public synchronized void emptyBalls() {
     mBallCount = 0;
   }
 
   /** Stops the roller. */
-  public void stop() {
+  public synchronized void stop() {
     mBottomRoller.set(ControlMode.PercentOutput, 0);
     mTopRoller.set(ControlMode.PercentOutput, 0);
   }
 
-  public void ejectBall() {
+  public synchronized void ejectBall() {
     mBottomRoller.set(ControlMode.PercentOutput, EJECT_SPEED * BOTTOM_SPEED_FACTOR);
     mTopRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
   }
 
-  public void setBottomOutput(double output) {
+  public synchronized void setBottomOutput(double output) {
     mBottomRoller.set(ControlMode.PercentOutput, output * BOTTOM_SPEED_FACTOR * TEST_SPEED_FACTOR);
   }
 
-  public void setTopOutput(double output) {
+  public synchronized void setTopOutput(double output) {
     mTopRoller.set(ControlMode.PercentOutput, output * TEST_SPEED_FACTOR);
   }
 
-  public int getBallCount() {
+  public synchronized int getBallCount() {
     return mBallCount;
   }
 
