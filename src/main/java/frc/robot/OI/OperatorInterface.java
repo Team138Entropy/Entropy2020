@@ -3,6 +3,7 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -14,6 +15,7 @@ public class OperatorInterface {
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
   private final NykoController OperatorController;
+  private LatchedBoolean mBarfLatch = new LatchedBoolean();
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -129,7 +131,7 @@ public class OperatorInterface {
   }
 
   public boolean isBarf() {
-    return DriverController.getButton(XboxController.Button.START);
+    return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
   }
 
   // Test Mode functions
