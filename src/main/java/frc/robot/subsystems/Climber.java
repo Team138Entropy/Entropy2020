@@ -5,9 +5,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
-import javax.naming.ldap.Control;
-
 import frc.robot.Config;
 import frc.robot.Logger;
 
@@ -20,8 +17,8 @@ public class Climber extends Subsystem {
   private final double RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
   private final double HOMING_SPEED_PERCENT = -.2;
 
-  // Talon SRX/ Victor SPX will support multiple (cascaded) PID loops
-  // For now we just want the primary one.
+  /** Talon SRX/ Victor SPX will support multiple (cascaded) PID loops. For now we just want the primary one. */
+
   public static final int kClimberPIDLoopIndex = 0;
 
   // climber motion command timeout
@@ -37,10 +34,12 @@ public class Climber extends Subsystem {
   private static Climber sInstance;
   private WPI_TalonSRX mMotor;
   private Logger mLogger;
+  private boolean mIsHoming;
 
   private Climber() {
     mMotor = new WPI_TalonSRX(PORT_NUMBER);
     mLogger = new Logger("climber");
+    mIsHoming = false;
   }
 
   public static Climber getInstance() {
@@ -98,15 +97,29 @@ public class Climber extends Subsystem {
     return true;
   }
 
-  public void jog(int direction, double speed) {
-    mMotor.set(ControlMode.PercentOutput, speed * direction);
+  public boolean isRetracted() {
+    return true;
   }
 
+  /** Jogs the climber as long as it's held */
+  public void jog(double speed) {
+    mMotor.set(ControlMode.PercentOutput, speed);
+  }
+
+  /** Homes the climber as long as it's held */
   public void home() {
-    mMotor.set(ControlMode.PercentOutput, HOMING_SPEED_PERCENT);
+    if (!mIsHoming) {
+      mMotor.set(ControlMode.PercentOutput, HOMING_SPEED_PERCENT);
+      mIsHoming = true;
+    } else if (mIsHoming && isRetracted()) {
+      stopHoming();
+      mIsHoming = false;
+    }
   }
 
-  public void stopHoming() {
+
+
+  private void stopHoming() {
     mMotor.stopMotor();
     mMotor.setSelectedSensorPosition(0, 0, 0);
   }

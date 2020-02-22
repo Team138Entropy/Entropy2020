@@ -47,7 +47,7 @@ public class OperatorInterface {
   public boolean startClimb() {
     boolean buttonValue = DriverController.getButton(XboxController.Button.Y);
     return mClimbWasPressed.update(buttonValue);
-    }
+  }
 
   public boolean getQuickturn() {
     return DriverController.getButton(XboxController.Button.RB);
@@ -162,5 +162,14 @@ public class OperatorInterface {
 
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
+  }
+
+  //TODO: Decide on climber jog and home buttons
+  public boolean isJogClimber() {
+    return true;
+  }
+
+  public boolean isHomeClimber() {
+    return true;
   }
 }

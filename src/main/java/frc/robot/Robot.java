@@ -296,6 +296,14 @@ public class Robot extends TimedRobot {
     } else {
       mDrive.setOutputRightFront(0);
     }
+
+    if (mOperatorInterface.isJogClimber()) {
+      mClimber.jog(Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED));
+    } else if (mOperatorInterface.isHomeClimber()) {
+      mClimber.home();
+    } else {
+      mClimber.stop();
+    }
   }
 
   @Override
@@ -669,7 +677,7 @@ public class Robot extends TimedRobot {
         }
         mClimber.extend();
 
-        /** Checks if the motor is overcurrenting, signalling it's done climbing */
+        /** Checks the encoder position to see if it's done climbing */
         if (mClimber.isExtended()) {
           mClimbingState = ClimbingState.EXTENDING_COMPLETE;
         }
@@ -683,8 +691,8 @@ public class Robot extends TimedRobot {
       case RETRACTING:
         mClimber.retract();
 
-        /** Checks if the motor is overcurrenting, signalling it's done retracting */
-        if (mClimber.isExtended()) {
+        /** Checks the encoder position to see if it's done retracting */
+        if (mClimber.isRetracted()) {
           mClimbingState = ClimbingState.IDLE;
         }
       default:

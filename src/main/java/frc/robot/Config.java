@@ -30,6 +30,7 @@ public class Config {
     STORAGE__ROLLER_EJECT_SPEED(1d),
     CLIMBER__EXTEND_SPEED(1d),
     CLIMBER__RETRACT_SPEED(-1d),
+    CLIMBER__JOG_SPEED(1d),
 
     OI__VISION__ENABLED(false),
     CLIMBER__ENABLED(false),
