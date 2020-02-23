@@ -5,7 +5,6 @@ import frc.robot.util.geometry.Rotation2d;
 import frc.robot.util.geometry.Translation2d;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
-@Deprecated
 public class Constants {
   // Controller Ports
   public static final int OperatorControllerPort = 1;
@@ -19,6 +18,11 @@ public class Constants {
 
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
+   // Oracle's official constant convention. Don't @ me.
+  public static final double TICKS_PER_FOOT = 1228.615;
+
+  // Auto Constants
+  public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds
 
   // 22 is too low, 100 is too high
   public static final double kDriveWheelTrackWidthInches = 75;

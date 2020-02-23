@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
+import frc.robot.Constants;
 import frc.robot.Config.Key;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
@@ -63,11 +64,10 @@ public class Drive extends Subsystem {
   }
 
   public int feetToTicks(double feet) {
-    long roundedVal =
-        Math.round(feet * 1228.615 /*Config.getInstance().getInt(Key.DRIVE__TICKS_PER_METER)*/);
+    long roundedVal = Math.round(feet * Constants.TICKS_PER_FOOT);
     if (roundedVal > Integer.MAX_VALUE) {
       mDriveLogger.warn(
-          "Integer overflow when converting meters to ticks! Something is likely VERY WRONG!");
+          "Integer overflow when converting feet to ticks! Something is likely VERY WRONG!");
     }
 
     return (int) roundedVal;
@@ -127,10 +127,6 @@ public class Drive extends Subsystem {
     ramp = Config.getInstance().getDouble(Key.AUTO__DRIVE_PID_RAMP);
 
     mDriveLogger.info("PID values: " + P + ", " + I + ", " + D);
-    try {
-      Thread.sleep(1000);
-    } catch (Exception ignored) {
-    }
 
     mLeftMaster.config_kP(0, P);
     mLeftMaster.config_kI(0, I);
@@ -260,8 +256,8 @@ public class Drive extends Subsystem {
   }
 
   public void zeroEncoders() {
-    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 0);
-    mRightMaster.getSensorCollection().setQuadraturePosition(0, 0);
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 250);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0, 250);
   }
 
   // Used only in TEST mode

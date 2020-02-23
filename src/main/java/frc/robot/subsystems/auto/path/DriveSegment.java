@@ -1,7 +1,9 @@
 package frc.robot.subsystems.auto.path;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.Drive;
+import frc.robot.util.DriveSignal;
 
 public class DriveSegment extends Segment {
   private final int acceptableError = 50;
@@ -34,14 +36,6 @@ public class DriveSegment extends Segment {
     logger.info("Target: " + targetPosition);
 
     drive.zeroEncoders();
-    try {
-      // TODO: Change the calls in zeroEncoders() so that they block until it's done so we don't
-      // need this
-      Thread.sleep(500);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     drive.setTargetPosition(targetPosition);
   }
 
@@ -64,11 +58,14 @@ public class DriveSegment extends Segment {
 
     SmartDashboard.putNumber("Average encoder value", avgPos);
 
-    // if (avgPos > min && avgPos < max) {
-    //   logger.verbose(min + " < " + avgPos + " < " + max);
-    //   done = true;
-    //   drive.setOpenLoop(DriveSignal.BRAKE);
-    // }
+    if (avgPos > min && avgPos < max) {
+      logger.verbose("Position in acceptable range for " + ++debounceCount + " tick(s)");
+
+      if (debounceCount >= Constants.AUTO_DEBOUNCE_TICKS) {
+        done = true;
+        drive.setOpenLoop(DriveSignal.BRAKE);
+      } 
+    }
   }
 
   @Override
