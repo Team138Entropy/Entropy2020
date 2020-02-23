@@ -1,9 +1,7 @@
 package frc.robot.subsystems.auto.path;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Config;
 import frc.robot.subsystems.Drive;
-import frc.robot.util.DriveSignal;
 
 public class DriveSegment extends Segment {
   private final int acceptableError = 50;
@@ -18,13 +16,14 @@ public class DriveSegment extends Segment {
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
-  // private int debounceCount = 
+
+  // The number of ticks for which we've been within the acceptable range
+  private int debounceCount = 0;
 
   public DriveSegment(double feet) {
     this.feet = feet;
     this.drive = Drive.getInstance();
     this.targetPosition = drive.feetToTicks(feet);
-    // int acceptableError = 10; // Config.getInstance().getInt(Config.Key.AUTO__DRIVE_PID_ACCEPTABLE_ERROR);
     this.min = targetPosition - acceptableError;
     this.max = targetPosition + acceptableError;
   }
