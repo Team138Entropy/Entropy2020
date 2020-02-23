@@ -30,10 +30,10 @@ public class Drive extends Subsystem {
 
   private DriveControlState mDriveControlState;
 
-  private PeriodicIO mPeriodicIO = new PeriodicIO();
+  private PeriodicDriveData mPeriodicDriveData = new PeriodicDriveData();
   private Logger mDriveLogger;
 
-  public static class PeriodicIO {
+  public static class PeriodicDriveData {
     // INPUTS
     public double timestamp;
     public double left_voltage;
@@ -78,9 +78,7 @@ public class Drive extends Subsystem {
 
     mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
-  }
 
-  public void init() {
     mLeftMaster.configFactoryDefault();
     mLeftMaster.configNominalOutputForward(0., 0);
     mLeftMaster.configNominalOutputReverse(0., 0);
@@ -142,7 +140,7 @@ public class Drive extends Subsystem {
     double brakeSpeed = Config.getInstance().getDouble(Key.DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS);
 
     // are we quickturning?
-    boolean quickturn = mPeriodicIO.isQuickturning;
+    boolean quickturn = mPeriodicDriveData.isQuickturning;
 
     // Segments are started by the variables they will need
     boolean leftStationary = false;
@@ -182,15 +180,15 @@ public class Drive extends Subsystem {
     boolean rightAcceleratingForward = false;
     boolean rightAcceleratingBackwards = false;
 
-    if (leftOutput > mPeriodicIO.left_old) {
+    if (leftOutput > mPeriodicDriveData.left_old) {
       leftAcceleratingForward = true;
-    } else if (leftOutput < mPeriodicIO.left_old) {
+    } else if (leftOutput < mPeriodicDriveData.left_old) {
       leftAcceleratingBackwards = true;
     }
 
-    if (rightOutput > mPeriodicIO.right_old) {
+    if (rightOutput > mPeriodicDriveData.right_old) {
       rightAcceleratingForward = true;
-    } else if (rightOutput < mPeriodicIO.right_old) {
+    } else if (rightOutput < mPeriodicDriveData.right_old) {
       rightAcceleratingBackwards = true;
     }
 
@@ -230,8 +228,8 @@ public class Drive extends Subsystem {
     }
 
     // cache our olds after we've used them to make them actually "olds"
-    mPeriodicIO.left_old = leftOutput;
-    mPeriodicIO.right_old = rightOutput;
+    mPeriodicDriveData.left_old = leftOutput;
+    mPeriodicDriveData.right_old = rightOutput;
 
     // then we set our master talons, remembering that the physical right of the drivetrain is backwards
     mLeftMaster.set(ControlMode.PercentOutput, leftOutput);
@@ -256,7 +254,7 @@ public class Drive extends Subsystem {
     }
 
     if (wheel != 0 && quickTurn) {
-      mPeriodicIO.isQuickturning = true;
+      mPeriodicDriveData.isQuickturning = true;
     }
 
     final double kWheelGain = 0.05;
@@ -281,7 +279,7 @@ public class Drive extends Subsystem {
     if (quickTurn) {
       setOpenLoop(
           new DriveSignal(
-              (signal.getLeft() / scaling_factor) / 2, (signal.getRight() / scaling_factor) / 2));
+              (signal.getLeft() / scaling_factor) / 1.5, (signal.getRight() / scaling_factor) / 1.5));
     } else {
       setOpenLoop(
           new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
@@ -294,15 +292,15 @@ public class Drive extends Subsystem {
       allows driver to control throttle
       this will be called with the ball as a target
   */
-  public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
-    double timestamp = Timer.getFPGATimestamp();
-    final double kAutosteerAlignmentPointOffset = 15.0; //
-    /*
-    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    setBrakeMode(true);
-    */
+  // public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
+  //   double timestamp = Timer.getFPGATimestamp();
+  //   final double kAutosteerAlignmentPointOffset = 15.0; //
+  //   /*
+  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+  //   setBrakeMode(true);
+  //   */
 
-  }
+  // }
 
   public void setOpenloopRamp(double speed) {
     mLeftMaster.configOpenloopRamp(speed);
@@ -342,7 +340,7 @@ public class Drive extends Subsystem {
   }
 
   public synchronized Rotation2d getHeading() {
-    return mPeriodicIO.gyro_heading;
+    return mPeriodicDriveData.gyro_heading;
   }
 
   // Used only in TEST mode

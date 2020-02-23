@@ -3,6 +3,7 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -14,6 +15,9 @@ public class OperatorInterface {
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
   private final NykoController OperatorController;
+  private LatchedBoolean mBarfLatch = new LatchedBoolean();
+  private LatchedBoolean mShootLatch = new LatchedBoolean();
+  private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -31,6 +35,10 @@ public class OperatorInterface {
   }
 
   // Driver
+
+  public boolean checkControllers(){
+    return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
+  }
 
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
@@ -66,13 +74,24 @@ public class OperatorInterface {
     DriverController.setRumble(LowGear);
     return LowGear;
   }
-
-  public boolean getTurretAdjustLeft() {
+  
+  public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
+  }
+  
+  public boolean getBallCounterAdjustUp() {
+    return OperatorController.getDPad() == DPad.RIGHT;
+  }
+
+  // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
+  public boolean getTurretAdjustLeft() {
+    // return OperatorController.getDPad() == DPad.LEFT;
+    return false;
   }
 
   public boolean getTurretAdjustRight() {
-    return OperatorController.getDPad() == DPad.RIGHT;
+    // return OperatorController.getDPad() == DPad.RIGHT;
+    return false;
   }
 
   public boolean getShooterVelocityTrimUp() {
@@ -106,7 +125,11 @@ public class OperatorInterface {
   }
 
   public boolean getShoot() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_3);
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
+  }
+
+  public boolean getSpinUp() {
+    return mSpinUpLatch.update(OperatorController.getButton(NykoController.Button.LEFT_BUMPER));
   }
 
   public boolean getStateReset() {
@@ -129,7 +152,7 @@ public class OperatorInterface {
   }
 
   public boolean isBarf() {
-    return DriverController.getButton(XboxController.Button.START);
+    return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
   }
 
   // Test Mode functions
