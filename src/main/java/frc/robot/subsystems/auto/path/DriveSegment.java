@@ -42,7 +42,8 @@ public class DriveSegment extends Segment {
   @Override
   public void tick() {
 
-    double avgPos = getAveragePosition();
+    int left = drive.getLeftEncoderDistance();
+    int right = drive.getRightEncoderDistance();
 
     if (++loggingCount > 5) {
       logger.info(
@@ -50,16 +51,16 @@ public class DriveSegment extends Segment {
               + drive.getLeftEncoderDistance()
               + ", "
               + drive.getRightEncoderDistance()
-              + "),"
-              + " Average position: "
-              + avgPos);
+              + ")");
       loggingCount = 0;
     }
 
-    SmartDashboard.putNumber("Average encoder value", avgPos);
+    SmartDashboard.putNumber("left encoder", left);
+    SmartDashboard.putNumber("right encoder", right);
 
-    if (avgPos > min && avgPos < max) {
-      logger.verbose("Position in acceptable range for " + ++debounceCount + " tick(s)");
+
+    if (acceptable(left) && acceptable(right)) {
+      logger.verbose("Positions in acceptable range for " + ++debounceCount + " tick(s)");
 
       if (debounceCount >= Constants.AUTO_DEBOUNCE_TICKS) {
         done = true;
@@ -82,12 +83,9 @@ public class DriveSegment extends Segment {
     return new DriveSegment(feet);
   }
 
-  /**
-   * Returns the average of the left and right encoder distances.
-   *
-   * @return the average of the encoder distances.
-   */
-  private double getAveragePosition() {
-    return (drive.getLeftEncoderDistance() + drive.getRightEncoderDistance()) / 2;
+
+
+  private boolean acceptable(int ticks) {
+    return (ticks > min && ticks < max);
   }
 }

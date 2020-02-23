@@ -218,6 +218,7 @@ public class Robot extends TimedRobot {
 
     mStorage.init();
     mDrive.init();
+    mDrive.zeroEncoders();
 
     // updated in Intake.java
     SmartDashboard.putBoolean("Intake Spinning Up", false);

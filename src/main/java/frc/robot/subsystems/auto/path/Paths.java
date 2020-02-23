@@ -13,7 +13,7 @@ public class Paths {
         new Path()
             .append(new DriveSegment(10))
             .append(new TurnSegment(45))
-            .append(new DriveSegment(1)));
+            .append(new DriveSegment(5)));
   }
 
   public static Optional<Path> find(String pathName) {

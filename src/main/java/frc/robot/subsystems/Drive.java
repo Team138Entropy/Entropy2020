@@ -131,12 +131,14 @@ public class Drive extends Subsystem {
     mLeftMaster.config_kP(0, P);
     mLeftMaster.config_kI(0, I);
     mLeftMaster.config_kD(0, D);
+    mLeftMaster.config_kF(0, 0);
     mLeftMaster.configClosedloopRamp(0.5, 0);
     mLeftMaster.configClosedLoopPeakOutput(0, 0.5);
 
     mRightMaster.config_kP(0, P);
     mRightMaster.config_kI(0, I);
     mRightMaster.config_kD(0, D);
+    mRightMaster.config_kF(0, 0);
     mRightMaster.configClosedloopRamp(0.5, 0);
     mRightMaster.configClosedLoopPeakOutput(0, 0.5);
 
@@ -243,11 +245,11 @@ public class Drive extends Subsystem {
   */
   public void checkSubsystem() {}
 
-  public synchronized double getLeftEncoderDistance() {
+  public synchronized int getLeftEncoderDistance() {
     return mLeftMaster.getSelectedSensorPosition(0);
   }
 
-  public synchronized double getRightEncoderDistance() {
+  public synchronized int getRightEncoderDistance() {
     return -mRightMaster.getSelectedSensorPosition(0);
   }
 
