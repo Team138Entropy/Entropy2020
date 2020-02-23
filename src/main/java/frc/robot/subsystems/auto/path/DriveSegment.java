@@ -64,7 +64,7 @@ public class DriveSegment extends Segment {
       if (debounceCount >= Constants.AUTO_DEBOUNCE_TICKS) {
         done = true;
         drive.setOpenLoop(DriveSignal.BRAKE);
-      } 
+      }
     }
   }
 

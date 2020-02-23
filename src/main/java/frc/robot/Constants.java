@@ -18,7 +18,7 @@ public class Constants {
 
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
-   // Oracle's official constant convention. Don't @ me.
+  // Oracle's official constant convention. Don't @ me.
   public static final double TICKS_PER_FOOT = 1228.615;
 
   // Auto Constants
