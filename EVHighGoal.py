@@ -13,7 +13,7 @@
 
 
 '''
-{"controls":[{"default":"1","id":"1","max":"1","min":"0","name":"connect_verbose","step":"1","type":"2","value":"1"},{"default":"0","id":"2","max":"0","min":"0","name":"","step":"0","type":"0","value":""},{"default":"50","id":"3","max":"100","min":"0","name":"raw_brightness","step":"1","type":"2","value":"50"},{"default":"50","id":"4","max":"100","min":"0","name":"brightness","step":"1","type":"2","value":"50"},{"default":"0","id":"5","max":"100","min":"-100","name":"raw_contrast","step":"1","type":"2","value":"0"},{"default":"50","id":"6","max":"100","min":"0","name":"contrast","step":"1","type":"2","value":"50"},{"default":"0","id":"7","max":"100","min":"-100","name":"raw_saturation","step":"1","type":"2","value":"0"},{"default":"50","id":"8","max":"100","min":"0","name":"saturation","step":"1","type":"2","value":"50"},{"default":"1000","id":"9","max":"7999","min":"1","name":"red_balance","step":"1","type":"2","value":"1000"},{"default":"1000","id":"10","max":"7999","min":"1","name":"blue_balance","step":"1","type":"2","value":"1000"},{"default":"0","id":"11","max":"1","min":"0","name":"horizontal_flip","step":"1","type":"1","value":"0"},{"default":"0","id":"12","max":"1","min":"0","name":"vertical_flip","step":"1","type":"1","value":"0"},{"default":"1","id":"13","max":"3","menu":{"0":"Disabled","1":"50 Hz","2":"60 Hz","3":"Auto"},"min":"0","name":"power_line_frequency","step":"1","type":"8","value":"1"},{"default":"0","id":"14","max":"100","min":"-100","name":"raw_sharpness","step":"1","type":"2","value":"0"},{"default":"50","id":"15","max":"100","min":"0","name":"sharpness","step":"1","type":"2","value":"50"},{"default":"0","id":"16","max":"15","menu":{"0":"None","1":"Black & White","2":"Sepia","3":"Negative","4":"Emboss","5":"Sketch","6":"Sky Blue","7":"Grass Green","8":"Skin Whiten","9":"Vivid","10":"Aqua","11":"Art Freeze","12":"Silhouette","13":"Solarization","14":"Antique","15":"Set Cb/Cr"},"min":"0","name":"color_effects","step":"1","type":"8","value":"0"},{"default":"0","id":"17","max":"360","min":"0","name":"rotate","step":"90","type":"2","value":"0"},{"default":"32896","id":"18","max":"65535","min":"0","name":"color_effects_cbcr","step":"1","type":"2","value":"32896"},{"default":"0","id":"19","max":"1","menu":{"0":"Variable Bitrate","1":"Constant Bitrate"},"min":"0","name":"video_bitrate_mode","step":"1","type":"8","value":"0"},{"default":"10000000","id":"20","max":"25000000","min":"25000","name":"video_bitrate","step":"25000","type":"2","value":"10000000"},{"default":"0","id":"21","max":"1","min":"0","name":"repeat_sequence_header","step":"1","type":"1","value":"0"},{"default":"60","id":"22","max":"2147483647","min":"0","name":"h264_i_frame_period","step":"1","type":"2","value":"60"},{"default":"11","id":"23","max":"11","menu":{"0":"1","1":"1b","2":"1.1","3":"1.2","4":"1.3","5":"2","6":"2.1","7":"2.2","8":"3","9":"3.1","10":"3.2","11":"4"},"min":"0","name":"h264_level","step":"1","type":"8","value":"11"},{"default":"4","id":"24","max":"4","menu":{"0":"Baseline","1":"Constrained Baseline","2":"Main","3":"","4":"High"},"min":"0","name":"h264_profile","step":"1","type":"8","value":"4"},{"default":"0","id":"25","max":"3","menu":{"0":"Auto Mode","1":"Manual Mode","2":"","3":""},"min":"0","name":"auto_exposure","step":"1","type":"8","value":"1"},{"default":"1000","id":"26","max":"10000","min":"1","name":"exposure_time_absolute","step":"1","type":"2","value":"6"},{"default":"0","id":"27","max":"1","min":"0","name":"exposure_dynamic_framerate","step":"1","type":"1","value":"0"},{"default":"12","id":"28","max":"24","menu":{"0":"-4000","1":"-3667","2":"-3333","3":"-3000","4":"-2667","5":"-2333","6":"-2000","7":"-1667","8":"-1333","9":"-1000","10":"-667","11":"-333","12":"0","13":"333","14":"667","15":"1000","16":"1333","17":"1667","18":"2000","19":"2333","20":"2667","21":"3000","22":"3333","23":"3667","24":"4000"},"min":"0","name":"auto_exposure_bias","step":"1","type":"8","value":"12"},{"default":"1","id":"29","max":"10","menu":{"0":"Manual","1":"Auto","2":"Incandescent","3":"Fluorescent","4":"Fluorescent H","5":"Horizon","6":"Daylight","7":"Flash","8":"Cloudy","9":"Shade","10":"Greyworld"},"min":"0","name":"white_balance_auto_preset","step":"1","type":"8","value":"1"},{"default":"0","id":"30","max":"1","min":"0","name":"image_stabilization","step":"1","type":"1","value":"0"},{"default":"0","id":"31","max":"4","menu":{"0":"0","1":"100000","2":"200000","3":"400000","4":"800000"},"min":"0","name":"iso_sensitivity","step":"1","type":"8","value":"0"},{"default":"1","id":"32","max":"1","menu":{"0":"Manual","1":"Auto"},"min":"0","name":"iso_sensitivity_auto","step":"1","type":"8","value":"1"},{"default":"0","id":"33","max":"2","menu":{"0":"Average","1":"Center Weighted","2":"Spot"},"min":"0","name":"exposure_metering_mode","step":"1","type":"8","value":"0"},{"default":"0","id":"34","max":"13","menu":{"0":"None","1":"","2":"","3":"","4":"","5":"","6":"","7":"","8":"Night","9":"","10":"","11":"Sports","12":"","13":""},"min":"0","name":"scene_mode","step":"1","type":"8","value":"0"},{"default":"30","id":"35","max":"100","min":"1","name":"compression_quality","step":"1","type":"2","value":"30"},{"default":"0","id":"36","max":"100","min":"0","name":"exposure_auto","step":"1","type":"2","value":"0"},{"default":"0","id":"37","max":"100","min":"0","name":"exposure_absolute","step":"1","type":"2","value":"0"}],"modes":[]}
+[{"name":"connect_verbose","value":1},{"name":"contrast","value":12},{"name":"saturation","value":89},{"name":"hue","value":35},{"name":"white_balance_automatic","value":false},{"name":"exposure","value":1},{"name":"gain_automatic","value":false},{"name":"gain","value":31},{"name":"horizontal_flip","value":false},{"name":"vertical_flip","value":false},{"name":"power_line_frequency","value":0},{"name":"sharpness","value":0},{"name":"auto_exposure","value":1}]
 '''
 
 import json
@@ -74,23 +74,20 @@ rat_high = 5
 #Solitity compares the hull vs contour, and looks at the difference in filled area
 #Works on a system of %
 solidity_low = .1
-solidity_high = .6
+solidity_high = .5
 
 #Vertices is acts as "length"
-minArea = 10
+minArea = 5
 minWidth = 20
 maxWidth = 1000
 minHeight = 20
 maxHeight = 1000
-maxVertices = 60
+maxVertices = 80
 minVertices = 25
 
-
-
-
-hsv_threshold_hue = [24, 142]
-hsv_threshold_saturation = [23, 169]
-hsv_threshold_value = [165, 255]
+hsv_threshold_hue = [15, 166]
+hsv_threshold_saturation = [71, 255]
+hsv_threshold_value = [39, 255]
 
 
 
@@ -525,6 +522,8 @@ def findTape(contours, image, centerX, centerY):
                     sendValues[0] = cx
                     sendValues[1] = cy
                     sendValues[3] = myDistFeet
+                    print(sendValues[3])
+                    
                 else:
                     cx, cy = 0, 0
                 if (len(biggestCnts) < 13):
