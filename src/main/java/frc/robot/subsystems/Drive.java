@@ -137,11 +137,14 @@ public class Drive extends Subsystem {
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
+    // A lot of the space in this function is taken up by local copies of stuff
     double accelSpeed = Config.getInstance().getDouble(Key.DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS);
     double brakeSpeed = Config.getInstance().getDouble(Key.DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS);
 
+    // are we quickturning?
     boolean quickturn = mPeriodicIO.isQuickturning;
 
+    // Segments are started by the variables they will need
     boolean leftStationary = false;
     boolean rightStationary = false;
 
@@ -153,12 +156,14 @@ public class Drive extends Subsystem {
       rightStationary = true;
     }
 
+    // Splitting up var definitions to their unique sections makes the code more readable
     boolean stationary = false;
 
     if (leftStationary && rightStationary) {
       stationary = true;
     }
     
+    // Don't know why this is here but I'm not gonna remove it
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
       // setBrakeMode(true);
       mDriveLogger.verbose("switching to open loop " + signal);
@@ -179,18 +184,14 @@ public class Drive extends Subsystem {
 
     if (leftOutput > mPeriodicIO.left_old) {
       leftAcceleratingForward = true;
-      mDriveLogger.log("leftaccelforward");
     } else if (leftOutput < mPeriodicIO.left_old) {
       leftAcceleratingBackwards = true;
-      mDriveLogger.log("leftaccelbackwards");
     }
 
     if (rightOutput > mPeriodicIO.right_old) {
       rightAcceleratingForward = true;
-      mDriveLogger.log("rightaccelforwards");
     } else if (rightOutput < mPeriodicIO.right_old) {
       rightAcceleratingBackwards = true;
-      mDriveLogger.log("rightaccelbackwards");
     }
 
     // Whether our velocity is increasing or decreasing
@@ -199,10 +200,8 @@ public class Drive extends Subsystem {
 
     if (leftAcceleratingForward && rightAcceleratingForward) {
       acceleratingForward = true;
-      mDriveLogger.log("acceleratingforward");
     } else if (leftAcceleratingBackwards && rightAcceleratingBackwards) {
       acceleratingBackwards = true;
-      mDriveLogger.log("acceleratingbackwards");
     }
 
     // Whether we are going forwards or in reverse
@@ -211,34 +210,30 @@ public class Drive extends Subsystem {
 
     if (leftOutput > 0) {
       velocityForwards = true;
-      mDriveLogger.log("velocityforwards");
     } else if (leftOutput < 0) {
       velocityReverse = true;
-      mDriveLogger.log("velocityreverse");
     }
 
+    // This is where the actual accel limiting logic begins
     if (velocityForwards) {
       if (acceleratingForward) {
         setOpenloopRamp(accelSpeed);
-        mDriveLogger.log("accelSpeed");
       }
     } else if (velocityReverse) {
       if (acceleratingForward) {
         setOpenloopRamp(brakeSpeed);
-        mDriveLogger.log("brakeSpeed");
       }
     } else if (stationary) {
       setOpenloopRamp(0);
-      mDriveLogger.log("stationary");
     } else if (quickturn) {
       setOpenloopRamp(0);
-      mDriveLogger.log("quickturn");
     }
 
+    // cache our olds after we've used them to make them actually "olds"
     mPeriodicIO.left_old = leftOutput;
     mPeriodicIO.right_old = rightOutput;
 
-    // then we set our master talons
+    // then we set our master talons, remembering that the physical right of the drivetrain is backwards
     mLeftMaster.set(ControlMode.PercentOutput, leftOutput);
     mRightMaster.set(ControlMode.PercentOutput, rightOutput * -1);
   }
