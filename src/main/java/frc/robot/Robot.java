@@ -106,6 +106,8 @@ public class Robot extends TimedRobot {
   private LatchedBoolean HarvestAim = new LatchedBoolean();
   static NetworkTable mTable;
 
+  private boolean mIsSpinningUp = false;
+
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
   private Timer mBarfTimer = new Timer();
@@ -162,6 +164,7 @@ public class Robot extends TimedRobot {
   private void updateSmartDashboard() {
     RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
 
+    SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
@@ -186,6 +189,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    mIsSpinningUp = false;
     mOperatorInterface.checkControllers();
     
     mRobotLogger.log("Auto Init Called");
@@ -208,6 +212,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    visionLight.set(Relay.Value.kForward);
+    mIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
 
     //Start background looper
@@ -234,6 +240,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Intake Current", 0);
     SmartDashboard.putNumber("Intake Current Countdown", 0);
     SmartDashboard.putNumber("Encoder Distance", 0);
+    SmartDashboard.putNumber("Encoder Distance Raw", 0);
   }
 
   @Override
@@ -316,10 +323,13 @@ public class Robot extends TimedRobot {
     } else {
       mDrive.setOutputRightFront(0);
     }
+
+    System.out.println(mStorage.getEncoder());
   }
 
   @Override
   public void disabledInit() {
+    visionLight.set(Relay.Value.kForward);
 
     Config.getInstance().reload();
   }
@@ -440,6 +450,16 @@ public class Robot extends TimedRobot {
 
     updateSmartDashboard();
 
+
+    if(mOperatorInterface.getSpinUp()){
+      mIsSpinningUp = !mIsSpinningUp;
+    }
+
+    if(mIsSpinningUp){
+      mShooter.start();
+    }else if(mState != State.SHOOTING){
+      mShooter.stop();
+    }
  
 
     // Shooter velocity trim
@@ -521,6 +541,7 @@ public class Robot extends TimedRobot {
             if(mStorage.getBallCount() == mStorage.getCapacity() + 1){
               mIntakeState = IntakeState.STORAGE_COMPLETE;
             }
+            mStorage.updateEncoderPosition();
             mIntakeState = IntakeState.STORE_BALL;
           }
 
@@ -539,6 +560,7 @@ public class Robot extends TimedRobot {
         }
 
         break;
+      // we just stored a ball
       case STORAGE_COMPLETE:
         mStorage.addBall();
         mStorage.stop();
@@ -557,9 +579,10 @@ public class Robot extends TimedRobot {
         mStorage.updateEncoderPosition();
         mIntake.barf(); // Ball Acqusition Reverse Functionality (BARF)
         mStorage.barf();
+        mStorage.emptyBalls();
+
         if (mBarfTimer.get() >= BARF_TIMER_DURATION) {
           mIntakeState = IntakeState.IDLE;
-          mStorage.emptyBalls();
         }
         break;
       default:
@@ -603,9 +626,11 @@ public class Robot extends TimedRobot {
 
     switch (mShootingState) {
       case PREPARE_TO_SHOOT:
+        mStorage.stop();
 
         /* Starts roller */
         mShooter.start();
+        mIsSpinningUp = false;
 
         // TODO: Placeholder method, replace later.
         mShooter.target();
@@ -614,6 +639,11 @@ public class Robot extends TimedRobot {
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
           mShootingState = ShootingState.SHOOT_BALL;
           mFireTimer.start();
+        }
+
+        if(mOperatorInterface.getShoot()){
+          mShootingState = ShootingState.SHOOTING_COMPLETE;
+          mStorage.stop();
         }
         break;
       case SHOOT_BALL:

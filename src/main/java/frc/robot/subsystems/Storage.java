@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -36,7 +37,7 @@ public class Storage extends Subsystem {
   private WPI_TalonSRX mTopRoller;
 
   private int mBallCount = 0;
-  private int mStartingEncoderPosition = 0;
+  
 
   private static Storage sInstance;
 
@@ -57,19 +58,24 @@ public class Storage extends Subsystem {
 
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
+    
+    mBottomRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+    mBottomRoller.setSensorPhase(false);
 
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
     updateEncoderPosition();
   }
 
-  private synchronized int getEncoder() {
+  public synchronized int getEncoder() {
     // return the negative position that the talon gets us because it's hooked up backwards
     // this will return positive values
-    return -mBottomRoller.getSelectedSensorPosition();
+    return mBottomRoller.getSelectedSensorPosition();
   }
 
   public synchronized void updateEncoderPosition() {
-    mStartingEncoderPosition = getEncoder();
+    mBottomRoller.setSelectedSensorPosition(0);
+    // mStartingEncoderPosition = getEncoder();
+    System.out.println("RESETTING");
   }
 
   public synchronized boolean getIntakeSensor() {
@@ -87,13 +93,12 @@ public class Storage extends Subsystem {
       return true;
     }
 
-    int encoderDistance = mStartingEncoderPosition - getEncoder();
+    int encoderDistance = getEncoder();
     SmartDashboard.putNumber("Encoder Distance", encoderDistance);
+    SmartDashboard.putNumber("Encoder Distance Raw", getEncoder());
 
     // if we've hit our encoder distance target
     if (encoderDistance >= BALL_DISTANCE_IN_ENCODER_TICKS) {
-      // reset the encoder position
-      mStartingEncoderPosition = getEncoder();
       return true;
     } else {
       return false;

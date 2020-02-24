@@ -17,6 +17,7 @@ public class OperatorInterface {
   private final NykoController OperatorController;
   private LatchedBoolean mBarfLatch = new LatchedBoolean();
   private LatchedBoolean mShootLatch = new LatchedBoolean();
+  private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -123,7 +124,11 @@ public class OperatorInterface {
   }
 
   public boolean getShoot() {
-    return mShootLatch.update(OperatorController.getButton(NykoController.Button.BUTTON_3));
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
+  }
+
+  public boolean getSpinUp() {
+    return mSpinUpLatch.update(OperatorController.getButton(NykoController.Button.LEFT_BUMPER));
   }
 
   public boolean getStateReset() {
