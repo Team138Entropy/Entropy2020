@@ -119,28 +119,27 @@ public class Drive extends Subsystem {
     talon.setNeutralMode(NeutralMode.Brake);
 
     // Configure Talon gains
-    double P, I, D, ramp;
+    double P, I, D;
 
     P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
     I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
     D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
-    ramp = Config.getInstance().getDouble(Key.AUTO__DRIVE_PID_RAMP);
 
     mDriveLogger.info("PID values: " + P + ", " + I + ", " + D);
 
-    mLeftMaster.config_kP(0, P);
-    mLeftMaster.config_kI(0, I);
-    mLeftMaster.config_kD(0, D);
-    mLeftMaster.config_kF(0, 0);
-    mLeftMaster.configClosedloopRamp(0.5, 0);
-    mLeftMaster.configClosedLoopPeakOutput(0, 0.5);
+    talon.config_kP(0, P);
+    talon.config_kI(0, I);
+    talon.config_kD(0, D);
+    talon.config_kF(0, 0);
+    // talon.configClosedloopRamp(0.5, 0);
+    // talon.configClosedLoopPeakOutput(0, 0.5);
+    // talon.configPeakCurrentDuration(3000);
+    // talon.configPeakCurrentLimit(30);
+    // talon.configContinuousCurrentLimit(15);
+    talon.configClosedLoopPeriod(0, 10);
 
-    mRightMaster.config_kP(0, P);
-    mRightMaster.config_kI(0, I);
-    mRightMaster.config_kD(0, D);
-    mRightMaster.config_kF(0, 0);
-    mRightMaster.configClosedloopRamp(0.5, 0);
-    mRightMaster.configClosedLoopPeakOutput(0, 0.5);
+    talon.configMotionCruiseVelocity(900);
+    talon.configMotionAcceleration(750);
 
     // talon.configClosedloopRamp(1);
   }
@@ -158,8 +157,8 @@ public class Drive extends Subsystem {
   }
 
   public void setTargetPosition(int position) {
-    mLeftMaster.set(ControlMode.Position, position);
-    mRightMaster.set(ControlMode.Position, -position);
+    mLeftMaster.set(ControlMode.MotionMagic, position);
+    mRightMaster.set(ControlMode.MotionMagic, -position);
   }
 
   /** Configure talons for open loop control */

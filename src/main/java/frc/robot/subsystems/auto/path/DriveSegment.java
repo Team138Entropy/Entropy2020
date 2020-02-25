@@ -55,8 +55,9 @@ public class DriveSegment extends Segment {
       loggingCount = 0;
     }
 
-    SmartDashboard.putNumber("left encoder", left);
-    SmartDashboard.putNumber("right encoder", right);
+    // SmartDashboard.putNumber("left encoder", left);
+    // SmartDashboard.putNumber("right encoder", right);
+    SmartDashboard.putNumber("Average encoder distance", (left + right) / 2.0);
 
 
     if (acceptable(left) && acceptable(right)) {

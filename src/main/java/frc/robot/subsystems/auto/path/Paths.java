@@ -11,9 +11,9 @@ public class Paths {
     paths.put(
         "test",
         new Path()
-            .append(new DriveSegment(10))
-            .append(new TurnSegment(45))
-            .append(new DriveSegment(5)));
+            .append(new DriveSegment(4))
+            .append(new DriveSegment(-4))
+        );
   }
 
   public static Optional<Path> find(String pathName) {
