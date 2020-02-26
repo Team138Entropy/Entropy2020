@@ -3,11 +3,13 @@ package frc.robot.subsystems.auto.path;
 import frc.robot.Logger;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import javax.annotation.Nullable;
 
 /**
- * Represents a path to be followed. TODO: Make everything immutable so we don't have to do the
- * scuffed cloning thing
+ * A queue of {@link Segment}s to be executed sequentially. Intended to be used for autonomous
+ * driving, but could be used for any sequence of tasks. Similar to WPILib's {@link
+ * edu.wpi.first.wpilibj2.command.SequentialCommandGroup SequentialCommandGroup}.
+ *
+ * @see Segment
  */
 public class Path {
   private LinkedList<Segment> segments;
@@ -35,7 +37,7 @@ public class Path {
     return this;
   }
 
-  private @Nullable Segment getCurrentSegment() {
+  private Segment getCurrentSegment() {
     return segments.peekFirst();
   }
 

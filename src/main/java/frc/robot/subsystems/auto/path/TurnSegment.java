@@ -2,6 +2,7 @@ package frc.robot.subsystems.auto.path;
 
 import frc.robot.subsystems.Drive;
 
+/** A type of {@link Segment} for turning in place. */
 public class TurnSegment extends Segment {
   private final double trackWidth = 0.58;
   private final int ticksPerMeter = 640;

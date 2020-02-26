@@ -2,6 +2,12 @@ package frc.robot.subsystems.auto.path;
 
 import frc.robot.Logger;
 
+/**
+ * A segment of a {@link Path}. The interface's design is task-agnostic, and is similar to WPILib's
+ * command class.
+ *
+ * @see Path
+ */
 public abstract class Segment {
   protected static Logger logger = Path.getLogger();
 

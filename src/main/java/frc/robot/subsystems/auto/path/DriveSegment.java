@@ -5,6 +5,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Drive;
 import frc.robot.util.DriveSignal;
 
+/** A type of {@link Segment} for driving straight. */
 public class DriveSegment extends Segment {
   private final int acceptableError = 50;
 

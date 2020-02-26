@@ -8,9 +8,17 @@ public class Paths {
   public static final Path NO_OP = new Path();
 
   static {
-    paths.put("test", new Path().append(new DriveSegment(4)).append(new DriveSegment(-4)));
+    paths.put("test", new Path()
+        .append(new DriveSegment(4))
+        .append(new DriveSegment(-4))
+    );
   }
 
+  /**
+   * Finds a path by name.
+   * @param pathName the name of the path.
+   * @return a copy of the path if one with a matching name was found.
+   */
   public static Optional<Path> find(String pathName) {
     Path path = paths.get(pathName);
 
