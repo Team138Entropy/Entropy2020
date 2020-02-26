@@ -202,9 +202,7 @@ public class Drive extends Subsystem {
     }
     // In the case that our joystick value is zero, disable our shit as it was last time, nothing
     // happens to our ramp
-    else if (signal.getLeft() == 0
-        && signal.getRight() == 0
-        && !mPeriodicDriveData.wasReversing) {
+    else if (signal.getLeft() == 0 && signal.getRight() == 0 && !mPeriodicDriveData.wasReversing) {
       setOpenloopRamp(0);
     }
     // At this point this is just getting ridiculous. Hopefully this is self-evident.
