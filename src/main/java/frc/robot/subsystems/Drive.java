@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Constants;
@@ -12,7 +11,6 @@ import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
-import frc.robot.vision.AimingParameters;
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
@@ -30,10 +28,10 @@ public class Drive extends Subsystem {
 
   private DriveControlState mDriveControlState;
 
-  private PeriodicIO mPeriodicIO;
+  private PeriodicDriveData mPeriodicDriveData = new PeriodicDriveData();
   private Logger mDriveLogger;
 
-  public static class PeriodicIO {
+  public static class PeriodicDriveData {
     // INPUTS
     public double timestamp;
     public double left_voltage;
@@ -50,10 +48,12 @@ public class Drive extends Subsystem {
     // OUTPUTS
     public double left_demand;
     public double right_demand;
-    public double left_accel;
-    public double right_accel;
     public double left_feedforward;
     public double right_feedforward;
+    public double left_old = 0;
+    public double right_old = 0;
+    public boolean wasReversing = false;
+    public boolean quickturn = false;
   }
 
   public static synchronized Drive getInstance() {
@@ -87,9 +87,7 @@ public class Drive extends Subsystem {
 
     mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
-  }
 
-  public void init() {
     configTalon(mLeftMaster);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
@@ -100,22 +98,19 @@ public class Drive extends Subsystem {
     mLeftSlave.follow(mLeftMaster);
     mRightSlave.follow(mRightMaster);
 
+    // TODO: figure out what this does and make it work
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
   private void configTalon(WPI_TalonSRX talon) {
+    talon.configFactoryDefault();
     talon.configNominalOutputForward(0., 0);
     talon.configNominalOutputReverse(0., 0);
     talon.configPeakOutputForward(1, 0);
     talon.configPeakOutputReverse(-1, 0);
-    talon.setNeutralMode(NeutralMode.Brake);
-    talon.setNeutralMode(NeutralMode.Brake);
+    talon.configOpenloopRamp(0);
     talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     talon.setSensorPhase(true);
-    talon.configNominalOutputForward(0., 0);
-    talon.configNominalOutputReverse(-0., 0);
-    talon.configPeakOutputForward(1, 0);
-    talon.configPeakOutputReverse(-1, 0);
     talon.setNeutralMode(NeutralMode.Brake);
 
     // Configure Talon gains
@@ -170,6 +165,58 @@ public class Drive extends Subsystem {
     }
 
     signal.PrintLog();
+
+    // Very first step is to update our negative magnitude checker
+    if (signal.getLeft() < 0 && signal.getRight() < 0) {
+      mPeriodicDriveData.wasReversing = true;
+    } else if (signal.getLeft() > 0 && signal.getRight() > 0) {
+      mPeriodicDriveData.wasReversing = false;
+    }
+
+    // If our acceleration is positive (going away from where we were last time)
+    // Remember that right has to be flipped down below so the bracket is the other way 'round
+    // mDriveLogger.log("Left: " + signal.getLeft() + " + " + mPeriodicDriveData.left_old);
+    // mDriveLogger.log("Right: " + signal.getRight() + " + " + mPeriodicDriveData.right_old);
+    if ((Math.abs(signal.getLeft()) > mPeriodicDriveData.left_old)
+        && (Math.abs(signal.getRight()) > mPeriodicDriveData.right_old)
+        && !mPeriodicDriveData.quickturn) {
+      // Tell the talons to be significantly less epic
+      setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_TIME_SECONDS));
+    }
+    // If the opposite is true, e.g. our velocity is decreasing, let us stop as fast as we want.
+    // Note that this
+    // "inverse case" is here because, if it wasn't, acceleration would only be capped while jerk is
+    // positive.
+    else if (Math.abs(signal.getLeft()) < mPeriodicDriveData.left_old
+        && Math.abs(signal.getRight()) < mPeriodicDriveData.right_old
+        && !mPeriodicDriveData.quickturn) {
+      // Actually don't stop as fast as we can, first check if we are going backwards by comparing
+      // the
+      // magnitudes of left and right drive signals
+      if (mPeriodicDriveData.wasReversing = true) {
+        setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__BACK_SLOW_RAMP_TIME_SECONDS));
+      } else {
+        // If we are going forwards, we can stop as fast as we want.
+        setOpenloopRamp(0);
+      }
+    }
+    // In the case that our joystick value is zero, disable our shit as it was last time, nothing
+    // happens to our ramp
+    else if (signal.getLeft() == 0
+        && signal.getRight() == 0
+        && !mPeriodicDriveData.wasReversing) {
+      setOpenloopRamp(0);
+    }
+    // At this point this is just getting ridiculous. Hopefully this is self-evident.
+    else if (mPeriodicDriveData.quickturn) {
+      setOpenloopRamp(0);
+    }
+
+    // Olds are cached as absolute to be useful above
+    mPeriodicDriveData.left_old = Math.abs(signal.getLeft());
+    mPeriodicDriveData.right_old = Math.abs(signal.getRight());
+
+    // then we set our master talons, remembering that right is backwards
     mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
     mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
   }
@@ -177,14 +224,7 @@ public class Drive extends Subsystem {
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
-    // // add a "minimum"
-    // if (throttle >= .17) {
-    //   throttle = .17;
-    // }
-
-    // if (throttle <= -.17) {
-    //   throttle = -.17;
-    // }
+    mPeriodicDriveData.quickturn = quickTurn;
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -219,8 +259,15 @@ public class Drive extends Subsystem {
     // Either the bigger of the two drive signals or 1, whichever is bigger.
     double scaling_factor =
         Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
-    setOpenLoop(
-        new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
+    if (quickTurn) {
+      setOpenLoop(
+          new DriveSignal(
+              (signal.getLeft() / scaling_factor) / 1.5,
+              (signal.getRight() / scaling_factor) / 1.5));
+    } else {
+      setOpenLoop(
+          new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
+    }
   }
 
   /*
@@ -229,14 +276,21 @@ public class Drive extends Subsystem {
       allows driver to control throttle
       this will be called with the ball as a target
   */
-  public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
-    double timestamp = Timer.getFPGATimestamp();
-    final double kAutosteerAlignmentPointOffset = 15.0; //
-    /*
-    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    setBrakeMode(true);
-    */
+  // public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
+  //   double timestamp = Timer.getFPGATimestamp();
+  //   final double kAutosteerAlignmentPointOffset = 15.0; //
+  //   /*
+  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle *
+  // (reverse ? -1.0 : 1.0))));
+  //   setBrakeMode(true);
+  //   */
 
+  // }
+
+  public void setOpenloopRamp(double speed) {
+    mDriveLogger.log("setting ramp to " + speed);
+    mLeftMaster.configOpenloopRamp(speed);
+    mRightMaster.configOpenloopRamp(speed);
   }
 
   /*
@@ -277,7 +331,7 @@ public class Drive extends Subsystem {
   }
 
   public synchronized Rotation2d getHeading() {
-    return mPeriodicIO.gyro_heading;
+    return mPeriodicDriveData.gyro_heading;
   }
 
   // Used only in TEST mode

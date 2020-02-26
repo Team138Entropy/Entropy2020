@@ -37,15 +37,38 @@ public class RobotTracker {
     return mInstance;
   }
 
-  // Result Object that is used to return
+  // Result Class
+  // Used to return values from the Robot Tracker
+  // Particularly with Vision Tracking
+  // as well as target distance
   public class RobotTrackerResult {
-    public double tangental_component;
-    public double angular_component;
-    public Rotation2d turret_error;
-    public boolean HasResult;
-    public double distance;
+    public final double tangental_component;
+    public final double angular_component;
+    public final Rotation2d turret_error;
+    public final double distance;
+    public final boolean HasResult;
 
-    public RobotTrackerResult() {}
+    public RobotTrackerResult(
+        double t_tangental_component,
+        double t_angular_component,
+        Rotation2d t_turret_error,
+        double t_distance) {
+      this.tangental_component = t_tangental_component;
+      this.angular_component = t_angular_component;
+      this.turret_error = t_turret_error;
+      this.distance = t_distance;
+      this.HasResult = true;
+    }
+
+    // Empty constructor!
+    // Resultless Robot Tracker Object
+    public RobotTrackerResult() {
+      this.HasResult = false;
+      this.tangental_component = 0;
+      this.angular_component = 0;
+      this.turret_error = null;
+      this.distance = 0;
+    }
   }
 
   // Size of the Storage Buffers
@@ -406,6 +429,7 @@ public class RobotTracker {
             vehicleToGoal,
             report.field_to_target,
             report.field_to_target.getRotation());
+
     return Optional.of(params);
   }
 
@@ -445,25 +469,34 @@ public class RobotTracker {
               .inverse()
               .rotateBy(mLatestAimingParameters.get().getRobotToGoalRotation());
 
-      RobotTrackerResult rtr = new RobotTrackerResult();
-      rtr.turret_error = turret_error;
-      rtr.distance = mLatestAimingParameters.get().getRange();
-      rtr.HasResult = true;
+      /*
+      double t_tangental_component,
+      double t_angular_component,
+      Rotation2d t_turret_error,
+      double t_distance,
+      boolean t_HasResult
+
+       */
+
       Twist2d velocity = getMeasuredVelocity();
-      rtr.tangental_component =
-          mLatestAimingParameters.get().getRobotToGoalRotation().sin()
-              * velocity.dx
-              / mLatestAimingParameters.get().getRange();
-      double angular_component = Units.radians_to_degrees(velocity.dtheta);
+      RobotTrackerResult rtr =
+          new RobotTrackerResult(
+              mLatestAimingParameters.get().getRobotToGoalRotation().sin()
+                  * velocity.dx
+                  / mLatestAimingParameters.get().getRange(),
+              Units.radians_to_degrees(velocity.dtheta),
+              turret_error,
+              0);
+
+      // System.out.println("REQ DEG: " + rtr.turret_error.getDegrees());
 
       return rtr;
 
     } else {
       // We don't have aiming parameters!
       // don't move the turret!
+      // empty object.. no results!
       RobotTrackerResult rtr = new RobotTrackerResult();
-      rtr.turret_error = Rotation2d.identity();
-      rtr.HasResult = false;
       return rtr; // 0 rotation
     }
   }

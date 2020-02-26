@@ -6,12 +6,12 @@ import frc.robot.util.geometry.Translation2d;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
 public class Constants {
-  // Controller Ports
-  public static final int OperatorControllerPort = 1;
-  public static final int DriverControllerPort = 0;
 
-  // Solenoid Constants
-  public static final int kPCMId = 1;
+  // Controller Ports
+  public static final int DriverControllerPort = 0;
+  public static final String DriverControllerName = "Controller (Xbox One For Windows)";
+  public static final int OperatorControllerPort = 1;
+  public static final String OperatorControllerName = "AIRFLO";
 
   // PWM
   public static final int kCameraRingId = 0;
@@ -25,7 +25,7 @@ public class Constants {
   public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds
 
   // 22 is too low, 100 is too high
-  public static final double kDriveWheelTrackWidthInches = 75;
+  public static final double kDriveWheelTrackWidthInches = 50;
 
   public static final double kDriveWheelDiameterInches = 3.938;
   public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
@@ -50,9 +50,6 @@ public class Constants {
   public static final double kTrackAgeWeight = 10.0;
   public static final double kTrackSwitchingWeight = 100.0;
   public static final double kCameraFrameRate = 90.0; // fps
-
-  // Field Related Constants
-  public static final double kHighGoalHeight = 96.25; // Center Goal Height
 
   // Camera Specific Information
   public static final double kCameraDiagonalView = Math.toRadians(75);
@@ -80,5 +77,19 @@ public class Constants {
       new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0));
 
   // Field Related Constants
+  public static final double kHighGoalHeight = 96.25; // Center Goal Height
   public static final double kBallHeight = 5; // ball height (inches)
+
+  // Looper System
+  // period at which the looper runs at
+  public static final double kLooperDt = 0.01;
+
+  // Constants for Server Motor System
+  public static final int kCANTimeoutMs = 10; // use for important on the fly updates
+  public static final int kLongCANTimeoutMs = 100; // use for constructor
+
+  // Turret
+  public static final int kTurretTalonMotorPort = 20;
+  public static final double kTurretAimAngleDeadband = 1.5;
+  public static final double kTicksPerDegee = 140;
 }

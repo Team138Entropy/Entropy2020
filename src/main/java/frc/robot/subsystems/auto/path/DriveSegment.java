@@ -59,7 +59,6 @@ public class DriveSegment extends Segment {
     // SmartDashboard.putNumber("right encoder", right);
     SmartDashboard.putNumber("Average encoder distance", (left + right) / 2.0);
 
-
     if (acceptable(left) && acceptable(right)) {
       logger.verbose("Positions in acceptable range for " + ++debounceCount + " tick(s)");
 
@@ -83,8 +82,6 @@ public class DriveSegment extends Segment {
   public Segment copy() {
     return new DriveSegment(feet);
   }
-
-
 
   private boolean acceptable(int ticks) {
     return (ticks > min && ticks < max);

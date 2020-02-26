@@ -3,6 +3,7 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
@@ -14,6 +15,11 @@ public class OperatorInterface {
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
   private final NykoController OperatorController;
+  private LatchedBoolean mBarfLatch = new LatchedBoolean();
+  private LatchedBoolean mShootLatch = new LatchedBoolean();
+  private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
+
+  private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
@@ -29,6 +35,10 @@ public class OperatorInterface {
   }
 
   // Driver
+
+  public boolean checkControllers() {
+    return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
+  }
 
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
@@ -51,7 +61,7 @@ public class OperatorInterface {
     boolean LowGear = previous;
     // Check if Low Gear is Toggled
     if (DriverController.getButton(XboxController.Button.START)) {
-      if (LowGear == false) {
+      if (!LowGear) {
         mLogger.verbose("Y PRESSED ON");
 
       } else {
@@ -65,12 +75,23 @@ public class OperatorInterface {
     return LowGear;
   }
 
-  public boolean getTurretAdjustLeft() {
+  public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
   }
 
-  public boolean getTurretAdjustRight() {
+  public boolean getBallCounterAdjustUp() {
     return OperatorController.getDPad() == DPad.RIGHT;
+  }
+
+  // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
+  public boolean getTurretAdjustLeft() {
+    // return OperatorController.getDPad() == DPad.LEFT;
+    return false;
+  }
+
+  public boolean getTurretAdjustRight() {
+    // return OperatorController.getDPad() == DPad.RIGHT;
+    return false;
   }
 
   public boolean getShooterVelocityTrimUp() {
@@ -104,11 +125,26 @@ public class OperatorInterface {
   }
 
   public boolean getShoot() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_3);
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
+  }
+
+  public boolean getSpinUp() {
+    return mSpinUpLatch.update(OperatorController.getButton(NykoController.Button.LEFT_BUMPER));
+  }
+
+  public boolean getStateReset() {
+    return OperatorController.getButton(NykoController.Button.BUTTON_2);
   }
 
   public boolean startIntake() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_1);
+    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
+    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
+      mIntakeWasPressedWhenWeLastChecked = false;
+      return true;
+    } else {
+      mIntakeWasPressedWhenWeLastChecked = buttonValue;
+      return false;
+    }
   }
 
   public void setDriverRumble(boolean toggle) {
@@ -116,7 +152,7 @@ public class OperatorInterface {
   }
 
   public boolean isBarf() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+    return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
   }
 
   // Test Mode functions
