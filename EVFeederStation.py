@@ -54,17 +54,12 @@ FOV = 75
 # Centroid of the tape is ~87.75 inches (center of height of tape)
 # tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
 
-#Camera height is 37.5 inches
-targetHeightInches = 50.25
-
 camPixelWidth = 640
-# target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
-Tft = 3.27
+# target reflective tape width in feet (7 inches / 12 ) ~3.27
+Tft = .583
 
 # theta = 1/2 FOV,
 tanFOV = math.tan(FOV / 2)
-
-
 
 #Constraint values
 # ratio values - detects feeder station. Doing and not when doing ratio checks will ignore them
