@@ -14,6 +14,9 @@
 
 '''
 [{"name":"connect_verbose","value":1},{"name":"contrast","value":12},{"name":"saturation","value":89},{"name":"hue","value":35},{"name":"white_balance_automatic","value":false},{"name":"exposure","value":1},{"name":"gain_automatic","value":false},{"name":"gain","value":31},{"name":"horizontal_flip","value":false},{"name":"vertical_flip","value":false},{"name":"power_line_frequency","value":0},{"name":"sharpness","value":0},{"name":"auto_exposure","value":1}]
+
+joes setings
+[{"name":"connect_verbose","value":1},{"name":"contrast","value":44},{"name":"saturation","value":64},{"name":"hue","value":18},{"name":"white_balance_automatic","value":false},{"name":"exposure","value":1},{"name":"gain_automatic","value":false},{"name":"gain","value":31},{"name":"horizontal_flip","value":false},{"name":"vertical_flip","value":false},{"name":"power_line_frequency","value":0},{"name":"sharpness","value":0},{"name":"auto_exposure","value":1}]
 '''
 
 import json
@@ -74,7 +77,7 @@ rat_high = 5
 #Solitity compares the hull vs contour, and looks at the difference in filled area
 #Works on a system of %
 solidity_low = .1
-solidity_high = .5
+solidity_high = .4
 
 #Vertices is acts as "length"
 minArea = 5
@@ -82,7 +85,7 @@ minWidth = 20
 maxWidth = 1000
 minHeight = 20
 maxHeight = 1000
-maxVertices = 80
+maxVertices = 100
 minVertices = 25
 
 hsv_threshold_hue = [15, 166]
@@ -332,10 +335,10 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
         #Blocking out parts of the robot
-        rect1 = cv2.rectangle(img, (0, 300), (640, 480), (0,0,0), -1)
         
         
-        value_array = findTape(contours, rect1, centerX, centerY)
+        
+        value_array = findTape(contours, image, centerX, centerY)
     else:
         # No Contours!
         pass
@@ -743,7 +746,9 @@ def findBalls(frame):
 def ProcessFrame(frame, tape):
     if (tape == True):
         threshold = threshold_video(lower_green, upper_green, frame)
-        processedValues = findTargets(frame, threshold, vals_to_send, centerX, centerY)
+        
+        rect1 = cv2.rectangle(frame, (0, 300), (640, 480), (0,0,0), -1)
+        processedValues = findTargets(rect1, threshold, vals_to_send, centerX, centerY)
         if processedValues[3] != None:
             print(processedValues[3])
 
