@@ -1,21 +1,16 @@
 package frc.robot.events;
 
-import edu.wpi.first.wpilibj.command.Command;
-
-/** Represents an event to be checked for by the {@link EventWatcherThread EventWatcherThread}. */
-public interface Event {
-  /**
-   * Check whether or not some command should be added to the scheduler. Try to keep this as
-   * short-running as possible. TODO timeout?
-   *
-   * @return Whether or not it should be added to the scheduler.
-   */
-  boolean check();
+public interface Event extends Runnable {
 
   /**
-   * Get the command to add to the scheduler.
-   *
-   * @return The command to add to the scheduler.
+   * The predicate for the main logic of this event.
+   * @return whether or not {@link #run()} should be called this tick.
    */
-  Command getCommand();
+  boolean predicate();
+
+  /**
+   * Tells the caller that {@link #predicate()} will never return true again.
+   * @return whether or not the event should be pruned.
+   */
+  default boolean pruneMe() { return false; }
 }
