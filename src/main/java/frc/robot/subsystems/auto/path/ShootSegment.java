@@ -1,8 +1,7 @@
 package frc.robot.subsystems.auto.path;
 
-import frc.robot.Robot;
-import frc.robot.subsystems.Storage;
 import frc.robot.OI.OperatorInterface;
+import frc.robot.subsystems.Storage;
 
 public class ShootSegment extends Segment {
   private OperatorInterface operatorInterface = OperatorInterface.getInstance();

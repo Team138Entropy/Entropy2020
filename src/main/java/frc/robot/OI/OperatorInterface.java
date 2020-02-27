@@ -13,7 +13,6 @@ public class OperatorInterface {
   Logger mLogger;
   private static OperatorInterface mInstance;
 
-
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
   private final NykoController OperatorController;
@@ -129,7 +128,9 @@ public class OperatorInterface {
   }
 
   /**
-   * Returns the status of the shooting toggle. This is <b>not</b> always the value of the controller input.
+   * Returns the status of the shooting toggle. This is <b>not</b> always the value of the
+   * controller input.
+   *
    * @return the shooting toggle.
    */
   public boolean getShoot() {
