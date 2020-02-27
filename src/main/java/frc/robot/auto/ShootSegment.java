@@ -26,7 +26,7 @@ public class ShootSegment extends Segment {
   @Override
   public boolean finished() {
     if (done) {
-      logger.info("Shoot segemnt finished");
+      logger.info("Shoot segment finished");
     }
 
     return done;

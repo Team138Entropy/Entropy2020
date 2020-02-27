@@ -12,6 +12,7 @@ public class EventWatcherThread extends Thread {
   public static synchronized EventWatcherThread getInstance() {
     if (instance == null) {
       instance = new EventWatcherThread();
+      instance.start();
     }
 
     return instance;
