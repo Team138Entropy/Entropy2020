@@ -15,6 +15,10 @@ public class Turret extends Subsystem {
   private final WPI_TalonSRX mTurretTalon;
   private final double TicksPerDegree = Constants.kTicksPerDegee;
 
+  //Home Position of Turret
+  //  as vision is disabled, goes to homing to get back home
+  private final double HomePosition = 14000.0;
+
   enum TurretState {
     AUTO_AIM,
     HOMING,
@@ -88,12 +92,20 @@ public class Turret extends Subsystem {
       }
     }else if(mCurrentState == TurretState.HOMING){
       //homing..
+      //command to go home position
+
     }else if(mCurrentState == TurretState.MANUAL_AIM){
       //Manual Control
       mTurretTalon.set(ControlMode.PercentOutput, mPeriodicIO.demand);
     }
   }
 
+
+  //Return the turret to its home position
+  //home position is on the backside of the robot
+  public synchronized void ReturnHome(){
+  
+  }
 
   //Operator Driven Manual Control
   public synchronized void SetManualOutput(double value){

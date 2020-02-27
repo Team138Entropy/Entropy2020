@@ -33,8 +33,8 @@ public class Storage extends Subsystem {
 
   private DigitalInput mIntakeSensor;
 
-  private WPI_TalonSRX mBottomRoller;
-  private WPI_TalonSRX mTopRoller;
+  private final WPI_TalonSRX mBottomRoller;
+  private final WPI_TalonSRX mTopRoller;
 
   private int mBallCount = 0;
   
@@ -55,6 +55,9 @@ public class Storage extends Subsystem {
   private Storage() {
     mBottomRoller = new WPI_TalonSRX(ROLLER_BOTTOM_PORT);
     mTopRoller = new WPI_TalonSRX(ROLLER_TOP_PORT);
+
+    mBottomRoller.configFactoryDefault();
+    mTopRoller.configFactoryDefault();
 
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
