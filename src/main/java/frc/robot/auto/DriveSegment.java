@@ -1,4 +1,4 @@
-package frc.robot.subsystems.auto.path;
+package frc.robot.auto;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;

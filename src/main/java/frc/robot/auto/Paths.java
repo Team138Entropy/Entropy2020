@@ -1,4 +1,4 @@
-package frc.robot.subsystems.auto.path;
+package frc.robot.auto;
 
 import java.util.HashMap;
 import java.util.Optional;

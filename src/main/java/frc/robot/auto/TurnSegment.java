@@ -1,4 +1,4 @@
-package frc.robot.subsystems.auto.path;
+package frc.robot.auto;
 
 import frc.robot.subsystems.Drive;
 
