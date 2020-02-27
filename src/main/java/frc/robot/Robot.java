@@ -77,6 +77,10 @@ public class Robot extends TimedRobot {
   private ClimingState mClimingState = ClimingState.IDLE;
   private TurretState mTurretState = TurretState.AUTO_AIM;
 
+  // Auto stuff
+  private static boolean mAuto = false;
+  private Path mAutoPath = Paths.NO_OP;
+
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
@@ -120,8 +124,6 @@ public class Robot extends TimedRobot {
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
   private Timer mBarfTimer = new Timer();
-
-  private Path mAutoPath = Paths.NO_OP;
 
   Logger mRobotLogger = new Logger("robot");
 
@@ -202,6 +204,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    mAuto = true;
     mIsSpinningUp = false;
     mOperatorInterface.checkControllers();
 
@@ -223,12 +226,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    RobotLoop();
     mAutoPath.tick();
     updateSmartDashboard();
   }
 
   @Override
   public void teleopInit() {
+    mAuto = false;
     visionLight.set(Relay.Value.kForward);
     mIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
@@ -275,6 +280,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    mAuto = false;
     mRobotLogger.log("Entropy 138: Test Init");
 
     Config.getInstance().reload();
@@ -381,6 +387,12 @@ public class Robot extends TimedRobot {
   }
 
   public void driveTrainLoop() {
+
+    // Hack
+    if (mAuto) {
+      return;
+    }
+
     // TODO: Cache whether or not the robot has a drivetrain. We shouldn't be calling the config
     // system every tick.
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
@@ -718,5 +730,9 @@ public class Robot extends TimedRobot {
    */
   public static Gyro getGyro() {
     return sGyro;
+  }
+
+  public static boolean isAuto() {
+    return mAuto;
   }
 }

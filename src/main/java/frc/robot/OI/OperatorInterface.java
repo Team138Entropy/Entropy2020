@@ -3,6 +3,7 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.Robot;
 import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
@@ -12,12 +13,15 @@ public class OperatorInterface {
   Logger mLogger;
   private static OperatorInterface mInstance;
 
+
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
   private final NykoController OperatorController;
   private LatchedBoolean mBarfLatch = new LatchedBoolean();
   private LatchedBoolean mShootLatch = new LatchedBoolean();
   private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
+
+  private boolean autoShootOverride = false;
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -124,8 +128,24 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.BUTTON_4);
   }
 
+  /**
+   * Returns the status of the shooting toggle. This is <b>not</b> always the value of the controller input.
+   * @return the shooting toggle.
+   */
   public boolean getShoot() {
-    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
+
+    // I'm terribly sorry. I just needed this to work and simulating actual input was the least
+    // likely to introduce a weird state bug. -Will
+    if (Robot.isAuto()) {
+      if (autoShootOverride) {
+        autoShootOverride = false;
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
+    }
   }
 
   public boolean getSpinUp() {
@@ -186,5 +206,13 @@ public class OperatorInterface {
 
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
+  }
+
+  /**
+   * Tells {@link #getShoot()} to return true the next time it's called. This is a hack to make auto
+   * shooting work. Please don't use it anywhere else. Please.
+   */
+  public void overrideShoot() {
+    autoShootOverride = true;
   }
 }
