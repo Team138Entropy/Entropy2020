@@ -32,6 +32,7 @@ import numpy as np
 from numpy import mean
 import math
 
+
 # Image Camera Size (Pixels)
 Camera_Image_Width = 640
 Camera_Image_Height = 480
@@ -77,16 +78,16 @@ rat_high = 5
 #Solitity compares the hull vs contour, and looks at the difference in filled area
 #Works on a system of %
 solidity_low = .1
-solidity_high = .4
+solidity_high = .3
 
 #Vertices is acts as "length"
-minArea = 5
+minArea = 10
 minWidth = 20
 maxWidth = 1000
 minHeight = 20
-maxHeight = 1000
+maxHeight = 60
 maxVertices = 100
-minVertices = 25
+minVertices = 30
 
 hsv_threshold_hue = [15, 166]
 hsv_threshold_saturation = [71, 255]
@@ -331,14 +332,10 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     # Gets the shape of video
     # Gets center of height and width
     # Copies frame and stores it in image
-    image = frame.copy()
+    
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
-        #Blocking out parts of the robot
-        
-        
-        
-        value_array = findTape(contours, image, centerX, centerY)
+        value_array = findTape(contours, frame, centerX, centerY)
     else:
         # No Contours!
         pass
@@ -462,6 +459,10 @@ def findTape(contours, image, centerX, centerY):
             cntArea = cv2.contourArea(cnt)
             # calculate area of convex hull
             hullArea = cv2.contourArea(hull)
+            
+            perimeter = cv2.arcLength(cnt, True)
+            approxCurve = cv2.approxPolyDP(cnt, perimeter * .01, True)
+            
 
             if cntArea != 0 and hullArea != 0:
                 mySolidity = float (cntArea)/hullArea
@@ -471,7 +472,7 @@ def findTape(contours, image, centerX, centerY):
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
             # Filters contours based off of size
-            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (x > minWidth) and (x < maxWidth) and (y > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if len(approxCurve) >= 8 and (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (x > minWidth) and (x < maxWidth) and (y > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 
@@ -749,6 +750,7 @@ def ProcessFrame(frame, tape):
         
         rect1 = cv2.rectangle(frame, (0, 300), (640, 480), (0,0,0), -1)
         processedValues = findTargets(rect1, threshold, vals_to_send, centerX, centerY)
+        
         if processedValues[3] != None:
             print(processedValues[3])
 
