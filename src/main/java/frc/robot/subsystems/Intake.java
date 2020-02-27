@@ -15,13 +15,13 @@ public class Intake extends Subsystem {
   // initial cooldown because our startup of the roller induces a countdown
   private int mOverCurrentCountdown = 30;
 
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
+  private final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
 
   // TODO: Tune these values
-  private static final double ROLLER_SPEED =
+  private final double ROLLER_SPEED =
       Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
 
-  private WPI_TalonSRX mRoller;
+  private final WPI_TalonSRX mRoller;
 
   private static Intake sInstance;
 
@@ -34,6 +34,7 @@ public class Intake extends Subsystem {
 
   private Intake() {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
+    mRoller.configFactoryDefault();
   }
 
   public void barf() {
