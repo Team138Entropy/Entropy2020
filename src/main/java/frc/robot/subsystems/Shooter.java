@@ -11,18 +11,18 @@ import frc.robot.SpeedLookupTable;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private static final double MAX_SPEED = 2550d;
+  private final double MAX_SPEED = 2550d;
   // private static final double SPEED_DEADBAND = 20;
-  private static final double SPEED_DEADBAND = 75;
-  private static final double DROP_DEADBAND = 250;
-  private static final int SPEED_DEADBAND_DELAY = 10;
-  private static final double FEEDFORWARD = 1023d / MAX_SPEED;
+  private final double SPEED_DEADBAND = 75;
+  private final double DROP_DEADBAND = 250;
+  private final int SPEED_DEADBAND_DELAY = 10;
+  private final double FEEDFORWARD = 1023d / MAX_SPEED;
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
   // private static final double D = 0.1;
-  private static final double P = 0;
-  private static final double I = 0;
-  private static final double D = 0;
+  private final double P = 0;
+  private final double I = 0;
+  private final double D = 0;
 
   // a minimum acountdown
   private static final int MIN_SHOT_COUNTDOWN = 100;
@@ -30,72 +30,26 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
+  private final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int DEFAULT_ROLLER_SPEED =
+  private final int DEFAULT_ROLLER_SPEED =
       2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
-  private static final int VELOCITY_ADJUSTMENT_BUMP =
+  private final int VELOCITY_ADJUSTMENT_BUMP =
       Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
   private boolean mHasHadCurrentDrop = false;
 
-  private static class TurretPosition {
-    private double mAzimuth, mDistance;
-
-    public TurretPosition(double azimuth, double distance) {
-      mAzimuth = azimuth;
-      mDistance = distance;
-    }
-
-    public double getAzimuth() {
-      return mAzimuth;
-    }
-
-    public double getDistance() {
-      return mDistance;
-    }
-  }
-
-  @FunctionalInterface
-  private interface Turret {
-    void set(TurretPosition position);
-  }
-
-  @FunctionalInterface
-  private interface Vision {
-    TurretPosition calcTargetPosition();
-  }
-
-  @FunctionalInterface
-  private interface Intake {
-    void shoveANodeIntoTheThing();
-  }
-
-  // TEMPORARY STUFF ENDS HERE
-
   // Aggregation
   private static Shooter instance;
-  private PIDRoller mRoller;
-  private TalonSRX mTestRoller;
-  private Turret mTurret;
-  private Vision mVision;
+  private final PIDRoller mRoller;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
 
-  private void x() {}
 
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
-
-    // TODO: Replace these with real subsystems
-    mTurret = position -> x();
-    mVision =
-        () -> {
-          // System.out.println("Getting dummy vision target");
-          return new TurretPosition(0, MAX_SPEED);
-        };
   }
 
   public static synchronized Shooter getInstance() {
@@ -103,10 +57,6 @@ public class Shooter extends Subsystem {
     return instance;
   }
 
-  /** Tells the turret to move to where the vision system says we should be. */
-  public void target() {
-    mTurret.set(mVision.calcTargetPosition());
-  }
 
   /** Starts the roller. */
   public void start() {
@@ -124,11 +74,14 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
+    double distance = 10; //for now
+    
     int speed =
         (int)
             Math.round(
                 SpeedLookupTable.getInstance()
-                    .getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
+                    .getSpeedFromDistance(distance));
+    
     return speed + mVelocityAdjustment;
   }
 

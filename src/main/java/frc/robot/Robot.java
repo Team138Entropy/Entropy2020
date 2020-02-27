@@ -19,13 +19,6 @@ import frc.robot.util.Util;
 public class Robot extends TimedRobot {
 
 
-  // Modes
-  public enum Mode {
-    Sharpshooter,
-    Rebounder,
-    Climber
-  };
-
   // State variables
   public enum State {
     IDLE, // Default state
@@ -65,7 +58,6 @@ public class Robot extends TimedRobot {
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
 
-  private Mode mMode = Mode.Sharpshooter;
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
@@ -624,9 +616,6 @@ public class Robot extends TimedRobot {
         /* Starts roller */
         mShooter.start();
         mIsSpinningUp = false;
-
-        // TODO: Placeholder method, replace later.
-        mShooter.target();
 
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {

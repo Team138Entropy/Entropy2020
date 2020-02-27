@@ -8,23 +8,20 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 class PIDRoller {
 
-  private static final int PID_LOOP_INDEX = 0;
-  private static final int TIMEOUT_MS = 10;
+  private final int PID_LOOP_INDEX = 0;
+  private final int TIMEOUT_MS = 10;
 
-  private WPI_TalonSRX mTalon;
-  private WPI_TalonSRX mTalonSlave;
+  private final WPI_TalonSRX mTalon;
+  private final WPI_TalonSRX mTalonSlave;
 
   PIDRoller(int talonPort, int talon2Port, double p, double i, double d, double f) {
-    super();
-
     mTalon = new WPI_TalonSRX(talonPort);
-
+    mTalon.configFactoryDefault();
     // All of this was ripped from the 2019 elevator code
     mTalon.configNominalOutputForward(0, TIMEOUT_MS);
     mTalon.configNominalOutputReverse(0, TIMEOUT_MS);
     mTalon.configPeakOutputForward(1, TIMEOUT_MS);
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
-    // mTalon.configFactoryDefault();
 
     mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_25Ms, 50);
     mTalon.configVelocityMeasurementWindow(32);
@@ -42,7 +39,6 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-    System.out.println("Using mTalonSlave: " + talon2Port);
     mTalonSlave = new WPI_TalonSRX(talon2Port);
     mTalonSlave.follow(mTalon);
   }
