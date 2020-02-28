@@ -360,28 +360,18 @@ public class Robot extends TimedRobot {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
       double driveTurn = mOperatorInterface.getDriveTurn();
-      boolean autoDrive = false;
-      mDrive.setDrive(driveThrottle, driveTurn, false);
 
-      // Quickturn
-      if (autoDrive == false && mOperatorInterface.getQuickturn()) {
-        // Quickturn!
-      }
+      boolean WantsAutoAim = mOperatorInterface.getFeederSteer();
 
-      // Detect Harvest Mode
-      boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
-      boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
-      boolean WantsAutoAim = false;
 
-      // Optional Object that may or may not contain a null value
-      Optional<AimingParameters> BallAimingParameters; // info to aim to the ball
 
       // Continue Driving
-      if (WantsHarvestMode == true) {
+      if (WantsAutoAim == true) {
         // Harvest Mode - AutoSteer Functionality
         // Used for tracking a ball
         // we may want to limit the speed?
-        // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
+        double dummyAngle = 0.0;
+        mDrive.autoSteerFeederStation(driveThrottle, dummyAngle);
       } else {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);
@@ -392,6 +382,11 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop() {
+
+    turretLoop();
+
+    driveTrainLoop();
+
     updateSmartDashboard();
 
     State prevState = mState;
@@ -435,9 +430,7 @@ public class Robot extends TimedRobot {
     // TODO: remove this and only allow shooting if you have at least 1 ball
     checkTransitionToShooting();
 
-    turretLoop();
 
-    driveTrainLoop();
 
     updateSmartDashboard();
 
