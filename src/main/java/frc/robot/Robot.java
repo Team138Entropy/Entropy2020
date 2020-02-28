@@ -326,7 +326,7 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.isClimberTest()) {
       mClimber.jog(mOperatorInterface.getClimberJogSpeed());
     } else {
-      mClimber.jog(0);
+      mClimber.stop();
     }
     
     if (mOperatorInterface.isHomeClimber()) {
