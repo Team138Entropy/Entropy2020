@@ -101,6 +101,7 @@ public class Climber extends Subsystem {
 
   /** Return true if extended */
   public boolean isExtended() {
+    mMotor.getSelectedSensorPosition();
     return true;
   }
 

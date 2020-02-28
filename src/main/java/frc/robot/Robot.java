@@ -87,6 +87,7 @@ public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
 
 
+  private boolean startedHoming = false;
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -323,6 +324,19 @@ public class Robot extends TimedRobot {
     }
 
     System.out.println(mStorage.getEncoder());
+    if (mOperatorInterface.isClimberTest()) {
+      mClimber.jog(mOperatorInterface.getClimberJogSpeed());
+    }
+    
+    if (mOperatorInterface.isHomeClimber()) {
+      startedHoming = true;
+      mClimber.home();
+    } else {
+      if (startedHoming) {
+        mClimber.stop();
+        startedHoming = false;
+      }
+    }
   }
 
   @Override

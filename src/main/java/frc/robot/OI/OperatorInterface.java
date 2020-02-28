@@ -116,6 +116,11 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
   }
 
+  // TODO: figure out why this is a ghost function incorrectly referenced in Robot.java
+  public boolean startIntake() {
+    return false;
+  }
+
   public double getOperatorThrottle() {
     return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
   }
@@ -194,14 +199,14 @@ public class OperatorInterface {
 
   //TODO: Decide on climber jog and home buttons
   public double getClimberJogSpeed() {
-    if (OperatorController.getButton(NykoController.Button.LEFT_BUMPER)) {
-      return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
-    } else {
-      return 0;
-    }
+    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
+  }
+
+  public boolean isClimberTest() {
+    return OperatorController.getButton(NykoController.Button.LEFT_BUMPER);
   }
 
   public boolean isHomeClimber() {
-    return true;
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
 }
