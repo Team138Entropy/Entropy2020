@@ -12,6 +12,7 @@ import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
 import frc.robot.auto.Path;
 import frc.robot.auto.Paths;
+import frc.robot.auto.ShootSegment;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.util.loops.Looper;
@@ -217,7 +218,7 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
 
     mState = State.SHOOTING;
-    mShootingState = ShootingState.PREPARE_TO_SHOOT;
+    mShootingState = ShootingState.IDLE;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
     mAutoPath =
@@ -226,8 +227,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    RobotLoop();
     mAutoPath.tick();
+
+    if (ShootSegment.shouldStartShooting()) {
+      mShootingState = ShootingState.PREPARE_TO_SHOOT;
+    }
+
+    if (ShootSegment.shouldStopShooting()) {
+      mShootingState = ShootingState.SHOOTING_COMPLETE;
+    }
+
+    executeShootingStateMachine();
+
     updateSmartDashboard();
   }
 

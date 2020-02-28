@@ -5,13 +5,15 @@ import frc.robot.events.Event;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.Storage;
 
-public class AsyncShootSegment extends Segment {
+public class AsyncShootSegment extends ShootSegment {
 
   @Override
   public void init() {
     logger.info("Initializing async shoot segment");
 
-    OperatorInterface.getInstance().overrideShoot();
+    // OperatorInterface.getInstance().overrideShoot();
+    startShooting();
+    
 
     EventWatcherThread.getInstance().registerEvent(new Event() {
       boolean done = false;
@@ -23,7 +25,8 @@ public class AsyncShootSegment extends Segment {
 
       @Override
       public void run() {
-        OperatorInterface.getInstance().overrideShoot();
+        // OperatorInterface.getInstance().overrideShoot();
+        stopShooting();
         done = true;
       }
 
