@@ -11,7 +11,6 @@ import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
-import frc.robot.util.motion.SetpointGenerator;
 import frc.robot.vision.AimingParameters;
 
 public class Drive extends Subsystem {
@@ -54,7 +53,8 @@ public class Drive extends Subsystem {
     public double right_feedforward;
     public double left_old = 0;
     public double right_old = 0;
-    public boolean isQuickturning = false;
+    public boolean wasReversing = false;
+    public boolean quickturn = false;
   }
 
   public static synchronized Drive getInstance() {
@@ -135,109 +135,63 @@ public class Drive extends Subsystem {
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
-    // A lot of the space in this function is taken up by local copies of stuff
-    double accelSpeed = Config.getInstance().getDouble(Key.DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS);
-    double brakeSpeed = Config.getInstance().getDouble(Key.DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS);
-
-    // are we quickturning?
-    boolean quickturn = mPeriodicDriveData.isQuickturning;
-
-    // Segments are started by the variables they will need
-    boolean leftStationary = false;
-    boolean rightStationary = false;
-
-    if (mLeftMaster.getSupplyCurrent() == 0) {
-      leftStationary = true;
-    }
-
-    if (mRightMaster.getSupplyCurrent() == 0) {
-      rightStationary = true;
-    }
-
-    // Splitting up var definitions to their unique sections makes the code more readable
-    boolean stationary = false;
-
-    if (leftStationary && rightStationary) {
-      stationary = true;
-    }
-    
-    // Don't know why this is here but I'm not gonna remove it
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
       // setBrakeMode(true);
       mDriveLogger.verbose("switching to open loop " + signal);
       mDriveControlState = DriveControlState.OPEN_LOOP;
     }
 
-    // Cache our signals for more readable code. right is backwards because reasons out of our control
-    double leftOutput = signal.getLeft();
-    double rightOutput = signal.getRight();
+    signal.PrintLog();
 
-    // Ramping is calculated through a series of "abstractions", calculating the acceleration directions
-    // of hierarchical components in the drivetrain.
-    boolean leftAcceleratingForward = false;
-    boolean leftAcceleratingBackwards = false;
-
-    boolean rightAcceleratingForward = false;
-    boolean rightAcceleratingBackwards = false;
-
-    if (leftOutput > mPeriodicDriveData.left_old) {
-      leftAcceleratingForward = true;
-    } else if (leftOutput < mPeriodicDriveData.left_old) {
-      leftAcceleratingBackwards = true;
+    // Very first step is to update our negative magnitude checker
+    if (signal.getLeft() < 0 && signal.getRight() < 0) {
+      mPeriodicDriveData.wasReversing = true;
+    } else if (signal.getLeft() > 0 && signal.getRight() > 0) {
+      mPeriodicDriveData.wasReversing = false;
     }
 
-    if (rightOutput > mPeriodicDriveData.right_old) {
-      rightAcceleratingForward = true;
-    } else if (rightOutput < mPeriodicDriveData.right_old) {
-      rightAcceleratingBackwards = true;
+    // If our acceleration is positive (going away from where we were last time)
+    // Remember that right has to be flipped down below so the bracket is the other way 'round
+    // mDriveLogger.log("Left: " + signal.getLeft() + " + " + mPeriodicDriveData.left_old);
+    // mDriveLogger.log("Right: " + signal.getRight() + " + " + mPeriodicDriveData.right_old);
+    if ((Math.abs(signal.getLeft()) > mPeriodicDriveData.left_old) && (Math.abs(signal.getRight()) > mPeriodicDriveData.right_old) && !mPeriodicDriveData.quickturn) {
+      // Tell the talons to be significantly less epic
+      setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__ACCEL_RAMP_TIME_SECONDS));
     }
-
-    // Whether our velocity is increasing or decreasing
-    boolean acceleratingForward = false;
-    boolean acceleratingBackwards = false;
-
-    if (leftAcceleratingForward && rightAcceleratingForward) {
-      acceleratingForward = true;
-    } else if (leftAcceleratingBackwards && rightAcceleratingBackwards) {
-      acceleratingBackwards = true;
-    }
-
-    // Whether we are going forwards or in reverse
-    boolean velocityForwards = false;
-    boolean velocityReverse = false;
-
-    if (leftOutput > 0) {
-      velocityForwards = true;
-    } else if (leftOutput < 0) {
-      velocityReverse = true;
-    }
-
-    // This is where the actual accel limiting logic begins
-    if (velocityForwards) {
-      if (acceleratingForward) {
-        setOpenloopRamp(accelSpeed);
+    // If the opposite is true, e.g. our velocity is decreasing, let us stop as fast as we want. Note that this
+    // "inverse case" is here because, if it wasn't, acceleration would only be capped while jerk is positive.
+    else if (Math.abs(signal.getLeft()) < mPeriodicDriveData.left_old && Math.abs(signal.getRight()) < mPeriodicDriveData.right_old && !mPeriodicDriveData.quickturn) {
+      // Actually don't stop as fast as we can, first check if we are going backwards by comparing the
+      // magnitudes of left and right drive signals
+      if (mPeriodicDriveData.wasReversing = true) {
+        setOpenloopRamp(Config.getInstance().getDouble(Key.DRIVE__BACK_SLOW_RAMP_TIME_SECONDS));
+      } else {
+        // If we are going forwards, we can stop as fast as we want.
+        setOpenloopRamp(0);
       }
-    } else if (velocityReverse) {
-      if (acceleratingForward) {
-        setOpenloopRamp(brakeSpeed);
-      }
-    } else if (stationary) {
+    }
+    // In the case that our joystick value is zero, disable our shit as it was last time, nothing happens to our ramp
+    else if (signal.getLeft() == 0 && signal.getRight() == 0 && mPeriodicDriveData.wasReversing == false) {
       setOpenloopRamp(0);
-    } else if (quickturn) {
+    }
+    // At this point this is just getting ridiculous. Hopefully this is self-evident.
+    else if (mPeriodicDriveData.quickturn) {
       setOpenloopRamp(0);
     }
 
-    // cache our olds after we've used them to make them actually "olds"
-    mPeriodicDriveData.left_old = leftOutput;
-    mPeriodicDriveData.right_old = rightOutput;
+    // Olds are cached as absolute to be useful above
+    mPeriodicDriveData.left_old = Math.abs(signal.getLeft());
+    mPeriodicDriveData.right_old = Math.abs(signal.getRight());
 
-    // then we set our master talons, remembering that the physical right of the drivetrain is backwards
-    mLeftMaster.set(ControlMode.PercentOutput, leftOutput);
-    mRightMaster.set(ControlMode.PercentOutput, rightOutput * -1);
+    // then we set our master talons, remembering that right is backwards
+    mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
+    mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
   }
 
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
+
+    mPeriodicDriveData.quickturn = quickTurn;
 
     // TODO: Extract this "epsilonEquals" pattern into a "handleDeadband" method
     // If we're not pushing forward on the throttle, automatically enable quickturn so that we
@@ -251,10 +205,6 @@ public class Drive extends Subsystem {
     // This is just a convoluted way to do a deadband.
     if (Util.epsilonEquals(wheel, 0.0, 0.020)) {
       wheel = 0.0;
-    }
-
-    if (wheel != 0 && quickTurn) {
-      mPeriodicDriveData.isQuickturning = true;
     }
 
     final double kWheelGain = 0.05;
@@ -303,6 +253,7 @@ public class Drive extends Subsystem {
   // }
 
   public void setOpenloopRamp(double speed) {
+    mDriveLogger.log("setting ramp to " + speed);
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
   }
