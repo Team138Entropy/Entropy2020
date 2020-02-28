@@ -54,6 +54,14 @@ public class Robot extends TimedRobot {
     MANUAL
   }
 
+  public enum TestState {
+    STORAGE_ENCODER_TEST,
+    STORAGE_ENCODER_TEST_WAITING,
+    SHOOTER_ENCODER_TEST,
+    SHOOTER_ENCODER_TEST_WAITING,
+    MANUAL
+  }
+
   private final int AUTONOMOUS_BALL_COUNT = 3;
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
@@ -63,6 +71,7 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
   private TurretState mTurretState = TurretState.AUTO_AIM;
+  private TestState mTestState = TestState.STORAGE_ENCODER_TEST;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -109,6 +118,13 @@ public class Robot extends TimedRobot {
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
+
+  private int mStartingStorageEncoderPosition;
+  private Timer mStorageEncoderTestTimer = new Timer();
+
+  private int mStartingShooterEncoderPosition;
+  private Timer mShooterEncoderTestTimer = new Timer();
+
   @Override
   public void robotInit() {
     // Zero all nesscary sensors on Robot
@@ -251,6 +267,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
+    mTestState = TestState.STORAGE_ENCODER_TEST;
 
     Config.getInstance().reload();
     mSubsystemManager.checkSubsystems();
@@ -258,66 +275,115 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+    System.out.println(mTestState);
+    switch(mTestState){
+      case STORAGE_ENCODER_TEST:
+        mRobotLogger.log("Got initial encoder value " + mStorage.getEncoder());
+        mStartingStorageEncoderPosition = mStorage.getEncoder();
 
-    // Intake roller ON while button held
-    if (mOperatorInterface.isIntakeRollerTest()) {
-      mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
-    } else if (mOperatorInterface.isBarf()) {
-      mIntake.barf();
-    } else {
-      mIntake.stop();
+        mStorageEncoderTestTimer.reset();
+        mStorageEncoderTestTimer.start();
+
+        mStorage.setBottomOutput(1);
+        mStorage.setTopOutput(1);
+
+        mTestState = TestState.STORAGE_ENCODER_TEST_WAITING;
+        break;
+      case STORAGE_ENCODER_TEST_WAITING:
+        if(mStorageEncoderTestTimer.get() >= 1){
+          int deltaPosition = mStorage.getEncoder() - mStartingStorageEncoderPosition;
+          mRobotLogger.log("Got delta position of " + deltaPosition);
+          
+          mStorage.setBottomOutput(0);
+          mStorage.setTopOutput(0);
+
+          mTestState = TestState.SHOOTER_ENCODER_TEST;
+        }
+        break;
+      case SHOOTER_ENCODER_TEST:
+        mShooter.setOutput(1);
+
+        mRobotLogger.log("Got initial speed " + mShooter.getSpeed());
+
+        mShooterEncoderTestTimer.reset();
+        mShooterEncoderTestTimer.start();
+
+        mTestState = TestState.SHOOTER_ENCODER_TEST_WAITING;
+        break;
+      case SHOOTER_ENCODER_TEST_WAITING:
+        if(mShooterEncoderTestTimer.get() >= 1){
+          mShooter.setOutput(0);
+        
+          mRobotLogger.log("Got final speed " + mShooter.getSpeed());
+          mTestState = TestState.MANUAL;
+        }
+        break;
+      case MANUAL:
+        // Intake roller ON while button held
+        if (mOperatorInterface.isIntakeRollerTest()) {
+          mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
+        } else if (mOperatorInterface.isBarf()) {
+          mIntake.barf();
+        } else {
+          mIntake.stop();
+        }
+
+        if (mOperatorInterface.isBarf()) {
+          mStorage.barf();
+        } else {
+          // Bottom storage rollers ON while button held
+          if (mOperatorInterface.isStorageRollerBottomTest()) {
+            mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
+          } else {
+            mStorage.setBottomOutput(0);
+          }
+
+          // Top storage rollers ON while button held
+          if (mOperatorInterface.isStorageRollerTopTest()) {
+            mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
+          } else {
+            mStorage.setTopOutput(0);
+          }
+        }
+
+        // Shooter roller ON while button held
+        if (mOperatorInterface.isShooterTest()) {
+          mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
+        } else {
+          mShooter.stop();
+        }
+
+        if (mOperatorInterface.isDriveLeftBackTest()) {
+          mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputLeftBack(0);
+        }
+
+        if (mOperatorInterface.isDriveLeftFrontTest()) {
+          mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputLeftFront(0);
+        }
+
+        if (mOperatorInterface.isDriveRightBackTest()) {
+          mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputRightBack(0);
+        }
+
+        if (mOperatorInterface.isDriveRightFrontTest()) {
+          mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputRightFront(0);
+        }
+      break;
+      default:
+        mRobotLogger.error("Unknown test state " + mTestState.toString());
+        break;
+      
     }
 
-    if (mOperatorInterface.isBarf()) {
-      mStorage.barf();
-    } else {
-      // Bottom storage rollers ON while button held
-      if (mOperatorInterface.isStorageRollerBottomTest()) {
-        mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
-      } else {
-        mStorage.setBottomOutput(0);
-      }
 
-      // Top storage rollers ON while button held
-      if (mOperatorInterface.isStorageRollerTopTest()) {
-        mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
-      } else {
-        mStorage.setTopOutput(0);
-      }
-    }
-
-    // Shooter roller ON while button held
-    if (mOperatorInterface.isShooterTest()) {
-      mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
-    } else {
-      mShooter.stop();
-    }
-
-    if (mOperatorInterface.isDriveLeftBackTest()) {
-      mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputLeftBack(0);
-    }
-
-    if (mOperatorInterface.isDriveLeftFrontTest()) {
-      mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputLeftFront(0);
-    }
-
-    if (mOperatorInterface.isDriveRightBackTest()) {
-      mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputRightBack(0);
-    }
-
-    if (mOperatorInterface.isDriveRightFrontTest()) {
-      mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputRightFront(0);
-    }
-
-    System.out.println(mStorage.getEncoder());
   }
 
   @Override
