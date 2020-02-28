@@ -95,7 +95,7 @@ public class RobotTracker{
     //Each vision target is a goal
     //so goal trackers for balls, and high goal
     private GoalTracker mVisionTarget_Ball = new GoalTracker(1);
-    private GoalTracker mVisionTarget_Goal = new GoalTracker(69);
+    private GoalTracker mVisionTarget_Goal = new GoalTracker(2);
 
     //Lists of Translations to the Vision Targets
     List<Translation2d> mCameraToVisionTarget_Ball = new ArrayList<>();
