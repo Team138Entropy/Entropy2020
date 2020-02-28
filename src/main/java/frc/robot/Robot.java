@@ -369,7 +369,7 @@ public class Robot extends TimedRobot {
       }
 
       // Detect Harvest Mode
-      boolean WantsHarvestMode = mOperatorInterface.getHarvestMode();
+      boolean WantsHarvestMode = mOperatorInterface.getFeederStationDrive();
       boolean HarvesModePressed = HarvestAim.update(WantsHarvestMode);
       boolean WantsAutoAim = false;
 
@@ -378,10 +378,9 @@ public class Robot extends TimedRobot {
 
       // Continue Driving
       if (WantsHarvestMode == true) {
-        // Harvest Mode - AutoSteer Functionality
-        // Used for tracking a ball
-        // we may want to limit the speed?
-        // mDrive.autoSteerBall(DriveThrottle, BallAimingParameters.get());
+        // DRIVER STATION STEER FUNCTIONALITY
+        double angle = 10;
+        mDrive.AutoTurret(driveThrottle, 10);
       } else {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);

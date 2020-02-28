@@ -36,6 +36,7 @@ public class OperatorInterface {
 
   // Driver
 
+
   public boolean checkControllers(){
     return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
   }
@@ -46,6 +47,10 @@ public class OperatorInterface {
 
   public double getDriveTurn() {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
+  }
+
+  public boolean getFeederStationDrive(){
+    return DriverController.getTrigger(XboxController.Side.RIGHT);
   }
 
   public boolean getClimb() {
