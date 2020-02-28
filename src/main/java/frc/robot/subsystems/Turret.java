@@ -1,33 +1,48 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-import frc.robot.Config;
-import frc.robot.Config.Key;
-import frc.robot.Constants;
-import frc.robot.Logger;
-import frc.robot.OI.OperatorInterface;
 
-/**
- * This Turret singleton extends WPILIB's PID subsystem via @Overriding methods use enable(),
- * disable() and setSetpoint() to control the PID. loop() should be run every tick
- */
-public class Turret extends PIDSubsystem {
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import frc.robot.Constants;
+
+
+public class Turret extends Subsystem {
   private static Turret sInstance;
 
-  private Logger mTurretLogger;
-  private WPI_TalonSRX mTurretTalon;
-  private Potentiometer mPot;
+  private final WPI_TalonSRX mTurretTalon;
+  private final double TicksPerDegree = Constants.kTicksPerDegee;
 
-  private Relay cameraLight = new Relay(Constants.kCameraRingId);
+  //Home Position of Turret
+  //  as vision is disabled, goes to homing to get back home
+  private final double HomePosition = 14000.0;
 
-  // the target position (on a scale from 0 to 100)
-  private double mManualTargetPos = 50;
+  enum TurretState {
+    AUTO_AIM,
+    HOMING,
+    MANUAL_AIM
+  };
+
+  //Default to Aiming State
+  //this turret state should remain local to the turret class
+  private TurretState mCurrentState = TurretState.AUTO_AIM;
+
+  protected PeriodicIO mPeriodicIO = new PeriodicIO();
+  
+  //Class of values that are periodically updated
+  public static class PeriodicIO {
+    //Inputs
+    public double timestamp;
+    public double CurrentPosition;
+
+    //Outputs
+    public double demand; //motor output, could be a position, or percent
+    public double angle;
+    public double feedforward;
+  };
+
 
   public static Turret getInstance() {
     if (sInstance == null) {
@@ -39,93 +54,96 @@ public class Turret extends PIDSubsystem {
 
   /** Set up our talon, logger and potentiometer */
   private Turret() {
+   mTurretTalon = new WPI_TalonSRX(Constants.kTurretTalonMotorPort);
+   mTurretTalon.configFactoryDefault();
+   mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTurretTalonMotorPort);
+   mTurretTalon.config_kF(0, 0); //MUST BE 0 in Position mode
+   mTurretTalon.config_kP(0, .7);
+   mTurretTalon.config_kI(0, 0);
+   mTurretTalon.config_kD(0, 0);
+   mTurretTalon.config_IntegralZone(0, 50);
+   mTurretTalon.setNeutralMode(NeutralMode.Brake);
 
-    // Set PID values
-    super(
-        new PIDController(
-            Config.getInstance().getDouble(Key.OI__VISION__PID__P),
-            Config.getInstance().getDouble(Key.OI__VISION__PID__I),
-            Config.getInstance().getDouble(Key.OI__VISION__PID__D)));
-    mTurretLogger = new Logger("turret");
-    mTurretTalon = new WPI_TalonSRX(Config.getInstance().getInt(Key.ROBOT__TURRET__TALON_LOCATION));
-    mPot =
-        new AnalogPotentiometer(
-            Config.getInstance().getInt(Key.ROBOT__POT__LOCATION),
-            Config.getInstance().getFloat(Key.ROBOT__POT__RANGE),
-            Config.getInstance().getFloat(Key.ROBOT__POT__OFFSET));
+
+
+
   }
 
-  /**
-   * Gets the PID value
-   *
-   * @return the PID value
-   */
+
+
+  //peridocally read inputs
   @Override
-  protected double getMeasurement() {
-    // gets the POT value, rounded to 2 decimal places
+  public synchronized void readPeriodicInputs() {
+    //store current encoder position
+    mPeriodicIO.CurrentPosition = mTurretTalon.getSelectedSensorPosition();
 
-    // TODO: is this even needed?
-    double potValue = Double.parseDouble(String.format("%.2f", this.mPot.get()));
-    mTurretLogger.verbose("pot value " + potValue);
-    return potValue;
+
   }
 
-  /** @param output The motor output from the PID to control the motor. */
+  //periodically write outputs
   @Override
-  protected void useOutput(double output, double unused) {
-    // limit the output to prevent the motor from going too fast
-    output = Math.min(output, Config.getInstance().getDouble(Key.OI__VISION__PID__MAX_SPEED));
-    mTurretLogger.verbose("pid out " + output);
-    mTurretTalon.set(ControlMode.PercentOutput, output);
-  }
-
-  /** @return the raw POT value */
-  public double getPotValue() {
-    return mPot.get();
-  }
-
-  /** Run this every tick. */
-  public void loop() {
-    float potMin = Config.getInstance().getFloat(Key.OI__VISION__POT__MIN);
-    float potMax = Config.getInstance().getFloat(Key.OI__VISION__POT__MAX);
-
-    boolean allowMovement = (mPot.get() < potMax && mPot.get() > potMin);
-    mTurretLogger.silly(
-        "allow movement "
-            + allowMovement
-            + " because we got "
-            + mPot.get()
-            + " inside of "
-            + potMin
-            + " to "
-            + potMax);
-
-    if (allowMovement) {
-      if (!this.isEnabled()) enable();
-      if (Config.getInstance().getBoolean(Key.OI__VISION__ENABLED)) {
-        // vision goes here
-      } else {
-        setSetpoint(mManualTargetPos);
-        if (OperatorInterface.getInstance().getTurretAdjustLeft()) mManualTargetPos -= 2.5;
-        if (OperatorInterface.getInstance().getTurretAdjustRight()) mManualTargetPos += 2.5;
-
-        mManualTargetPos = Math.min(Math.max(mManualTargetPos, potMin), potMax);
-        mTurretLogger.debug(
-            mManualTargetPos
-                + " "
-                + OperatorInterface.getInstance().getTurretAdjustLeft()
-                + " : "
-                + OperatorInterface.getInstance().getTurretAdjustRight());
+  public synchronized void writePeriodicOutputs() {
+    //Control Turret Based on State
+    if(mCurrentState == TurretState.AUTO_AIM){
+      //Perform Auto Aim!
+      //deadband: Angle error must be greater than 1 degree
+      if(Math.abs(mPeriodicIO.angle) > 1){
+        mTurretTalon.set(ControlMode.Position, mPeriodicIO.demand);
       }
-    } else {
-      if (this.isEnabled()) disable();
-      mTurretLogger.verbose("movement blocked");
+    }else if(mCurrentState == TurretState.HOMING){
+      //homing..
+      //command to go home position
+
+    }else if(mCurrentState == TurretState.MANUAL_AIM){
+      //Manual Control
+      mTurretTalon.set(ControlMode.PercentOutput, mPeriodicIO.demand);
     }
-    // run the PIDSubsystem system's loop
-    this.periodic();
   }
 
-  public void setCameraLight(boolean on) {
-    cameraLight.set(on ? Relay.Value.kOn : Relay.Value.kOff);
+
+  //Return the turret to its home position
+  //home position is on the backside of the robot
+  public synchronized void ReturnHome(){
+  
   }
+
+  //Operator Driven Manual Control
+  public synchronized void SetManualOutput(double value){
+    mPeriodicIO.demand = value;
+    //Force correct control mode
+    if(mCurrentState != TurretState.MANUAL_AIM){
+      //change pid slot if needed
+      mCurrentState = TurretState.MANUAL_AIM;
+    }
+  }
+
+
+  //Vision Aim System
+  public synchronized void SetAimError(double angle){
+    mPeriodicIO.angle = angle;
+    double setpoint = mPeriodicIO.CurrentPosition + (angle * TicksPerDegree);
+    mPeriodicIO.demand = setpoint;
+    mPeriodicIO.feedforward = 0;
+
+    if(mCurrentState != TurretState.AUTO_AIM){
+      //change pid slot if needed
+      mCurrentState = TurretState.AUTO_AIM;
+    }
+  }
+
+
+
+  public void zeroSensors() {
+  }
+
+    /*
+      Test all Sensors in the Subsystem
+  */
+  public void checkSubsystem() {
+
+  }
+
+  @Override
+  public void stopSubsytem(){}
+ 
 }

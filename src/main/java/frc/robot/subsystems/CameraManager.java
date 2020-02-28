@@ -39,7 +39,7 @@ public class CameraManager extends Subsystem {
       // front camera
       frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
       // resolution set
-      frontCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+      frontCamera.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
 
       // // back camera
       // backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
