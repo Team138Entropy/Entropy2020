@@ -19,7 +19,7 @@ public class EventWatcherThread extends Thread {
   }
 
   private EventWatcherThread() {
-    this.queue = new ArrayList<>();
+    queue = new ArrayList<>();
   }
 
   @Override
