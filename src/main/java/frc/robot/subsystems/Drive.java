@@ -302,6 +302,23 @@ public class Drive extends Subsystem {
 
   // }
 
+
+  //Auto Steer functionality to the goal
+  //driver only controls the throttle
+  //'we may want to set a speed floor/speed minimum'
+  public synchronized void autoSteerFeederStation(double throttle, double angle){
+    //double heading_error_rad = vehicle_to_alignment_point_bearing.getRadians();
+    double radians = (0.0174533) * angle;
+    double heading_error_rad = radians;
+    final double kAutosteerKp = 0.05;
+    boolean towards_goal = true;
+    boolean reverse = false;
+    double curvature = (towards_goal ? 1.0 : 0.0) * heading_error_rad * kAutosteerKp;
+    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+    //setBrakeMode(true);
+  }
+
+
   public void setOpenloopRamp(double speed) {
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
