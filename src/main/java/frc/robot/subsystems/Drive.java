@@ -4,9 +4,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
@@ -22,6 +22,9 @@ public class Drive extends Subsystem {
 
   // Drive is plummed to default to high gear
   private boolean mHighGear = true;
+
+  public static final int DEFAULT_ACCEL = 750;
+  public static final int DEFAULT_CRUISE_VELOCITY = 900;
 
   public enum DriveControlState {
     OPEN_LOOP, // open loop voltage control
@@ -64,6 +67,16 @@ public class Drive extends Subsystem {
     return mInstance;
   }
 
+  public int feetToTicks(double feet) {
+    long roundedVal = Math.round(feet * Constants.TICKS_PER_FOOT);
+    if (roundedVal > Integer.MAX_VALUE) {
+      mDriveLogger.warn(
+          "Integer overflow when converting feet to ticks! Something is likely VERY WRONG!");
+    }
+
+    return (int) roundedVal;
+  }
+
   private Drive() {
     mDriveLogger = new Logger("drive");
 
@@ -79,49 +92,11 @@ public class Drive extends Subsystem {
     mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
     // configureSpark(mRightSlave, false, false);
 
-    mLeftMaster.configFactoryDefault();
-    mLeftMaster.configNominalOutputForward(0., 0);
-    mLeftMaster.configNominalOutputReverse(0., 0);
-    mLeftMaster.configPeakOutputForward(1, 0);
-    mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.configOpenloopRamp(0);
-
-    mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    mLeftMaster.setSensorPhase(true);
-    mLeftMaster.configNominalOutputForward(0., 0);
-    mLeftMaster.configNominalOutputReverse(-0., 0);
-    mLeftMaster.configPeakOutputForward(1, 0);
-    mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
+    configTalon(mLeftMaster);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
-    mRightMaster.configFactoryDefault();
-    mRightMaster.configNominalOutputForward(0., 0);
-    mRightMaster.configNominalOutputReverse(0., 0);
-    mRightMaster.configPeakOutputForward(1, 0);
-    mRightMaster.configPeakOutputReverse(-1, 0);
-    mRightMaster.configOpenloopRamp(0);
-
-    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    mRightMaster.setSensorPhase(true);
-    mRightMaster.configNominalOutputForward(0., 0);
-    mRightMaster.configNominalOutputReverse(-0., 0);
-    mRightMaster.configPeakOutputForward(1, 0);
-    mRightMaster.configPeakOutputReverse(-1, 0);
-    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    configTalon(mRightMaster);
     mRightSlave.setNeutralMode(NeutralMode.Brake);
-
-    // Configure Talon gains
-    /*
-    mLeftMaster.config_kF(0, Drive_Kf,0);
-    mLeftMaster.config_kP(0, Drive_Kp,0);
-    mLeftMaster.config_kI(0, Drive_Ki,0);
-    mLeftMaster.config_kD(0, Drive_Kd,0);
-    mRightMaster.config_kF(0, Drive_Kf,0);
-    mRightMaster.config_kP(0, Drive_Kp,0);
-    mRightMaster.config_kI(0, Drive_Ki,0);
-    mRightMaster.config_kD(0, Drive_Kd,0);
-          */
 
     // Configure slave Talons to follow masters
     mLeftSlave.follow(mLeftMaster);
@@ -131,7 +106,63 @@ public class Drive extends Subsystem {
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
-  public void zeroSensors() {}
+  private void configTalon(WPI_TalonSRX talon) {
+    talon.configFactoryDefault();
+    talon.configNominalOutputForward(0., 0);
+    talon.configNominalOutputReverse(0., 0);
+    talon.configPeakOutputForward(1, 0);
+    talon.configPeakOutputReverse(-1, 0);
+    talon.configOpenloopRamp(0);
+    talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    talon.setSensorPhase(true);
+    talon.setNeutralMode(NeutralMode.Brake);
+
+    // Configure Talon gains
+    double P, I, D;
+
+    P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
+
+    mDriveLogger.info("PID values: " + P + ", " + I + ", " + D);
+
+    talon.config_kP(0, P);
+    talon.config_kI(0, I);
+    talon.config_kD(0, D);
+    talon.config_kF(0, 0);
+    // talon.configClosedloopRamp(0.5, 0);
+    // talon.configClosedLoopPeakOutput(0, 0.5);
+    // talon.configPeakCurrentDuration(3000);
+    // talon.configPeakCurrentLimit(30);
+    // talon.configContinuousCurrentLimit(15);
+    talon.configClosedLoopPeriod(0, 10);
+
+    talon.configMotionCruiseVelocity(900);
+    talon.configMotionAcceleration(750);
+
+    // talon.configClosedloopRamp(1);
+  }
+
+  public void resetCruiseAndAccel() {
+    setCruiseAndAcceleration(DEFAULT_CRUISE_VELOCITY, DEFAULT_ACCEL);
+  }
+
+  public void setCruiseAndAcceleration(int cruise, int accel) {
+    mLeftMaster.configMotionCruiseVelocity(cruise);
+    mRightMaster.configMotionCruiseVelocity(cruise);
+
+    mLeftMaster.configMotionAcceleration(accel);
+    mRightMaster.configMotionAcceleration(accel);
+  }
+
+  public void zeroSensors() {
+    zeroEncoders();
+  }
+
+  public void setTargetPosition(int left, int right) {
+    mLeftMaster.set(ControlMode.MotionMagic, left);
+    mRightMaster.set(ControlMode.MotionMagic, -right);
+  }
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
@@ -279,7 +310,8 @@ public class Drive extends Subsystem {
     if (quickTurn) {
       setOpenLoop(
           new DriveSignal(
-              (signal.getLeft() / scaling_factor) / 1.5, (signal.getRight() / scaling_factor) / 1.5));
+              (signal.getLeft() / scaling_factor) / 1.5,
+              (signal.getRight() / scaling_factor) / 1.5));
     } else {
       setOpenLoop(
           new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
@@ -296,7 +328,8 @@ public class Drive extends Subsystem {
   //   double timestamp = Timer.getFPGATimestamp();
   //   final double kAutosteerAlignmentPointOffset = 15.0; //
   //   /*
-  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle *
+  // (reverse ? -1.0 : 1.0))));
   //   setBrakeMode(true);
   //   */
 
@@ -339,6 +372,11 @@ public class Drive extends Subsystem {
 
   public synchronized Rotation2d getRotation() {
     return null;
+  }
+
+  public void zeroEncoders() {
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 250);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0, 250);
   }
 
   // Used only in TEST mode

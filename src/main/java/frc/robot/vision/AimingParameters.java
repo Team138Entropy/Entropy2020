@@ -1,4 +1,5 @@
 package frc.robot.vision;
+
 import frc.robot.util.geometry.*;
 
 /*
@@ -51,40 +52,44 @@ public class AimingParameters {
         return robot_to_goal;
     }
 
-    public Pose2d getFieldToGoal(){
-        return field_to_goal;
-    }
+  // Robots pose to the goal
+  public Pose2d getRobotToGoal() {
+    return robot_to_goal;
+  }
 
-    public double getRange(){
-        return range;
-    }
+  public Pose2d getFieldToGoal() {
+    return field_to_goal;
+  }
 
-    public double getDistance(){
-        return range;
-    }
+  public double getRange() {
+    return range;
+  }
 
-    public Rotation2d getRobotToGoalRotation(){
-        return robot_to_goal_rotation;
-    }
+  public double getDistance() {
+    return range;
+  }
 
-    public double getLastSeenTimestamp(){
-        return last_seen_timestamp;
-    }
+  public Rotation2d getRobotToGoalRotation() {
+    return robot_to_goal_rotation;
+  }
 
-    public double getStability(){
-        return stability;
-    }
+  public double getLastSeenTimestamp() {
+    return last_seen_timestamp;
+  }
 
-    public Rotation2d getFieldToVisionTargetNormal(){
-        return field_to_vision_target_normal;
-    }
+  public double getStability() {
+    return stability;
+  }
 
-    public int getTrackID(){
-        return track_id;
-    }
+  public Rotation2d getFieldToVisionTargetNormal() {
+    return field_to_vision_target_normal;
+  }
 
-    public int getID(){
-        return track_id;
-    }
+  public int getTrackID() {
+    return track_id;
+  }
 
+  public int getID() {
+    return track_id;
+  }
 }

@@ -1,22 +1,20 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.subsystems.Drive;
 import frc.robot.util.InterpolatingDouble;
 import frc.robot.util.InterpolatingTreeMap;
+import frc.robot.util.Units;
 import frc.robot.util.geometry.*;
+import frc.robot.vision.AimingParameters;
 import frc.robot.vision.GoalTracker;
 import frc.robot.vision.TargetInfo;
-import frc.robot.vision.AimingParameters;
-import frc.robot.util.Units;
 import java.util.*;
-
 
 /*
 RobotTracker (formly RobotState) keeps track of the poses of various coordinate frames throughout the match.
 Coordinate frame is a point (x,y) and a direction.
 
-RobotTracker has update messages called from 
+RobotTracker has update messages called from
 
 RobotTracker also interfaces with the vision system, and calculates what our turret needs to turn by
 from Robot we can the then call:
@@ -29,52 +27,49 @@ Vehicle-To-Turret -
 Measurement of where the turrets rotation is relative to the vehicle
 */
 
-public class RobotTracker{
-    private static RobotTracker mInstance;
+public class RobotTracker {
+  private static RobotTracker mInstance;
 
-    public static RobotTracker getInstance(){
-        if(mInstance == null){
-            mInstance = new RobotTracker();
-        }
-        return mInstance;
+  public static RobotTracker getInstance() {
+    if (mInstance == null) {
+      mInstance = new RobotTracker();
+    }
+    return mInstance;
+  }
+
+  // Result Class
+  // Used to return values from the Robot Tracker
+  // Particularly with Vision Tracking
+  // as well as target distance
+  public class RobotTrackerResult {
+    public final double tangental_component;
+    public final double angular_component;
+    public final Rotation2d turret_error;
+    public final double distance;
+    public final boolean HasResult;
+
+    public RobotTrackerResult(
+        double t_tangental_component,
+        double t_angular_component,
+        Rotation2d t_turret_error,
+        double t_distance) {
+      this.tangental_component = t_tangental_component;
+      this.angular_component = t_angular_component;
+      this.turret_error = t_turret_error;
+      this.distance = t_distance;
+      this.HasResult = true;
     }
 
-    //Result Class
-    //Used to return values from the Robot Tracker
-    //Particularly with Vision Tracking
-    //as well as target distance
-    public class RobotTrackerResult {
-        public final double tangental_component;
-        public final double angular_component;
-        public final Rotation2d turret_error;
-        public final double distance;
-        public final boolean HasResult;
-
-        public RobotTrackerResult(
-           double t_tangental_component,
-           double t_angular_component,
-           Rotation2d t_turret_error,
-           double t_distance
-        ){
-            this.tangental_component = t_tangental_component;
-            this.angular_component = t_angular_component;
-            this.turret_error = t_turret_error;
-            this.distance = t_distance;
-            this.HasResult = true;
-        }
-
-        //Empty constructor!
-        //Resultless Robot Tracker Object
-        public RobotTrackerResult(){
-            this.HasResult = false;   
-            this.tangental_component = 0;
-            this.angular_component = 0;
-            this.turret_error = null;
-            this.distance = 0;         
-        }
-
-
+    // Empty constructor!
+    // Resultless Robot Tracker Object
+    public RobotTrackerResult() {
+      this.HasResult = false;
+      this.tangental_component = 0;
+      this.angular_component = 0;
+      this.turret_error = null;
+      this.distance = 0;
     }
+  }
 
     //all these data structures are guarded by locks for improved synchronization
 
@@ -195,15 +190,67 @@ public class RobotTracker{
     public synchronized Map.Entry<InterpolatingDouble, Pose2d> getLatestFieldToRobot() {
         return mField_to_Robot.lastEntry();
     }
+    mRobot_velocity_predicted = predicted_velocity;
+  }
 
-    public synchronized Map.Entry<InterpolatingDouble, Rotation2d> getLatestFieldToTurret() {
-        return mRobot_to_Turret.lastEntry();
+  // Encoder Based Distance Driven
+  public synchronized double getDistanceDriven() {
+    return mRobot_Distance_Driven;
+  }
+
+  // Reset Distance driven
+  public synchronized void resetDistanceDriven() {
+    mRobot_Distance_Driven = 0.0;
+  }
+
+  // Robot's predicted velocity
+  public synchronized Twist2d getPredictedVelocity() {
+    return mRobot_velocity_predicted;
+  }
+
+  // Get Robot's measured velocity
+  public synchronized Twist2d getMeasuredVelocity() {
+    return mRobot_velocity_measured;
+  }
+
+  // based on moving average, get a smoothed average velocity
+  public synchronized Twist2d getSmoothedVelocity() {
+    return mRobot_velocity_measured_filtered.getAverage();
+  }
+
+  // reset vision targets
+  public synchronized void resetVision() {
+    mVisionTarget_Ball.reset();
+    mVisionTarget_Goal.reset();
+  }
+
+  // Get translation
+  /*
+
+  */
+  private Translation2d getCameraToVisionTargetPose(TargetInfo target, boolean highgoal) {
+    Rotation2d SelectedCameraRotation;
+    double TargetHeight;
+    double LensHeight;
+    // Select Rotation based on camera mount point
+    if (highgoal) {
+      // High Goal
+      SelectedCameraRotation = Constants.kShooterCameraHorizontalPlaneToLens;
+      TargetHeight = Constants.kHighGoalHeight;
+      LensHeight = Constants.kShooterCameraHeight;
+    } else {
+      // Ball
+      SelectedCameraRotation = Constants.kBallCameraHorizontalPlaneToLens;
+      TargetHeight = Constants.kBallHeight;
+      LensHeight = Constants.kBallCameraHeight;
     }
 
-    public synchronized Pose2d getPredictedFieldToVehicle(double lookahead_time) {
-        return getLatestFieldToRobot().getValue()
-                .transformBy(Pose2d.exp(mRobot_velocity_predicted.scaled(lookahead_time)));
-    }
+    // Compensate for camera pitch
+    Translation2d xz_plane_translation =
+        new Translation2d(target.getX(), target.getZ()).rotateBy(SelectedCameraRotation);
+    double x = xz_plane_translation.x();
+    double y = target.getY();
+    double z = xz_plane_translation.y();
 
     //Store Pose2d of the robots position
     public synchronized void addFieldToRobotObservation(double timestamp, Pose2d observation) {
@@ -233,29 +280,40 @@ public class RobotTracker{
         mRobot_velocity_predicted = predicted_velocity;
     }
 
-    //Encoder Based Distance Driven
-    public synchronized double getDistanceDriven() {
-        return mRobot_Distance_Driven;
-    }
+    double distance = target.getDistance();
+    distance = 3;
+    Rotation2d angle = new Rotation2d(x, y, true);
 
-    //Reset Distance driven
-    public synchronized void resetDistanceDriven() {
-        mRobot_Distance_Driven = 0.0;
-    }
+    // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
 
-    //Robot's predicted velocity
-    public synchronized Twist2d getPredictedVelocity() {
-        return mRobot_velocity_predicted;
-    }
+    return new Translation2d(distance * angle.cos(), distance * angle.sin());
 
-    //Get Robot's measured velocity
-    public synchronized Twist2d getMeasuredVelocity() {
-        return mRobot_velocity_measured;
+    /*
+    if ((z < 0.0) == (differential_height > 0.0)) {
+        double scaling = differential_height / -z;
+        double distance = Math.hypot(x, y) * scaling;
+        Rotation2d angle = new Rotation2d(x, y, true);
+        return new Translation2d(distance * angle.cos(), distance * angle.sin());
     }
+    */
 
-    //based on moving average, get a smoothed average velocity
-    public synchronized Twist2d getSmoothedVelocity() {
-        return mRobot_velocity_measured_filtered.getAverage();
+    // return null;
+  }
+
+  // updates the goal tracker!
+  // there is a goal tracker for
+  private void updateGoalTracker(
+      double timestamp, List<Translation2d> cameraToVisionTargetPose, boolean HighGoal) {
+    GoalTracker SelectedTracker;
+    Pose2d LensOffset; // Where from our center point this is mounted
+    if (HighGoal == true) {
+      // High Goal
+      SelectedTracker = mVisionTarget_Goal;
+      LensOffset = Constants.kTurrentToLens;
+    } else {
+      // Ball
+      SelectedTracker = mVisionTarget_Ball;
+      LensOffset = Constants.kWheelsToLens;
     }
 
     //reset vision targets
@@ -272,9 +330,12 @@ public class RobotTracker{
         }
     }
 
-    //Get translation 
     /*
-
+    if (cameraToVisionTargetPoses.size() != 2 ||
+            cameraToVisionTargetPoses.get(0) == null ||
+            cameraToVisionTargetPoses.get(1) == null) return;
+    Pose2d cameraToVisionTarget = Pose2d.fromTranslation(cameraToVisionTargetPoses.get(0).interpolate(
+            cameraToVisionTargetPoses.get(1), 0.5));
     */
     private Translation2d getCameraToVisionTargetPose(TargetInfo target, boolean highgoal) {
         Rotation2d SelectedCameraRotation;
@@ -427,10 +488,10 @@ public class RobotTracker{
         }
     }
 
-    //If the vision target was offset (dramaitcally) we would have something here
-    //because this game there really isn't an offset, just return 0 (no offset)
-    public synchronized Pose2d getVisionTargetToGoalOffset(){
-        return Pose2d.identity();
+    // return empty if nothing
+    if (reports.isEmpty()) {
+      // System.out.println("Returning Optional!");
+      return Optional.empty();
     }
 
     //Return aiming information for the turret
@@ -585,9 +646,9 @@ public class RobotTracker{
             return rtr; //0 rotation
         }
     }
+  }
 
-
-    public Pose2d getRobot() {
-        return new Pose2d();
-    }
+  public Pose2d getRobot() {
+    return new Pose2d();
+  }
 }

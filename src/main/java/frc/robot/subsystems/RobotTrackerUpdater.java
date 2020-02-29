@@ -1,10 +1,9 @@
 package frc.robot.subsystems;
 
+import frc.robot.Kinematics;
+import frc.robot.RobotTracker;
 import frc.robot.util.geometry.*;
 import frc.robot.util.loops.*;
-import frc.robot.RobotTracker;
-import frc.robot.Kinematics;
-
 
 /*
     Class that periodically updates the RobotTracker Object
@@ -13,29 +12,39 @@ import frc.robot.Kinematics;
 
 */
 public class RobotTrackerUpdater extends Subsystem {
-    
-    private static RobotTrackerUpdater mInstance;
 
-    private RobotTracker mRobotTracker = RobotTracker.getInstance();
-    private Drive mDrive = Drive.getInstance();
+  private static RobotTrackerUpdater mInstance;
 
-    private double mLeft_encoder_prev_distance_ = 0.0;
-    private double mRight_encoder_prev_distance_ = 0.0;
-    private double mPrev_timestamp_ = -1.0;
-    private Rotation2d mPrev_Rotation = null;
-        
-    public static synchronized RobotTrackerUpdater getInstance() {
-        if (mInstance == null) {
-        mInstance = new RobotTrackerUpdater();
-        }
-        return mInstance;
+  private RobotTracker mRobotTracker = RobotTracker.getInstance();
+  private Drive mDrive = Drive.getInstance();
+
+  private double mLeft_encoder_prev_distance_ = 0.0;
+  private double mRight_encoder_prev_distance_ = 0.0;
+  private double mPrev_timestamp_ = -1.0;
+  private Rotation2d mPrev_Rotation = null;
+
+  public static synchronized RobotTrackerUpdater getInstance() {
+    if (mInstance == null) {
+      mInstance = new RobotTrackerUpdater();
     }
+    return mInstance;
+  }
 
-    private RobotTrackerUpdater(){}
+  private RobotTrackerUpdater() {}
+
+  @Override
+  public void registerEnabledLoops(ILooper looper) {
+    looper.register(new EnabledLoop());
+  }
+
+  private class EnabledLoop implements Loop {
 
     @Override
-    public void registerEnabledLoops(ILooper looper) {
-        looper.register(new EnabledLoop());
+    public synchronized void onStart(double timestamp) {
+      // Update Encoder Distance
+      mLeft_encoder_prev_distance_ = mDrive.getLeftEncoderDistance();
+      mRight_encoder_prev_distance_ = mDrive.getRightEncoderDistance();
+      mPrev_timestamp_ = timestamp;
     }
 
     private class EnabledLoop implements Loop {
@@ -95,15 +104,13 @@ public class RobotTrackerUpdater extends Subsystem {
     }
 
     @Override
-    public void stopSubsytem(){}
+    public void onStop(double timestamp) {}
+  }
 
-    
-    public void zeroSensors(){
+  @Override
+  public void stopSubsytem() {}
 
-    }
+  public void zeroSensors() {}
 
-    public void checkSubsystem(){
-
-    }
-
+  public void checkSubsystem() {}
 }

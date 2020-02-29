@@ -4,6 +4,7 @@ import frc.robot.Constants;
 import frc.robot.OI.NykoController.DPad;
 import frc.robot.OI.XboxController.Button;
 import frc.robot.OI.XboxController.Side;
+import frc.robot.Robot;
 import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
@@ -19,6 +20,8 @@ public class OperatorInterface {
   private LatchedBoolean mShootLatch = new LatchedBoolean();
   private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
   private LatchedBoolean mVisionToggle = new LatchedBoolean();
+
+  private boolean autoIntakeOverride = false;
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -43,7 +46,7 @@ public class OperatorInterface {
 
   // Driver
 
-  public boolean checkControllers(){
+  public boolean checkControllers() {
     return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
   }
 
@@ -71,13 +74,22 @@ public class OperatorInterface {
   }
   
   public boolean startIntake() {
-    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
-    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
-      mIntakeWasPressedWhenWeLastChecked = false;
-      return true;
+    if (Robot.isAuto()) {
+      if (autoIntakeOverride) {
+        autoIntakeOverride = false;
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      mIntakeWasPressedWhenWeLastChecked = buttonValue;
-      return false;
+      boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
+      if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
+        mIntakeWasPressedWhenWeLastChecked = false;
+        return true;
+      } else {
+        mIntakeWasPressedWhenWeLastChecked = buttonValue;
+        return false;
+      }
     }
   }
 
@@ -138,7 +150,7 @@ public class OperatorInterface {
   public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
   }
-  
+
   public boolean getBallCounterAdjustUp() {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
@@ -218,5 +230,11 @@ public class OperatorInterface {
 
   public boolean getFunctional() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+  /**
+   * Tells {@link #startIntake()} to return true the next time it's called. This is a hack to make auto
+   * shooting work. Please don't use it anywhere else. Please.
+   */
+  public void overrideIntake() {
+    autoIntakeOverride = true;
   }
 }

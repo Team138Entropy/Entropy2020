@@ -18,6 +18,12 @@ public class Constants {
 
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
+  // Oracle's official constant convention. Don't @ me.
+  public static final double TICKS_PER_FOOT = 1228.615;
+  public static final double REAL_TRACK_WIDTH = 1.916;
+
+  // Auto Constants
+  public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds
 
   // 22 is too low, 100 is too high
   public static final double kDriveWheelTrackWidthInches = 50;
@@ -45,39 +51,46 @@ public class Constants {
   public static final double kTrackAgeWeight = 10.0;
   public static final double kTrackSwitchingWeight = 100.0;
   public static final double kCameraFrameRate = 90.0; // fps
- 
-    //Camera Specific Information
-    public static final double kCameraDiagonalView = Math.toRadians(75);
-    public static final double kCameraHorizontalAspect = 4;
-    public static final double kCameraVerticalAspect = 3;
-    public static final double kDiagonalAspect = Math.hypot(kCameraHorizontalAspect, kCameraVerticalAspect);
-    public static final double kCameraHorizontalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView)) * 2;
-    public static final double kCameraVerticalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView)) * 2;
-    public static final Rotation2d kShooterCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(0); //Shooter should sit pretty flat
-    public static final Rotation2d kBallCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(-5); //camera is angled downards
-    public static final double kShooterCameraHeight = 40; //shooter camera height on robot (inches)
-    public static final double kBallCameraHeight = 12; //ball camera height
-    
-    //Offsets from our center point
-    public static final Pose2d kTurrentToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 
-    public static final Pose2d kWheelsToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 
- 
- 
-   //Field Related Constants
-   public static final double kHighGoalHeight = 96.25; //Center Goal Height
-   public static final double kBallHeight = 5; //ball height (inches)
- 
-   //Looper System
-   //period at which the looper runs at
-   public static final double kLooperDt = 0.01;
- 
-   //Constants for Server Motor System
-   public static final int kCANTimeoutMs = 10; // use for important on the fly updates
-   public static final int kLongCANTimeoutMs = 100; // use for constructor
 
+  // Camera Specific Information
+  public static final double kCameraDiagonalView = Math.toRadians(75);
+  public static final double kCameraHorizontalAspect = 4;
+  public static final double kCameraVerticalAspect = 3;
+  public static final double kDiagonalAspect =
+      Math.hypot(kCameraHorizontalAspect, kCameraVerticalAspect);
+  public static final double kCameraHorizontalView =
+      Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView))
+          * 2;
+  public static final double kCameraVerticalView =
+      Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView))
+          * 2;
+  public static final Rotation2d kShooterCameraHorizontalPlaneToLens =
+      Rotation2d.fromDegrees(0); // Shooter should sit pretty flat
+  public static final Rotation2d kBallCameraHorizontalPlaneToLens =
+      Rotation2d.fromDegrees(-5); // camera is angled downards
+  public static final double kShooterCameraHeight = 40; // shooter camera height on robot (inches)
+  public static final double kBallCameraHeight = 12; // ball camera height
 
-    //Turret
-    public static final int kTurretTalonMotorPort = 20;
-    public static final double kTurretAimAngleDeadband = 1.5; 
-    public static final double kTicksPerDegee = 140;
+  // Offsets from our center point
+  public static final Pose2d kTurrentToLens =
+      new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0));
+  public static final Pose2d kWheelsToLens =
+      new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0));
+
+  // Field Related Constants
+  public static final double kHighGoalHeight = 96.25; // Center Goal Height
+  public static final double kBallHeight = 5; // ball height (inches)
+
+  // Looper System
+  // period at which the looper runs at
+  public static final double kLooperDt = 0.01;
+
+  // Constants for Server Motor System
+  public static final int kCANTimeoutMs = 10; // use for important on the fly updates
+  public static final int kLongCANTimeoutMs = 100; // use for constructor
+
+  // Turret
+  public static final int kTurretTalonMotorPort = 20;
+  public static final double kTurretAimAngleDeadband = 1.5;
+  public static final double kTicksPerDegee = 140;
 }

@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
@@ -136,8 +135,9 @@ public class Shooter extends Subsystem {
     return isAtVelocityDebounced;
   }
 
-  public boolean isBallFired(){
-    boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
+  public boolean isBallFired() {
+    boolean didDropVelocity =
+        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity;
     return ballFired;
   }
