@@ -122,7 +122,6 @@ public class Robot extends TimedRobot {
   private int mStartingStorageEncoderPosition;
   private Timer mStorageEncoderTestTimer = new Timer();
 
-  private int mStartingShooterEncoderPosition;
   private Timer mShooterEncoderTestTimer = new Timer();
 
   @Override
@@ -275,7 +274,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    System.out.println(mTestState);
     switch(mTestState){
       case STORAGE_ENCODER_TEST:
         mRobotLogger.log("Got initial encoder value " + mStorage.getEncoder());
@@ -284,14 +282,16 @@ public class Robot extends TimedRobot {
         mStorageEncoderTestTimer.reset();
         mStorageEncoderTestTimer.start();
 
-        mStorage.setBottomOutput(1);
-        mStorage.setTopOutput(1);
-
         mTestState = TestState.STORAGE_ENCODER_TEST_WAITING;
         break;
       case STORAGE_ENCODER_TEST_WAITING:
+        mStorage.setBottomOutput(1);
+        mStorage.setTopOutput(1);
         if(mStorageEncoderTestTimer.get() >= 1){
           int deltaPosition = mStorage.getEncoder() - mStartingStorageEncoderPosition;
+          if(Math.abs(deltaPosition - 26) > 3){
+            // invalid delta
+          }
           mRobotLogger.log("Got delta position of " + deltaPosition);
           
           mStorage.setBottomOutput(0);
@@ -305,6 +305,10 @@ public class Robot extends TimedRobot {
 
         mRobotLogger.log("Got initial speed " + mShooter.getSpeed());
 
+        if(mShooter.getSpeed() != 0){
+          // invalid speed 
+        }
+
         mShooterEncoderTestTimer.reset();
         mShooterEncoderTestTimer.start();
 
@@ -315,6 +319,7 @@ public class Robot extends TimedRobot {
           mShooter.setOutput(0);
         
           mRobotLogger.log("Got final speed " + mShooter.getSpeed());
+          if(Math.max(mShooter.getSpeed() - 50)
           mTestState = TestState.MANUAL;
         }
         break;
