@@ -18,6 +18,8 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
     return kIdentity;
   }
 
+  public double StoredDistance;
+
   protected double cos_angle_ = Double.NaN;
   protected double sin_angle_ = Double.NaN;
   protected double radians_ = Double.NaN;

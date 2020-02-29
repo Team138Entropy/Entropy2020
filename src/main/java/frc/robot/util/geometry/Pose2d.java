@@ -19,6 +19,11 @@ public class Pose2d implements IPose2d<Pose2d> {
   protected final Translation2d translation_;
   protected final Rotation2d rotation_;
 
+
+
+
+  public double StoredDistance;
+
   public Pose2d() {
     translation_ = new Translation2d();
     rotation_ = new Rotation2d();

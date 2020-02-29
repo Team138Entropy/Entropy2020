@@ -51,6 +51,7 @@ public class RobotTrackerUpdater extends Subsystem {
         @Override
         public synchronized void onLoop(double timestamp) {
             //Intial Heading Update
+            
             if (mPrev_Rotation == null) {
                 //get robot's latest position of the field
                 mPrev_Rotation = mRobotTracker.getLatestFieldToRobot().getValue().getRotation();

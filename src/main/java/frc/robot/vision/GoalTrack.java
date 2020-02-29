@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 
  * As goals are detected/not detected by vision system, function calls will be 
  * made to create, destroy, or update a goal track.
- * 
+ * T
  * As goals are detected/not detected by vision system,
  * function calls will be made to create, destroy, update goal track
  * 
@@ -25,6 +25,8 @@ public class GoalTrack {
 
     //Smoothed Pose Position
     Pose2d mSmoothedPosition = null;
+
+    public double VisionDistance;
 
     // Indentiferier of the goal track
     int mTrackID;
@@ -65,6 +67,7 @@ public class GoalTrack {
         
         //if target is within our max tracking distance
         if(distance < Constants.kMaxTrackerDistance){
+
             mObservedPositions.put(timestamp, observation);
             PruneTracksByTime();
             return true;
@@ -130,9 +133,11 @@ public class GoalTrack {
             //if we have tracks
             //x position, y position, sin, cos
             double x = 0, y = 0, sin = 0, cos = 0;
+            double vd = 0;
             double CurrentTime = Timer.getFPGATimestamp();
             double TimeDelta = 0;
             int ValueCount = 0;
+            
             for(Map.Entry<Double, Pose2d> entry: mObservedPositions.entrySet()){
                 TimeDelta = CurrentTime - entry.getKey();
                 if(TimeDelta > Constants.kMaxGoalTrackSmoothingTime){
@@ -145,12 +150,15 @@ public class GoalTrack {
                 y += entry.getValue().getTranslation().y();
                 cos += entry.getValue().getRotation().cos();
                 sin += entry.getValue().getRotation().sin();
+                vd += entry.getValue().StoredDistance;
             }
 
             if(ValueCount == 0){
                 //if we found that all samples are older than the max smoothing time
                 //just set our current position (smoothed position)
                 mSmoothedPosition = mObservedPositions.lastEntry().getValue();
+                VisionDistance = mSmoothedPosition.StoredDistance;
+                int iii = 0;
             }else{
                 //We have Samples
                 //Average each Sample
@@ -162,6 +170,9 @@ public class GoalTrack {
                 
                 //Create a new Pose2D object
                 mSmoothedPosition = new Pose2d(x, y, new Rotation2d(cos, sin, true));
+                VisionDistance = (vd/ValueCount);
+                int iiii = 0;
+
             }
 
         }

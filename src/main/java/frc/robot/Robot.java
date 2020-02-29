@@ -54,6 +54,7 @@ public class Robot extends TimedRobot {
     MANUAL
   }
 
+  private double LastDistance = -1;
   public enum TestState {
     START,
     INTAKE_FORWARD,
@@ -685,11 +686,15 @@ public class Robot extends TimedRobot {
     if(mTurretState == TurretState.AUTO_AIM){
       //Command the Turret with vision set points
       RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-        if(result.HasResult){
+      double dis = result.distance;
+      if(result.HasResult){
           //We have Target Information
+          LastDistance = dis;
+         // System.out.println("DISTANCE: " + LastDistance);
           mTurret.SetAimError(result.turret_error.getDegrees());
         }else{
           //No Results, Don't Rotate
+          //System.out.println("NO TRACK!");
         }
     }else{
       //Command the Turret Manually
