@@ -332,15 +332,18 @@ public class RobotTracker{
     //updates the goal tracker!
     //there is a goal tracker for 
     private void updateGoalTracker(double timestamp, List<Translation2d> cameraToVisionTargetPose, boolean HighGoal) {
+        Object SelectedLock;
         GoalTracker SelectedTracker;
         Pose2d LensOffset; //Where from our center point this is mounted
         if(HighGoal == true){
             //High Goal
             SelectedTracker = mVisionTarget_Goal;
+            SelectedLock = mVisionTarget_Goal_Lock;
             LensOffset = Constants.kTurrentToLens;
         }else{
             //Ball
             SelectedTracker = mVisionTarget_Ball;
+            SelectedLock = mVisionTarget_Ball_Lock;
             LensOffset = Constants.kWheelsToLens;
         }
 
@@ -358,45 +361,61 @@ public class RobotTracker{
 
         //Trasnlate from the vision points on the robot
         Pose2d fieldToVisionTarget = getFieldToTurret(timestamp).transformBy(LensOffset).transformBy(cameraToVisionTarget);
-        SelectedTracker.update(timestamp, List.of(new Pose2d(fieldToVisionTarget.getTranslation(), Rotation2d.identity())));
+
+        //updated the selected tracker in a thread safe manner
+        synchronized(SelectedLock){
+            SelectedTracker.update(timestamp, List.of(new Pose2d(fieldToVisionTarget.getTranslation(), Rotation2d.identity())));
+        }
     }
 
     //Add vision packet
     //this takes the vision packet
-    public synchronized void addVisionUpdate(double timestamp, TargetInfo observation) {
+    public void addVisionUpdate(double timestamp, TargetInfo observation) {
         boolean HighGoal = observation.IsHighGoal();
 
         //Perform Processing based on type of target
         if(HighGoal == true){
             //HighGoal
-            mCameraToVisionTarget_Goal.clear();
+            synchronized(mCameraToVisionTarget_Goal_Lock){
+                mCameraToVisionTarget_Goal.clear();
+            }
 
             //This is built for multiple observations to stream in
             //right now we just stream in one
             if (observation == null) {
-                mVisionTarget_Goal.update(timestamp, new ArrayList<>());
+                synchronized(mVisionTarget_Goal_Lock){
+                    mVisionTarget_Goal.update(timestamp, new ArrayList<>());
+                }
                 return;
             }
 
             //Get Camera to Target Pose
-            mCameraToVisionTarget_Goal.add(getCameraToVisionTargetPose(observation, true));
+            synchronized(mCameraToVisionTarget_Goal_Lock){
+                mCameraToVisionTarget_Goal.add(getCameraToVisionTargetPose(observation, true));
+            }
 
             //Update Goal Tracker
             updateGoalTracker(timestamp, mCameraToVisionTarget_Goal, true);
 
         }else{
             //Ball
-            mCameraToVisionTarget_Ball.clear();
+            synchronized(mCameraToVisionTarget_Ball_Lock){
+                mCameraToVisionTarget_Ball.clear();
+            }
 
             //This is built for multiple observations to stream in
             //right now we just stream in one
             if (observation == null) {
-                mVisionTarget_Ball.update(timestamp, new ArrayList<>());
+                synchronized(mVisionTarget_Ball_Lock){
+                    mVisionTarget_Ball.update(timestamp, new ArrayList<>());
+                }
                 return;
             }
 
             //Get Camera to Target Pose
-            mCameraToVisionTarget_Ball.add(getCameraToVisionTargetPose(observation, false));
+            synchronized(mCameraToVisionTarget_Ball_Lock){
+                mCameraToVisionTarget_Ball.add(getCameraToVisionTargetPose(observation, false));
+            }
 
             //Update Goal Tracker
             updateGoalTracker(timestamp, mCameraToVisionTarget_Ball, false);
@@ -410,14 +429,17 @@ public class RobotTracker{
     }
 
     //Return aiming information for the turret
-    public synchronized Optional<AimingParameters> getAimingParameters(boolean highgoal, int prev_track_id, double max_track_age){
+    public Optional<AimingParameters> getAimingParameters(boolean highgoal, int prev_track_id, double max_track_age){
         GoalTracker SelectedTracker;
+        Object SelectedLock;
         if(highgoal){
             //goal
             SelectedTracker = mVisionTarget_Goal;
+            SelectedLock = mVisionTarget_Goal_Lock;
         }else{
             //ball
             SelectedTracker = mVisionTarget_Ball;
+            SelectedLock = mVisionTarget_Ball_Lock;
         }
 
         List<GoalTracker.TrackReport> reports = SelectedTracker.getTrackReports();

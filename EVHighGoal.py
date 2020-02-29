@@ -137,31 +137,6 @@ class SocketWorker(threading.Thread):
             except Exception as e1:
                 pass
 
-# class that runs separate thread for showing video,
-class VideoShow:
-    """
-    Class that continuously shows a frame using a dedicated thread.
-    """
-
-    def __init__(self, imgWidth, imgHeight, cameraServer, frame=None, name='stream'):
-        self.outputStream = cameraServer.putVideo(name, imgWidth, imgHeight)
-        self.frame = frame
-        self.stopped = False
-
-    def start(self):
-        Thread(target=self.show, args=()).start()
-        return self
-
-    def show(self):
-        while not self.stopped:
-            self.outputStream.putFrame(self.frame)
-
-    def stop(self):
-        self.stopped = True
-
-    def notifyError(self, error):
-        self.outputStream.notifyError(error)
-
 
 class WebcamVideoStream:
     def __init__(self, camera, cameraServer, frameWidth, frameHeight, name="WebcamVideoStream"):
