@@ -190,6 +190,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   private void updateSmartDashboard() {
+    SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
 
     SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
@@ -213,6 +214,9 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
+
+    SmartDashboard.putNumber("Vision Distance", LastDistance);
+    SmartDashboard.putBoolean("Has Vision", LastDistance != -1);
   }
 
   @Override
@@ -589,7 +593,6 @@ public class Robot extends TimedRobot {
             }
           });
         }
-        System.out.println("RF " + mDrive.getRightEncoderDistance());
         break;
       case DRIVE_RIGHT_BACK:
         if(runMotorTest(new MotorWithEncoder(){
@@ -746,6 +749,8 @@ public class Robot extends TimedRobot {
         visionLight.set(Relay.Value.kOff);
       }
     }
+
+    mShooter.updateDistance(LastDistance);
 
     turretLoop();
 
@@ -1034,7 +1039,8 @@ public class Robot extends TimedRobot {
   }
 
   private static void readIsPracticeBot() {
-    isPracticeBot = practiceInput.get();
+    // why do we invert it? because
+    isPracticeBot = !practiceInput.get();
   }
 
   public static boolean getIsPracticeBot() {

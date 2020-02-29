@@ -94,7 +94,6 @@ public class Storage extends Subsystem {
       mTopRoller.setSelectedSensorPosition(0);
     }
     // mStartingEncoderPosition = getEncoder();
-    System.out.println("RESETTING");
   }
 
   public synchronized boolean getIntakeSensor() {
@@ -106,7 +105,6 @@ public class Storage extends Subsystem {
   }
 
   public synchronized boolean isBallStored() {
-    System.out.println(getEncoder());
     // this allows us to fit a 5th ball
     if (sInstance.getBallCount() == 4) {
       return true;
