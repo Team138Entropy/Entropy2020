@@ -67,10 +67,10 @@ public class Config {
 
     CLIMBER__PID_LOOP_INDEX(0),
     CLIMBER__TIMEOUT_MS(10),
-    CLIMBER__KF(.2d),
-    CLIMBER__KP(5d),
-    CLIMBER__KI(.01d),
-    CLIMBER__KD(10d);
+    CLIMBER__KF(1d),
+    CLIMBER__KP(0d),
+    CLIMBER__KI(0d),
+    CLIMBER__KD(0d);
 
     private Object value;
 
