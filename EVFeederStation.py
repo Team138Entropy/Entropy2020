@@ -129,134 +129,13 @@ class SocketWorker(threading.Thread):
                 pass
 
 
-# Class to examine Frames per second of camera stream. Currently not used.
-class FPS:
-    def __init__(self):
-        # store the start time, end time, and total number of frames
-        # that were examined between the start and end intervals
-        self._start = None
-        self._end = None
-        self._numFrames = 0
-
-    def start(self):
-        # start the timer
-        self._start = datetime.datetime.now()
-        return self
-
-    def stop(self):
-        # stop the timer
-        self._end = datetime.datetime.now()
-
-    def update(self):
-        # increment the total number of frames examined during the
-        # start and end intervals
-        self._numFrames += 1
-
-    def elapsed(self):
-        # return the total number of seconds between the start and
-        # end interval
-        return (self._end - self._start).total_seconds()
-
-    def fps(self):
-        # compute the (approximate) frames per second
-        return self._numFrames / self.elapsed()
-
-
-# class that runs separate thread for showing video,
-class VideoShow:
-    """
-    Class that continuously shows a frame using a dedicated thread.
-    """
-
-    def __init__(self, imgWidth, imgHeight, cameraServer, frame=None, name='stream'):
-        self.outputStream = cameraServer.putVideo(name, imgWidth, imgHeight)
-        self.frame = frame
-        self.stopped = False
-
-    def start(self):
-        Thread(target=self.show, args=()).start()
-        return self
-
-    def show(self):
-        while not self.stopped:
-            self.outputStream.putFrame(self.frame)
-
-    def stop(self):
-        self.stopped = True
-
-    def notifyError(self, error):
-        self.outputStream.notifyError(error)
-
-
-class WebcamVideoStream:
-    def __init__(self, camera, cameraServer, frameWidth, frameHeight, name="WebcamVideoStream"):
-        # initialize the video camera stream and read the first frame
-        # from the stream
-
-        # Automatically sets exposure to 0 to track tape
-        self.webcam = camera
-        # print("SETTING EXPOSURE ")
-        # print(self.webcame.exposure)
-
-        # self.webcam.setExposureManual(0)
-        # Some booleans so that we don't keep setting exposure over and over to the same value
-        # self.autoExpose = False
-        # self.prevValue = self.autoExpose
-        # Make a blank image to write on
-        self.img = np.zeros(shape=(frameWidth, frameHeight, 3), dtype=np.uint8)
-        # Gets the video
-        self.stream = cameraServer.getVideo(camera=camera)
-        (self.timestamp, self.img) = self.stream.grabFrame(self.img)
-
-        # initialize the thread name
-        self.name = name
-
-        # initialize the variable used to indicate if the thread should
-        # be stopped
-        self.stopped = False
-
-    def start(self):
-        # start the thread to read frames from the video stream
-        t = Thread(target=self.update, name=self.name, args=())
-        t.daemon = True
-        t.start()
-        return self
-
-    def update(self):
-        # keep looping infinitely until the thread is stopped
-        while True:
-            # if the thread indicator variable is set, stop the thread
-            if self.stopped:
-                return
-            # Boolean logic we don't keep setting exposure over and over to the same value
-            '''
-            if self.autoExpose:
-                self.webcam.setExposureAuto()
-            else:
-                self.webcam.setExposureManual(0)
-            '''
-            # gets the image and timestamp from cameraserver
-            (self.timestamp, self.img) = self.stream.grabFrame(self.img)
-
-    def read(self):
-        # return the frame most recently read
-        return self.timestamp, self.img
-
-    def stop(self):
-        # indicate that the thread should be stopped
-        self.stopped = True
-
-    def getError(self):
-        return self.stream.getError()
-
-
 ###################### PROCESSING OPENCV ################################
 
 # Angles in radians
 
 # image size ratioed to 16:9
-image_width = 640
-image_height = 480
+image_width = 320
+image_height = 240
 
 # Playstation Eye
 # Datasheet: https://en.wikipedia.org/wiki/PlayStation_Eye
@@ -967,7 +846,7 @@ if __name__ == "__main__":
 
     # cap.autoExpose=True;
     tape = False
-    # fps = FPS().start()
+
     # TOTAL_FRAMES = 200;
     # loop forever
     while True:
@@ -977,9 +856,3 @@ if __name__ == "__main__":
 
         Tape = True
         frame = ProcessFrame(img, Tape)
-
-    # Doesn't do anything at the moment. You can easily get this working by indenting these three lines
-    # and setting while loop to: while fps._numFrames < TOTAL_FRAMES
-    # fps.stop()
-    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))

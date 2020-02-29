@@ -155,17 +155,17 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   private void updateSmartDashboard() {
-    RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
 
     SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
+    /*
     SmartDashboard.putBoolean("Has Vision", result.HasResult);
     if (result.HasResult) {
       SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
     } else {
       SmartDashboard.putNumber("Turret Offset Error", 0);
     }
-
+    */
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
@@ -370,8 +370,8 @@ public class Robot extends TimedRobot {
         // Harvest Mode - AutoSteer Functionality
         // Used for tracking a ball
         // we may want to limit the speed?
-        double dummyAngle = 0.0;
-        mDrive.autoSteerFeederStation(driveThrottle, dummyAngle);
+        RobotTracker.RobotTrackerResult DriveResult = mRobotTracker.GetFeederStationError(Timer.getFPGATimestamp());
+        mDrive.autoSteerFeederStation(driveThrottle, DriveResult.turret_error.getDegrees());
       } else {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);
@@ -572,7 +572,6 @@ public class Robot extends TimedRobot {
   }
 
   private boolean checkTransitionToShooting() {
-    RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
     // result.HasResult ensures that our vision system sees a target
     if (mOperatorInterface.getShoot() /* && (!mStorage.isEmpty()) && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
