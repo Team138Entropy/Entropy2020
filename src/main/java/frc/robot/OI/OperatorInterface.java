@@ -230,6 +230,8 @@ public class OperatorInterface {
 
   public boolean getFunctional() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+  }
+
   /**
    * Tells {@link #startIntake()} to return true the next time it's called. This is a hack to make auto
    * shooting work. Please don't use it anywhere else. Please.
