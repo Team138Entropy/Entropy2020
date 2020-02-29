@@ -201,8 +201,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
 
-    System.out.println(SmartDashboard.getNumber("test", 0));
-
     SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     /*
