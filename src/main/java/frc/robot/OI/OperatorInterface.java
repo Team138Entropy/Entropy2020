@@ -21,7 +21,9 @@ public class OperatorInterface {
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
-  private LatchedBoolean mClimbWasPressed;
+  private LatchedBoolean mClimbUpWasPressed;
+  private LatchedBoolean mClimbDownWasPressed;
+  private LatchedBoolean mClimbStartWasPressed;
 
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
@@ -33,7 +35,9 @@ public class OperatorInterface {
   private OperatorInterface() {
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new NykoController(Constants.OperatorControllerPort);
-    mClimbWasPressed = new LatchedBoolean();
+    mClimbUpWasPressed = new LatchedBoolean();
+    mClimbDownWasPressed = new LatchedBoolean();
+    mClimbStartWasPressed = new LatchedBoolean();
   }
 
   // Driver
@@ -50,9 +54,19 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
-  public boolean startClimb() {
+  public boolean climbUp() {
     boolean buttonValue = DriverController.getButton(XboxController.Button.Y);
-    return mClimbWasPressed.update(buttonValue);
+    return mClimbUpWasPressed.update(buttonValue);
+  }
+
+  public boolean climbDown() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.B);
+    return mClimbDownWasPressed.update(buttonValue);
+  }
+
+  public boolean climbStart() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.START);
+    return mClimbStartWasPressed.update(buttonValue);
   }
 
   //if we are auto steering
