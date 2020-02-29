@@ -821,8 +821,7 @@
               "Graph/Visible time": 15.0,
               "Y-axis/Automatic bounds": false,
               "Y-axis/Upper bound": 3000.0,
-              "Y-axis/Lower bound": 2000.0,
-              "Visible data/SmartDashboard/Shooter Speed": true
+              "Y-axis/Lower bound": 2000.0
             }
           },
           "0,0": {
@@ -1505,8 +1504,7 @@
               "Graph/Visible time": 30.0,
               "Y-axis/Automatic bounds": false,
               "Y-axis/Upper bound": 3000.0,
-              "Y-axis/Lower bound": 2000.0,
-              "Visible data/SmartDashboard/Shooter Speed": true
+              "Y-axis/Lower bound": 2000.0
             }
           },
           "12,0": {
@@ -1586,7 +1584,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Shooter initial speed check passed",
-              "_title": "SmartDashboard/Shooter initial speed check passed",
+              "_title": "/SmartDashboard/Shooter initial speed check passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1599,7 +1597,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Test State",
-              "_title": "SmartDashboard/Test State"
+              "_title": "/SmartDashboard/Test State"
             }
           },
           "13,9": {
@@ -1610,7 +1608,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Shooter speed check passed",
-              "_title": "SmartDashboard/Shooter speed check passed",
+              "_title": "/SmartDashboard/Shooter speed check passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1623,7 +1621,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Final speed error",
-              "_title": "SmartDashboard/Final speed error"
+              "_title": "/SmartDashboard/Final speed error"
             }
           },
           "7,7": {
@@ -1634,7 +1632,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Test shooter speed",
-              "_title": "SmartDashboard/Test shooter speed"
+              "_title": "/SmartDashboard/Test shooter speed"
             }
           },
           "7,9": {
@@ -1645,7 +1643,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Final speed",
-              "_title": "SmartDashboard/Final speed"
+              "_title": "/SmartDashboard/Final speed"
             }
           },
           "7,3": {
@@ -1656,7 +1654,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Storage Forwards Test Delta",
-              "_title": "SmartDashboard/Storage Forwards Test Delta"
+              "_title": "/SmartDashboard/Storage Forwards Test Delta"
             }
           },
           "7,5": {
@@ -1667,7 +1665,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Storage Backwards Test Delta",
-              "_title": "SmartDashboard/Storage Backwards Test Delta"
+              "_title": "/SmartDashboard/Storage Backwards Test Delta"
             }
           },
           "10,5": {
@@ -1678,7 +1676,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Storage Backwards Test Error",
-              "_title": "SmartDashboard/Storage Backwards Test Error"
+              "_title": "/SmartDashboard/Storage Backwards Test Error"
             }
           },
           "10,3": {
@@ -1689,7 +1687,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Storage Forwards Test Error",
-              "_title": "SmartDashboard/Storage Forwards Test Error"
+              "_title": "/SmartDashboard/Storage Forwards Test Error"
             }
           },
           "13,5": {
@@ -1700,7 +1698,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Storage Backwards Test Passed",
-              "_title": "SmartDashboard/Storage Backwards Test Passed",
+              "_title": "/SmartDashboard/Storage Backwards Test Passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1713,7 +1711,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Storage Forwards Test Passed",
-              "_title": "SmartDashboard/Storage Forwards Test Passed",
+              "_title": "/SmartDashboard/Storage Forwards Test Passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1726,7 +1724,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Intake Forwards Passed",
-              "_title": "SmartDashboard/Intake Forwards Passed",
+              "_title": "/SmartDashboard/Intake Forwards Passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1739,7 +1737,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Intake Backwards Passed",
-              "_title": "SmartDashboard/Intake Backwards Passed",
+              "_title": "/SmartDashboard/Intake Backwards Passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1752,7 +1750,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Storage No Encoder Backwards Test Passed",
-              "_title": "SmartDashboard/Storage No Encoder Backwards Test Passed",
+              "_title": "/SmartDashboard/Storage No Encoder Backwards Test Passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
@@ -1765,7 +1763,7 @@
             "content": {
               "_type": "Boolean Box",
               "_source0": "network_table:///SmartDashboard/Storage No Encoder Forwards Test Passed",
-              "_title": "SmartDashboard/Storage No Encoder Forwards Test Passed",
+              "_title": "/SmartDashboard/Storage No Encoder Forwards Test Passed",
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }

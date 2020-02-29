@@ -67,6 +67,10 @@ public class Robot extends TimedRobot {
     STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST,
     SHOOTER_ENCODER_TEST,
     SHOOTER_ENCODER_TEST_WAITING,
+    DRIVE_LEFT_FRONT,
+    DRIVE_LEFT_BACK,
+    DRIVE_RIGHT_FRONT,
+    DRIVE_RIGHT_BACK,
     MANUAL
   }
 
@@ -287,8 +291,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Storage Backwards Test Passed", false);
     SmartDashboard.putBoolean("Storage No Encoder Forwards Test Passed", false);
     SmartDashboard.putBoolean("Storage No Encoder Backwards Test Passed", false);
-    SmartDashboard.putBoolean("Shooter initial speed check passed", false);
-    SmartDashboard.putBoolean("Shooter speed check passed", false);
+    SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", false);
+    SmartDashboard.putBoolean("Shooter Speed Test Passed", false);
   }
 
   interface JustAnEncoder{
@@ -355,11 +359,11 @@ public class Robot extends TimedRobot {
         mTestTimer.reset();
         mTestTimer.start();
         mTestState = TestState.INTAKE_FORWARD;
+        // mTestState = TestState.DRIVE1_FORWARD_TEST;
         mStorage.updateEncoderPosition();
         break;
       case INTAKE_FORWARD:
         if(runMotorTest(new MotorWithEncoder(){
-        
           @Override
           public void percentOutput(double output) {
             mIntake.setOutput(output);
@@ -370,7 +374,6 @@ public class Robot extends TimedRobot {
         break;
       case INTAKE_BACKWARD:
         if(runMotorTest(new MotorWithEncoder(){
-        
           @Override
           public void percentOutput(double output) {
             mIntake.setOutput(-output);
@@ -480,35 +483,69 @@ public class Robot extends TimedRobot {
         }
         break;
       case SHOOTER_ENCODER_TEST:
-        mShooter.setOutput(1);
+        setupMotorTest(new JustAnEncoder(){});
 
-        mRobotLogger.log("Got initial speed " + mShooter.getSpeed());
-
-        SmartDashboard.putNumber("Test shooter speed", mShooter.getSpeed());
         if(mShooter.getSpeed() != 0){
-          SmartDashboard.putBoolean("Shooter initial speed check passed", false);
+          SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", false);
         }else{
-          SmartDashboard.putBoolean("Shooter initial speed check passed", true);
+          SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", true);
         }
-
-        mTestTimer.reset();
-        mTestTimer.start();
 
         mTestState = TestState.SHOOTER_ENCODER_TEST_WAITING;
         break;
       case SHOOTER_ENCODER_TEST_WAITING:
-        if(mTestTimer.get() >= timePerTest){
-          mShooter.setOutput(0);
-        
-          mRobotLogger.log("Got final speed " + mShooter.getSpeed());
-          int error = Math.abs(mShooter.getSpeed() - expectedShooterSpeed);
-          SmartDashboard.putNumber("Final speed", mShooter.getSpeed());
-          SmartDashboard.putNumber("Final speed error", error);
-          if(error > shooterAcceptableError){
-            SmartDashboard.putBoolean("Shooter speed check passed", false);
-          }else{
-            SmartDashboard.putBoolean("Shooter speed check passed", true);
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public int getEncoder() {
+            return mShooter.getSpeed();
           }
+        
+          @Override
+          public void percentOutput(double output) {
+            mShooter.setOutput(output);
+            
+          }
+        }, "Shooter Speed Test", true, expectedShooterSpeed, shooterAcceptableError, timePerTest)){
+          mTestState = TestState.DRIVE_LEFT_FRONT;
+        }
+        break;
+      case DRIVE_LEFT_FRONT:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputLeftFront(output);
+          }
+        }, "Drive Left Front", false, 0, 0, timePerTest)){
+          mTestState = TestState.DRIVE_LEFT_BACK;
+        }
+        break;
+      case DRIVE_LEFT_BACK:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputLeftBack(output);
+          }
+        }, "Drive Left Back", false, 0, 0, timePerTest)){
+          mTestState = TestState.DRIVE_RIGHT_FRONT;
+        }
+        break;
+      case DRIVE_RIGHT_FRONT:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputRightFront(output);
+          }
+        }, "Drive Right Front", false, 0, 0, timePerTest)){
+          mTestState = TestState.DRIVE_RIGHT_BACK;
+        }
+        break;
+      case DRIVE_RIGHT_BACK:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputRightBack(output);
+          }
+        }, "Drive Right Back", false, 0, 0, timePerTest)){
           mTestState = TestState.MANUAL;
         }
         break;
