@@ -729,7 +729,7 @@ public class Robot extends TimedRobot {
   public void RobotLoop() {
     if(mOperatorInterface.getVisionToggle()){
       if(visionLight.get() == Relay.Value.kOff){
-        visionLight.set(Relay.Value.kOn);
+        visionLight.set(Relay.Value.kForward);
       }else{
         visionLight.set(Relay.Value.kOff);
       }
