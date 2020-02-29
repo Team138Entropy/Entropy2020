@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
 
   // Auto stuff
   private static boolean mAuto = false;
+  private boolean shooterIsStopped = false;
   private Path mAutoPath = Paths.NO_OP;
 
   // Controller Reference
@@ -230,11 +231,15 @@ public class Robot extends TimedRobot {
     mAutoPath.tick();
 
     if (ShootSegment.shouldStartShooting()) {
+      mRobotLogger.info("Setting shooting state to prepare to shoot");
       mShootingState = ShootingState.PREPARE_TO_SHOOT;
     }
 
-    if (ShootSegment.shouldStopShooting()) {
+    if (mStorage.isEmpty() && !shooterIsStopped) {
+      shooterIsStopped =  true;
+      mRobotLogger.info("Setting shooting state to complete");
       mShootingState = ShootingState.SHOOTING_COMPLETE;
+      mStorage.stop();
     }
 
     executeShootingStateMachine();

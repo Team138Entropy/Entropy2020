@@ -286,7 +286,7 @@ public class Drive extends Subsystem {
   // }
 
   public void setOpenloopRamp(double speed) {
-    mDriveLogger.log("setting ramp to " + speed);
+    // mDriveLogger.log("setting ramp to " + speed);
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
   }

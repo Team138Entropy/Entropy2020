@@ -9,8 +9,8 @@ public class Paths {
 
   static {
     paths.put("test", new Path()
+      .append(new AsyncShootSegment())
       .append(new DriveSegment(5))
-      .append(new ShootSegment())
       .append(new DriveSegment(-5))
       );
   }

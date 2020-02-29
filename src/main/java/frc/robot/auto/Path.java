@@ -14,6 +14,8 @@ import java.util.LinkedList;
 public class Path {
   private LinkedList<Segment> segments;
   private ArrayList<Segment> uninitializedSegments;
+  private boolean finished = false;
+
   private static Logger logger = new Logger("path");
 
   protected static Logger getLogger() {
@@ -43,22 +45,25 @@ public class Path {
 
   /** Does the stuff. Call this periodically. */
   public void tick() {
-    Segment segment = getCurrentSegment();
-    if (segment != null) {
-      if (uninitializedSegments.contains(segment)) {
-        logger.info("Segments: " + segments.toString());
-        segment.init();
-        uninitializedSegments.remove(segment);
+    if (!finished) {
+      Segment segment = getCurrentSegment();
+      if (segment != null) {
+        if (uninitializedSegments.contains(segment)) {
+          logger.info("Segments: " + segments.toString());
+          segment.init();
+          uninitializedSegments.remove(segment);
+        }
+  
+        segment.tick();
+  
+        if (segment.finished()) {
+          logger.info("Segment finished");
+          segments.removeFirst();
+        }
+      } else {
+        logger.info("Path finished");
+        finished = true;
       }
-
-      segment.tick();
-
-      if (segment.finished()) {
-        logger.info("Segment finished");
-        segments.removeFirst();
-      }
-    } else {
-      logger.info("Path finished");
     }
   }
 
