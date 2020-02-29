@@ -18,6 +18,7 @@ public class OperatorInterface {
   private LatchedBoolean mBarfLatch = new LatchedBoolean();
   private LatchedBoolean mShootLatch = new LatchedBoolean();
   private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
+  private LatchedBoolean mVisionToggle = new LatchedBoolean();
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -68,6 +69,25 @@ public class OperatorInterface {
     boolean buttonValue = DriverController.getButton(XboxController.Button.START);
     return mClimbStartWasPressed.update(buttonValue);
   }
+  
+  public boolean startIntake() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
+    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
+      mIntakeWasPressedWhenWeLastChecked = false;
+      return true;
+    } else {
+      mIntakeWasPressedWhenWeLastChecked = buttonValue;
+      return false;
+    }
+  }
+
+  public void setDriverRumble(boolean toggle) {
+    DriverController.setRumble(toggle);
+  }
+
+  public boolean isBarf() {
+    return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
+  }
 
   //if we are auto steering
   //WHILE held
@@ -95,6 +115,25 @@ public class OperatorInterface {
     DriverController.setRumble(LowGear);
     return LowGear;
   }
+
+  // Operator
+  public boolean getVisionToggle(){
+    return mVisionToggle.update(OperatorController.getButton(NykoController.Button.BUTTON_3));
+  }
+
+  public boolean getShoot() {
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.BUTTON_1));
+  }
+
+  public boolean getSpinUp() {
+    return mSpinUpLatch.update(OperatorController.getButton(NykoController.Button.BUTTON_4));
+  }
+
+  public boolean getStateReset() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_10);
+  }
+
+  // Operator trims, etc.
   
   public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
@@ -127,55 +166,6 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.MIDDLE_9);
   }
 
-  // Operator
-
-  public boolean getHarvestMode() {
-    return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
-  }
-
-  public double getOperatorThrottle() {
-    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
-  }
-
-  public double getOperatorTurn() {
-    return OperatorController.getJoystick(NykoController.Side.RIGHT, NykoController.Axis.X);
-  }
-
-  public boolean getCameraSwap() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_4);
-  }
-
-  public boolean getShoot() {
-    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
-  }
-
-  public boolean getSpinUp() {
-    return mSpinUpLatch.update(OperatorController.getButton(NykoController.Button.LEFT_BUMPER));
-  }
-
-  public boolean getStateReset() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_2);
-  }
-
-  public boolean startIntake() {
-    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
-    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
-      mIntakeWasPressedWhenWeLastChecked = false;
-      return true;
-    } else {
-      mIntakeWasPressedWhenWeLastChecked = buttonValue;
-      return false;
-    }
-  }
-
-  public void setDriverRumble(boolean toggle) {
-    DriverController.setRumble(toggle);
-  }
-
-  public boolean isBarf() {
-    return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
-  }
-
   // Test Mode functions
   public boolean isDriveLeftBackTest() {
     return DriverController.getButton(XboxController.Button.A);
@@ -195,6 +185,10 @@ public class OperatorInterface {
 
   public boolean isIntakeRollerTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_1);
+  }
+
+  public double getOperatorThrottle() {
+    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
   }
 
   public boolean isStorageRollerBottomTest() {

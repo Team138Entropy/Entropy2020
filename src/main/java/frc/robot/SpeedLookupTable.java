@@ -16,9 +16,7 @@ public class SpeedLookupTable {
     {10d, 2600d},
     {20d, 2600d},
     {30d, 2600d},
-    {40d, 2600d},
-    {50d, 2600d},
-    {60d, 2600d}
+    {40d, 2600d}
   };
 
   double[][] mProductionLookupTable = {
@@ -26,9 +24,7 @@ public class SpeedLookupTable {
     {10d, 2600d},
     {20d, 2600d},
     {30d, 2600d},
-    {40d, 2600d},
-    {50d, 2600d},
-    {60d, 2600d}
+    {40d, 2600d}
   };
 
   SpeedLookupTable() {}
@@ -63,6 +59,7 @@ public class SpeedLookupTable {
       lowerBoundSpeed = upperBoundSpeed;
       upperBoundDistance = thisDistance;
       upperBoundSpeed = thisSpeed;
+
 
       if (distance > lowerBoundDistance && distance < upperBoundDistance) {
         return linearInterpolate(

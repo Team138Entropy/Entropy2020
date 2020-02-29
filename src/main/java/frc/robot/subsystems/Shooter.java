@@ -45,6 +45,7 @@ public class Shooter extends Subsystem {
   // Aggregation
   private static Shooter instance;
   private final PIDRoller mRoller;
+  private double mDistance = 0;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
 
 
@@ -69,12 +70,16 @@ public class Shooter extends Subsystem {
     mRoller.setSpeed(0);
   }
 
+  public void updateDistance(double dist){
+    mDistance = dist;
+  }
+
   public int getSpeed() {
     return mRoller.getVelocity();
   }
 
   private int getAdjustedVelocitySetpoint() {
-    double distance = 10; //for now
+    double distance = mDistance; //for now
     
     int speed =
         (int)
