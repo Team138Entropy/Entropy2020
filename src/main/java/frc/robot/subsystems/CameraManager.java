@@ -50,6 +50,10 @@ public class CameraManager extends Subsystem {
     }
   }
 
+  public boolean getCameraStatus(){
+    return frontCamera.isConnected() && frontCamera.isEnabled() && frontCamera.isValid();
+  }
+
   @Override
   public void zeroSensors() {}
 
