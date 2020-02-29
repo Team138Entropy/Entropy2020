@@ -22,6 +22,10 @@ public class OperatorInterface {
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
+  private LatchedBoolean mClimbUpWasPressed;
+  private LatchedBoolean mClimbDownWasPressed;
+  private LatchedBoolean mClimbStartWasPressed;
+
   public static synchronized OperatorInterface getInstance() {
     if (mInstance == null) {
       mInstance = new OperatorInterface();
@@ -32,6 +36,9 @@ public class OperatorInterface {
   private OperatorInterface() {
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new NykoController(Constants.OperatorControllerPort);
+    mClimbUpWasPressed = new LatchedBoolean();
+    mClimbDownWasPressed = new LatchedBoolean();
+    mClimbStartWasPressed = new LatchedBoolean();
   }
 
   // Driver
@@ -48,8 +55,19 @@ public class OperatorInterface {
     return DriverController.getJoystick(XboxController.Side.RIGHT, XboxController.Axis.X);
   }
 
-  public boolean getClimb() {
-    return DriverController.getButton(XboxController.Button.Y);
+  public boolean climbUp() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.Y);
+    return mClimbUpWasPressed.update(buttonValue);
+  }
+
+  public boolean climbDown() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.B);
+    return mClimbDownWasPressed.update(buttonValue);
+  }
+
+  public boolean climbStart() {
+    boolean buttonValue = DriverController.getButton(XboxController.Button.START);
+    return mClimbStartWasPressed.update(buttonValue);
   }
   
   public boolean startIntake() {
@@ -183,5 +201,18 @@ public class OperatorInterface {
 
   public boolean isShooterTest() {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
+  }
+
+  //TODO: Decide on climber jog and home buttons
+  public double getClimberJogSpeed() {
+    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
+  }
+
+  public boolean isClimberTest() {
+    return OperatorController.getButton(NykoController.Button.LEFT_BUMPER);
+  }
+
+  public boolean isHomeClimber() {
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
 }

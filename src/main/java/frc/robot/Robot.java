@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
   }
 
   public enum IntakeState {
-    IDLE, // Default state, when State is not INTAKE
+    IDLE, // Default state when State is not INTAKE
     READY_TO_INTAKE,
     INTAKE_WAITING,
     INTAKE,
@@ -39,15 +39,21 @@ public class Robot extends TimedRobot {
   }
 
   public enum ShootingState {
-    IDLE, // Default state, when State is not SHOOTING
+    IDLE, // Default state when State is not SHOOTING
     PREPARE_TO_SHOOT,
     SHOOT_BALL,
     SHOOT_BALL_COMPLETE,
     SHOOTING_COMPLETE
   }
 
-  public enum ClimingState {
-    IDLE
+  public enum ClimbingState {
+    IDLE, // Default state when State is not CLIMBING
+    WAIT,
+    EXTENDING,
+    EXTENDING_COMPLETE,
+    HOLD,
+    RETRACTING,
+    RETRACTING_COMPLETE
   }
 
   public enum TurretState {
@@ -85,7 +91,7 @@ public class Robot extends TimedRobot {
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
-  private ClimingState mClimingState = ClimingState.IDLE;
+  private ClimbingState mClimbingState = ClimbingState.IDLE;
   private TurretState mTurretState = TurretState.MANUAL;
   private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
 
@@ -100,6 +106,7 @@ public class Robot extends TimedRobot {
   private final Shooter mShooter = Shooter.getInstance();
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
+  private final Climber mClimber = Climber.getInstance();
   private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
 
@@ -111,6 +118,7 @@ public class Robot extends TimedRobot {
   private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
 
 
+  private boolean startedHoming = false;
   private BallIndicator mBallIndicator;
   private CameraManager mCameraManager;
 
@@ -177,7 +185,7 @@ public class Robot extends TimedRobot {
     // Set the initial Robot State
     mState = State.INTAKE;
     mIntakeState = IntakeState.IDLE;
-    mClimingState = ClimingState.IDLE;
+    mClimbingState = ClimbingState.IDLE;
     mShootingState = ShootingState.IDLE;
 
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
@@ -211,8 +219,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("RobotState", mState.name());
     SmartDashboard.putString("IntakeState", mIntakeState.name());
     SmartDashboard.putString("ShootingState", mShootingState.name());
-    SmartDashboard.putString("ClimbingState", mClimingState.name());
-
+    SmartDashboard.putString("ClimbingState", mClimbingState.name());
+    
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
 
@@ -262,7 +270,7 @@ public class Robot extends TimedRobot {
     // Set the initial Robot State
     mState = State.INTAKE;
     mIntakeState = IntakeState.IDLE;
-    mClimingState = ClimingState.IDLE;
+    mClimbingState = ClimbingState.IDLE;
     mShootingState = ShootingState.IDLE;
 
 
@@ -674,7 +682,22 @@ public class Robot extends TimedRobot {
       
     }
 
-
+    if (mOperatorInterface.isClimberTest()) {
+      mClimber.jog(mOperatorInterface.getClimberJogSpeed());
+    } else {
+      mClimber.stop();
+    }
+    
+    if (mOperatorInterface.isHomeClimber()) {
+      startedHoming = true;
+      mClimber.home();
+    } else {
+      if (startedHoming) {
+        mClimber.stop();
+        startedHoming = false;
+      }
+    }
+    System.out.println(mStorage.getEncoder());
   }
 
   @Override
@@ -768,7 +791,7 @@ public class Robot extends TimedRobot {
 
     State prevState = mState;
     IntakeState prevIntakeState = mIntakeState;
-    ClimingState prevClimbState = mClimingState;
+    ClimbingState prevClimbState = mClimbingState;
     ShootingState prevShootState = mShootingState;
     executeRobotStateMachine();
     if (prevState != mState) {
@@ -777,8 +800,8 @@ public class Robot extends TimedRobot {
     if (prevIntakeState != mIntakeState) {
       mRobotLogger.log("Changed state to " + mIntakeState);
     }
-    if (prevClimbState != mClimingState) {
-      mRobotLogger.log("Changed state to " + mClimingState);
+    if (prevClimbState != mClimbingState) {
+      mRobotLogger.log("Changed state to " + mClimbingState);
     }
     if (prevShootState != mShootingState) {
       mRobotLogger.log("Changed state to " + mShootingState);
@@ -787,7 +810,7 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getStateReset()) {
       mState = State.INTAKE;
       mIntakeState = IntakeState.IDLE;
-      mClimingState = ClimingState.IDLE;
+      mClimbingState = ClimbingState.IDLE;
       mShootingState = ShootingState.IDLE;
       if (mState == State.SHOOTING) {
         mShootingState = ShootingState.SHOOTING_COMPLETE;
@@ -807,6 +830,7 @@ public class Robot extends TimedRobot {
       }
     }
 
+    // TODO: REMOVE THIS IT SHOULDNT BE HERE
     // check if we are shooting
     // TODO: remove this and only allow shooting if you have at least 1 ball
     checkTransitionToShooting();
@@ -843,10 +867,11 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("RobotState", mState.name());
         SmartDashboard.putString("IntakeState", mIntakeState.name());
         SmartDashboard.putString("ShootingState", mShootingState.name());
-        SmartDashboard.putString("ClimbingState", mClimingState.name());
+        SmartDashboard.putString("ClimbingState", mClimbingState.name());
         mIntake.stop();
         mStorage.stop();
         mShooter.stop();
+        mClimber.stop();
         break;
       case INTAKE:
         executeIntakeStateMachine();
@@ -865,14 +890,18 @@ public class Robot extends TimedRobot {
 
   private void executeIntakeStateMachine() {
     switch (mIntakeState) {
+      // TODO: Make this not a transitionary state
       case IDLE:
         mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
+        checkTransitionToClimbing();
         break;
       case READY_TO_INTAKE:
+        checkTransitionToClimbing();
+
         // If the operator issues the intake command, start intake
         if (mOperatorInterface.startIntake()) {
           mIntake.resetOvercurrentCooldown();
@@ -889,7 +918,6 @@ public class Robot extends TimedRobot {
       case INTAKE:
         // Check transition to shooting before we start intake of a new ball
         if (!checkTransitionToShooting()) {
-
           mIntake.start();
 
           // If a ball is detected, store it
@@ -952,6 +980,8 @@ public class Robot extends TimedRobot {
     if (mOperatorInterface.getShoot() /* && (!mStorage.isEmpty()) && result.HasResult*/) {
       mRobotLogger.log("Changing to shoot because our driver said so...");
       switch (mState) {
+
+        /** Disables intake if transitioning from intake */
         case INTAKE:
           mIntake.stop();
           mStorage.stop();
@@ -961,6 +991,8 @@ public class Robot extends TimedRobot {
           break;
       }
       mState = State.SHOOTING;
+
+      /** Sets the shooting state to preparing if it's not already */
       if (mShootingState == ShootingState.IDLE) {
         mShootingState = ShootingState.PREPARE_TO_SHOOT;
       }
@@ -972,9 +1004,49 @@ public class Robot extends TimedRobot {
     }
   }
 
+  private boolean checkTransitionToClimbing() {
+    //TODO: Remove the check that climber is enabled
+    if (mOperatorInterface.climbStart() && Config.getInstance().getBoolean(Key.CLIMBER__ENABLED)) {
+      mRobotLogger.log("Changing to climbing");
+
+      /** Disables intake if transitioning from intake */
+      switch (mState) {
+        case INTAKE:
+          mIntake.stop();
+          mStorage.stop();
+          mIntakeState = IntakeState.IDLE;
+          break;
+        default:
+          break;
+      }
+
+      /** Sets the climbing state to idle if it's not already */
+      mState = State.CLIMBING;
+      if (mClimbingState == ClimbingState.IDLE) {
+        mClimbingState = ClimbingState.WAIT;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean checkTransitionToIntake() {
+    if (mOperatorInterface.climbStart()) {
+      mState = State.INTAKE;
+
+      mIntakeState = IntakeState.READY_TO_INTAKE;
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
+        checkTransitionToClimbing();
         mRobotLogger.warn("Shooting state is idle");
         mShooter.stop();
         break;
@@ -1041,9 +1113,57 @@ public class Robot extends TimedRobot {
   }
 
   private void executeClimbingStateMachine() {
-    switch (mClimingState) {
+    switch (mClimbingState) {
       case IDLE:
+        mClimber.stop();
+        mRobotLogger.warn("Climbing state is idle");
         break;
+      case WAIT:
+        if (mOperatorInterface.climbUp()) {
+          mClimbingState = ClimbingState.EXTENDING;
+        }
+
+        checkTransitionToIntake();
+      case EXTENDING:
+        //TODO: Decide if climb and retract should be the same button
+        /** Checks if the climb button has been hit again, signalling it to retract */
+        if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
+          mClimbingState = ClimbingState.HOLD;
+        }
+        mClimber.extend();
+
+        /** Checks the encoder position to see if it's done climbing */
+        if (mClimber.isExtended()) {
+          mClimbingState = ClimbingState.EXTENDING_COMPLETE;
+        }
+      case EXTENDING_COMPLETE:
+        mClimber.stop();
+
+        /** Checks if the climb button has been hit again, signalling it to retract */
+        if (mOperatorInterface.climbDown()) {
+          mClimbingState = ClimbingState.RETRACTING;
+        }
+      case HOLD:
+        mClimber.stop();
+
+        if (mOperatorInterface.climbUp()) {
+          mClimbingState = ClimbingState.EXTENDING;
+        }
+
+        if (mOperatorInterface.climbDown()) {
+          mClimbingState = ClimbingState.RETRACTING;
+        }
+      case RETRACTING:
+        mClimber.retract();
+
+        if (mOperatorInterface.climbUp() || mOperatorInterface.climbDown()) {
+          mClimbingState = ClimbingState.HOLD;
+        }
+
+        /** Checks the encoder position to see if it's done retracting */
+        if (mClimber.isRetracted()) {
+          mClimbingState = ClimbingState.WAIT;
+        }
       default:
         mRobotLogger.error("Invalid Climbing State");
         break;
