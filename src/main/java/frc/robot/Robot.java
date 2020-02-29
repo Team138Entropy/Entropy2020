@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
-  private TurretState mTurretState = TurretState.AUTO_AIM;
+  private TurretState mTurretState = TurretState.MANUAL;
   private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
 
   // Controller Reference
@@ -191,6 +191,7 @@ public class Robot extends TimedRobot {
 
   private void updateSmartDashboard() {
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
+    SmartDashboard.putString("Turret State", mTurretState.toString());
 
     SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
@@ -743,10 +744,17 @@ public class Robot extends TimedRobot {
   */
   public void RobotLoop() {
     if(mOperatorInterface.getVisionToggle()){
-      if(visionLight.get() == Relay.Value.kOff){
-        visionLight.set(Relay.Value.kForward);
-      }else{
+
+      if(mTurretState == TurretState.AUTO_AIM){
+        //Turn off Auto Aiming
         visionLight.set(Relay.Value.kOff);
+        mTurretState = TurretState.MANUAL;
+      }else if(mTurretState == TurretState.MANUAL){
+        //Turn on Auto Aiming
+        mTurretState = TurretState.AUTO_AIM;
+
+        //Enable Light
+        visionLight.set(Relay.Value.kForward);
       }
     }
 
