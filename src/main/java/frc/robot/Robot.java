@@ -12,74 +12,49 @@ import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.vision.AimingParameters;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 import frc.robot.util.loops.Looper;
 import frc.robot.util.Util;
 
-
 public class Robot extends TimedRobot {
-
 
   // State variables
   public enum State {
     IDLE, // Default state
-    INTAKE,
-    SHOOTING,
-    CLIMBING
+    INTAKE, SHOOTING, CLIMBING
   }
 
   public enum IntakeState {
     IDLE, // Default state when State is not INTAKE
-    READY_TO_INTAKE,
-    INTAKE_WAITING,
-    INTAKE,
-    STORE_BALL,
-    STORAGE_COMPLETE,
-    STORAGE_EJECT
+    READY_TO_INTAKE, INTAKE_WAITING, INTAKE, STORE_BALL, STORAGE_COMPLETE, STORAGE_EJECT
   }
 
   public enum ShootingState {
     IDLE, // Default state when State is not SHOOTING
-    PREPARE_TO_SHOOT,
-    SHOOT_BALL,
-    SHOOT_BALL_COMPLETE,
-    SHOOTING_COMPLETE
+    PREPARE_TO_SHOOT, SHOOT_BALL, SHOOT_BALL_COMPLETE, SHOOTING_COMPLETE
   }
 
   public enum ClimbingState {
     IDLE, // Default state when State is not CLIMBING
-    WAIT,
-    EXTENDING,
-    EXTENDING_COMPLETE,
-    HOLD,
-    RETRACTING,
-    RETRACTING_COMPLETE
+    WAIT, EXTENDING, EXTENDING_COMPLETE, HOLD, RETRACTING, RETRACTING_COMPLETE
   }
 
   public enum TurretState {
-    AUTO_AIM,
-    MANUAL
+    AUTO_AIM, MANUAL
   }
 
   private double LastDistance = -1;
+
   public enum TestState {
-    START,
-    INTAKE_FORWARD,
-    INTAKE_BACKWARD,
-    STORAGE_ENCODER_FORWARDS_TEST,
-    STORAGE_ENCODER_FORWARDS_TEST_WAITING,
-    STORAGE_ENCODER_STOP,
-    STORAGE_ENCODER_BACKWARDS_TEST,
-    STORAGE_ENCODER_BACKWARDS_TEST_WAITING,
-    STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST,
-    STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST,
-    SHOOTER_ENCODER_TEST,
-    SHOOTER_ENCODER_TEST_WAITING,
-    DRIVE_LEFT_FRONT,
-    DRIVE_LEFT_BACK,
-    DRIVE_RIGHT_FRONT,
-    DRIVE_RIGHT_BACK,
-    MANUAL
+    START, TEST_PI, TEST_LIGHT, INTAKE_FORWARD, INTAKE_BACKWARD, STORAGE_ENCODER_FORWARDS_TEST,
+    STORAGE_ENCODER_FORWARDS_TEST_WAITING, STORAGE_ENCODER_STOP, STORAGE_ENCODER_BACKWARDS_TEST,
+    STORAGE_ENCODER_BACKWARDS_TEST_WAITING, STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST,
+    STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST, SHOOTER_ENCODER_TEST, SHOOTER_ENCODER_TEST_WAITING, DRIVE_LEFT_FRONT,
+    DRIVE_LEFT_BACK, DRIVE_RIGHT_FRONT, DRIVE_RIGHT_BACK, MANUAL
   }
 
   private boolean mIsPracticeBot = true;
@@ -93,7 +68,7 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimbingState mClimbingState = ClimbingState.IDLE;
   private TurretState mTurretState = TurretState.MANUAL;
-  private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
+  private TestState mTestState;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -110,13 +85,13 @@ public class Robot extends TimedRobot {
   private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
 
-  private static final DigitalInput practiceInput = new DigitalInput(Config.getInstance().getInt(Key.ROBOT__PRACTICE_JUMPER_PIN));
+  private static final DigitalInput practiceInput = new DigitalInput(
+      Config.getInstance().getInt(Key.ROBOT__PRACTICE_JUMPER_PIN));
 
   private static boolean isPracticeBot = false;
 
-  //Looper - Running on a set period
+  // Looper - Running on a set period
   private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
-
 
   private boolean startedHoming = false;
   private BallIndicator mBallIndicator;
@@ -153,18 +128,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    SmartDashboard.putNumber("Auto Layout", 0);
+
     // Zero all nesscary sensors on Robot
     Config.getInstance().reload();
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
 
     // Read the jumper pin for practice bot
     readIsPracticeBot();
-    
-    //Register the Enabled Looper
-    //Used to run background tasks!
-    //Constantly collects information
-    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
 
+    // Register the Enabled Looper
+    // Used to run background tasks!
+    // Constantly collects information
+    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
 
     // Zero all nesscary sensors on Robot
     mSubsystemManager.zeroSensors();
@@ -173,11 +149,9 @@ public class Robot extends TimedRobot {
     // This starting Rotation, X, Y is now the Zero Point
     mRobotTracker.reset();
 
-
     // prepare the network table
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     mTable = inst.getTable("SmartDashboard");
-
 
     mCameraManager = CameraManager.getInstance();
     mCameraManager.init();
@@ -193,9 +167,10 @@ public class Robot extends TimedRobot {
     }
   }
 
-  
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
+  }
 
   private void updateSmartDashboard() {
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
@@ -204,13 +179,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     /*
-    SmartDashboard.putBoolean("Has Vision", result.HasResult);
-    if (result.HasResult) {
-      SmartDashboard.putNumber("Turret Offset Error", -result.turret_error.getDegrees());
-    } else {
-      SmartDashboard.putNumber("Turret Offset Error", 0);
-    }
-    */
+     * SmartDashboard.putBoolean("Has Vision", result.HasResult); if
+     * (result.HasResult) { SmartDashboard.putNumber("Turret Offset Error",
+     * -result.turret_error.getDegrees()); } else {
+     * SmartDashboard.putNumber("Turret Offset Error", 0); }
+     */
     SmartDashboard.putNumber("Ball Counter", mStorage.getBallCount());
     SmartDashboard.putBoolean("ShooterFull", mStorage.isFull());
     SmartDashboard.putBoolean("ShooterSpunUp", mShooter.isAtVelocity());
@@ -220,7 +193,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("IntakeState", mIntakeState.name());
     SmartDashboard.putString("ShootingState", mShootingState.name());
     SmartDashboard.putString("ClimbingState", mClimbingState.name());
-    
+
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
     SmartDashboard.putNumber("Shooter Speed", mShooter.getSpeed());
 
@@ -230,13 +203,15 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 0));
+
     mIsSpinningUp = false;
     mOperatorInterface.checkControllers();
-    
+
     mRobotLogger.log("Auto Init Called");
 
-    //Start background looper
-    //collections information periodically
+    // Start background looper
+    // collections information periodically
     mEnabledLooper.start();
 
     Config.getInstance().reload();
@@ -257,8 +232,8 @@ public class Robot extends TimedRobot {
     mIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
 
-    //Start background looper
-    //collections information periodically
+    // Start background looper
+    // collections information periodically
     mEnabledLooper.start();
 
     Config.getInstance().reload();
@@ -272,7 +247,6 @@ public class Robot extends TimedRobot {
     mIntakeState = IntakeState.IDLE;
     mClimbingState = ClimbingState.IDLE;
     mShootingState = ShootingState.IDLE;
-
 
     // updated in Intake.java
     SmartDashboard.putBoolean("Intake Spinning Up", false);
@@ -299,12 +273,12 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
-    mTestState = TestState.START;
+    mTestState = TestState.MANUAL;
 
     Config.getInstance().reload();
     mSubsystemManager.checkSubsystems();
 
-    
+    SmartDashboard.putBoolean("Raspberry PI Passed", false);
     SmartDashboard.putBoolean("Intake Forwards Passed", false);
     SmartDashboard.putBoolean("Intake Backwards Passed", false);
     SmartDashboard.putBoolean("Storage Forwards Test Passed", false);
@@ -319,49 +293,49 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Drive Right Back Passed", false);
   }
 
-  interface JustAnEncoder{
-    default int getEncoder(){
-      return 0;
-    } 
-  }
-
-  interface MotorWithEncoder{
-    void percentOutput(double output);
-
-    default int getEncoder(){
+  interface JustAnEncoder {
+    default int getEncoder() {
       return 0;
     }
   }
 
-  private void setupMotorTest(JustAnEncoder func){
+  interface MotorWithEncoder {
+    void percentOutput(double output);
+
+    default int getEncoder() {
+      return 0;
+    }
+  }
+
+  private void setupMotorTest(JustAnEncoder func) {
     mTestPosition = func.getEncoder();
-    
+
     mTestTimer.reset();
     mTestTimer.start();
   }
 
-  private boolean runMotorTest(MotorWithEncoder func, String name, boolean hasEncoder, int expectedPosition, int acceptableError, double testTime){
+  private boolean runMotorTest(MotorWithEncoder func, String name, boolean hasEncoder, int expectedPosition,
+      int acceptableError, double testTime) {
 
     func.percentOutput(1d);
-    
-    if(mTestTimer.get() >= testTime){
-      if(hasEncoder){
+
+    if (mTestTimer.get() >= testTime) {
+      if (hasEncoder) {
         int deltaPosition = func.getEncoder() - mTestPosition;
         int error = Math.abs(deltaPosition - expectedPosition);
         SmartDashboard.putNumber(name + " Delta", deltaPosition);
         SmartDashboard.putNumber(name + " Error", error);
-        if(error > acceptableError){
+        if (error > acceptableError) {
           SmartDashboard.putBoolean(name + " Passed", false);
-        }else{
+        } else {
           SmartDashboard.putBoolean(name + " Passed", true);
         }
-      }else{
+      } else {
         SmartDashboard.putBoolean(name + " Passed", true);
       }
-      
-     
+
       func.percentOutput(0d);
-      
+
       mTestTimer.reset();
       mTestTimer.start();
 
@@ -380,14 +354,32 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("Test State", mTestState.toString());
     SmartDashboard.putBoolean("Driver Cameras", mCameraManager.getCameraStatus());
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
-    
-    switch(mTestState){
+
+    switch (mTestState) {
       case START:
         mTestTimer.reset();
         mTestTimer.start();
-        mTestState = TestState.INTAKE_FORWARD;
+        mTestState = TestState.TEST_PI;
         // mTestState = TestState.DRIVE1_FORWARD_TEST;
         mStorage.updateEncoderPosition();
+        break;
+      case TEST_PI:
+        try {
+          InetAddress address = InetAddress.getByName("10.1.38.41");
+          boolean reachable = address.isReachable(1000);
+          if(reachable){
+            SmartDashboard.putBoolean("Raspberry PI Passed", true);
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        mTestState = TestState.TEST_LIGHT;
+        break;
+      case TEST_LIGHT:
+        visionLight.set(Relay.Value.kForward);
+        mTestState = TestState.INTAKE_FORWARD;
+        mTestTimer.reset();
+        mTestTimer.start();
         break;
       case INTAKE_FORWARD:
         if(runMotorTest(new MotorWithEncoder(){
@@ -675,6 +667,10 @@ public class Robot extends TimedRobot {
         } else {
           mDrive.setOutputRightFront(0);
         }
+
+        if(mOperatorInterface.getFunctional()){
+          mTestState = TestState.START;
+        }
       break;
       default:
         mRobotLogger.error("Unknown test state " + mTestState.toString());
@@ -697,7 +693,6 @@ public class Robot extends TimedRobot {
         startedHoming = false;
       }
     }
-    System.out.println(mStorage.getEncoder());
   }
 
   @Override
