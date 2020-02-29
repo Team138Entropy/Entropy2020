@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
-  private ClimingState mClimingState = ClimingState.IDLE;
+  private ClimbingState mClimbingState = ClimbingState.IDLE;
   private TurretState mTurretState = TurretState.MANUAL;
   private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
 
