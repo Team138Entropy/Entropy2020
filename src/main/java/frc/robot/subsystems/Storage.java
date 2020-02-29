@@ -61,29 +61,38 @@ public class Storage extends Subsystem {
 
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
-    
-    mBottomRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
 
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
-    updateEncoderPosition();
     
     if (Robot.getIsPracticeBot()) {
       BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRACTICE);
+      mBottomRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
       mBottomRoller.setSensorPhase(false);
     } else {
       BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRODUCTION);
-      mBottomRoller.setSensorPhase(true);
+      mTopRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+      mBottomRoller.setSensorPhase(false);
     }
+    
+    updateEncoderPosition();
   }
 
   public synchronized int getEncoder() {
     // return the negative position that the talon gets us because it's hooked up backwards
     // this will return positive values
-    return mBottomRoller.getSelectedSensorPosition();
+    if (Robot.getIsPracticeBot()) {
+      return mBottomRoller.getSelectedSensorPosition();
+    } else {
+      return mTopRoller.getSelectedSensorPosition();
+    }
   }
 
   public synchronized void updateEncoderPosition() {
-    mBottomRoller.setSelectedSensorPosition(0);
+    if (Robot.getIsPracticeBot()) {
+      mBottomRoller.setSelectedSensorPosition(0);
+    } else {
+      mTopRoller.setSelectedSensorPosition(0);
+    }
     // mStartingEncoderPosition = getEncoder();
     System.out.println("RESETTING");
   }
