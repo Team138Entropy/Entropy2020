@@ -7,6 +7,8 @@ import java.text.DecimalFormat;
 public class Translation2d implements ITranslation2d<Translation2d> {
   protected static final Translation2d kIdentity = new Translation2d();
 
+  public double StoreDistance;
+
   public static Translation2d identity() {
     return kIdentity;
   }

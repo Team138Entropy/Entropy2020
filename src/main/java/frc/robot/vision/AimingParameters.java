@@ -16,6 +16,8 @@ public class AimingParameters {
     private final Rotation2d field_to_vision_target_normal;
     private final int track_id;
 
+    private double VisionDistance;
+
     public AimingParameters(
         int trackIDarg,
         double last_seen_timestamparg,
@@ -33,6 +35,16 @@ public class AimingParameters {
         this.range = robot_to_goalarg.getTranslation().norm();
         this.robot_to_goal_rotation = robot_to_goalarg.getTranslation().direction();
     }
+
+    public void SetVisionRange(double range){
+        VisionDistance = range;
+    }
+
+    public double GetVisionRange(){
+        return VisionDistance;
+    }
+
+
 
     //Robots pose to the goal
     public Pose2d getRobotToGoal(){
