@@ -1,6 +1,5 @@
 package frc.robot.auto;
 
-import frc.robot.OI.OperatorInterface;
 import frc.robot.events.Event;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.Storage;
@@ -27,6 +26,7 @@ public class AsyncShootSegment extends ShootSegment {
       public void run() {
         // OperatorInterface.getInstance().overrideShoot();
         stopShooting();
+        resetState(); // This will absolutely cause problems if we have two shoot segments running at the same time
         done = true;
       }
 

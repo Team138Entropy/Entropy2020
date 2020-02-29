@@ -7,7 +7,10 @@ public class ShootSegment extends Segment {
   private OperatorInterface operatorInterface = OperatorInterface.getInstance();
 
   private static boolean startShooting = false;
+  private static boolean lastStartShooting = false;
+
   private static boolean stopShooting = false;
+  private static boolean lastStopShooting = false;
 
   // This codebase:
   //                 ##### | #####
@@ -31,15 +34,22 @@ public class ShootSegment extends Segment {
   //              OOOOOOO|OOOOOOO
 
   public static boolean shouldStartShooting() {
-    return startShooting;
+    boolean ret = startShooting && !lastStartShooting;
+    lastStartShooting = startShooting;
+    return ret;
   }
 
   public static boolean shouldStopShooting() {
-    return stopShooting;
+    boolean ret = stopShooting && !lastStopShooting;
+    lastStopShooting = stopShooting;
+    return ret;
   }
 
   public static synchronized void resetState() {
-    
+    startShooting = false;
+    lastStartShooting = false;
+    stopShooting = false;
+    lastStopShooting = false;
   }
 
   static synchronized void startShooting() {
@@ -56,7 +66,6 @@ public class ShootSegment extends Segment {
   public void init() {
     logger.info("Initializing shoot segment");
 
-    //operatorInterface.overrideShoot(); // Simulate first button press
     startShooting();
 
   }
@@ -64,7 +73,6 @@ public class ShootSegment extends Segment {
   @Override
   public void tick() {
     if (Storage.getInstance().isEmpty()) {
-      // operatorInterface.overrideShoot(); // Simulate last button press
       stopShooting();
       done = true;
     }
@@ -74,6 +82,7 @@ public class ShootSegment extends Segment {
   public boolean finished() {
     if (done) {
       logger.info("Shoot segment finished");
+      resetState(); // I can feel the tumors growing
     }
 
     return done;
