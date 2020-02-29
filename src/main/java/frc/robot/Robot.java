@@ -293,6 +293,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Storage No Encoder Backwards Test Passed", false);
     SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", false);
     SmartDashboard.putBoolean("Shooter Speed Test Passed", false);
+    SmartDashboard.putBoolean("Drive Left Front Passed", false);
+    SmartDashboard.putBoolean("Drive Left Back Passed", false);
+    SmartDashboard.putBoolean("Drive Right Front Passed", false);
+    SmartDashboard.putBoolean("Drive Right Back Passed", false);
   }
 
   interface JustAnEncoder{
@@ -507,46 +511,88 @@ public class Robot extends TimedRobot {
           }
         }, "Shooter Speed Test", true, expectedShooterSpeed, shooterAcceptableError, timePerTest)){
           mTestState = TestState.DRIVE_LEFT_FRONT;
+
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getLeftEncoderDistance();
+            }
+          });
         }
         break;
       case DRIVE_LEFT_FRONT:
         if(runMotorTest(new MotorWithEncoder(){
           @Override
           public void percentOutput(double output) {
-            mDrive.setOutputLeftFront(output);
+            mDrive.setOutputLeftFront(output / 2);
           }
-        }, "Drive Left Front", false, 0, 0, timePerTest)){
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getLeftEncoderDistance();
+          }
+        }, "Drive Left Front", true, 1139, 200, timePerTest)){
           mTestState = TestState.DRIVE_LEFT_BACK;
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getLeftEncoderDistance();
+            }
+          });
         }
         break;
       case DRIVE_LEFT_BACK:
         if(runMotorTest(new MotorWithEncoder(){
           @Override
           public void percentOutput(double output) {
-            mDrive.setOutputLeftBack(output);
+            mDrive.setOutputLeftBack(output / 2);
           }
-        }, "Drive Left Back", false, 0, 0, timePerTest)){
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getLeftEncoderDistance();
+          }
+        }, "Drive Left Back", true, 1231, 200, timePerTest)){
           mTestState = TestState.DRIVE_RIGHT_FRONT;
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getRightEncoderDistance();
+            }
+          });
         }
         break;
       case DRIVE_RIGHT_FRONT:
         if(runMotorTest(new MotorWithEncoder(){
           @Override
           public void percentOutput(double output) {
-            mDrive.setOutputRightFront(output);
+            mDrive.setOutputRightFront(output / 2);
           }
-        }, "Drive Right Front", false, 0, 0, timePerTest)){
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getRightEncoderDistance();
+          }
+        }, "Drive Right Front", true, 873, 200, timePerTest)){
           mTestState = TestState.DRIVE_RIGHT_BACK;
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getRightEncoderDistance();
+            }
+          });
         }
+        System.out.println("RF " + mDrive.getRightEncoderDistance());
         break;
       case DRIVE_RIGHT_BACK:
         if(runMotorTest(new MotorWithEncoder(){
           @Override
           public void percentOutput(double output) {
-            mDrive.setOutputRightBack(output);
+            mDrive.setOutputRightBack(output / 2);
           }
-        }, "Drive Right Back", false, 0, 0, timePerTest)){
-          mTestState = TestState.MANUAL;
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getRightEncoderDistance();
+          }
+        }, "Drive Right Back", true, 1485, 200, timePerTest)){
+          mTestState = TestState.MANUAL; 
         }
         break;
       case MANUAL:
