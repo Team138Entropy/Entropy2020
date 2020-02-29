@@ -31,6 +31,11 @@ public class DriveSegment extends Segment {
     this.max = targetPosition + acceptableError;
   }
 
+  public DriveSegment(double feet, int cruise, int accel) {
+    this(feet);
+    drive.setCruiseAndAcceleration(cruise, accel);
+  }
+
   @Override
   public void init() {
     logger.info("Initializing drive segment");
@@ -74,6 +79,7 @@ public class DriveSegment extends Segment {
   public boolean finished() {
     if (done) {
       logger.info("Drive segment finished");
+      drive.resetCruiseAndAccel();
     }
 
     return done;

@@ -21,6 +21,9 @@ public class Drive extends Subsystem {
   // Drive is plummed to default to high gear
   private boolean mHighGear = true;
 
+  public static final int DEFAULT_ACCEL = 750;
+  public static final int DEFAULT_CRUISE_VELOCITY = 900;
+
   public enum DriveControlState {
     OPEN_LOOP, // open loop voltage control
     PATH_FOLLOWING, // velocity PID control
@@ -137,6 +140,18 @@ public class Drive extends Subsystem {
     talon.configMotionAcceleration(750);
 
     // talon.configClosedloopRamp(1);
+  }
+
+  public void resetCruiseAndAccel() {
+    setCruiseAndAcceleration(DEFAULT_CRUISE_VELOCITY, DEFAULT_ACCEL);
+  }
+
+  public void setCruiseAndAcceleration(int cruise, int accel) {
+    mLeftMaster.configMotionCruiseVelocity(cruise);
+    mRightMaster.configMotionCruiseVelocity(cruise);
+
+    mLeftMaster.configMotionAcceleration(accel);
+    mRightMaster.configMotionAcceleration(accel);
   }
 
   public void zeroSensors() {
