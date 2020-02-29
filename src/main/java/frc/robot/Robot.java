@@ -798,9 +798,13 @@ public class Robot extends TimedRobot {
     }
 
     if (mOperatorInterface.isBarf()) {
-      mIntakeState = IntakeState.STORAGE_EJECT;
-      mBarfTimer.reset();
-      mBarfTimer.start();
+      if(mIntakeState == IntakeState.STORAGE_EJECT){
+        mIntakeState = IntakeState.IDLE;
+      }else{
+        mIntakeState = IntakeState.STORAGE_EJECT;
+        mBarfTimer.reset();
+        mBarfTimer.start();
+      }
     }
 
     // check if we are shooting
