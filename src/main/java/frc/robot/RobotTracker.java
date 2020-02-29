@@ -475,9 +475,62 @@ public class RobotTracker{
         return Optional.of(params);
     }
 
+
+    public RobotTrackerResult GetFeederStationError(double timestamp){
+        Optional<AimingParameters> mLatestAimingParameters = getAimingParameters(false, -1, Constants.kMaxGoalTrackAge);
+
+        if(mLatestAimingParameters.isPresent()){
+            //We have Aiming Parameters!
+
+            //perform latency compensation
+            //predfict robot's position
+            final double kLookaheadTime = 0.7;
+            Pose2d robot_to_predicted_robot = getLatestFieldToRobot().getValue().inverse()
+                    .transformBy(getPredictedFieldToVehicle(kLookaheadTime));
+
+            //predicted robot to goal
+            Pose2d predicted_robot_to_goal = robot_to_predicted_robot.inverse()
+                    .transformBy(mLatestAimingParameters.get().getRobotToGoal());
+
+            double mCorrectedRangeToTarget = predicted_robot_to_goal.getTranslation().norm();
+
+            //don't aim if not in distance range
+
+            Rotation2d turret_error = getRobotToTurret(timestamp).getRotation().inverse().rotateBy(mLatestAimingParameters.get().getRobotToGoalRotation());
+
+            /*
+           double t_tangental_component,
+           double t_angular_component,
+           Rotation2d t_turret_error,
+           double t_distance,
+           boolean t_HasResult
+
+            */
+
+            Twist2d velocity = getMeasuredVelocity();
+            RobotTrackerResult rtr = new RobotTrackerResult(
+                mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange(),
+                Units.radians_to_degrees(velocity.dtheta),
+                turret_error,
+                0
+            );
+
+            //System.out.println("REQ DEG: " + rtr.turret_error.getDegrees());
+
+            return rtr;        
+        }else{
+            //We don't have aiming parameters!
+            //don't move the turret!
+            //empty object.. no results!
+            RobotTrackerResult rtr = new RobotTrackerResult();
+            return rtr; //0 rotation
+        }
+
+    }
+
     //Gets the turret error from the vision target
     //this is the function the turret will use to correct to
-    public synchronized RobotTrackerResult GetTurretError(double timestamp){
+    public RobotTrackerResult GetTurretError(double timestamp){
         Optional<AimingParameters> mLatestAimingParameters = getAimingParameters(true, -1, Constants.kMaxGoalTrackAge);
 
         //check age here to make sure we didn't loose packets and this isn't really old
