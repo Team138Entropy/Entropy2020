@@ -1241,6 +1241,8 @@ public class Robot extends TimedRobot {
 
   public static boolean getIsPracticeBot() {
     return isPracticeBot;
+  }
+
   /**
    * Returns the robot's gyro. It should be noted that this gyro object's reported heading will
    * often <bold>not</bold> reflect the actual heading of the robot. This is because it is reset at
