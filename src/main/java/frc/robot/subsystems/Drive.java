@@ -154,13 +154,45 @@ public class Drive extends Subsystem {
     mRightMaster.configMotionAcceleration(accel);
   }
 
+  public void configP(double p) {
+    mLeftMaster.config_kP(0, p);
+    mRightMaster.config_kP(0, p);
+  }
+  
+  public void configI(double i) {
+    mLeftMaster.config_kI(0, i);
+    mRightMaster.config_kI(0, i);
+  }
+
+  public void configD(double d) {
+    mLeftMaster.config_kD(0, d);
+    mRightMaster.config_kD(0, d);
+  }
+
+  public void resetPID() {
+    double P, I, D;
+
+    P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
+
+    configP(P);
+    configI(I);
+    configD(D);
+  }
+
   public void zeroSensors() {
     zeroEncoders();
   }
 
-  public void setTargetPosition(int left, int right) {
+  public void setMotionMagicTarget(int left, int right) {
     mLeftMaster.set(ControlMode.MotionMagic, left);
     mRightMaster.set(ControlMode.MotionMagic, -right);
+  }
+
+  public void setSimplePIDTarget(int left, int right) {
+    mLeftMaster.set(ControlMode.Position, left);
+    mRightMaster.set(ControlMode.Position, -right);
   }
 
   /** Configure talons for open loop control */
