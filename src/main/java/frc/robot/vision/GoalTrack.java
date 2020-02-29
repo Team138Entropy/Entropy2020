@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 
  * As goals are detected/not detected by vision system, function calls will be 
  * made to create, destroy, or update a goal track.
- * 
+ * T
  * As goals are detected/not detected by vision system,
  * function calls will be made to create, destroy, update goal track
  * 
@@ -25,6 +25,8 @@ public class GoalTrack {
 
     //Smoothed Pose Position
     Pose2d mSmoothedPosition = null;
+
+    public double VisionDistance;
 
     // Indentiferier of the goal track
     int mTrackID;

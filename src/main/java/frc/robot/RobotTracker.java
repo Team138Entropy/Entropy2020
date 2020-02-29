@@ -349,7 +349,8 @@ public class RobotTracker{
 
         //Select Pose2d
         //254 performed an interpolation here, for now we will just use the one we have
-        Pose2d cameraToVisionTarget = Pose2d.fromTranslation(cameraToVisionTargetPose.get(0));
+        Translation2d SelectedTranslation = cameraToVisionTargetPose.get(0);
+        Pose2d cameraToVisionTarget = Pose2d.fromTranslation(SelectedTranslation);
 
         /*
         if (cameraToVisionTargetPoses.size() != 2 ||
@@ -362,9 +363,12 @@ public class RobotTracker{
         //Trasnlate from the vision points on the robot
         Pose2d fieldToVisionTarget = getFieldToTurret(timestamp).transformBy(LensOffset).transformBy(cameraToVisionTarget);
 
+
         //updated the selected tracker in a thread safe manner
         synchronized(SelectedLock){
-            SelectedTracker.update(timestamp, List.of(new Pose2d(fieldToVisionTarget.getTranslation(), Rotation2d.identity())));
+            Pose2d NewPose = new Pose2d(fieldToVisionTarget.getTranslation(), Rotation2d.identity());
+            NewPose.StoredDistance = SelectedTranslation.StoreDistance;
+            SelectedTracker.update(timestamp, List.of(NewPose));
         }
     }
 
@@ -471,6 +475,7 @@ public class RobotTracker{
                 report.field_to_target,
                 report.field_to_target.getRotation()
             );
+            params.SetVisionRange(report.distance);
         }
 
         return Optional.of(params);
@@ -499,21 +504,15 @@ public class RobotTracker{
 
             Rotation2d turret_error = getRobotToTurret(timestamp).getRotation().inverse().rotateBy(mLatestAimingParameters.get().getRobotToGoalRotation());
 
-            /*
-           double t_tangental_component,
-           double t_angular_component,
-           Rotation2d t_turret_error,
-           double t_distance,
-           boolean t_HasResult
 
-            */
+           // mLatestAimingParameters.get()
 
             Twist2d velocity = getMeasuredVelocity();
             RobotTrackerResult rtr = new RobotTrackerResult(
                 mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange(),
                 Units.radians_to_degrees(velocity.dtheta),
                 turret_error,
-                0
+                mLatestAimingParameters.get().GetVisionRange()
             );
 
             //System.out.println("REQ DEG: " + rtr.turret_error.getDegrees());
