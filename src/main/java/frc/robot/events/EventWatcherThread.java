@@ -51,6 +51,8 @@ public class EventWatcherThread extends Thread {
   }
 
   public synchronized void unRegisterEvent(Event e) {
-    queue.remove(e);
+    if (queue.contains(e)) {
+      queue.remove(e);
+    }
   }
 }
