@@ -25,10 +25,10 @@ public class Climber extends Subsystem {
   private final int TimeoutMS = Config.getInstance().getInt(Config.Key.CLIMBER__TIMEOUT_MS);
 
   /** Servo loop gains */
-  private final double mMotorKF = Config.getInstance().getInt(Config.Key.CLIMBER__KF);
-  private final double mMotorKP = Config.getInstance().getInt(Config.Key.CLIMBER__KP);
-  private final double mMotorKI = Config.getInstance().getInt(Config.Key.CLIMBER__KI);
-  private final double mMotorKD = Config.getInstance().getInt(Config.Key.CLIMBER__KD);
+  private final double mMotorKF = Config.getInstance().getDouble(Config.Key.CLIMBER__KF);
+  private final double mMotorKP = Config.getInstance().getDouble(Config.Key.CLIMBER__KP);
+  private final double mMotorKI = Config.getInstance().getDouble(Config.Key.CLIMBER__KI);
+  private final double mMotorKD = Config.getInstance().getDouble(Config.Key.CLIMBER__KD);
 
   /** Aggregation */
   private static Climber sInstance;
