@@ -740,10 +740,19 @@ public class Robot extends TimedRobot {
   */
   public void RobotLoop() {
     if(mOperatorInterface.getVisionToggle()){
-      if(visionLight.get() == Relay.Value.kOff){
-        visionLight.set(Relay.Value.kForward);
-      }else{
+
+      if(mTurretState == TurretState.AUTO_AIM){
+        //Turn off Auto Aiming
         visionLight.set(Relay.Value.kOff);
+        mTurretState = TurretState.MANUAL;
+      }else if(mTurretState == TurretState.MANUAL){
+        //Turn on Auto Aiming
+        mTurretState = TurretState.AUTO_AIM;
+
+        //Enable Light if it isn't
+        if(visionLight.get() == Relay.Value.kOff){
+          visionLight.set(Relay.Value.kForward);
+        }
       }
     }
 
