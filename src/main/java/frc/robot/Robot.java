@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimbingState mClimbingState = ClimbingState.IDLE;
   private TurretState mTurretState = TurretState.MANUAL;
-  private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
+  private TestState mTestState;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -273,7 +273,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
-    mTestState = TestState.START;
+    mTestState = TestState.MANUAL;
 
     Config.getInstance().reload();
     mSubsystemManager.checkSubsystems();
@@ -665,6 +665,10 @@ public class Robot extends TimedRobot {
           mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
         } else {
           mDrive.setOutputRightFront(0);
+        }
+
+        if(mOperatorInterface.getFunctional()){
+          mTestState = TestState.START;
         }
       break;
       default:
