@@ -71,9 +71,9 @@ public class Storage extends Subsystem {
     } else {
       BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRODUCTION);
       mTopRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-      mBottomRoller.setSensorPhase(false);
+      mTopRoller.setSensorPhase(false);
     }
-    
+
     updateEncoderPosition();
   }
 
