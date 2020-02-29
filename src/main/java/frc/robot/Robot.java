@@ -54,6 +54,28 @@ public class Robot extends TimedRobot {
     MANUAL
   }
 
+  public enum TestState {
+    START,
+    INTAKE_FORWARD,
+    INTAKE_BACKWARD,
+    STORAGE_ENCODER_FORWARDS_TEST,
+    STORAGE_ENCODER_FORWARDS_TEST_WAITING,
+    STORAGE_ENCODER_STOP,
+    STORAGE_ENCODER_BACKWARDS_TEST,
+    STORAGE_ENCODER_BACKWARDS_TEST_WAITING,
+    STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST,
+    STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST,
+    SHOOTER_ENCODER_TEST,
+    SHOOTER_ENCODER_TEST_WAITING,
+    DRIVE_LEFT_FRONT,
+    DRIVE_LEFT_BACK,
+    DRIVE_RIGHT_FRONT,
+    DRIVE_RIGHT_BACK,
+    MANUAL
+  }
+
+  private boolean mIsPracticeBot = true;
+
   private final int AUTONOMOUS_BALL_COUNT = 3;
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
@@ -63,6 +85,7 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
   private TurretState mTurretState = TurretState.AUTO_AIM;
+  private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -109,6 +132,11 @@ public class Robot extends TimedRobot {
   // autonomousInit, autonomousPeriodic, disabledInit,
   // disabledPeriodic, loopFunc, robotInit, robotPeriodic,
   // teleopInit, teleopPeriodic, testInit, testPeriodic
+
+  private int mStartingStorageEncoderPosition;
+  private int mTestPosition;
+  private Timer mTestTimer = new Timer();
+
   @Override
   public void robotInit() {
     // Zero all nesscary sensors on Robot
@@ -251,73 +279,391 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
+    mTestState = TestState.START;
 
     Config.getInstance().reload();
     mSubsystemManager.checkSubsystems();
+
+    
+    SmartDashboard.putBoolean("Intake Forwards Passed", false);
+    SmartDashboard.putBoolean("Intake Backwards Passed", false);
+    SmartDashboard.putBoolean("Storage Forwards Test Passed", false);
+    SmartDashboard.putBoolean("Storage Backwards Test Passed", false);
+    SmartDashboard.putBoolean("Storage No Encoder Forwards Test Passed", false);
+    SmartDashboard.putBoolean("Storage No Encoder Backwards Test Passed", false);
+    SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", false);
+    SmartDashboard.putBoolean("Shooter Speed Test Passed", false);
+    SmartDashboard.putBoolean("Drive Left Front Passed", false);
+    SmartDashboard.putBoolean("Drive Left Back Passed", false);
+    SmartDashboard.putBoolean("Drive Right Front Passed", false);
+    SmartDashboard.putBoolean("Drive Right Back Passed", false);
+  }
+
+  interface JustAnEncoder{
+    default int getEncoder(){
+      return 0;
+    } 
+  }
+
+  interface MotorWithEncoder{
+    void percentOutput(double output);
+
+    default int getEncoder(){
+      return 0;
+    }
+  }
+
+  private void setupMotorTest(JustAnEncoder func){
+    mTestPosition = func.getEncoder();
+    
+    mTestTimer.reset();
+    mTestTimer.start();
+  }
+
+  private boolean runMotorTest(MotorWithEncoder func, String name, boolean hasEncoder, int expectedPosition, int acceptableError, double testTime){
+
+    func.percentOutput(1d);
+    
+    if(mTestTimer.get() >= testTime){
+      if(hasEncoder){
+        int deltaPosition = func.getEncoder() - mTestPosition;
+        int error = Math.abs(deltaPosition - expectedPosition);
+        SmartDashboard.putNumber(name + " Delta", deltaPosition);
+        SmartDashboard.putNumber(name + " Error", error);
+        if(error > acceptableError){
+          SmartDashboard.putBoolean(name + " Passed", false);
+        }else{
+          SmartDashboard.putBoolean(name + " Passed", true);
+        }
+      }else{
+        SmartDashboard.putBoolean(name + " Passed", true);
+      }
+      
+     
+      func.percentOutput(0d);
+      
+      mTestTimer.reset();
+      mTestTimer.start();
+
+      return true;
+    }
+    return false;
   }
 
   @Override
   public void testPeriodic() {
+    double timePerTest = Config.getInstance().getDouble(Key.TESTMODE__TIME_PER_TEST);
+    int expectedStorageDistance = Config.getInstance().getInt(Key.TESTMODE__EXPECTED_STORAGE_DISTANCE);
+    int storageAcceptableError = Config.getInstance().getInt(Key.TESTMODE__STORAGE_ACCEPTABLE_ERROR);
+    int expectedShooterSpeed = Config.getInstance().getInt(Key.TESTMODE__EXPECTED_SHOOTER_SPEED);
+    int shooterAcceptableError = Config.getInstance().getInt(Key.TESTMODE__SHOOTER_ACCEPTABLE_ERROR);
+    SmartDashboard.putString("Test State", mTestState.toString());
+    SmartDashboard.putBoolean("Driver Cameras", mCameraManager.getCameraStatus());
+    SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
+    
+    switch(mTestState){
+      case START:
+        mTestTimer.reset();
+        mTestTimer.start();
+        mTestState = TestState.INTAKE_FORWARD;
+        // mTestState = TestState.DRIVE1_FORWARD_TEST;
+        mStorage.updateEncoderPosition();
+        break;
+      case INTAKE_FORWARD:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mIntake.setOutput(output);
+          }
+        }, "Intake Forwards", false, 0, 0, timePerTest)){
+          mTestState = TestState.INTAKE_BACKWARD;
+        }
+        break;
+      case INTAKE_BACKWARD:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mIntake.setOutput(-output);
+          }
+        }, "Intake Backwards", false, 0, 0, timePerTest)){
+          mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
+        }
+        break;
+      case STORAGE_ENCODER_FORWARDS_TEST:
 
-    // Intake roller ON while button held
-    if (mOperatorInterface.isIntakeRollerTest()) {
-      mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
-    } else if (mOperatorInterface.isBarf()) {
-      mIntake.barf();
-    } else {
-      mIntake.stop();
+        // intentional fallthrough
+      case STORAGE_ENCODER_BACKWARDS_TEST:
+        // mRobotLogger.log("Got initial encoder value " + mStorage.getEncoder());
+        // mStartingStorageEncoderPosition = mStorage.getEncoder();
+
+        // mTestTimer.reset();
+        // mTestTimer.start();
+
+        if(mTestState == TestState.STORAGE_ENCODER_FORWARDS_TEST){
+          mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST_WAITING;
+        }else{
+          mTestState = TestState.STORAGE_ENCODER_BACKWARDS_TEST_WAITING;
+        }
+
+        setupMotorTest(new JustAnEncoder(){
+          @Override
+          public int getEncoder() {
+            return mStorage.getEncoder();
+          }
+        });
+        break;
+      case STORAGE_ENCODER_FORWARDS_TEST_WAITING:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public int getEncoder() {
+            return mStorage.getEncoder();
+          }
+        
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setBottomOutput(output);
+            }else{
+              mStorage.setTopOutput(output);
+            }
+            
+          }
+        }, "Storage Forwards Test", true, expectedStorageDistance, storageAcceptableError, timePerTest)){
+          mTestState = TestState.STORAGE_ENCODER_STOP;
+        }
+        break;
+      case STORAGE_ENCODER_STOP:
+        if(mTestTimer.get() >= timePerTest){
+          mTestTimer.reset();
+          mTestTimer.start();
+          mTestState = TestState.STORAGE_ENCODER_BACKWARDS_TEST;
+        }
+        break;
+      case STORAGE_ENCODER_BACKWARDS_TEST_WAITING:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public int getEncoder() {
+            return mStorage.getEncoder();
+          }
+        
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setBottomOutput(-output);
+            }else{
+              mStorage.setTopOutput(-output);
+            }
+            
+          }
+        }, "Storage Backwards Test", true, -expectedStorageDistance, storageAcceptableError, timePerTest)){ 
+          mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST;
+        }
+        break;
+      case STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setTopOutput(output);
+            }else{
+              mStorage.setBottomOutput(output);
+            }
+            
+          }
+        }, "Storage No Encoder Forwards Test", false, 0, 0, timePerTest)){ 
+          mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST;
+        }
+        break;
+      case STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setTopOutput(-output);
+            }else{
+              mStorage.setBottomOutput(-output);
+            }
+            
+          }
+        }, "Storage No Encoder Backwards Test", false, 0, 0, timePerTest)){ 
+          mTestState = TestState.SHOOTER_ENCODER_TEST;
+        }
+        break;
+      case SHOOTER_ENCODER_TEST:
+        setupMotorTest(new JustAnEncoder(){});
+
+        if(mShooter.getSpeed() != 0){
+          SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", false);
+        }else{
+          SmartDashboard.putBoolean("Shooter Initial Speed Test Passed", true);
+        }
+
+        mTestState = TestState.SHOOTER_ENCODER_TEST_WAITING;
+        break;
+      case SHOOTER_ENCODER_TEST_WAITING:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public int getEncoder() {
+            return mShooter.getSpeed();
+          }
+        
+          @Override
+          public void percentOutput(double output) {
+            mShooter.setOutput(output);
+            
+          }
+        }, "Shooter Speed Test", true, expectedShooterSpeed, shooterAcceptableError, timePerTest)){
+          mTestState = TestState.DRIVE_LEFT_FRONT;
+
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getLeftEncoderDistance();
+            }
+          });
+        }
+        break;
+      case DRIVE_LEFT_FRONT:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputLeftFront(output / 2);
+          }
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getLeftEncoderDistance();
+          }
+        }, "Drive Left Front", true, 1139, 200, timePerTest)){
+          mTestState = TestState.DRIVE_LEFT_BACK;
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getLeftEncoderDistance();
+            }
+          });
+        }
+        break;
+      case DRIVE_LEFT_BACK:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputLeftBack(output / 2);
+          }
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getLeftEncoderDistance();
+          }
+        }, "Drive Left Back", true, 1231, 200, timePerTest)){
+          mTestState = TestState.DRIVE_RIGHT_FRONT;
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getRightEncoderDistance();
+            }
+          });
+        }
+        break;
+      case DRIVE_RIGHT_FRONT:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputRightFront(output / 2);
+          }
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getRightEncoderDistance();
+          }
+        }, "Drive Right Front", true, 873, 200, timePerTest)){
+          mTestState = TestState.DRIVE_RIGHT_BACK;
+          setupMotorTest(new JustAnEncoder() {
+            @Override
+            public int getEncoder() {
+              return (int) mDrive.getRightEncoderDistance();
+            }
+          });
+        }
+        System.out.println("RF " + mDrive.getRightEncoderDistance());
+        break;
+      case DRIVE_RIGHT_BACK:
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            mDrive.setOutputRightBack(output / 2);
+          }
+          @Override
+          public int getEncoder() {
+            return (int) mDrive.getRightEncoderDistance();
+          }
+        }, "Drive Right Back", true, 1485, 200, timePerTest)){
+          mTestState = TestState.MANUAL; 
+        }
+        break;
+      case MANUAL:
+        // Intake roller ON while button held
+        if (mOperatorInterface.isIntakeRollerTest()) {
+          mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
+        } else if (mOperatorInterface.isBarf()) {
+          mIntake.barf();
+        } else {
+          mIntake.stop();
+        }
+
+        if (mOperatorInterface.isBarf()) {
+          mStorage.barf();
+        } else {
+          // Bottom storage rollers ON while button held
+          if (mOperatorInterface.isStorageRollerBottomTest()) {
+            mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
+          } else {
+            mStorage.setBottomOutput(0);
+          }
+
+          // Top storage rollers ON while button held
+          if (mOperatorInterface.isStorageRollerTopTest()) {
+            mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
+          } else {
+            mStorage.setTopOutput(0);
+          }
+        }
+
+        // Shooter roller ON while button held
+        if (mOperatorInterface.isShooterTest()) {
+          mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
+        } else {
+          mShooter.stop();
+        }
+
+        if (mOperatorInterface.isDriveLeftBackTest()) {
+          mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputLeftBack(0);
+        }
+
+        if (mOperatorInterface.isDriveLeftFrontTest()) {
+          mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputLeftFront(0);
+        }
+
+        if (mOperatorInterface.isDriveRightBackTest()) {
+          mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputRightBack(0);
+        }
+
+        if (mOperatorInterface.isDriveRightFrontTest()) {
+          mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
+        } else {
+          mDrive.setOutputRightFront(0);
+        }
+      break;
+      default:
+        mRobotLogger.error("Unknown test state " + mTestState.toString());
+        break;
+      
     }
 
-    if (mOperatorInterface.isBarf()) {
-      mStorage.barf();
-    } else {
-      // Bottom storage rollers ON while button held
-      if (mOperatorInterface.isStorageRollerBottomTest()) {
-        mStorage.setBottomOutput(mOperatorInterface.getOperatorThrottle());
-      } else {
-        mStorage.setBottomOutput(0);
-      }
 
-      // Top storage rollers ON while button held
-      if (mOperatorInterface.isStorageRollerTopTest()) {
-        mStorage.setTopOutput(mOperatorInterface.getOperatorThrottle());
-      } else {
-        mStorage.setTopOutput(0);
-      }
-    }
-
-    // Shooter roller ON while button held
-    if (mOperatorInterface.isShooterTest()) {
-      mShooter.setOutput(mOperatorInterface.getOperatorThrottle());
-    } else {
-      mShooter.stop();
-    }
-
-    if (mOperatorInterface.isDriveLeftBackTest()) {
-      mDrive.setOutputLeftBack(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputLeftBack(0);
-    }
-
-    if (mOperatorInterface.isDriveLeftFrontTest()) {
-      mDrive.setOutputLeftFront(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputLeftFront(0);
-    }
-
-    if (mOperatorInterface.isDriveRightBackTest()) {
-      mDrive.setOutputRightBack(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputRightBack(0);
-    }
-
-    if (mOperatorInterface.isDriveRightFrontTest()) {
-      mDrive.setOutputRightFront(mOperatorInterface.getDriveThrottle());
-    } else {
-      mDrive.setOutputRightFront(0);
-    }
-
-    System.out.println(mStorage.getEncoder());
   }
 
   @Override
