@@ -130,6 +130,7 @@ public class Robot extends TimedRobot {
   // teleopInit, teleopPeriodic, testInit, testPeriodic
 
   private int mStartingStorageEncoderPosition;
+  private int mTestPosition;
   private Timer mTestTimer = new Timer();
 
   @Override
@@ -280,14 +281,65 @@ public class Robot extends TimedRobot {
     mSubsystemManager.checkSubsystems();
 
     
-    SmartDashboard.putBoolean("Forwards Storage Test Passed", false);
-    SmartDashboard.putBoolean("Backwards Storage Test Passed", false);
+    SmartDashboard.putBoolean("Intake Forwards Passed", false);
+    SmartDashboard.putBoolean("Intake Backwards Passed", false);
+    SmartDashboard.putBoolean("Storage Forwards Test Passed", false);
+    SmartDashboard.putBoolean("Storage Backwards Test Passed", false);
+    SmartDashboard.putBoolean("Storage No Encoder Forwards Test Passed", false);
+    SmartDashboard.putBoolean("Storage No Encoder Backwards Test Passed", false);
     SmartDashboard.putBoolean("Shooter initial speed check passed", false);
     SmartDashboard.putBoolean("Shooter speed check passed", false);
   }
 
-  private void runMotorTest(){
+  interface JustAnEncoder{
+    default int getEncoder(){
+      return 0;
+    } 
+  }
 
+  interface MotorWithEncoder{
+    void percentOutput(double output);
+
+    default int getEncoder(){
+      return 0;
+    }
+  }
+
+  private void setupMotorTest(JustAnEncoder func){
+    mTestPosition = func.getEncoder();
+    
+    mTestTimer.reset();
+    mTestTimer.start();
+  }
+
+  private boolean runMotorTest(MotorWithEncoder func, String name, boolean hasEncoder, int expectedPosition, int acceptableError, double testTime){
+
+    func.percentOutput(1d);
+    
+    if(mTestTimer.get() >= testTime){
+      if(hasEncoder){
+        int deltaPosition = func.getEncoder() - mTestPosition;
+        int error = Math.abs(deltaPosition - expectedPosition);
+        SmartDashboard.putNumber(name + " Delta", deltaPosition);
+        SmartDashboard.putNumber(name + " Error", error);
+        if(error > acceptableError){
+          SmartDashboard.putBoolean(name + " Passed", false);
+        }else{
+          SmartDashboard.putBoolean(name + " Passed", true);
+        }
+      }else{
+        SmartDashboard.putBoolean(name + " Passed", true);
+      }
+      
+     
+      func.percentOutput(0d);
+      
+      mTestTimer.reset();
+      mTestTimer.start();
+
+      return true;
+    }
+    return false;
   }
 
   @Override
@@ -306,71 +358,67 @@ public class Robot extends TimedRobot {
         mStorage.updateEncoderPosition();
         break;
       case INTAKE_FORWARD:
-        mIntake.setOutput(1);
+        if(runMotorTest(new MotorWithEncoder(){
         
-        if(mTestTimer.get() >= timePerTest){
+          @Override
+          public void percentOutput(double output) {
+            mIntake.setOutput(output);
+          }
+        }, "Intake Forwards", false, 0, 0, timePerTest)){
           mTestState = TestState.INTAKE_BACKWARD;
-          mTestTimer.reset();
-          mTestTimer.start();
         }
         break;
       case INTAKE_BACKWARD:
-        mIntake.setOutput(-1);
-
+        if(runMotorTest(new MotorWithEncoder(){
         
-        if(mTestTimer.get() >= timePerTest){
+          @Override
+          public void percentOutput(double output) {
+            mIntake.setOutput(-output);
+          }
+        }, "Intake Backwards", false, 0, 0, timePerTest)){
           mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
-          mTestTimer.reset();
-          mTestTimer.start();
-          
-          mIntake.setOutput(0);
         }
         break;
       case STORAGE_ENCODER_FORWARDS_TEST:
 
         // intentional fallthrough
       case STORAGE_ENCODER_BACKWARDS_TEST:
-        mStorage.updateEncoderPosition();
+        // mRobotLogger.log("Got initial encoder value " + mStorage.getEncoder());
+        // mStartingStorageEncoderPosition = mStorage.getEncoder();
 
-        mRobotLogger.log("Got initial encoder value " + mStorage.getEncoder());
-        mStartingStorageEncoderPosition = mStorage.getEncoder();
-
-        mTestTimer.reset();
-        mTestTimer.start();
+        // mTestTimer.reset();
+        // mTestTimer.start();
 
         if(mTestState == TestState.STORAGE_ENCODER_FORWARDS_TEST){
           mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST_WAITING;
         }else{
           mTestState = TestState.STORAGE_ENCODER_BACKWARDS_TEST_WAITING;
         }
+
+        setupMotorTest(new JustAnEncoder(){
+          @Override
+          public int getEncoder() {
+            return mStorage.getEncoder();
+          }
+        });
         break;
       case STORAGE_ENCODER_FORWARDS_TEST_WAITING:
-        if(mIsPracticeBot){
-          mStorage.setBottomOutput(1);
-        }else{
-          mStorage.setTopOutput(1);
-        }
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public int getEncoder() {
+            return mStorage.getEncoder();
+          }
         
-        if(mTestTimer.get() >= timePerTest){
-          int deltaPosition = mStorage.getEncoder() - mStartingStorageEncoderPosition;
-          int error = Math.abs(deltaPosition - expectedStorageDistance);
-          SmartDashboard.putNumber("Forwards storage delta", deltaPosition);
-          SmartDashboard.putNumber("Forwards storage error", error);
-          if(error > storageAcceptableError){
-            SmartDashboard.putBoolean("Forwards Storage Test Passed", false);
-          }else{
-            SmartDashboard.putBoolean("Forwards Storage Test Passed", true);
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setBottomOutput(output);
+            }else{
+              mStorage.setTopOutput(output);
+            }
+            
           }
-          
-         
-          if(mIsPracticeBot){
-            mStorage.setBottomOutput(0);
-          }else{
-            mStorage.setTopOutput(0);
-          }
-          
-          mTestTimer.reset();
-          mTestTimer.start();
+        }, "Storage Forwards Test", true, expectedStorageDistance, storageAcceptableError, timePerTest)){
           mTestState = TestState.STORAGE_ENCODER_STOP;
         }
         break;
@@ -382,65 +430,53 @@ public class Robot extends TimedRobot {
         }
         break;
       case STORAGE_ENCODER_BACKWARDS_TEST_WAITING:
-        if(mIsPracticeBot){
-          mStorage.setBottomOutput(-1);
-        }else{
-          mStorage.setTopOutput(-1);
-        }
-
-        if(mTestTimer.get() >= timePerTest){
-          int deltaPosition = mStorage.getEncoder() - mStartingStorageEncoderPosition;
-          int error = Math.abs(-deltaPosition - expectedStorageDistance);
-          SmartDashboard.putNumber("Backwards storage delta", deltaPosition);
-          SmartDashboard.putNumber("Backwards storage error", error);
-          if(error > storageAcceptableError){
-            SmartDashboard.putBoolean("Backwards Storage Test Passed", false);
-          }else{
-            SmartDashboard.putBoolean("Backwards Storage Test Passed", true);
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public int getEncoder() {
+            return mStorage.getEncoder();
           }
-          
-          mStorage.setBottomOutput(0);
-          mStorage.setTopOutput(0);
-
+        
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setBottomOutput(-output);
+            }else{
+              mStorage.setTopOutput(-output);
+            }
+            
+          }
+        }, "Storage Backwards Test", true, -expectedStorageDistance, storageAcceptableError, timePerTest)){ 
           mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST;
-          mTestTimer.reset();
-          mTestTimer.start();
         }
         break;
       case STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST:
-        if(mIsPracticeBot){
-          mStorage.setTopOutput(1);
-        }else{
-          mStorage.setBottomOutput(1);
-        }
-        if(mTestTimer.get() >= timePerTest){
-          mTestTimer.reset();
-          mTestTimer.start();
-          mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST;
-
-          if(mIsPracticeBot){
-            mStorage.setTopOutput(0);
-          }else{
-            mStorage.setBottomOutput(0);
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setTopOutput(output);
+            }else{
+              mStorage.setBottomOutput(output);
+            }
+            
           }
+        }, "Storage No Encoder Forwards Test", false, 0, 0, timePerTest)){ 
+          mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST;
         }
         break;
       case STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST:
-        if(mIsPracticeBot){
-          mStorage.setTopOutput(-1);
-        }else{
-          mStorage.setBottomOutput(-1);
-        }
-        if(mTestTimer.get() >= timePerTest){
-          mTestTimer.reset();
-          mTestTimer.start();
-          mTestState = TestState.SHOOTER_ENCODER_TEST;
-
-          if(mIsPracticeBot){
-            mStorage.setTopOutput(0);
-          }else{
-            mStorage.setBottomOutput(0);
+        if(runMotorTest(new MotorWithEncoder(){
+          @Override
+          public void percentOutput(double output) {
+            if(mIsPracticeBot){
+              mStorage.setTopOutput(-output);
+            }else{
+              mStorage.setBottomOutput(-output);
+            }
+            
           }
+        }, "Storage No Encoder Backwards Test", false, 0, 0, timePerTest)){ 
+          mTestState = TestState.SHOOTER_ENCODER_TEST;
         }
         break;
       case SHOOTER_ENCODER_TEST:
