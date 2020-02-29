@@ -158,17 +158,9 @@ public class Drive extends Subsystem {
     zeroEncoders();
   }
 
-  // Temp
-  private static final int AUTO_TICKS = 1000;
-
-  public void setAutoPosition() {
-    mLeftMaster.set(ControlMode.Position, AUTO_TICKS);
-    mRightMaster.set(ControlMode.Position, -AUTO_TICKS);
-  }
-
-  public void setTargetPosition(int position) {
-    mLeftMaster.set(ControlMode.MotionMagic, position);
-    mRightMaster.set(ControlMode.MotionMagic, -position);
+  public void setTargetPosition(int left, int right) {
+    mLeftMaster.set(ControlMode.MotionMagic, left);
+    mRightMaster.set(ControlMode.MotionMagic, -right);
   }
 
   /** Configure talons for open loop control */

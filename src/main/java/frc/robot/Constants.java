@@ -20,6 +20,7 @@ public class Constants {
   public static final double kJoystickThreshold = 0.15;
   // Oracle's official constant convention. Don't @ me.
   public static final double TICKS_PER_FOOT = 1228.615;
+  public static final double REAL_TRACK_WIDTH = 1.916;
 
   // Auto Constants
   public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds

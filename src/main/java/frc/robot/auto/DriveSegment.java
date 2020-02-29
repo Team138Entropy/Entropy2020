@@ -42,7 +42,7 @@ public class DriveSegment extends Segment {
     logger.info("Target: " + targetPosition);
 
     drive.zeroEncoders();
-    drive.setTargetPosition(targetPosition);
+    drive.setTargetPosition(targetPosition, targetPosition);
   }
 
   @Override
