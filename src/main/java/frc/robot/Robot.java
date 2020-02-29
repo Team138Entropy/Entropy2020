@@ -152,7 +152,6 @@ public class Robot extends TimedRobot {
 
     // Zero all nesscary sensors on Robot
     mSubsystemManager.zeroSensors();
-    visionLight.set(Relay.Value.kForward);
 
     // Reset Robot Tracker - Note starting position of the Robot
     // This starting Rotation, X, Y is now the Zero Point
@@ -233,7 +232,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    visionLight.set(Relay.Value.kForward);
+    visionLight.set(Relay.Value.kOff);
     mIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
 
@@ -668,7 +667,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    visionLight.set(Relay.Value.kForward);
+    visionLight.set(Relay.Value.kOff);
 
     Config.getInstance().reload();
   }
@@ -728,6 +727,13 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop() {
+    if(mOperatorInterface.getVisionToggle()){
+      if(visionLight.get() == Relay.Value.kOff){
+        visionLight.set(Relay.Value.kOn);
+      }else{
+        visionLight.set(Relay.Value.kOff);
+      }
+    }
 
     turretLoop();
 
@@ -799,11 +805,6 @@ public class Robot extends TimedRobot {
       mShooter.increaseVelocity();
     } else if (mOperatorInterface.getResetVelocityTrim()) {
       mShooter.resetVelocity();
-    }
-
-    // Camera Swap
-    if (mOperatorInterface.getCameraSwap()) {
-      // Swap Camera!
     }
   }
 

@@ -18,6 +18,7 @@ public class OperatorInterface {
   private LatchedBoolean mBarfLatch = new LatchedBoolean();
   private LatchedBoolean mShootLatch = new LatchedBoolean();
   private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
+  private LatchedBoolean mVisionToggle = new LatchedBoolean();
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -110,6 +111,9 @@ public class OperatorInterface {
   }
 
   // Operator
+  public boolean getVisionToggle(){
+    return mVisionToggle.update(OperatorController.getButton(NykoController.Button.BUTTON_4));
+  }
 
   public boolean getHarvestMode() {
     return OperatorController.getButton(NykoController.Button.LEFT_TRIGGER);
@@ -121,10 +125,6 @@ public class OperatorInterface {
 
   public double getOperatorTurn() {
     return OperatorController.getJoystick(NykoController.Side.RIGHT, NykoController.Axis.X);
-  }
-
-  public boolean getCameraSwap() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_4);
   }
 
   public boolean getShoot() {
