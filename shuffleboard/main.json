@@ -141,10 +141,10 @@
               "Colors/Color when false": "#0000FFFF"
             }
           },
-          "22,5": {
+          "22,6": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Text View",
@@ -255,6 +255,17 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
+          "12,9": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Shooter Speed",
+              "_title": "Shooter Speed"
+            }
+          },
           "16,3": {
             "size": [
               2,
@@ -294,6 +305,83 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
+          "26,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Intake Current",
+              "_title": "Intake Current"
+            }
+          },
+          "26,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Intake Current Countdown",
+              "_title": "Intake Current Countdown"
+            }
+          },
+          "26,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Encoder Distance",
+              "_title": "Encoder Distance"
+            }
+          },
+          "26,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Encoder Distance Raw",
+              "_title": "Encoder Distance Raw"
+            }
+          },
+          "26,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Shot Countdown",
+              "_title": "Shot Countdown"
+            }
+          },
+          "22,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Velocity Countdown",
+              "_title": "Velocity Countdown"
+            }
+          },
+          "23,5": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Vision Distance",
+              "_title": "Vision Distance"
+            }
+          },
           "16,7": {
             "size": [
               4,
@@ -308,19 +396,6 @@
               "Range/Center": 0.0,
               "Visuals/Num tick marks": 5,
               "Visuals/Show text": true
-            }
-          },
-          "6,9": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Practice Bot",
-              "_title": "Practice Bot",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
             }
           }
         }
@@ -431,7 +506,7 @@
                 {
                   "_type": "Boolean Box",
                   "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[1]/Value",
-                  "_title": "/LiveWindow/Ungrouped/DigitalInput[1]/Value",
+                  "_title": "LiveWindow/Ungrouped/DigitalInput[1]/Value",
                   "Colors/Color when true": "#7CFC00FF",
                   "Colors/Color when false": "#8B0000FF"
                 }
@@ -802,42 +877,7 @@
             "content": {
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Vision Distance",
-              "_title": "/SmartDashboard/Vision Distance"
-            }
-          },
-          "15,8": {
-            "size": [
-              4,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Encoder Distance Raw",
-              "_title": "Encoder Distance Raw"
-            }
-          },
-          "19,7": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Practice Bot",
-              "_title": "Practice Bot",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "22,7": {
-            "size": [
-              3,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Turret State",
-              "_title": "Turret State"
+              "_title": "SmartDashboard/Vision Distance"
             }
           }
         }
