@@ -10,12 +10,9 @@ public class AsyncShootSegment extends ShootSegment {
   public void init() {
     logger.info("Initializing async shoot segment");
 
-    // OperatorInterface.getInstance().overrideShoot();
     startShooting();
     
-
     EventWatcherThread.getInstance().registerEvent(new Event() {
-      boolean done = false;
 
       @Override
       public boolean predicate() {
@@ -24,19 +21,14 @@ public class AsyncShootSegment extends ShootSegment {
 
       @Override
       public void run() {
-        // OperatorInterface.getInstance().overrideShoot();
+        logger.info("Async shoot segment finished");
         stopShooting();
         resetState(); // This will absolutely cause problems if we have two shoot segments running at the same time
-        done = true;
       }
 
       @Override
       public boolean pruneMe() {
-        if (done) {
-          logger.info("Async shoot segment finished");
-        }
-
-        return done;
+        return true;
       }
     });
   }

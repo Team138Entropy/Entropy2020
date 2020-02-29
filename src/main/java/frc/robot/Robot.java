@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
+import frc.robot.auto.IntakeSegment;
 import frc.robot.auto.Path;
 import frc.robot.auto.Paths;
 import frc.robot.auto.ShootSegment;
@@ -80,7 +81,7 @@ public class Robot extends TimedRobot {
 
   // Auto stuff
   private static boolean mAuto = false;
-  private boolean shooterIsStopped = false;
+  private boolean mShooterIsStopped = false;
   private Path mAutoPath = Paths.NO_OP;
 
   // Controller Reference
@@ -224,6 +225,8 @@ public class Robot extends TimedRobot {
 
     mAutoPath =
         Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
+    mShooterIsStopped = false;
+    IntakeSegment.resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency stop?)
   }
 
   @Override
@@ -235,11 +238,15 @@ public class Robot extends TimedRobot {
       mShootingState = ShootingState.PREPARE_TO_SHOOT;
     }
 
-    if (mStorage.isEmpty() && !shooterIsStopped) {
-      shooterIsStopped =  true;
+    if (mStorage.isEmpty() && !mShooterIsStopped) {
+      mShooterIsStopped =  true;
       mRobotLogger.info("Setting shooting state to complete");
       mShootingState = ShootingState.SHOOTING_COMPLETE;
       mStorage.stop();
+    }
+
+    if (IntakeSegment.isActive()) {
+      executeIntakeStateMachine();
     }
 
     executeShootingStateMachine();

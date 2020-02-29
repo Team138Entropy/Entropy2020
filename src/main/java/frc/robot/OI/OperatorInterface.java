@@ -20,7 +20,7 @@ public class OperatorInterface {
   private LatchedBoolean mShootLatch = new LatchedBoolean();
   private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
 
-  private boolean autoShootOverride = false;
+  private boolean autoIntakeOverride = false;
 
   private boolean mIntakeWasPressedWhenWeLastChecked = false;
 
@@ -134,19 +134,7 @@ public class OperatorInterface {
    * @return the shooting toggle.
    */
   public boolean getShoot() {
-
-    // I'm terribly sorry. I just needed this to work and simulating actual input was the least
-    // likely to introduce a weird state bug. -Will
-    if (Robot.isAuto()) {
-      if (autoShootOverride) {
-        autoShootOverride = false;
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
-    }
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
   }
 
   public boolean getSpinUp() {
@@ -158,13 +146,22 @@ public class OperatorInterface {
   }
 
   public boolean startIntake() {
-    boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
-    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
-      mIntakeWasPressedWhenWeLastChecked = false;
-      return true;
+    if (Robot.isAuto()) {
+      if (autoIntakeOverride) {
+        autoIntakeOverride = false;
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      mIntakeWasPressedWhenWeLastChecked = buttonValue;
-      return false;
+      boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
+      if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
+        mIntakeWasPressedWhenWeLastChecked = false;
+        return true;
+      } else {
+        mIntakeWasPressedWhenWeLastChecked = buttonValue;
+        return false;
+      }
     }
   }
 
@@ -210,10 +207,10 @@ public class OperatorInterface {
   }
 
   /**
-   * Tells {@link #getShoot()} to return true the next time it's called. This is a hack to make auto
+   * Tells {@link #startIntake()} to return true the next time it's called. This is a hack to make auto
    * shooting work. Please don't use it anywhere else. Please.
    */
-  public void overrideShoot() {
-    autoShootOverride = true;
+  public void overrideIntake() {
+    autoIntakeOverride = true;
   }
 }

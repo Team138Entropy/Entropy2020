@@ -6,7 +6,8 @@ package frc.robot.events;
 public interface Event extends Runnable {
 
   /**
-   * The predicate for the main logic of this event.
+   * The predicate for the main logic of this event. Any logic that needs to be run
+   * every tick should go here.
    *
    * @return whether or not {@link #run()} should be called this tick.
    */
@@ -14,6 +15,8 @@ public interface Event extends Runnable {
 
   /**
    * Tells the caller that the event should be pruned.
+   * It is safe to assume that {@link #predicate()} and {@link #run()}
+   * have been called at least once at this point.
    *
    * @return whether or not the event should be pruned.
    */
