@@ -64,10 +64,6 @@ public class Turret extends Subsystem {
    mTurretTalon.config_kD(0, 0);
    mTurretTalon.config_IntegralZone(0, 50);
    mTurretTalon.setNeutralMode(NeutralMode.Brake);
-
-
-
-
   }
 
 

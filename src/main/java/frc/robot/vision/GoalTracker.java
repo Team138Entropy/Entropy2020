@@ -17,6 +17,8 @@ public class GoalTracker {
         // Transform from the field frame to the vision target
         public Pose2d field_to_target;
 
+        public double distance;
+
         // timestamp of the lastest time that the goal has been observed
         public double latest_timestamp;
 
@@ -33,6 +35,7 @@ public class GoalTracker {
             latest_timestamp = track.getLatestTimestamp();
             stability = track.getStability();
             id = track.getID();
+            distance = track.VisionDistance;
         }
 
     }
@@ -140,7 +143,9 @@ public class GoalTracker {
                 //attempt to update a track
                 if(FoundUpdatedTrack == false){
                     //Attempt to update current track
+
                     if(CurrentTrackTemp.tryUpdate(timestamp, CurrentTarget) == true){
+
                         //Succesfully Update
                         FoundUpdatedTrack = true;
                     }
@@ -155,6 +160,7 @@ public class GoalTracker {
             if(FoundUpdatedTrack == false){
                 //Lets create a new goal track
                 GoalTrack t = GoalTrack.makeNewTrack(mNextTrackID, timestamp, CurrentTarget);
+                t.VisionDistance = CurrentTarget.StoredDistance;
 
                 //Add New Track
                 mCurrentTracks.add(t);

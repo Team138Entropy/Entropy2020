@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -54,6 +55,7 @@ public class Robot extends TimedRobot {
     MANUAL
   }
 
+  private double LastDistance = -1;
   public enum TestState {
     START,
     INTAKE_FORWARD,
@@ -101,6 +103,10 @@ public class Robot extends TimedRobot {
   private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
 
+  private static final DigitalInput practiceInput = new DigitalInput(Config.getInstance().getInt(Key.ROBOT__PRACTICE_JUMPER_PIN));
+
+  private static boolean isPracticeBot = false;
+
   //Looper - Running on a set period
   private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
 
@@ -143,6 +149,8 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
 
+    // Read the jumper pin for practice bot
+    readIsPracticeBot();
     
     //Register the Enabled Looper
     //Used to run background tasks!
@@ -684,11 +692,15 @@ public class Robot extends TimedRobot {
     if(mTurretState == TurretState.AUTO_AIM){
       //Command the Turret with vision set points
       RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-        if(result.HasResult){
+      double dis = result.distance;
+      if(result.HasResult){
           //We have Target Information
+          LastDistance = dis;
+         // System.out.println("DISTANCE: " + LastDistance);
           mTurret.SetAimError(result.turret_error.getDegrees());
         }else{
           //No Results, Don't Rotate
+          //System.out.println("NO TRACK!");
         }
     }else{
       //Command the Turret Manually
@@ -1019,5 +1031,13 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Invalid Climbing State");
         break;
     }
+  }
+
+  private static void readIsPracticeBot() {
+    isPracticeBot = practiceInput.get();
+  }
+
+  public static boolean getIsPracticeBot() {
+    return isPracticeBot;
   }
 }
