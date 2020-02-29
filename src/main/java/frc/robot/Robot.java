@@ -358,6 +358,9 @@ public class Robot extends TimedRobot {
     int expectedShooterSpeed = Config.getInstance().getInt(Key.TESTMODE__EXPECTED_SHOOTER_SPEED);
     int shooterAcceptableError = Config.getInstance().getInt(Key.TESTMODE__SHOOTER_ACCEPTABLE_ERROR);
     SmartDashboard.putString("Test State", mTestState.toString());
+    SmartDashboard.putBoolean("Driver Cameras", mCameraManager.getCameraStatus());
+    SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
+    
     switch(mTestState){
       case START:
         mTestTimer.reset();
