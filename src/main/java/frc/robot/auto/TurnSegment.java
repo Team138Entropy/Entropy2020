@@ -47,14 +47,14 @@ public class TurnSegment extends Segment {
   @Override
   public void tick() {
     int left = drive.getLeftEncoderDistance();
-    int right = drive.getRightEncoderDistance();
+    int right = -drive.getRightEncoderDistance();
 
     if (++loggingCount > 5) {
       logger.info(
           "Encoder distances: ("
               + drive.getLeftEncoderDistance()
               + ", "
-              + drive.getRightEncoderDistance()
+              + -drive.getRightEncoderDistance()
               + ")");
       loggingCount = 0;
     }
