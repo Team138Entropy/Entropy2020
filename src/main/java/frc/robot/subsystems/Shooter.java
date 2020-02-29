@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -12,95 +11,57 @@ import frc.robot.SpeedLookupTable;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  // Temporary, until default config values are merged
-  private static final double MAX_SPEED = 2445d;
-  private static final double SPEED_DEADBAND = 30;
-  private static final int SPEED_DEADBAND_DELAY = 10;
-  private static final double FEEDFORWARD = 1023d / MAX_SPEED, P = (.5 * 1023) / 50, I = 0, D = 0;
+  private final double MAX_SPEED = 2550d;
+  // private static final double SPEED_DEADBAND = 20;
+  private final double SPEED_DEADBAND = 75;
+  private final double DROP_DEADBAND = 250;
+  private final int SPEED_DEADBAND_DELAY = 10;
+  private final double FEEDFORWARD = 1023d / MAX_SPEED;
+  // private static final double P = (.3 * 1023) / 50;
+  // private static final double I = 0.2;
+  // private static final double D = 0.1;
+  private final double P = 0;
+  private final double I = 0;
+  private final double D = 0;
+
+  // a minimum acountdown
+  private static final int MIN_SHOT_COUNTDOWN = 100;
+  private int mShotCountdown = MIN_SHOT_COUNTDOWN;
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private static final int ROLLER_SLAVE_PORT =
-      Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
+  private final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
 
   // TODO: Tune these values
-  private static final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
+  private final int DEFAULT_ROLLER_SPEED =
+      2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
-  private static final int VELOCITY_ADJUSTMENT_BUMP = Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
+  private final int VELOCITY_ADJUSTMENT_BUMP =
+      Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
 
   private boolean mHasHadCurrentDrop = false;
 
-  private static class TurretPosition {
-    private double mAzimuth, mDistance;
-
-    public TurretPosition(double azimuth, double distance) {
-      mAzimuth = azimuth;
-      mDistance = distance;
-    }
-
-    public double getAzimuth() {
-      return mAzimuth;
-    }
-
-    public double getDistance() {
-      return mDistance;
-    }
-  }
-
-  @FunctionalInterface
-  private interface Turret {
-    void set(TurretPosition position);
-  }
-
-  @FunctionalInterface
-  private interface Vision {
-    TurretPosition calcTargetPosition();
-  }
-
-  @FunctionalInterface
-  private interface Intake {
-    void shoveANodeIntoTheThing();
-  }
-
-  // TEMPORARY STUFF ENDS HERE
-
   // Aggregation
-  private static Shooter sInstance;
-  private PIDRoller mRoller;
-  private TalonSRX mTestRoller;
-  private Turret mTurret;
-  private Vision mVision;
+  private static Shooter instance;
+  private final PIDRoller mRoller;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
-  private void x(){}
+
+
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
-    mTestRoller = new TalonSRX(ROLLER_PORT);
-
-    // TODO: Replace these with real subsystems
-    mTurret =
-        position -> 
-            x();
-    mVision =
-        () -> {
-          // System.out.println("Getting dummy vision target");
-          return new TurretPosition(0, MAX_SPEED);
-        };
   }
 
   public static synchronized Shooter getInstance() {
-    if (sInstance == null) sInstance = new Shooter();
-    return sInstance;
+    if (instance == null) instance = new Shooter();
+    return instance;
   }
 
-  /** Tells the turret to move to where the vision system says we should be. */
-  public void target() {
-    mTurret.set(mVision.calcTargetPosition());
-  }
 
   /** Starts the roller. */
   public void start() {
     mRoller.setSpeed(getAdjustedVelocitySetpoint());
+    // mRoller.setPercentOutput(1);
   }
 
   /** Stops the roller. */
@@ -113,7 +74,14 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
-    int speed = (int) Math.round(SpeedLookupTable.getInstance().getSpeedFromDistance(mVision.calcTargetPosition().getDistance()));
+    double distance = 10; //for now
+    
+    int speed =
+        (int)
+            Math.round(
+                SpeedLookupTable.getInstance()
+                    .getSpeedFromDistance(distance));
+    
     return speed + mVelocityAdjustment;
   }
 
@@ -135,10 +103,12 @@ public class Shooter extends Subsystem {
 
   /** Returns whether roller is at full speed. */
   public boolean isAtVelocity() {
+    SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
-    boolean isAtVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
+    boolean isAtVelocity =
+        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there
@@ -162,12 +132,14 @@ public class Shooter extends Subsystem {
   }
 
   public boolean isBallFired(){
-    return Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (SPEED_DEADBAND + 50);
+    boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
+    boolean ballFired = didDropVelocity;
+    return ballFired;
   }
 
   // Used in TEST mode only
   public void setOutput(double output) {
-    mTestRoller.set(ControlMode.PercentOutput, output);
+    mRoller.setPercentOutput(output);
   }
 
   @Override

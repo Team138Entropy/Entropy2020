@@ -1,22 +1,26 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
-import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.OI.XboxController.Button;
+import frc.robot.OI.XboxController.Side;
 import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
 
 public class OperatorInterface {
-  Logger mLogger;
   private static OperatorInterface mInstance;
 
   // Instances of the Driver and Operator Controller
   private final XboxController DriverController;
   private final NykoController OperatorController;
+  private LatchedBoolean mBarfLatch = new LatchedBoolean();
+  private LatchedBoolean mShootLatch = new LatchedBoolean();
+  private LatchedBoolean mSpinUpLatch = new LatchedBoolean();
 
-  private LatchedBoolean mIntakeWasPressed;
+  private boolean mIntakeWasPressedWhenWeLastChecked = false;
+
   private LatchedBoolean mClimbWasPressed;
 
   public static synchronized OperatorInterface getInstance() {
@@ -27,14 +31,16 @@ public class OperatorInterface {
   }
 
   private OperatorInterface() {
-    mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new NykoController(Constants.OperatorControllerPort);
-    mIntakeWasPressed = new LatchedBoolean();
     mClimbWasPressed = new LatchedBoolean();
   }
 
   // Driver
+
+  public boolean checkControllers(){
+    return DriverController.checkNameAndPort() && OperatorController.checkNameAndPort();
+  }
 
   public double getDriveThrottle() {
     return DriverController.getJoystick(XboxController.Side.LEFT, XboxController.Axis.Y);
@@ -49,6 +55,12 @@ public class OperatorInterface {
     return mClimbWasPressed.update(buttonValue);
   }
 
+  //if we are auto steering
+  //WHILE held
+  public boolean getFeederSteer(){
+    return DriverController.getTrigger(Side.RIGHT) || DriverController.getTrigger(Side.LEFT);
+  }
+
   public boolean getQuickturn() {
     return DriverController.getButton(XboxController.Button.RB);
   }
@@ -59,10 +71,8 @@ public class OperatorInterface {
     // Check if Low Gear is Toggled
     if (DriverController.getButton(XboxController.Button.START)) {
       if (LowGear == false) {
-        mLogger.verbose("Y PRESSED ON");
 
       } else {
-        mLogger.verbose("Y PRESSED OFF");
       }
       LowGear = !LowGear;
     }
@@ -71,13 +81,24 @@ public class OperatorInterface {
     DriverController.setRumble(LowGear);
     return LowGear;
   }
-
-  public boolean getTurretAdjustLeft() {
+  
+  public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
+  }
+  
+  public boolean getBallCounterAdjustUp() {
+    return OperatorController.getDPad() == DPad.RIGHT;
+  }
+
+  // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
+  public boolean getTurretAdjustLeft() {
+    // return OperatorController.getDPad() == DPad.LEFT;
+    return false;
   }
 
   public boolean getTurretAdjustRight() {
-    return OperatorController.getDPad() == DPad.RIGHT;
+    // return OperatorController.getDPad() == DPad.RIGHT;
+    return false;
   }
 
   public boolean getShooterVelocityTrimUp() {
@@ -111,7 +132,11 @@ public class OperatorInterface {
   }
 
   public boolean getShoot() {
-    return OperatorController.getButton(NykoController.Button.BUTTON_3);
+    return mShootLatch.update(OperatorController.getButton(NykoController.Button.RIGHT_BUMPER));
+  }
+
+  public boolean getSpinUp() {
+    return mSpinUpLatch.update(OperatorController.getButton(NykoController.Button.LEFT_BUMPER));
   }
 
   public boolean getStateReset() {
@@ -120,7 +145,13 @@ public class OperatorInterface {
 
   public boolean startIntake() {
     boolean buttonValue = DriverController.getButton(XboxController.Button.RB);
-    return mIntakeWasPressed.update(buttonValue);
+    if (mIntakeWasPressedWhenWeLastChecked && !buttonValue) {
+      mIntakeWasPressedWhenWeLastChecked = false;
+      return true;
+    } else {
+      mIntakeWasPressedWhenWeLastChecked = buttonValue;
+      return false;
+    }
   }
 
   public void setDriverRumble(boolean toggle) {
@@ -128,7 +159,7 @@ public class OperatorInterface {
   }
 
   public boolean isBarf() {
-    return DriverController.getButton(XboxController.Button.START);
+    return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
   }
 
   // Test Mode functions
@@ -166,14 +197,14 @@ public class OperatorInterface {
 
   //TODO: Decide on climber jog and home buttons
   public double getClimberJogSpeed() {
-    if (OperatorController.getButton(NykoController.Button.LEFT_BUMPER)) {
-      return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
-    } else {
-      return 0;
-    }
+    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
+  }
+
+  public boolean isClimberTest() {
+    return OperatorController.getButton(NykoController.Button.LEFT_BUMPER);
   }
 
   public boolean isHomeClimber() {
-    return true;
+    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
   }
 }

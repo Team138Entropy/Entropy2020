@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -16,13 +15,13 @@ public class Intake extends Subsystem {
   // initial cooldown because our startup of the roller induces a countdown
   private int mOverCurrentCountdown = 30;
 
-  private static final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
+  private final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
 
   // TODO: Tune these values
-  private static final double ROLLER_SPEED =
+  private final double ROLLER_SPEED =
       Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
 
-  private WPI_TalonSRX mRoller;
+  private final WPI_TalonSRX mRoller;
 
   private static Intake sInstance;
 
@@ -35,6 +34,7 @@ public class Intake extends Subsystem {
 
   private Intake() {
     mRoller = new WPI_TalonSRX(ROLLER_PORT);
+    mRoller.configFactoryDefault();
   }
 
   public void barf() {
@@ -59,9 +59,9 @@ public class Intake extends Subsystem {
     mRoller.set(ControlMode.PercentOutput, output);
   }
 
-  public void updateSmartDashboard(){
+  public void updateSmartDashboard() {
     SmartDashboard.putNumber("Intake Current Countdown", mOverCurrentCountdown);
-    double current = mRoller.getStatorCurrent();    
+    double current = mRoller.getStatorCurrent();
     SmartDashboard.putNumber("Intake Current", current);
     SmartDashboard.putBoolean("Intake Spinning Up", false);
     SmartDashboard.putBoolean("Intake Overcurrent", false);
