@@ -373,12 +373,13 @@ public class Robot extends TimedRobot {
         } catch (IOException e) {
           e.printStackTrace();
         }
-
         mTestState = TestState.TEST_LIGHT;
         break;
       case TEST_LIGHT:
         visionLight.set(Relay.Value.kForward);
         mTestState = TestState.INTAKE_FORWARD;
+        mTestTimer.reset();
+        mTestTimer.start();
         break;
       case INTAKE_FORWARD:
         if(runMotorTest(new MotorWithEncoder(){
