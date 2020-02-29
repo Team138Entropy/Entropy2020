@@ -21,7 +21,8 @@ public class Turret extends Subsystem {
 
   enum TurretState {
     AUTO_AIM,
-    HOMING,
+    HOME,
+    SEARCHING,
     MANUAL_AIM
   };
 
@@ -88,11 +89,15 @@ public class Turret extends Subsystem {
       //Perform Auto Aim!
       //deadband: Angle error must be greater than 1 degree
       if(Math.abs(mPeriodicIO.angle) > 1){
-        mTurretTalon.set(ControlMode.Position, mPeriodicIO.demand);
+        mTurretTalon.set(ControlMode.MotionMagic, mPeriodicIO.demand);
       }
-    }else if(mCurrentState == TurretState.HOMING){
-      //homing..
-      //command to go home position
+    }else if(mCurrentState == TurretState.HOME){
+     //going to home position
+      mTurretTalon.set(ControlMode.MotionMagic, HomePosition);
+    }else if(mCurrentState == TurretState.SEARCHING){
+      //searching for a track
+      //TODO
+      //move in between two areas
 
     }else if(mCurrentState == TurretState.MANUAL_AIM){
       //Manual Control
@@ -104,7 +109,8 @@ public class Turret extends Subsystem {
   //Return the turret to its home position
   //home position is on the backside of the robot
   public synchronized void ReturnHome(){
-  
+    //set to home state
+    mCurrentState = TurretState.HOME;
   }
 
   //Operator Driven Manual Control

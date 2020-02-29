@@ -1,15 +1,15 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
-import frc.robot.Logger;
 import frc.robot.OI.NykoController.DPad;
+import frc.robot.OI.XboxController.Button;
+import frc.robot.OI.XboxController.Side;
 import frc.robot.util.LatchedBoolean;
 
 // Main Control Class
 // Contains instances of the Driver and Operator Controller
 
 public class OperatorInterface {
-  Logger mLogger;
   private static OperatorInterface mInstance;
 
   // Instances of the Driver and Operator Controller
@@ -31,7 +31,6 @@ public class OperatorInterface {
   }
 
   private OperatorInterface() {
-    mLogger = new Logger("oi");
     DriverController = new XboxController(Constants.DriverControllerPort);
     OperatorController = new NykoController(Constants.OperatorControllerPort);
     mClimbWasPressed = new LatchedBoolean();
@@ -56,6 +55,12 @@ public class OperatorInterface {
     return mClimbWasPressed.update(buttonValue);
   }
 
+  //if we are auto steering
+  //WHILE held
+  public boolean getFeederSteer(){
+    return DriverController.getTrigger(Side.RIGHT) || DriverController.getTrigger(Side.LEFT);
+  }
+
   public boolean getQuickturn() {
     return DriverController.getButton(XboxController.Button.RB);
   }
@@ -66,10 +71,8 @@ public class OperatorInterface {
     // Check if Low Gear is Toggled
     if (DriverController.getButton(XboxController.Button.START)) {
       if (LowGear == false) {
-        mLogger.verbose("Y PRESSED ON");
 
       } else {
-        mLogger.verbose("Y PRESSED OFF");
       }
       LowGear = !LowGear;
     }

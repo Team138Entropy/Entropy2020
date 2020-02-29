@@ -14,9 +14,6 @@
 
 '''
 [{"name":"connect_verbose","value":1},{"name":"contrast","value":12},{"name":"saturation","value":89},{"name":"hue","value":35},{"name":"white_balance_automatic","value":false},{"name":"exposure","value":1},{"name":"gain_automatic","value":false},{"name":"gain","value":31},{"name":"horizontal_flip","value":false},{"name":"vertical_flip","value":false},{"name":"power_line_frequency","value":0},{"name":"sharpness","value":0},{"name":"auto_exposure","value":1}]
-
-joes setings
-[{"name":"connect_verbose","value":1},{"name":"contrast","value":44},{"name":"saturation","value":64},{"name":"hue","value":18},{"name":"white_balance_automatic","value":false},{"name":"exposure","value":1},{"name":"gain_automatic","value":false},{"name":"gain","value":31},{"name":"horizontal_flip","value":false},{"name":"vertical_flip","value":false},{"name":"power_line_frequency","value":0},{"name":"sharpness","value":0},{"name":"auto_exposure","value":1}]
 '''
 
 import json
@@ -31,7 +28,6 @@ import cv2
 import numpy as np
 from numpy import mean
 import math
-
 
 # Image Camera Size (Pixels)
 Camera_Image_Width = 640
@@ -58,36 +54,31 @@ FOV = 75
 # Centroid of the tape is ~87.75 inches (center of height of tape)
 # tape is 1 ft 5inches, 17 inches/2 = 8.5 inches. 96.25-8.5 gives 87.75
 
-#Camera height is 37.5 inches
-targetHeightInches = 50.25
-
 camPixelWidth = 640
-# target reflective tape width in feet (3 feet, 3 & 1/4 inch) ~3.27
-Tft = 3.27
+# target reflective tape width in feet (7 inches / 12 ) ~3.27
+Tft = .583
 
 # theta = 1/2 FOV,
 tanFOV = math.tan(FOV / 2)
 
-
-
 #Constraint values
 # ratio values - detects feeder station. Doing and not when doing ratio checks will ignore them
-rat_low = 1.5
-rat_high = 5
+rat_low = 0
+rat_high = 1
 
 #Solitity compares the hull vs contour, and looks at the difference in filled area
 #Works on a system of %
-solidity_low = .1
-solidity_high = .3
+solidity_low = .5
+solidity_high = .95
 
 #Vertices is acts as "length"
-minArea = 10
-minWidth = 20
+minArea = 40
+minWidth = 10
 maxWidth = 1000
-minHeight = 20
-maxHeight = 60
+minHeight = 10
+maxHeight = 1000
 maxVertices = 100
-minVertices = 30
+minVertices = 5
 
 hsv_threshold_hue = [15, 166]
 hsv_threshold_saturation = [71, 255]
@@ -138,75 +129,13 @@ class SocketWorker(threading.Thread):
                 pass
 
 
-class WebcamVideoStream:
-    def __init__(self, camera, cameraServer, frameWidth, frameHeight, name="WebcamVideoStream"):
-        # initialize the video camera stream and read the first frame
-        # from the stream
-
-        # Automatically sets exposure to 0 to track tape
-        self.webcam = camera
-        # print("SETTING EXPOSURE ")
-        # print(self.webcame.exposure)
-
-        # self.webcam.setExposureManual(0)
-        # Some booleans so that we don't keep setting exposure over and over to the same value
-        # self.autoExpose = False
-        # self.prevValue = self.autoExpose
-        # Make a blank image to write on
-        self.img = np.zeros(shape=(frameWidth, frameHeight, 3), dtype=np.uint8)
-        # Gets the video
-        self.stream = cameraServer.getVideo(camera=camera)
-        (self.timestamp, self.img) = self.stream.grabFrame(self.img)
-
-        # initialize the thread name
-        self.name = name
-
-        # initialize the variable used to indicate if the thread should
-        # be stopped
-        self.stopped = False
-
-    def start(self):
-        # start the thread to read frames from the video stream
-        t = Thread(target=self.update, name=self.name, args=())
-        t.daemon = True
-        t.start()
-        return self
-
-    def update(self):
-        # keep looping infinitely until the thread is stopped
-        while True:
-            # if the thread indicator variable is set, stop the thread
-            if self.stopped:
-                return
-            # Boolean logic we don't keep setting exposure over and over to the same value
-            '''
-            if self.autoExpose:
-                self.webcam.setExposureAuto()
-            else:
-                self.webcam.setExposureManual(0)
-            '''
-            # gets the image and timestamp from cameraserver
-            (self.timestamp, self.img) = self.stream.grabFrame(self.img)
-
-    def read(self):
-        # return the frame most recently read
-        return self.timestamp, self.img
-
-    def stop(self):
-        # indicate that the thread should be stopped
-        self.stopped = True
-
-    def getError(self):
-        return self.stream.getError()
-
-
 ###################### PROCESSING OPENCV ################################
 
 # Angles in radians
 
 # image size ratioed to 16:9
-image_width = 640
-image_height = 480
+image_width = 320
+image_height = 240
 
 # Playstation Eye
 # Datasheet: https://en.wikipedia.org/wiki/PlayStation_Eye
@@ -273,10 +202,14 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     # Gets the shape of video
     # Gets center of height and width
     # Copies frame and stores it in image
-    
+    image = frame.copy()
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
-        value_array = findTape(contours, frame, centerX, centerY)
+        #Blocking out parts of the robot
+        rect1 = cv2.rectangle(img, (0, 300), (640, 480), (0,0,0), -1)
+        
+        
+        value_array = findTape(contours, rect1, centerX, centerY)
     else:
         # No Contours!
         pass
@@ -400,10 +333,6 @@ def findTape(contours, image, centerX, centerY):
             cntArea = cv2.contourArea(cnt)
             # calculate area of convex hull
             hullArea = cv2.contourArea(hull)
-            
-            perimeter = cv2.arcLength(cnt, True)
-            approxCurve = cv2.approxPolyDP(cnt, perimeter * .01, True)
-            
 
             if cntArea != 0 and hullArea != 0:
                 mySolidity = float (cntArea)/hullArea
@@ -413,7 +342,7 @@ def findTape(contours, image, centerX, centerY):
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
             # Filters contours based off of size
-            if len(approxCurve) >= 8 and (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (x > minWidth) and (x < maxWidth) and (y > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (x > minWidth) and (x < maxWidth) and (y > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 
@@ -688,10 +617,7 @@ def findBalls(frame):
 def ProcessFrame(frame, tape):
     if (tape == True):
         threshold = threshold_video(lower_green, upper_green, frame)
-        
-        rect1 = cv2.rectangle(frame, (0, 300), (640, 480), (0,0,0), -1)
-        processedValues = findTargets(rect1, threshold, vals_to_send, centerX, centerY)
-        
+        processedValues = findTargets(frame, threshold, vals_to_send, centerX, centerY)
         if processedValues[3] != None:
             print(processedValues[3])
 
@@ -920,7 +846,7 @@ if __name__ == "__main__":
 
     # cap.autoExpose=True;
     tape = False
-    # fps = FPS().start()
+
     # TOTAL_FRAMES = 200;
     # loop forever
     while True:
@@ -930,9 +856,3 @@ if __name__ == "__main__":
 
         Tape = True
         frame = ProcessFrame(img, Tape)
-
-    # Doesn't do anything at the moment. You can easily get this working by indenting these three lines
-    # and setting while loop to: while fps._numFrames < TOTAL_FRAMES
-    # fps.stop()
-    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
