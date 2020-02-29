@@ -55,12 +55,22 @@ public class Robot extends TimedRobot {
   }
 
   public enum TestState {
-    STORAGE_ENCODER_TEST,
-    STORAGE_ENCODER_TEST_WAITING,
+    START,
+    INTAKE_FORWARD,
+    INTAKE_BACKWARD,
+    STORAGE_ENCODER_FORWARDS_TEST,
+    STORAGE_ENCODER_FORWARDS_TEST_WAITING,
+    STORAGE_ENCODER_STOP,
+    STORAGE_ENCODER_BACKWARDS_TEST,
+    STORAGE_ENCODER_BACKWARDS_TEST_WAITING,
+    STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST,
+    STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST,
     SHOOTER_ENCODER_TEST,
     SHOOTER_ENCODER_TEST_WAITING,
     MANUAL
   }
+
+  private boolean mIsPracticeBot = true;
 
   private final int AUTONOMOUS_BALL_COUNT = 3;
   private final double FIRE_DURATION_SECONDS = 0.3;
@@ -71,7 +81,7 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimingState mClimingState = ClimingState.IDLE;
   private TurretState mTurretState = TurretState.AUTO_AIM;
-  private TestState mTestState = TestState.STORAGE_ENCODER_TEST;
+  private TestState mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
 
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
@@ -120,9 +130,7 @@ public class Robot extends TimedRobot {
   // teleopInit, teleopPeriodic, testInit, testPeriodic
 
   private int mStartingStorageEncoderPosition;
-  private Timer mStorageEncoderTestTimer = new Timer();
-
-  private Timer mShooterEncoderTestTimer = new Timer();
+  private Timer mTestTimer = new Timer();
 
   @Override
   public void robotInit() {
@@ -266,38 +274,173 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mRobotLogger.log("Entropy 138: Test Init");
-    mTestState = TestState.STORAGE_ENCODER_TEST;
+    mTestState = TestState.START;
 
     Config.getInstance().reload();
     mSubsystemManager.checkSubsystems();
+
+    
+    SmartDashboard.putBoolean("Forwards Storage Test Passed", false);
+    SmartDashboard.putBoolean("Backwards Storage Test Passed", false);
+    SmartDashboard.putBoolean("Shooter initial speed check passed", false);
+    SmartDashboard.putBoolean("Shooter speed check passed", false);
+  }
+
+  private void runMotorTest(){
+
   }
 
   @Override
   public void testPeriodic() {
+    double timePerTest = Config.getInstance().getDouble(Key.TESTMODE__TIME_PER_TEST);
+    int expectedStorageDistance = Config.getInstance().getInt(Key.TESTMODE__EXPECTED_STORAGE_DISTANCE);
+    int storageAcceptableError = Config.getInstance().getInt(Key.TESTMODE__STORAGE_ACCEPTABLE_ERROR);
+    int expectedShooterSpeed = Config.getInstance().getInt(Key.TESTMODE__EXPECTED_SHOOTER_SPEED);
+    int shooterAcceptableError = Config.getInstance().getInt(Key.TESTMODE__SHOOTER_ACCEPTABLE_ERROR);
+    SmartDashboard.putString("Test State", mTestState.toString());
     switch(mTestState){
-      case STORAGE_ENCODER_TEST:
+      case START:
+        mTestTimer.reset();
+        mTestTimer.start();
+        mTestState = TestState.INTAKE_FORWARD;
+        mStorage.updateEncoderPosition();
+        break;
+      case INTAKE_FORWARD:
+        mIntake.setOutput(1);
+        
+        if(mTestTimer.get() >= timePerTest){
+          mTestState = TestState.INTAKE_BACKWARD;
+          mTestTimer.reset();
+          mTestTimer.start();
+        }
+        break;
+      case INTAKE_BACKWARD:
+        mIntake.setOutput(-1);
+
+        
+        if(mTestTimer.get() >= timePerTest){
+          mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST;
+          mTestTimer.reset();
+          mTestTimer.start();
+          
+          mIntake.setOutput(0);
+        }
+        break;
+      case STORAGE_ENCODER_FORWARDS_TEST:
+
+        // intentional fallthrough
+      case STORAGE_ENCODER_BACKWARDS_TEST:
+        mStorage.updateEncoderPosition();
+
         mRobotLogger.log("Got initial encoder value " + mStorage.getEncoder());
         mStartingStorageEncoderPosition = mStorage.getEncoder();
 
-        mStorageEncoderTestTimer.reset();
-        mStorageEncoderTestTimer.start();
+        mTestTimer.reset();
+        mTestTimer.start();
 
-        mTestState = TestState.STORAGE_ENCODER_TEST_WAITING;
+        if(mTestState == TestState.STORAGE_ENCODER_FORWARDS_TEST){
+          mTestState = TestState.STORAGE_ENCODER_FORWARDS_TEST_WAITING;
+        }else{
+          mTestState = TestState.STORAGE_ENCODER_BACKWARDS_TEST_WAITING;
+        }
         break;
-      case STORAGE_ENCODER_TEST_WAITING:
-        mStorage.setBottomOutput(1);
-        mStorage.setTopOutput(1);
-        if(mStorageEncoderTestTimer.get() >= 1){
+      case STORAGE_ENCODER_FORWARDS_TEST_WAITING:
+        if(mIsPracticeBot){
+          mStorage.setBottomOutput(1);
+        }else{
+          mStorage.setTopOutput(1);
+        }
+        
+        if(mTestTimer.get() >= timePerTest){
           int deltaPosition = mStorage.getEncoder() - mStartingStorageEncoderPosition;
-          if(Math.abs(deltaPosition - 26) > 3){
-            // invalid delta
+          int error = Math.abs(deltaPosition - expectedStorageDistance);
+          SmartDashboard.putNumber("Forwards storage delta", deltaPosition);
+          SmartDashboard.putNumber("Forwards storage error", error);
+          if(error > storageAcceptableError){
+            SmartDashboard.putBoolean("Forwards Storage Test Passed", false);
+          }else{
+            SmartDashboard.putBoolean("Forwards Storage Test Passed", true);
           }
-          mRobotLogger.log("Got delta position of " + deltaPosition);
+          
+         
+          if(mIsPracticeBot){
+            mStorage.setBottomOutput(0);
+          }else{
+            mStorage.setTopOutput(0);
+          }
+          
+          mTestTimer.reset();
+          mTestTimer.start();
+          mTestState = TestState.STORAGE_ENCODER_STOP;
+        }
+        break;
+      case STORAGE_ENCODER_STOP:
+        if(mTestTimer.get() >= timePerTest){
+          mTestTimer.reset();
+          mTestTimer.start();
+          mTestState = TestState.STORAGE_ENCODER_BACKWARDS_TEST;
+        }
+        break;
+      case STORAGE_ENCODER_BACKWARDS_TEST_WAITING:
+        if(mIsPracticeBot){
+          mStorage.setBottomOutput(-1);
+        }else{
+          mStorage.setTopOutput(-1);
+        }
+
+        if(mTestTimer.get() >= timePerTest){
+          int deltaPosition = mStorage.getEncoder() - mStartingStorageEncoderPosition;
+          int error = Math.abs(-deltaPosition - expectedStorageDistance);
+          SmartDashboard.putNumber("Backwards storage delta", deltaPosition);
+          SmartDashboard.putNumber("Backwards storage error", error);
+          if(error > storageAcceptableError){
+            SmartDashboard.putBoolean("Backwards Storage Test Passed", false);
+          }else{
+            SmartDashboard.putBoolean("Backwards Storage Test Passed", true);
+          }
           
           mStorage.setBottomOutput(0);
           mStorage.setTopOutput(0);
 
+          mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST;
+          mTestTimer.reset();
+          mTestTimer.start();
+        }
+        break;
+      case STORAGE_ENCODER_NO_ENCODER_FORWARDS_TEST:
+        if(mIsPracticeBot){
+          mStorage.setTopOutput(1);
+        }else{
+          mStorage.setBottomOutput(1);
+        }
+        if(mTestTimer.get() >= timePerTest){
+          mTestTimer.reset();
+          mTestTimer.start();
+          mTestState = TestState.STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST;
+
+          if(mIsPracticeBot){
+            mStorage.setTopOutput(0);
+          }else{
+            mStorage.setBottomOutput(0);
+          }
+        }
+        break;
+      case STORAGE_ENCODER_NO_ENCODER_BACKWARDS_TEST:
+        if(mIsPracticeBot){
+          mStorage.setTopOutput(-1);
+        }else{
+          mStorage.setBottomOutput(-1);
+        }
+        if(mTestTimer.get() >= timePerTest){
+          mTestTimer.reset();
+          mTestTimer.start();
           mTestState = TestState.SHOOTER_ENCODER_TEST;
+
+          if(mIsPracticeBot){
+            mStorage.setTopOutput(0);
+          }else{
+            mStorage.setBottomOutput(0);
+          }
         }
         break;
       case SHOOTER_ENCODER_TEST:
@@ -305,21 +448,31 @@ public class Robot extends TimedRobot {
 
         mRobotLogger.log("Got initial speed " + mShooter.getSpeed());
 
+        SmartDashboard.putNumber("Test shooter speed", mShooter.getSpeed());
         if(mShooter.getSpeed() != 0){
-          // invalid speed 
+          SmartDashboard.putBoolean("Shooter initial speed check passed", false);
+        }else{
+          SmartDashboard.putBoolean("Shooter initial speed check passed", true);
         }
 
-        mShooterEncoderTestTimer.reset();
-        mShooterEncoderTestTimer.start();
+        mTestTimer.reset();
+        mTestTimer.start();
 
         mTestState = TestState.SHOOTER_ENCODER_TEST_WAITING;
         break;
       case SHOOTER_ENCODER_TEST_WAITING:
-        if(mShooterEncoderTestTimer.get() >= 1){
+        if(mTestTimer.get() >= timePerTest){
           mShooter.setOutput(0);
         
           mRobotLogger.log("Got final speed " + mShooter.getSpeed());
-          if(Math.max(mShooter.getSpeed() - 50)
+          int error = Math.abs(mShooter.getSpeed() - expectedShooterSpeed);
+          SmartDashboard.putNumber("Final speed", mShooter.getSpeed());
+          SmartDashboard.putNumber("Final speed error", error);
+          if(error > shooterAcceptableError){
+            SmartDashboard.putBoolean("Shooter speed check passed", false);
+          }else{
+            SmartDashboard.putBoolean("Shooter speed check passed", true);
+          }
           mTestState = TestState.MANUAL;
         }
         break;
