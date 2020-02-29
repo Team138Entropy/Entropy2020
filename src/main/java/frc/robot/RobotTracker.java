@@ -430,6 +430,7 @@ public class RobotTracker{
 
     //Return aiming information for the turret
     public Optional<AimingParameters> getAimingParameters(boolean highgoal, int prev_track_id, double max_track_age){
+        AimingParameters params;
         GoalTracker SelectedTracker;
         Object SelectedLock;
         if(highgoal){
@@ -442,35 +443,35 @@ public class RobotTracker{
             SelectedLock = mVisionTarget_Ball_Lock;
         }
 
-        List<GoalTracker.TrackReport> reports = SelectedTracker.getTrackReports();
+        synchronized(SelectedLock){
+            List<GoalTracker.TrackReport> reports = SelectedTracker.getTrackReports();
 
-        //return empty if nothing
-        if(reports.isEmpty()){
-            //System.out.println("Returning Optional!");
-            return Optional.empty();
+            //return empty if nothing
+            if(reports.isEmpty()){
+                //System.out.println("Returning Optional!");
+                return Optional.empty();
+            }
+    
+            GoalTracker.TrackReport report = reports.get(0);
+    
+            double timestamp = Timer.getFPGATimestamp();
+    
+            //could perform sorting here for  multiple tracks
+    
+            //get pose of robot to goal
+            Pose2d vehicleToGoal = getFieldToRobot(timestamp).inverse().transformBy(report.field_to_target).transformBy(getVisionTargetToGoalOffset());
+    
+            //Create Aiming Parameters output
+            //includes stability score so we could decide if we wanted to use this
+            params = new AimingParameters(
+                report.id,
+                report.latest_timestamp,
+                report.stability,
+                vehicleToGoal,
+                report.field_to_target,
+                report.field_to_target.getRotation()
+            );
         }
-
-        GoalTracker.TrackReport report = reports.get(0);
-
-        double timestamp = Timer.getFPGATimestamp();
-
-        //could perform sorting here for  multiple tracks
-
-        //get pose of robot to goal
-        Pose2d vehicleToGoal = getFieldToRobot(timestamp).inverse().transformBy(report.field_to_target).transformBy(getVisionTargetToGoalOffset());
-
-        //Create Aiming Parameters output
-        //includes stability score so we could decide if we wanted to use this
-        AimingParameters params = new AimingParameters(
-            report.id,
-            report.latest_timestamp,
-            report.stability,
-            vehicleToGoal,
-            report.field_to_target,
-            report.field_to_target.getRotation()
-        );
-
-
 
         return Optional.of(params);
     }
