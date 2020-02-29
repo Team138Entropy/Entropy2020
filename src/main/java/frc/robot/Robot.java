@@ -682,7 +682,7 @@ public class Robot extends TimedRobot {
   }
 
   private static void readIsPracticeBot() {
-    isPracticeBot = practiceInput.get();
+    isPracticeBot = !practiceInput.get();
   }
 
   public static boolean getIsPracticeBot() {
