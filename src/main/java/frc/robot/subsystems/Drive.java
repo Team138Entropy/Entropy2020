@@ -362,11 +362,11 @@ public class Drive extends Subsystem {
   */
   public void checkSubsystem() {}
 
-  public synchronized double getLeftEncoderDistance() {
+  public synchronized int getLeftEncoderDistance() {
     return mLeftMaster.getSelectedSensorPosition();
   }
 
-  public synchronized double getRightEncoderDistance() {
+  public synchronized int getRightEncoderDistance() {
     return mRightMaster.getSelectedSensorPosition();
   }
 
