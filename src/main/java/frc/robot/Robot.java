@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -102,6 +103,10 @@ public class Robot extends TimedRobot {
   private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
 
+  private static final DigitalInput practiceInput = new DigitalInput(Config.getInstance().getInt(Key.ROBOT__PRACTICE_JUMPER_PIN));
+
+  private static boolean isPracticeBot = false;
+
   //Looper - Running on a set period
   private final Looper mEnabledLooper = new Looper(Constants.kLooperDt);
 
@@ -144,6 +149,8 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
 
+    // Read the jumper pin for practice bot
+    readIsPracticeBot();
     
     //Register the Enabled Looper
     //Used to run background tasks!
@@ -1023,5 +1030,13 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Invalid Climbing State");
         break;
     }
+  }
+
+  private static void readIsPracticeBot() {
+    isPracticeBot = practiceInput.get();
+  }
+
+  public static boolean getIsPracticeBot() {
+    return isPracticeBot;
   }
 }
