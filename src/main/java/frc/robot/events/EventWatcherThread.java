@@ -6,11 +6,12 @@ public class EventWatcherThread extends Thread {
   // IMPORTANT: For IntakeSegment to work reliably, the delay between its event calls *must* be less than the robot loop period (~20ms)!
   // That means this value should be set considerably lower to account for delays caused by other events.
   // FIXME: Do this the right way so we don't have to restrict the timing
-  private static final int LOOP_PERIOD_MS = 10;
+  private static final int LOOP_PERIOD_MS = 5;
 
   private static EventWatcherThread instance;
 
   private ArrayList<Event> queue;
+  private ArrayList<Event> pruneList; // Needed to avoid ConcurrentModificationException!
 
   public static synchronized EventWatcherThread getInstance() {
     if (instance == null) {
@@ -23,6 +24,7 @@ public class EventWatcherThread extends Thread {
 
   private EventWatcherThread() {
     queue = new ArrayList<>();
+    pruneList = new ArrayList<>();
   }
 
   @Override
@@ -34,23 +36,27 @@ public class EventWatcherThread extends Thread {
             e.run();
           
             if (e.pruneMe()) {
-              queue.remove(e);
+              pruneList.add(e);
             }
           }
         }
 
-        wait(LOOP_PERIOD_MS);
+        for (Event e : pruneList) {
+          queue.remove(e);
+        }
+
+        Thread.sleep(LOOP_PERIOD_MS);
       } catch (InterruptedException ex) {
         Thread.currentThread().interrupt();
       }
     }
   }
 
-  public synchronized void registerEvent(Event e) {
+  public void registerEvent(Event e) {
     queue.add(e);
   }
 
-  public synchronized void unRegisterEvent(Event e) {
+  public void unRegisterEvent(Event e) {
     if (queue.contains(e)) {
       queue.remove(e);
     }
