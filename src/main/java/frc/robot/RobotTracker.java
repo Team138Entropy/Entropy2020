@@ -76,17 +76,28 @@ public class RobotTracker{
 
     }
 
+    //all these data structures are guarded by locks for improved synchronization
+
+
     // Size of the Storage Buffers
-  // We don't want to carry TOO many values
-  private static final int kObservationBufferSize = 100;
+    // We don't want to carry TOO many values
+    private final int kObservationBufferSize = 100;
 
     private InterpolatingTreeMap<InterpolatingDouble, Pose2d> mField_to_Robot; //Robot's Pose on the Field
+    private final Object mField_to_Robot_Lock = new Object();
+
     private InterpolatingTreeMap<InterpolatingDouble, Rotation2d> mRobot_to_Turret; //Turret's Rotation
+    private final Object mRobot_to_Turret_Lock = new Object();
 
     //Robot Drive Velocity Predictors
     private Twist2d mRobot_velocity_predicted;
+    private final Object mRobot_velocity_predicted_Lock = new Object();
+
     private Twist2d mRobot_velocity_measured;
+    private final Object mRobot_velocity_measured_Lock = new Object();
+
     private MovingAverageTwist2d mRobot_velocity_measured_filtered;
+    private final Object mRobot_velocity_measured_filtered_Lock = new Object();
 
     //Tracker for how far the robot has driven
     private double mRobot_Distance_Driven = 0;
@@ -95,11 +106,19 @@ public class RobotTracker{
     //Each vision target is a goal
     //so goal trackers for balls, and high goal
     private GoalTracker mVisionTarget_Ball = new GoalTracker(1);
+    private final Object mVisionTarget_Ball_Lock = new Object();
+
+
     private GoalTracker mVisionTarget_Goal = new GoalTracker(2);
+    private final Object mVisionTarget_Goal_Lock = new Object();
 
     //Lists of Translations to the Vision Targets
     List<Translation2d> mCameraToVisionTarget_Ball = new ArrayList<>();
+    private final Object mCameraToVisionTarget_Ball_Lock = new Object();
+
+
     List<Translation2d> mCameraToVisionTarget_Goal = new ArrayList<>();
+    private final Object mCameraToVisionTarget_Goal_Lock = new Object();
 
     //Reset the Robot. This is our zero point!
     private RobotTracker(){
@@ -197,6 +216,7 @@ public class RobotTracker{
     }
 
     //called from the robot tracker updater method
+    //NOT USED.. for now...
     public synchronized void addDriveObservations(double timestamp, Twist2d displacement, Twist2d measured_velocity,
                                              Twist2d predicted_velocity) {
         mRobot_Distance_Driven += displacement.dx;
@@ -239,9 +259,17 @@ public class RobotTracker{
     }
 
     //reset vision targets
-    public synchronized void resetVision(){
-        mVisionTarget_Ball.reset();
-        mVisionTarget_Goal.reset();
+    //in a thread safe manner
+    public void resetVision(){
+        //reset ball tracker
+        synchronized(mVisionTarget_Ball_Lock){
+            mVisionTarget_Ball.reset();
+        }
+
+        //reset goal tracker
+        synchronized(mVisionTarget_Goal_Lock){
+            mVisionTarget_Goal.reset();
+        }
     }
 
     //Get translation 
