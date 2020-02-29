@@ -314,8 +314,9 @@ public class RobotTracker{
         Rotation2d angle = new Rotation2d(x, y, true);
 
       // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
-
-        return new Translation2d(distance * angle.cos(), distance * angle.sin());
+        Translation2d t = new Translation2d(distance * angle.cos(), distance * angle.sin());
+        t.StoreDistance = target.getDistance();
+        return t;
 
         /*
         if ((z < 0.0) == (differential_height > 0.0)) {
@@ -553,6 +554,7 @@ public class RobotTracker{
             //don't aim if not in distance range
 
             Rotation2d turret_error = getRobotToTurret(timestamp).getRotation().inverse().rotateBy(mLatestAimingParameters.get().getRobotToGoalRotation());
+            
 
             /*
            double t_tangental_component,
@@ -568,7 +570,7 @@ public class RobotTracker{
                 mLatestAimingParameters.get().getRobotToGoalRotation().sin() * velocity.dx / mLatestAimingParameters.get().getRange(),
                 Units.radians_to_degrees(velocity.dtheta),
                 turret_error,
-                0
+                mLatestAimingParameters.get().GetVisionRange()
             );
 
             //System.out.println("REQ DEG: " + rtr.turret_error.getDegrees());
