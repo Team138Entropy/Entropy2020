@@ -221,7 +221,8 @@ public class Robot extends TimedRobot {
 
     mState = State.SHOOTING;
     mShootingState = ShootingState.IDLE;
-    mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
+    //mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
+    mStorage.preloadBalls(0);
 
     mAutoPath =
         Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
@@ -557,7 +558,7 @@ public class Robot extends TimedRobot {
   private void executeIntakeStateMachine() {
     switch (mIntakeState) {
       case IDLE:
-        mRobotLogger.warn("Intake state is idle");
+        // mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
         mShooter.stop();
@@ -696,7 +697,7 @@ public class Robot extends TimedRobot {
 
         mShooter.start();
 
-        if (mOperatorInterface.getShoot()) {
+        if (mOperatorInterface.getShoot() || mStorage.isEmpty()) {
           mShootingState = ShootingState.SHOOTING_COMPLETE;
           mStorage.stop();
         }

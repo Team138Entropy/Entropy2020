@@ -9,10 +9,10 @@ public class Paths {
 
   static {
     paths.put("test", new Path()
-      .append(new AsyncShootSegment())
-      .append(new DriveSegment(5))
-      .append(new DriveSegment(-5))
-      );
+      .append(new IntakeSegment(3))
+      .append(new DriveSegment(4, 250, 125))
+      .append(new ShootSegment())
+    );
   }
 
   /**

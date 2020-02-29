@@ -10,6 +10,9 @@ public class DriveSegment extends Segment {
   private final int acceptableError = 50;
 
   private double feet; // For cloning
+  private int cruise;
+  private int accel;
+  private boolean test;
 
   private int targetPosition;
   private int min, max;
@@ -23,17 +26,19 @@ public class DriveSegment extends Segment {
   // The number of ticks for which we've been within the acceptable range
   private int debounceCount = 0;
 
-  public DriveSegment(double feet) {
+  public DriveSegment(double feet, int cruise, int accel) {
     this.feet = feet;
     this.drive = Drive.getInstance();
     this.targetPosition = drive.feetToTicks(feet);
     this.min = targetPosition - acceptableError;
     this.max = targetPosition + acceptableError;
-  }
 
-  public DriveSegment(double feet, int cruise, int accel) {
-    this(feet);
-    drive.setCruiseAndAcceleration(cruise, accel);
+    this.cruise = cruise;
+    this.accel = accel;
+    this.test = true;
+
+    logger.info("Constructor Cruise: " + cruise);
+    logger.info("Constructor Accel: " + accel);
   }
 
   @Override
@@ -42,6 +47,19 @@ public class DriveSegment extends Segment {
     logger.info("Target: " + targetPosition);
 
     drive.zeroEncoders();
+    drive.setCruiseAndAcceleration(cruise, accel);
+
+    if (test) logger.info("Hello!");
+    logger.info("Cruise: " + cruise);
+    logger.info("Accel: " + accel);
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+
     drive.setTargetPosition(targetPosition);
   }
 
@@ -87,7 +105,7 @@ public class DriveSegment extends Segment {
 
   @Override
   public Segment copy() {
-    return new DriveSegment(feet);
+    return new DriveSegment(feet, cruise, accel);
   }
 
   private boolean acceptable(int ticks) {
