@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Constants;
@@ -221,7 +222,14 @@ public class Drive extends Subsystem {
     mPeriodicDriveData.left_old = Math.abs(signal.getLeft());
     mPeriodicDriveData.right_old = Math.abs(signal.getRight());
 
-    // then we set our master talons, remembering that right is backwards
+    // then we set our master talons
+    mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
+    mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
+  }
+
+  // Used for arcade turning during auto
+  public void setSimplePercentOutput(DriveSignal signal) {
+    setOpenloopRamp(0); // Just in case
     mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
     mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
   }
@@ -296,6 +304,61 @@ public class Drive extends Subsystem {
     // mDriveLogger.log("setting ramp to " + speed);
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
+  }
+
+  /**
+   * WPILib's arcade drive. We need this for auto turning because it allows us to set a rotation
+   * speed. Note that the deadband functionality has been removed, since we don't have to worry
+   * about driver error during auto. If we were using WPILib's {@link
+   * edu.wpi.first.wpilibj.drive.DifferentialDrive DifferentialDrive} we wouldn't need to copy this
+   * over.
+   *
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *     positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   */
+  public void arcadeHack(double xSpeed, double zRotation, boolean squareInputs) {
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+
+    // Square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power.
+    if (squareInputs) {
+      xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+      zRotation = Math.copySign(zRotation * zRotation, zRotation);
+    }
+
+    double leftMotorOutput;
+    double rightMotorOutput;
+
+    double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
+
+    if (xSpeed >= 0.0) {
+      // First quadrant, else second quadrant
+      if (zRotation >= 0.0) {
+        leftMotorOutput = maxInput;
+        rightMotorOutput = xSpeed - zRotation;
+      } else {
+        leftMotorOutput = xSpeed + zRotation;
+        rightMotorOutput = maxInput;
+      }
+    } else {
+      // Third quadrant, else fourth quadrant
+      if (zRotation >= 0.0) {
+        leftMotorOutput = xSpeed + zRotation;
+        rightMotorOutput = maxInput;
+      } else {
+        leftMotorOutput = maxInput;
+        rightMotorOutput = xSpeed - zRotation;
+      }
+    }
+
+    setSimplePercentOutput(
+        new DriveSignal(
+            MathUtil.clamp(leftMotorOutput, -1.0, 1.0),
+            MathUtil.clamp(rightMotorOutput, -1.0, 1.0)));
   }
 
   /*
