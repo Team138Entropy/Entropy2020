@@ -6,7 +6,7 @@ import frc.robot.util.DriveSignal;
 
 /** A type of {@link Segment} for turning in place. */
 public class TurnSegment extends Segment {
-  private static final double ACCEPTABLE_ERROR = 5;
+  private static final double ACCEPTABLE_ERROR = 2;
 
   private double degrees; // For cloning
 
@@ -27,8 +27,9 @@ public class TurnSegment extends Segment {
     // this.ticksPerMeter = Config.getInstance().getDouble(Config.Key.DRIVE__TICKS_PER_METER);
 
     this.degrees = degrees % 360;
-    targetPosition = degreesToTicks(degrees);
     this.drive = Drive.getInstance();
+    targetPosition = degreesToTicks(degrees);
+
     // double acceptableError =
     //    Config.getInstance().getDouble(Config.Key.AUTO__TURN_PID_ACCEPTABLE_ERROR);
     this.minAcceptable = this.degrees - ACCEPTABLE_ERROR;
@@ -38,10 +39,14 @@ public class TurnSegment extends Segment {
   @Override
   public void init() {
     logger.info("Initializing turn segment");
-    logger.info("Target: " + degrees + "deg");
+    logger.info("Target angle: " + degrees + "deg");
+    logger.info("Target distance: " + targetPosition);
+
+    drive.configP(10);
+    drive.configI(0);
 
     drive.zeroEncoders();
-    drive.setTargetPosition(-targetPosition, targetPosition); // Counterclockwise
+    drive.setMotionMagicTarget(-targetPosition, targetPosition); // Counterclockwise
   }
 
   @Override
@@ -73,7 +78,10 @@ public class TurnSegment extends Segment {
 
   @Override
   public boolean finished() {
-    if (done) logger.info("Turn segment finished");
+    if (done) {
+      logger.info("Turn segment finished");
+      drive.resetPID();
+    }
     return done;
   }
 
