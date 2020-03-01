@@ -139,7 +139,15 @@ public class VisionManager extends Subsystem {
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!
                // mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
-                   mRobotTracker.UpdateTurretError(ti);
+                 //  mRobotTracker.UpdateTurretError(ti);
+
+                //Call update function based on target
+                if(ti.IsHighGoal() == true){
+                  mRobotTracker.UpdateTurretVision(Timer.getFPGATimestamp(), ti);
+                }else if(ti.IsBall() == true){
+                  mRobotTracker.UpdateDriveVision(Timer.getFPGATimestamp(), ti);
+                }
+
               }
             });
 

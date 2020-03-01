@@ -9,6 +9,7 @@ import frc.robot.vision.GoalTracker;
 import frc.robot.vision.TargetInfo;
 import frc.robot.vision.AimingParameters;
 import frc.robot.util.Units;
+import frc.robot.vision.VisionPacket;
 import java.util.*;
 
 
@@ -127,12 +128,92 @@ public class RobotTracker{
     private final Object TurretError_Lock = new Object();
     private final Object DriveError_Lock = new Object();
 
+
+    //Vision Tracking Packets
+    //Locks to allow these objects to be updated from a seperate thread
+    private VisionPacket Turret_Vision = null;
+    private VisionPacket Drive_Vision = null;
+    private final Object Turret_Vision_Packet_Error = new Object();
+    private final Object Drive_Vision_Packet_Error = new Object();
+
     //Reset the Robot. This is our zero point!
     private RobotTracker(){
         //Resets are called with everything at 0
         reset(0.0, Pose2d.identity(), Rotation2d.identity());
     }
 
+    //For Turret
+    public void UpdateTurretVision(double timestamp, TargetInfo ti){
+        Rotation2d angle = getCameraToVisionAngle(ti, true);
+        System.out.println("Initial Angle: " + angle);
+        //translate by the camera offset
+        Pose2d pose = new Pose2d(new Translation2d(0, 0), angle);
+        pose.transformBy(new Pose2d(new Translation2d(10, 0), Rotation2d.identity()));
+        Rotation2d NewAngle = pose.getRotation();
+        System.out.println("Second Angle: " + NewAngle.getDegrees());
+
+        //Check for heavy leighers before updating
+        //angle isn't too big, vision makes sense..
+
+        VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
+
+        synchronized(Turret_Vision_Packet_Error){
+            Turret_Vision = vp;
+        }
+    }
+
+
+    public void UpdateDriveVision(double timestamp, TargetInfo ti){
+
+    }
+
+    public VisionPacket GetTurretVisionPacket(double timestamp){
+        VisionPacket Current;
+        synchronized(Turret_Vision_Packet_Error){
+            Current = Turret_Vision;
+
+            //no vision packet set, return 0
+            if(Current == null){
+                return new VisionPacket();
+            }
+
+
+            //check if within timestamp
+            //check if its within 6 seconds
+            double Timedelta = Math.abs(Current.Timestamp - timestamp);
+            if(Timedelta <= 6){
+                //Valid Timestamp
+                return Current;
+            }else{
+                //Too Old
+                return new VisionPacket();
+            }
+        }
+    }
+
+    public VisionPacket GetDriveVisionPacket(double timestamp){
+        VisionPacket Current;
+        synchronized(Drive_Vision_Packet_Error){
+            Current = Drive_Vision;
+
+            //no vision packet set, return 0
+            if(Current == null){
+                return new VisionPacket();
+            }
+
+
+            //check if within timestamp
+            //check if its within 6 seconds
+            double Timedelta = Math.abs(Current.Timestamp - timestamp);
+            if(Timedelta <= 6){
+                //Valid Timestamp
+                return Current;
+            }else{
+                //Too Old
+                return new VisionPacket();
+            }
+        }
+    }
 
     public void UpdateTurretError(TargetInfo observation){
         Rotation2d td1 = getCameraToVisionAngle(observation, true);
@@ -396,6 +477,7 @@ public class RobotTracker{
         Translation2d t = new Translation2d(distance * angle.cos(), distance * angle.sin());
         t.StoreDistance = target.getDistance();
         angle = td.direction();
+        
         return angle;
        // return t;
 

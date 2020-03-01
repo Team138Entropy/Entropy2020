@@ -12,6 +12,7 @@ import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.vision.AimingParameters;
+import frc.robot.vision.VisionPacket;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -715,18 +716,14 @@ public class Robot extends TimedRobot {
       //Command the Turret with vision set points
      // RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
      // double dis = result.distance;
-      double ang = mRobotTracker.GetTurretError();
-
-      if(ang != 0){
+      VisionPacket vp = mRobotTracker.GetTurretVisionPacket(Timer.getFPGATimestamp());
+      if(vp.HasValue == true){
           //We have Target Information
-          LastDistance = 0;
-         // System.out.println("DISTANCE: " + LastDistance);
-
-         System.out.println("ANGLE: " + ang);
-          mTurret.SetAimError(ang);
+          LastDistance = vp.Distance;
+          mTurret.SetAimError(vp.Error_Angle);
         }else{
           //No Results, Don't Rotate
-          //System.out.println("NO TRACK!");
+        
         }
     }else{
       //Command the Turret Manually
@@ -765,8 +762,10 @@ public class Robot extends TimedRobot {
         // Harvest Mode - AutoSteer Functionality
         // Used for tracking a ball
         // we may want to limit the speed?
-        RobotTracker.RobotTrackerResult DriveResult = mRobotTracker.GetFeederStationError(Timer.getFPGATimestamp());
-        mDrive.autoSteerFeederStation(driveThrottle, DriveResult.turret_error.getDegrees());
+        //RobotTracker.RobotTrackerResult DriveResult = mRobotTracker.GetFeederStationError(Timer.getFPGATimestamp());
+        
+        VisionPacket vp = mRobotTracker.GetTurretVisionPacket(Timer.getFPGATimestamp());
+        mDrive.autoSteerFeederStation(driveThrottle, vp.Error_Angle);
       } else {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);
