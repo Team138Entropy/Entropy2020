@@ -213,4 +213,8 @@ public class OperatorInterface {
   public void overrideIntake() {
     autoIntakeOverride = true;
   }
+
+  public void resetOverride() {
+    autoIntakeOverride = false;
+  }
 }

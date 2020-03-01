@@ -14,6 +14,7 @@ import frc.robot.auto.IntakeSegment;
 import frc.robot.auto.Path;
 import frc.robot.auto.Paths;
 import frc.robot.auto.ShootSegment;
+import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.util.loops.Looper;
@@ -221,6 +222,7 @@ public class Robot extends TimedRobot {
 
     mState = State.SHOOTING;
     mShootingState = ShootingState.IDLE;
+    mIntakeState = IntakeState.IDLE;
     //mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
     mStorage.preloadBalls(3);
 
@@ -382,6 +384,8 @@ public class Robot extends TimedRobot {
     visionLight.set(Relay.Value.kForward);
 
     Config.getInstance().reload();
+
+    mOperatorInterface.resetOverride();
   }
 
   @Override

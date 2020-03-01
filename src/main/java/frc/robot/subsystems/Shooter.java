@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
+import frc.robot.Logger;
 import frc.robot.Robot;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
@@ -10,6 +11,8 @@ import frc.robot.SpeedLookupTable;
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
+
+  private static final Logger mLogger = new Logger("Shooter");
 
   private static final double MAX_SPEED = 2550d;
   // private static final double SPEED_DEADBAND = 20;
