@@ -154,6 +154,16 @@ public class RobotTracker{
 
         //Check for heavy leighers before updating
         //angle isn't too big, vision makes sense..
+        double DegreeCheck = Math.abs(NewAngle.getDegrees());
+        if(DegreeCheck > 82){
+            //Outleigher! don't store this
+            return;
+        }
+
+        double DistCheck = ti.getDistance();
+        if(DistCheck > 65 || DistCheck < -5){
+            return;
+        }
 
         VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
 
