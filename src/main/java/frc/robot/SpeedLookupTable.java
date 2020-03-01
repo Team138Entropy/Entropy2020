@@ -21,10 +21,10 @@ public class SpeedLookupTable {
 
   double[][] mProductionLookupTable = {
     // {distance in meters, speed in whatever our system uses}
-    {10d, 3100d},
-    {20d, 3100d},
-    {30d, 3100d},
-    {40d, 3100d}
+    {10d, 2950},
+    {20d, 2950},
+    {30d, 2950},
+    {40d, 2950}
   };
 
   SpeedLookupTable() {}

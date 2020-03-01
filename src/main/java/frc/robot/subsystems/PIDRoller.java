@@ -17,7 +17,7 @@ class PIDRoller {
   private final WPI_TalonSRX mTalonSlave;
 
   PIDRoller(int talonPort, int talon2Port, double p, double i, double d, double f) {
-    mTalon = new WPI_TalonSRX(talonPort);
+    mTalon = new WPI_TalonSRX(6);
     mTalon.configFactoryDefault();
     // All of this was ripped from the 2019 elevator code
     mTalon.configNominalOutputForward(0, TIMEOUT_MS);
@@ -27,7 +27,7 @@ class PIDRoller {
 
     mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_25Ms, 50);
     mTalon.configVelocityMeasurementWindow(32);
-    mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
+    mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
     mTalon.setSensorPhase(!Robot.getIsPracticeBot());
 
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 0, TIMEOUT_MS);
@@ -41,26 +41,30 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-    mTalonSlave = new WPI_TalonSRX(talon2Port);
+    mTalonSlave = new WPI_TalonSRX(7);
     if(!Robot.getIsPracticeBot()) mTalon.setInverted(true);
-    mTalonSlave.configFactoryDefault();
+
+    //mTalonSlave.configFactoryDefault();
     mTalonSlave.follow(mTalon);
   }
 
-  int getVelocity() {
-    return -mTalon.getSelectedSensorVelocity();
+  public int getVelocity() {
+    System.out.println("SELECD SENSOR: " + mTalon.getSelectedSensorVelocity());
+    return - mTalon.getSelectedSensorVelocity();
   }
 
   void setPercentOutput(double output){
-    System.out.println(getVelocity() + " velocity at output " + output);
-    mTalon.set(ControlMode.PercentOutput, - output);
+   // System.out.println(getVelocity() + " velocity at output " + output);
+    //mTalon.set(ControlMode.PercentOutput, - output);
+    mTalon.set(ControlMode.Velocity, - 2000);
+
   }
 
   void setSpeed(int posPer100Ms) {
     if (posPer100Ms == 0) {
       mTalon.set(ControlMode.PercentOutput, 0);
     } else {
-      mTalon.set(ControlMode.Velocity, -posPer100Ms);
+      mTalon.set(ControlMode.Velocity, - posPer100Ms);
     }
   }
 }

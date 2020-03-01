@@ -48,7 +48,7 @@ public class Shooter extends Subsystem {
 
 
   private Shooter() {
-    mRoller = new PIDRoller(ROLLER_SLAVE_PORT, ROLLER_PORT, P, I, D, FEEDFORWARD);
+    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
 
   }
 
@@ -60,8 +60,8 @@ public class Shooter extends Subsystem {
 
   /** Starts the roller. */
   public void start() {
-    // mRoller.setSpeed(getAdjustedVelocitySetpoint());
-    mRoller.setPercentOutput(1);
+    mRoller.setSpeed(getAdjustedVelocitySetpoint());
+    //mRoller.setPercentOutput(1);
   }
 
   /** Stops the roller. */
@@ -111,6 +111,9 @@ public class Shooter extends Subsystem {
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
+   
+    double mv = mRoller.getVelocity();
+    double mv1 = getAdjustedVelocitySetpoint();
     boolean isAtVelocity =
         Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
@@ -144,6 +147,7 @@ public class Shooter extends Subsystem {
   // Used in TEST mode only
   public void setOutput(double output) {
     mRoller.setPercentOutput(output);
+    mRoller.getVelocity();
   }
 
   @Override

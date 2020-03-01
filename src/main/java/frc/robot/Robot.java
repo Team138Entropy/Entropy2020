@@ -347,6 +347,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
+    if(1 == 1){
+      mShooter.setOutput(1.0);
+      return;
+    }
+    
     double timePerTest = Config.getInstance().getDouble(Key.TESTMODE__TIME_PER_TEST);
     int expectedStorageDistance = Config.getInstance().getInt(Key.TESTMODE__EXPECTED_STORAGE_DISTANCE);
     int storageAcceptableError = Config.getInstance().getInt(Key.TESTMODE__STORAGE_ACCEPTABLE_ERROR);
@@ -729,10 +734,10 @@ public class Robot extends TimedRobot {
       //Command the Turret Manually
         // Operator Controls
         double ManualTurn = mOperatorInterface.getTurretAdjust();
-        if(ManualTurn > .7){
-          mTurret.SetManualOutput(.3);
-        }else if(ManualTurn < -.7){
-          mTurret.SetManualOutput(-.3);
+        if(ManualTurn > .6){
+          mTurret.SetManualOutput(-1.0);
+        }else if(ManualTurn < -.6){
+          mTurret.SetManualOutput(1.0);
         }else{
           mTurret.SetManualOutput(0);
         }
@@ -791,6 +796,7 @@ public class Robot extends TimedRobot {
         visionLight.set(Relay.Value.kForward);
       }
     }
+
 
     mShooter.updateDistance(LastDistance);
 

@@ -136,14 +136,7 @@ public class Turret extends Subsystem {
     velocity = Math.abs(velocity);
 
     //Shooter is offset
-    
-
-    //Filter Out a Bad Angle
-    double angleCheck = Math.abs(angle);
-    if(angleCheck > 80){
-      return;
-    }
-
+    System.out.println("COMMANDED ANGLE: " + angle);
 
     if(velocity <= 80){
       mPeriodicIO.angle = angle;

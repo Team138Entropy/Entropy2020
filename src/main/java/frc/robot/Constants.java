@@ -43,7 +43,7 @@ public class Constants {
   public static final double kMaxGoalTrackSmoothingTime = 0.5;
   public static final double kTrackStabilityWeight = 0.0;
   public static final double kTrackAgeWeight = 10.0;
-  public static final double kTrackSwitchingWeight = 100.0;
+  public static final double kTrackSwitchingWeight = 60.0;
   public static final double kCameraFrameRate = 90.0; // fps
  
     //Camera Specific Information
@@ -69,7 +69,7 @@ public class Constants {
  
    //Looper System
    //period at which the looper runs at
-   public static final double kLooperDt = 0.01;
+   public static final double kLooperDt = 0.02;
  
    //Constants for Server Motor System
    public static final int kCANTimeoutMs = 10; // use for important on the fly updates

@@ -145,10 +145,10 @@ public class RobotTracker{
     //For Turret
     public void UpdateTurretVision(double timestamp, TargetInfo ti){
         Rotation2d angle = getCameraToVisionAngle(ti, true);
-        System.out.println("Initial Angle: " + angle);
+        System.out.println("Initial Angle: " + angle.getDegrees());
         //translate by the camera offset
         Pose2d pose = new Pose2d(new Translation2d(0, 0), angle);
-        pose.transformBy(new Pose2d(new Translation2d(10, 0), Rotation2d.identity()));
+        pose.transformBy(new Pose2d(new Translation2d(0, 50), Rotation2d.identity()));
         Rotation2d NewAngle = pose.getRotation();
         System.out.println("Second Angle: " + NewAngle.getDegrees());
 
