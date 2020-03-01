@@ -222,12 +222,13 @@ public class Robot extends TimedRobot {
     mState = State.SHOOTING;
     mShootingState = ShootingState.IDLE;
     //mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
-    mStorage.preloadBalls(0);
+    mStorage.preloadBalls(3);
 
     mAutoPath =
         Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
     mShooterIsStopped = false;
     IntakeSegment.resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency stop?)
+    ShootSegment.resetState();
   }
 
   @Override
@@ -268,7 +269,7 @@ public class Robot extends TimedRobot {
 
     Config.getInstance().reload();
 
-    mStorage.preloadBalls(0);
+    // mStorage.preloadBalls(3);
 
     mOperatorInterface.checkControllers();
 
@@ -292,6 +293,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    // mRobotLogger.info("Angle: " + sGyro.getAngle());
     try {
       RobotLoop();
     } catch (Exception e) {

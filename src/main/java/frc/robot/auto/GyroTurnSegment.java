@@ -28,6 +28,7 @@ public class GyroTurnSegment extends Segment {
   public GyroTurnSegment(double degrees) {
     this.drive = Drive.getInstance();
     
+    degrees = degrees % 360;
     this.degrees = degrees;
 
     P = Config.getInstance().getDouble(Config.Key.AUTO__TURN_PID_P);
@@ -58,6 +59,8 @@ public class GyroTurnSegment extends Segment {
       logger.info("Angle: " + angle);
       loggingCount = 0;
     }
+    
+    drive.arcadeHack(0, out, true);
 
     if (controller.atSetpoint()) {
       logger.verbose("Angle in acceptable range for " + ++debounceCount + " tick(s)");
@@ -67,9 +70,6 @@ public class GyroTurnSegment extends Segment {
         drive.setOpenLoop(DriveSignal.BRAKE);
       }
     }
-
-
-    drive.arcadeHack(0, out, true);
   }
 
   @Override

@@ -343,7 +343,7 @@ public class Drive extends Subsystem {
    * speed. Note that the deadband functionality has been removed, since we don't have to worry
    * about driver error during auto. If we were using WPILib's {@link
    * edu.wpi.first.wpilibj.drive.DifferentialDrive DifferentialDrive} we wouldn't need to copy this
-   * over.
+   * over. The output is also clamped so that we don't lose control.
    *
    * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
@@ -387,10 +387,12 @@ public class Drive extends Subsystem {
       }
     }
 
+    final double max = 0.5;
+
     setSimplePercentOutput(
         new DriveSignal(
-            MathUtil.clamp(leftMotorOutput, -1.0, 1.0),
-            MathUtil.clamp(rightMotorOutput, -1.0, 1.0)));
+            MathUtil.clamp(leftMotorOutput, -max, max),
+            MathUtil.clamp(rightMotorOutput, -max, max)));
   }
 
   /*

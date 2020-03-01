@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
+import frc.robot.Robot;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
 
@@ -116,7 +117,7 @@ public class Shooter extends Subsystem {
 
   /** Stops the roller. */
   public void stop() {
-    mRoller.setSpeed(0);
+    if (!Robot.isAuto()) mRoller.setSpeed(0);
   }
 
   public int getSpeed() {

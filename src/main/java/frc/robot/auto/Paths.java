@@ -11,7 +11,13 @@ public class Paths {
 
   static {
     paths.put("test", new Path()
-      .append(new TurnSegment(180))
+      .append(new ShootSegment())
+      .append(new IntakeSegment(3))
+      .append(new DriveSegment(6, 250, 125))
+      .append(new AsyncShootSegment())
+      .append(new DriveSegment(-6, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL))
+      // .append(new GyroTurnSegment(180))
+      // .append(new GyroTurnSegment(180))
     );
   }
 
