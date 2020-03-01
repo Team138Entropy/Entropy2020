@@ -138,7 +138,8 @@ public class VisionManager extends Subsystem {
               public void run() {
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!
-                mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
+               // mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
+                   mRobotTracker.UpdateTurretError(ti);
               }
             });
 

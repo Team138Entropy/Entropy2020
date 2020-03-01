@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
@@ -11,7 +9,7 @@ import frc.robot.SpeedLookupTable;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private final double MAX_SPEED = 2550d;
+  private final double MAX_SPEED = 3100d;
   // private static final double SPEED_DEADBAND = 20;
   private final double SPEED_DEADBAND = 75;
   private final double DROP_DEADBAND = 250;
@@ -50,7 +48,8 @@ public class Shooter extends Subsystem {
 
 
   private Shooter() {
-    mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
+    mRoller = new PIDRoller(ROLLER_SLAVE_PORT, ROLLER_PORT, P, I, D, FEEDFORWARD);
+
   }
 
   public static synchronized Shooter getInstance() {
@@ -61,8 +60,8 @@ public class Shooter extends Subsystem {
 
   /** Starts the roller. */
   public void start() {
-    mRoller.setSpeed(getAdjustedVelocitySetpoint());
-    // mRoller.setPercentOutput(1);
+    // mRoller.setSpeed(getAdjustedVelocitySetpoint());
+    mRoller.setPercentOutput(1);
   }
 
   /** Stops the roller. */

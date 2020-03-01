@@ -120,10 +120,31 @@ public class RobotTracker{
     List<Translation2d> mCameraToVisionTarget_Goal = new ArrayList<>();
     private final Object mCameraToVisionTarget_Goal_Lock = new Object();
 
+
+
+    public Rotation2d TurretError = new Rotation2d();
+    public Rotation2d DriveError = new Rotation2d();
+    private final Object TurretError_Lock = new Object();
+    private final Object DriveError_Lock = new Object();
+
     //Reset the Robot. This is our zero point!
     private RobotTracker(){
         //Resets are called with everything at 0
         reset(0.0, Pose2d.identity(), Rotation2d.identity());
+    }
+
+
+    public void UpdateTurretError(TargetInfo observation){
+        Rotation2d td1 = getCameraToVisionAngle(observation, true);
+        synchronized(TurretError_Lock){
+            TurretError = td1;
+        }
+    }
+
+    public double GetTurretError(){
+        synchronized(TurretError_Lock){
+            return TurretError.getDegrees();
+        }
     }
 
     /**
@@ -310,13 +331,73 @@ public class RobotTracker{
         */
 
         double distance = target.getDistance();
-        distance = 3;
+        distance = 1;
         Rotation2d angle = new Rotation2d(x, y, true);
 
       // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
         Translation2d t = new Translation2d(distance * angle.cos(), distance * angle.sin());
         t.StoreDistance = target.getDistance();
         return t;
+
+        /*
+        if ((z < 0.0) == (differential_height > 0.0)) {
+            double scaling = differential_height / -z;
+            double distance = Math.hypot(x, y) * scaling;
+            Rotation2d angle = new Rotation2d(x, y, true);
+            return new Translation2d(distance * angle.cos(), distance * angle.sin());
+        }
+        */
+
+        //return null;
+    }
+
+
+    private Rotation2d getCameraToVisionAngle(TargetInfo target, boolean highgoal) {
+        Rotation2d SelectedCameraRotation;
+        double TargetHeight;
+        double LensHeight;
+        //Select Rotation based on camera mount point
+        if(highgoal){
+            //High Goal 
+            SelectedCameraRotation = Constants.kShooterCameraHorizontalPlaneToLens;
+            TargetHeight = Constants.kHighGoalHeight;
+            LensHeight = Constants.kShooterCameraHeight;
+        }else{
+            //Ball
+            SelectedCameraRotation = Constants.kBallCameraHorizontalPlaneToLens;
+            TargetHeight = Constants.kBallHeight;
+            LensHeight = Constants.kBallCameraHeight;
+        }
+        
+
+        // Compensate for camera pitch
+        Translation2d xz_plane_translation = new Translation2d(target.getX(), target.getZ()).rotateBy(SelectedCameraRotation);
+        //xz_plane_translation.translateBy(new Translation2d(, ))
+        double x = xz_plane_translation.x();
+        double y = target.getY();
+        double z = xz_plane_translation.y();
+
+        // find intersection with the goal
+        //254's distance method
+        /*
+        double differential_height = TargetHeight - LensHeight;
+        double scaling = differential_height / z;
+        scaling = 20;
+        double distance = Math.hypot(x, y) * scaling;
+        */
+
+        double distance = target.getDistance();
+        distance = 1;
+        Rotation2d angle = new Rotation2d(x, y, true);
+        Translation2d td = angle.toTranslation();
+        td.translateBy(new Translation2d(0, 10));
+
+      // System.out.println("Camera's Angle to Vision Target: " + angle.getDegrees());
+        Translation2d t = new Translation2d(distance * angle.cos(), distance * angle.sin());
+        t.StoreDistance = target.getDistance();
+        angle = td.direction();
+        return angle;
+       // return t;
 
         /*
         if ((z < 0.0) == (differential_height > 0.0)) {

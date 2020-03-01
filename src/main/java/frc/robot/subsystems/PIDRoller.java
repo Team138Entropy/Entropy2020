@@ -6,6 +6,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import frc.robot.Robot;
+
 class PIDRoller {
 
   private final int PID_LOOP_INDEX = 0;
@@ -26,7 +28,7 @@ class PIDRoller {
     mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_25Ms, 50);
     mTalon.configVelocityMeasurementWindow(32);
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PID_LOOP_INDEX, TIMEOUT_MS);
-    mTalon.setSensorPhase(false);
+    mTalon.setSensorPhase(!Robot.getIsPracticeBot());
 
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 0, TIMEOUT_MS);
 
@@ -40,6 +42,8 @@ class PIDRoller {
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
     mTalonSlave = new WPI_TalonSRX(talon2Port);
+    if(!Robot.getIsPracticeBot()) mTalon.setInverted(true);
+    mTalonSlave.configFactoryDefault();
     mTalonSlave.follow(mTalon);
   }
 

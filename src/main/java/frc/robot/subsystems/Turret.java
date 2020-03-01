@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
+import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -37,11 +39,13 @@ public class Turret extends Subsystem {
     //Inputs
     public double timestamp;
     public double CurrentPosition;
+    public double Velocity;
 
     //Outputs
     public double demand; //motor output, could be a position, or percent
     public double angle;
     public double feedforward;
+    
   };
 
 
@@ -57,13 +61,16 @@ public class Turret extends Subsystem {
   private Turret() {
    mTurretTalon = new WPI_TalonSRX(Constants.kTurretTalonMotorPort);
    mTurretTalon.configFactoryDefault();
+   mTurretTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed, 10);
+   mTurretTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed, 10);
    mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTurretTalonMotorPort);
    mTurretTalon.config_kF(0, 0); //MUST BE 0 in Position mode
-   mTurretTalon.config_kP(0, .7);
+   mTurretTalon.config_kP(0, .1);
    mTurretTalon.config_kI(0, 0);
    mTurretTalon.config_kD(0, 0);
    mTurretTalon.config_IntegralZone(0, 50);
    mTurretTalon.setNeutralMode(NeutralMode.Brake);
+   
   }
 
 
@@ -73,19 +80,20 @@ public class Turret extends Subsystem {
   public synchronized void readPeriodicInputs() {
     //store current encoder position
     mPeriodicIO.CurrentPosition = mTurretTalon.getSelectedSensorPosition();
-
-
+    mPeriodicIO.Velocity = mTurretTalon.getSelectedSensorVelocity();
+    //System.out.println("Turret Error: " + mPeriodicIO.CurrentPosition);
   }
 
   //periodically write outputs
   @Override
   public synchronized void writePeriodicOutputs() {
+    
     //Control Turret Based on State
     if(mCurrentState == TurretState.AUTO_AIM){
       //Perform Auto Aim!
       //deadband: Angle error must be greater than 1 degree
-      if(Math.abs(mPeriodicIO.angle) > 1){
-        mTurretTalon.set(ControlMode.MotionMagic, mPeriodicIO.demand);
+      if(Math.abs(mPeriodicIO.angle) > .7){
+       mTurretTalon.set(ControlMode.Position, mPeriodicIO.demand);
       }
     }else if(mCurrentState == TurretState.HOME){
      //going to home position
@@ -99,6 +107,7 @@ public class Turret extends Subsystem {
       //Manual Control
       mTurretTalon.set(ControlMode.PercentOutput, mPeriodicIO.demand);
     }
+    
   }
 
 
@@ -122,15 +131,35 @@ public class Turret extends Subsystem {
 
   //Vision Aim System
   public synchronized void SetAimError(double angle){
-    mPeriodicIO.angle = angle;
-    double setpoint = mPeriodicIO.CurrentPosition + (angle * TicksPerDegree);
-    mPeriodicIO.demand = setpoint;
-    mPeriodicIO.feedforward = 0;
 
-    if(mCurrentState != TurretState.AUTO_AIM){
-      //change pid slot if needed
-      mCurrentState = TurretState.AUTO_AIM;
+    double velocity = mPeriodicIO.Velocity;
+    velocity = Math.abs(velocity);
+
+    //Shooter is offset
+    
+
+    //Filter Out a Bad Angle
+    double angleCheck = Math.abs(angle);
+    if(angleCheck > 80){
+      return;
     }
+
+
+    if(velocity <= 80){
+      mPeriodicIO.angle = angle;
+      //System.out.println("COMMANDED ANGLE: " + angle);
+  
+      double setpoint = mPeriodicIO.CurrentPosition - (angle * TicksPerDegree);
+      mPeriodicIO.demand = setpoint;
+      mPeriodicIO.feedforward = 0;
+  
+      if(mCurrentState != TurretState.AUTO_AIM){
+        //change pid slot if needed
+        mCurrentState = TurretState.AUTO_AIM;
+      }
+    }
+
+
   }
 
 

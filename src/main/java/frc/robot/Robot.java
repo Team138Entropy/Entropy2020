@@ -713,13 +713,17 @@ public class Robot extends TimedRobot {
 
     if(mTurretState == TurretState.AUTO_AIM){
       //Command the Turret with vision set points
-      RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
-      double dis = result.distance;
-      if(result.HasResult){
+     // RobotTracker.RobotTrackerResult result = mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
+     // double dis = result.distance;
+      double ang = mRobotTracker.GetTurretError();
+
+      if(ang != 0){
           //We have Target Information
-          LastDistance = dis;
+          LastDistance = 0;
          // System.out.println("DISTANCE: " + LastDistance);
-          mTurret.SetAimError(result.turret_error.getDegrees());
+
+         System.out.println("ANGLE: " + ang);
+          mTurret.SetAimError(ang);
         }else{
           //No Results, Don't Rotate
           //System.out.println("NO TRACK!");
@@ -727,11 +731,23 @@ public class Robot extends TimedRobot {
     }else{
       //Command the Turret Manually
         // Operator Controls
+        double ManualTurn = mOperatorInterface.getTurretAdjust();
+        if(ManualTurn > .7){
+          mTurret.SetManualOutput(.3);
+        }else if(ManualTurn < -.7){
+          mTurret.SetManualOutput(-.3);
+        }else{
+          mTurret.SetManualOutput(0);
+        }
+
+        /*
         if (mOperatorInterface.getTurretAdjustLeft()) {
           // manual turret aim
+          mTurret.
         } else if (mOperatorInterface.getTurretAdjustRight()) {
           // manual turret aim
         }
+        */
     }
   }
 
@@ -766,6 +782,7 @@ public class Robot extends TimedRobot {
       if(mTurretState == TurretState.AUTO_AIM){
         //Turn off Auto Aiming
         visionLight.set(Relay.Value.kOff);
+
         mTurretState = TurretState.MANUAL;
       }else if(mTurretState == TurretState.MANUAL){
         //Turn on Auto Aiming

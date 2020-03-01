@@ -72,6 +72,7 @@ public class Storage extends Subsystem {
       BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRODUCTION);
       mTopRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
       mTopRoller.setSensorPhase(false);
+      mTopRoller.setInverted(true);
     }
 
     updateEncoderPosition();
@@ -97,7 +98,7 @@ public class Storage extends Subsystem {
   }
 
   public synchronized boolean getIntakeSensor() {
-    return mIntakeSensor.get();
+    return Robot.getIsPracticeBot() ? mIntakeSensor.get() : !mIntakeSensor.get();
   }
 
   public synchronized boolean isBallDetected() {

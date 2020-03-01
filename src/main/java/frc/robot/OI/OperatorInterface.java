@@ -143,6 +143,10 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
 
+  public double getTurretAdjust(){
+    return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.X);
+  }
+
   // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
   public boolean getTurretAdjustLeft() {
     // return OperatorController.getDPad() == DPad.LEFT;
