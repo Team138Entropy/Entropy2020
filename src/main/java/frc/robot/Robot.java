@@ -898,7 +898,7 @@ public class Robot extends TimedRobot {
         break;
       case CLIMBING:
         
-        ();
+        
         break;
       default:
         mRobotLogger.error("Invalid Robot State");
@@ -1135,7 +1135,7 @@ public class Robot extends TimedRobot {
       case IDLE:
         mClimber.stop();
         mRobotLogger.warn("Climbing state is idle");
-        mClimbingState = Climber.Extending;
+       // mClimbingState = ClimbingState.Extending;
         //set Home?
         break;
       case EXTENDING:

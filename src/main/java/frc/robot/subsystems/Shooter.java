@@ -10,7 +10,7 @@ import frc.robot.Constants;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private final double MAX_SPEED = 3100d;
+  private final double MAX_SPEED = 2950.0;
   // private static final double SPEED_DEADBAND = 20;
   private final double SPEED_DEADBAND = 75;
   private final double DROP_DEADBAND = 250;
@@ -19,7 +19,7 @@ public class Shooter extends Subsystem {
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
   // private static final double D = 0.1;
-  private final double P = 0;
+  private final double P = .35;
   private final double I = 0;
   private final double D = 0;
 
@@ -143,7 +143,7 @@ public class Shooter extends Subsystem {
     boolean isAtVelocityDebounced = mTimeSinceWeWereAtVelocity <= 0;
     */
 
-    return false;
+    //return false;
   }
 
   public boolean isBallFired(){
