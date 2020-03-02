@@ -107,14 +107,20 @@ public class Shooter extends Subsystem {
   }
 
   /** Returns whether roller is at full speed. */
+  //UPDATE: 
   public boolean isAtVelocity() {
+
+    //New Concept: Velocity FLOOR
+    //our velocity setpoint will be slightly higher than it needs to be
+    // allow velocity to be sliughtly lower, but operate as a floor
+    boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 15) >= 0);
+    return isAtVelocity;
+    /*
     SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
-   
-    double mv = mRoller.getVelocity();
-    double mv1 = getAdjustedVelocitySetpoint();
+
     boolean isAtVelocity =
         Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
@@ -135,8 +141,9 @@ public class Shooter extends Subsystem {
     }
     // if the time is at least 0, we are "at velocity"
     boolean isAtVelocityDebounced = mTimeSinceWeWereAtVelocity <= 0;
+    */
 
-    return isAtVelocityDebounced;
+    return false;
   }
 
   public boolean isBallFired(){
