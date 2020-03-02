@@ -897,7 +897,8 @@ public class Robot extends TimedRobot {
         executeShootingStateMachine();
         break;
       case CLIMBING:
-        executeClimbingStateMachine();
+        
+        ();
         break;
       default:
         mRobotLogger.error("Invalid Robot State");
@@ -1134,53 +1135,29 @@ public class Robot extends TimedRobot {
       case IDLE:
         mClimber.stop();
         mRobotLogger.warn("Climbing state is idle");
+        mClimbingState = Climber.Extending;
+        //set Home?
         break;
-      case WAIT:
-        if (mOperatorInterface.climbUp()) {
-          mClimbingState = ClimbingState.EXTENDING;
-        }
-
-        checkTransitionToIntake();
       case EXTENDING:
-        //TODO: Decide if climb and retract should be the same button
-        /** Checks if the climb button has been hit again, signalling it to retract */
-        if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
-          mClimbingState = ClimbingState.HOLD;
+        //This will run constantly once in climbing mode
+        //While Operator Holds the Button, you can extend
+        //Constantly check if the operator has completed the extension period
+        
+        if(mOperatorInterface.climbUp()){
+          //Command the Climber Up
+          //sends the climber up at a reasonable speed
+          //will only allow continuation a certain way up
+          mClimber.extend();
+        }else if(mOperatorInterface.climbDown()){
+          //Command the Climber Down
+          //sends the climber down at a reasonable speed
+          //will not allow climber to go beyond zeroed encoder value
+          mClimber.retract();
+        }else{
+         //Command the Climber to Stop 
+          mClimber.stop();
         }
-        mClimber.extend();
-
-        /** Checks the encoder position to see if it's done climbing */
-        if (mClimber.isExtended()) {
-          mClimbingState = ClimbingState.EXTENDING_COMPLETE;
-        }
-      case EXTENDING_COMPLETE:
-        mClimber.stop();
-
-        /** Checks if the climb button has been hit again, signalling it to retract */
-        if (mOperatorInterface.climbDown()) {
-          mClimbingState = ClimbingState.RETRACTING;
-        }
-      case HOLD:
-        mClimber.stop();
-
-        if (mOperatorInterface.climbUp()) {
-          mClimbingState = ClimbingState.EXTENDING;
-        }
-
-        if (mOperatorInterface.climbDown()) {
-          mClimbingState = ClimbingState.RETRACTING;
-        }
-      case RETRACTING:
-        mClimber.retract();
-
-        if (mOperatorInterface.climbUp() || mOperatorInterface.climbDown()) {
-          mClimbingState = ClimbingState.HOLD;
-        }
-
-        /** Checks the encoder position to see if it's done retracting */
-        if (mClimber.isRetracted()) {
-          mClimbingState = ClimbingState.WAIT;
-        }
+    
       default:
         mRobotLogger.error("Invalid Climbing State");
         break;
