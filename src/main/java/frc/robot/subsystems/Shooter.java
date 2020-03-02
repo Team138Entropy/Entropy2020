@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
+import frc.robot.Constants;
 
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
@@ -28,8 +29,8 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private final int ROLLER_PORT = Constants.Talon_Shooter_Master;
+  private final int ROLLER_SLAVE_PORT = Constants.Talon_Shooter_Slave;
 
   // TODO: Tune these values
   private final int DEFAULT_ROLLER_SPEED =

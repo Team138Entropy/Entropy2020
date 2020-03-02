@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Logger;
+import frc.robot.Constants;
 
 /** Add your docs here. */
 public class Intake extends Subsystem {
@@ -15,7 +16,7 @@ public class Intake extends Subsystem {
   // initial cooldown because our startup of the roller induces a countdown
   private int mOverCurrentCountdown = 30;
 
-  private final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
+  private final int ROLLER_PORT = Constants.Talon_IntakeRoller;
 
   // TODO: Tune these values
   private final double ROLLER_SPEED =

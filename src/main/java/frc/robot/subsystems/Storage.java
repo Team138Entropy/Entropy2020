@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Robot;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private final int ROLLER_BOTTOM_PORT =
-      Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
-  private final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
+  private final int ROLLER_BOTTOM_PORT = Constants.Talon_Storage_Bottom;
+  private final int ROLLER_TOP_PORT = Constants.Talon_Storage_Top;
 
   private final int STORAGE_CAPICTY = 5;
 

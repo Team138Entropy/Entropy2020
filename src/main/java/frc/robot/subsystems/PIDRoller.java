@@ -17,8 +17,12 @@ class PIDRoller {
   private final WPI_TalonSRX mTalonSlave;
 
   PIDRoller(int talonPort, int talon2Port, double p, double i, double d, double f) {
-    mTalon = new WPI_TalonSRX(6);
+    mTalon = new WPI_TalonSRX(talonPort);
+    mTalonSlave = new WPI_TalonSRX(talon2Port);
+
     mTalon.configFactoryDefault();
+    mTalonSlave.configFactoryDefault();
+
     // All of this was ripped from the 2019 elevator code
     mTalon.configNominalOutputForward(0, TIMEOUT_MS);
     mTalon.configNominalOutputReverse(0, TIMEOUT_MS);
@@ -41,23 +45,19 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-    mTalonSlave = new WPI_TalonSRX(7);
     if(!Robot.getIsPracticeBot()) mTalon.setInverted(true);
 
-    //mTalonSlave.configFactoryDefault();
+    //Set to Slave Mode
     mTalonSlave.follow(mTalon);
   }
 
   public int getVelocity() {
-    System.out.println("SELECD SENSOR: " + mTalon.getSelectedSensorVelocity());
     return - mTalon.getSelectedSensorVelocity();
   }
 
   void setPercentOutput(double output){
-   // System.out.println(getVelocity() + " velocity at output " + output);
-    //mTalon.set(ControlMode.PercentOutput, - output);
-    mTalon.set(ControlMode.Velocity, - 2000);
-
+   System.out.println(getVelocity() + " velocity at output " + output);
+    mTalon.set(ControlMode.PercentOutput, - output);
   }
 
   void setSpeed(int posPer100Ms) {

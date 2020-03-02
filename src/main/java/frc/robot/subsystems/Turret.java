@@ -21,6 +21,9 @@ public class Turret extends Subsystem {
   //  as vision is disabled, goes to homing to get back home
   private final double HomePosition = 14000.0;
 
+  //How Close the Turret can be
+  private final double AutoAimDeadband = 0.7;
+
   enum TurretState {
     AUTO_AIM,
     HOME,
@@ -59,11 +62,11 @@ public class Turret extends Subsystem {
 
   /** Set up our talon, logger and potentiometer */
   private Turret() {
-   mTurretTalon = new WPI_TalonSRX(Constants.kTurretTalonMotorPort);
+   mTurretTalon = new WPI_TalonSRX(Constants.Talon_Turret);
    mTurretTalon.configFactoryDefault();
    mTurretTalon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed, 10);
    mTurretTalon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed, 10);
-   mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, Constants.kTurretTalonMotorPort);
+   mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
    mTurretTalon.config_kF(0, 0); //MUST BE 0 in Position mode
    mTurretTalon.config_kP(0, .1);
    mTurretTalon.config_kI(0, 0);
@@ -92,9 +95,10 @@ public class Turret extends Subsystem {
     if(mCurrentState == TurretState.AUTO_AIM){
       //Perform Auto Aim!
       //deadband: Angle error must be greater than 1 degree
-      if(Math.abs(mPeriodicIO.angle) > .7){
+      if(Math.abs(mPeriodicIO.angle) > AutoAimDeadband){
        mTurretTalon.set(ControlMode.Position, mPeriodicIO.demand);
       }
+
     }else if(mCurrentState == TurretState.HOME){
      //going to home position
       mTurretTalon.set(ControlMode.MotionMagic, HomePosition);
@@ -136,8 +140,6 @@ public class Turret extends Subsystem {
     velocity = Math.abs(velocity);
 
     //Shooter is offset
-    System.out.println("COMMANDED ANGLE: " + angle);
-
     if(velocity <= 80){
       mPeriodicIO.angle = angle;
       //System.out.println("COMMANDED ANGLE: " + angle);

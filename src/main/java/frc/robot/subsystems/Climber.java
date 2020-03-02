@@ -7,10 +7,11 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Config;
 import frc.robot.Logger;
+import frc.robot.Constants;
 
 
 public class Climber extends Subsystem {
-  private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER__MOTOR);
+  private final int PORT_NUMBER = Constants.Talon_Climber;
 
   //TODO: Tune these values
   private final double HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);

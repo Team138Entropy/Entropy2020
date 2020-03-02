@@ -13,6 +13,7 @@ import frc.robot.util.*;
 import frc.robot.util.geometry.*;
 import frc.robot.util.motion.SetpointGenerator;
 import frc.robot.vision.AimingParameters;
+import frc.robot.Constants;
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
@@ -67,16 +68,16 @@ public class Drive extends Subsystem {
   private Drive() {
     mDriveLogger = new Logger("drive");
 
-    mLeftMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_BACK_PORT));
+    mLeftMaster = new WPI_TalonSRX(Constants.Talon_LeftDrive1_Master);
     // configureSpark(mLeftMaster, true, true);
 
-    mLeftSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_FRONT_PORT));
+    mLeftSlave = new WPI_TalonSRX(Constants.Talon_LeftDrive2_Slave);
     // configureSpark(mLeftSlave, true, false);
 
-    mRightMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_BACK_PORT));
+    mRightMaster = new WPI_TalonSRX(Constants.Talon_RightDrive1_Master);
     // configureSpark(mRightMaster, false, true);
 
-    mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
+    mRightSlave = new WPI_TalonSRX(Constants.Talon_RightDrive2_Slave);
     // configureSpark(mRightSlave, false, false);
 
     mLeftMaster.configFactoryDefault();
