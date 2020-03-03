@@ -62,6 +62,9 @@ public class Storage extends Subsystem {
     mTopRoller.setNeutralMode(NeutralMode.Brake);
     mBottomRoller.setNeutralMode(NeutralMode.Brake);
 
+    mTopRoller.configContinuousCurrentLimit(7);
+    mTopRoller.configPeakCurrentLimit(7);
+
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
     
     if (Robot.getIsPracticeBot()) {
@@ -170,6 +173,7 @@ public class Storage extends Subsystem {
   public synchronized void ejectBall() {
     mBottomRoller.set(ControlMode.PercentOutput, EJECT_SPEED * BOTTOM_SPEED_FACTOR);
     mTopRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
+    SmartDashboard.putNumber("Storage Current", mTopRoller.getSupplyCurrent());
   }
 
   public synchronized void setBottomOutput(double output) {

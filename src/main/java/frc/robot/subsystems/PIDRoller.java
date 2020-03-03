@@ -29,8 +29,8 @@ class PIDRoller {
     mTalon.configPeakOutputForward(1, TIMEOUT_MS);
     mTalon.configPeakOutputReverse(-1, TIMEOUT_MS);
 
-    mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_25Ms, 50);
-    mTalon.configVelocityMeasurementWindow(32);
+    mTalon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_5Ms, 50);
+    mTalon.configVelocityMeasurementWindow(64);
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
     mTalon.setSensorPhase(!Robot.getIsPracticeBot());
 
@@ -53,6 +53,10 @@ class PIDRoller {
 
   public int getVelocity() {
     return - mTalon.getSelectedSensorVelocity();
+  }
+
+  public double getCurrent() {
+    return mTalon.getStatorCurrent();
   }
 
   void setPercentOutput(double output){

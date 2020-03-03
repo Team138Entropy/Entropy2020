@@ -10,16 +10,16 @@ import frc.robot.Constants;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private final double MAX_SPEED = 2950.0;
+  private final double MAX_SPEED = 3700.0;
   // private static final double SPEED_DEADBAND = 20;
-  private final double SPEED_DEADBAND = 75;
+  private final double SPEED_DEADBAND = 5;
   private final double DROP_DEADBAND = 250;
-  private final int SPEED_DEADBAND_DELAY = 10;
+  private final int SPEED_DEADBAND_DELAY = 5;
   private final double FEEDFORWARD = 1023d / MAX_SPEED;
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
   // private static final double D = 0.1;
-  private final double P = .35;
+  private final double P = 0;
   private final double I = 0;
   private final double D = 0;
 
@@ -62,7 +62,10 @@ public class Shooter extends Subsystem {
   /** Starts the roller. */
   public void start() {
     mRoller.setSpeed(getAdjustedVelocitySetpoint());
-    //mRoller.setPercentOutput(1);
+    // mRoller.setPercentOutput(1);
+
+
+    SmartDashboard.putNumber("ShooterCurrent", mRoller.getCurrent());
   }
 
   /** Stops the roller. */
@@ -113,16 +116,16 @@ public class Shooter extends Subsystem {
     //New Concept: Velocity FLOOR
     //our velocity setpoint will be slightly higher than it needs to be
     // allow velocity to be sliughtly lower, but operate as a floor
-    boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 15) >= 0);
-    return isAtVelocity;
-    /*
+    boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint()/* - 15*/) >= 0);
+    // return isAtVelocity;
+    
     SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
 
-    boolean isAtVelocity =
-        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
+    // boolean isAtVelocity =
+        // Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there
@@ -141,7 +144,9 @@ public class Shooter extends Subsystem {
     }
     // if the time is at least 0, we are "at velocity"
     boolean isAtVelocityDebounced = mTimeSinceWeWereAtVelocity <= 0;
-    */
+    
+
+    return isAtVelocityDebounced;
 
     //return false;
   }
