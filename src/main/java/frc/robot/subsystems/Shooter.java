@@ -14,12 +14,12 @@ public class Shooter extends Subsystem {
   // private static final double SPEED_DEADBAND = 20;
   private final double SPEED_DEADBAND = 5;
   private final double DROP_DEADBAND = 250;
-  private final int SPEED_DEADBAND_DELAY = 5;
+  private final int SPEED_DEADBAND_DELAY = 10;
   private final double FEEDFORWARD = 1023d / MAX_SPEED;
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
   // private static final double D = 0.1;
-  private final double P = 0;
+  private final double P = .4;
   private final double I = 0;
   private final double D = 0;
 
@@ -61,8 +61,8 @@ public class Shooter extends Subsystem {
 
   /** Starts the roller. */
   public void start() {
-    mRoller.setSpeed(getAdjustedVelocitySetpoint());
-    // mRoller.setPercentOutput(1);
+  //  mRoller.setSpeed(getAdjustedVelocitySetpoint());
+     mRoller.setPercentOutput(.97);
 
 
     SmartDashboard.putNumber("ShooterCurrent", mRoller.getCurrent());
@@ -116,7 +116,7 @@ public class Shooter extends Subsystem {
     //New Concept: Velocity FLOOR
     //our velocity setpoint will be slightly higher than it needs to be
     // allow velocity to be sliughtly lower, but operate as a floor
-    boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint()/* - 15*/) >= 0);
+     boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint()/* - 15*/) >= 0);
     // return isAtVelocity;
     
     SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
@@ -124,7 +124,7 @@ public class Shooter extends Subsystem {
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
 
-    // boolean isAtVelocity =
+    //boolean isAtVelocity =
         // Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
     // here's the problem:
