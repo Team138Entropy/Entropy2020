@@ -68,15 +68,17 @@ rat_high = 1
 
 #Solitity compares the hull vs contour, and looks at the difference in filled area
 #Works on a system of %
-solidity_low = .5
-solidity_high = .95
+solidity_low = .80
+solidity_high = 1.00
 
 #Vertices is acts as "length"
 minArea = 40
 minWidth = 10
-maxWidth = 1000
+maxWidth = 75
 minHeight = 10
-maxHeight = 1000
+#150
+maxHeight = 150
+#
 maxVertices = 100
 minVertices = 5
 
@@ -463,13 +465,13 @@ def findTape(contours, image, centerX, centerY):
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
             # Filters contours based off of size
-            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (x > minWidth) and (x < maxWidth) and (y > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (w > minWidth) and (w < maxWidth) and (h > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 
-                #cv2.imwrite("1drawncontours.jpg", contimage)
-                #time.sleep(1)
-                #print("writing image")
+                cv2.imwrite("1drawncontours.jpg", contimage)
+                time.sleep(1)
+                print("writing image")
                 
                 ### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
                 # Gets the centeroids of contour
@@ -615,7 +617,7 @@ def calculateDistanceFeet(targetPixelWidth):
     # Unsure as to what measurement distEst is producing in the above line, but multiplying it by .32 will return your distance in feet
     distEstFeet = distEst * .32
     #distEstInches = distEstFeet *.32*12
-    return (distEstFeet)
+    return (abs(distEstFeet))
 
 
 # Uses trig and focal length of camera to find yaw.
@@ -744,13 +746,13 @@ def ProcessFrame(frame, tape):
 
 
         highGoal = {}
-        highGoal['x'] = processedValues[0]
-        highGoal['y'] = processedValues[1]
+        highGoal['y'] = processedValues[0]
+        highGoal['z'] = processedValues[1]
         highGoal['yaw'] = processedValues[2]
         if processedValues[3] != None:
             processedValues[3] = abs(round(processedValues[3], 2))
         highGoal['dis'] = processedValues[3]
-        highGoal['targid'] = 0
+        highGoal['targid'] = 1
 
         if processedValues[3] != None:
             PacketQueue.put_nowait(highGoal)
