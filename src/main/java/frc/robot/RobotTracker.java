@@ -166,8 +166,24 @@ public class RobotTracker{
         }
 
         VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
-
+        int previousID = 0;
         synchronized(Turret_Vision_Packet_Error){
+            //store previous ID if it exists
+            if(TurretError == null){
+                //first id
+                vp.setID(1);
+            }else{
+                //not first id, incriment unless we reach limit
+                previousID = Turret_Vision.ID;
+                if(previousID == 10000){
+                    //rollover
+                    vp.setID(1);
+                }else{
+                    //incriment
+                    vp.setID(previousID + 1);
+                }
+            }
+            //now update!
             Turret_Vision = vp;
         }
     }

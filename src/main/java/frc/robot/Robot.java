@@ -48,7 +48,14 @@ public class Robot extends TimedRobot {
     AUTO_AIM, MANUAL
   }
 
+  public enum DriveState {
+    MANUAL, AUTO_DRIVE
+  }
+
+  //Vision Related Valuables
   private double LastDistance = -1;
+  private int LastTurretVisionID = -1; //use IDs to filter out bad ideas
+  private int LastFeederStationVisionID = -1;
 
   public enum TestState {
     START, TEST_PI, TEST_LIGHT, INTAKE_FORWARD, INTAKE_BACKWARD, STORAGE_ENCODER_FORWARDS_TEST,
@@ -69,6 +76,7 @@ public class Robot extends TimedRobot {
   private ShootingState mShootingState = ShootingState.IDLE;
   private ClimbingState mClimbingState = ClimbingState.IDLE;
   private TurretState mTurretState = TurretState.MANUAL;
+  private DriveState mDriveState = DriveState.MANUAL;
   private TestState mTestState;
 
   // Controller Reference
@@ -725,7 +733,13 @@ public class Robot extends TimedRobot {
       if(vp.HasValue == true){
           //We have Target Information
           LastDistance = vp.Distance;
-          mTurret.SetAimError(vp.Error_Angle);
+
+          //verify we haven't already commanded this packet!
+          if(vp.ID != LastTurretVisionID){
+            mTurret.SetAimError(vp.Error_Angle);
+            LastTurretVisionID = vp.ID;
+          }
+
         }else{
           //No Results, Don't Rotate
         
@@ -768,12 +782,18 @@ public class Robot extends TimedRobot {
         // Used for tracking a ball
         // we may want to limit the speed?
         //RobotTracker.RobotTrackerResult DriveResult = mRobotTracker.GetFeederStationError(Timer.getFPGATimestamp());
+        mDriveState = DriveState.AUTO_DRIVE;
         
         VisionPacket vp = mRobotTracker.GetTurretVisionPacket(Timer.getFPGATimestamp());
         mDrive.autoSteerFeederStation(driveThrottle, vp.Error_Angle);
       } else {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);
+
+        //if we were previously in auto drive.. turn it off
+        if(mDriveState == DriveState.AUTO_DRIVE){
+          mDriveState = DriveState.MANUAL;
+        }
       }
   }
 
@@ -781,10 +801,18 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop() {
-    if(mOperatorInterface.getVisionToggle()){
 
-      if(mTurretState == TurretState.AUTO_AIM){
-        //Turn off Auto Aiming
+    //automatically turn on auto steer light
+    //if it isn't on....
+    if(mDriveState == DriveState.AUTO_DRIVE){
+      visionLight.set(Relay.Value.kForward);
+    }
+
+    //Check if the Operator has toggled the turret aiming system
+    if(mOperatorInterface.getVisionToggle()){
+      if(mTurretState == TurretState.AUTO_AIM && mDriveState != DriveState.AUTO_DRIVE){
+        //Turn off Auto Aiming Light
+        //only do this if we aren't in auto steer!
         visionLight.set(Relay.Value.kOff);
 
         mTurretState = TurretState.MANUAL;
@@ -796,6 +824,10 @@ public class Robot extends TimedRobot {
         visionLight.set(Relay.Value.kForward);
       }
     }
+
+    
+
+
 
 
     mShooter.updateDistance(LastDistance);

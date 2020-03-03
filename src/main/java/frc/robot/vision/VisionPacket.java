@@ -17,6 +17,7 @@ public class VisionPacket {
     public final double Timestamp;
     public final double Error_Angle;
     public final boolean HasValue;
+    public int ID;
 
     public VisionPacket(
         double TS,
@@ -35,4 +36,13 @@ public class VisionPacket {
         Error_Angle = 0;
         HasValue = false;
     }
+
+    public void setID(int idarg){
+        ID = idarg;
+    }
+
+    public int getID(){
+        return ID;
+    }
+
 }
