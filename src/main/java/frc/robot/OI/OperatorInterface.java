@@ -212,10 +212,6 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.LEFT_BUMPER);
   }
 
-  public boolean isHomeClimber() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
-  }
-
   public boolean getFunctional() {
     return OperatorController.getButton(NykoController.Button.MIDDLE_10);
   }

@@ -679,19 +679,9 @@ public class Robot extends TimedRobot {
     }
 
     if (mOperatorInterface.isClimberTest()) {
-      mClimber.jog(mOperatorInterface.getClimberJogSpeed());
+      mClimber.jog(mOperatorInterface.getClimberJogSpeed() * Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED_FACTOR));
     } else {
       mClimber.stop();
-    }
-    
-    if (mOperatorInterface.isHomeClimber()) {
-      startedHoming = true;
-      mClimber.home();
-    } else {
-      if (startedHoming) {
-        mClimber.stop();
-        startedHoming = false;
-      }
     }
   }
 

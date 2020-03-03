@@ -60,6 +60,7 @@ public class Climber extends Subsystem {
 
     mMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PIDLoopIndex, TimeoutMS);
     mMotor.setSensorPhase(false);
+    mMotor.configClosedLoopPeakOutput(0, 0.3);
 
     /* set the allowable closed-loop error,
      * Closed-Loop output will be neutral within this range.
@@ -92,11 +93,7 @@ public class Climber extends Subsystem {
   /** Stops the climber */
   public void stop() {
     mLogger.verbose("Stopping the climber");
-    if (mIsHoming) {
-      stopHoming();
-    }else {
-      mMotor.stopMotor();
-    }
+    mMotor.stopMotor();
   }
 
   /** Return true if extended */
@@ -113,25 +110,6 @@ public class Climber extends Subsystem {
   /** Jogs the climber */
   public void jog(double speed) {
     mMotor.set(ControlMode.PercentOutput, speed);
-  }
-
-  /** Homes the climber */
-  public void home() {
-    mMotor.set(ControlMode.PercentOutput, HOMING_SPEED_PERCENT);
-    mIsHoming = true;
-  }
-
-  /** Stops the  */
-  private void stopHoming() {
-    mMotor.stopMotor();
-    setHome();
-    mIsHoming = false;
-  }
-
-  /** Sets the encoder's home */
-  public void setHome() {
-    mLogger.verbose("Home set");
-    mMotor.setSelectedSensorPosition(0, 0, 0);
   }
 
   public void zeroSensors() {}

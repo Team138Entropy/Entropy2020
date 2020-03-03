@@ -32,6 +32,7 @@ public class Config {
     CLIMBER__HOME_SPEED(.5d),
     DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS(1d),
     DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS(1d),
+    CLIMBER__JOG_SPEED_FACTOR(0.3d),
 
     CLIMBER__ENABLED(false),
 
@@ -67,8 +68,8 @@ public class Config {
 
     CLIMBER__PID_LOOP_INDEX(0),
     CLIMBER__TIMEOUT_MS(10),
-    CLIMBER__KF(1d),
-    CLIMBER__KP(0d),
+    CLIMBER__KF(1.0d),
+    CLIMBER__KP(.1d),
     CLIMBER__KI(0d),
     CLIMBER__KD(0d),
     
