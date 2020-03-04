@@ -23,7 +23,7 @@ public class Constants {
   public static final double REAL_TRACK_WIDTH = 1.916;
 
   // Auto Constants
-  public static final int AUTO_DEBOUNCE_TICKS = 50; // ~0.2 seconds
+  public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds
 
   // 22 is too low, 100 is too high
   public static final double kDriveWheelTrackWidthInches = 50;

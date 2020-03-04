@@ -237,13 +237,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 0));
+    int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 1));
 
     mAuto = true;
     mIsSpinningUp = false;
     mOperatorInterface.checkControllers();
 
-    mRobotLogger.log("Auto Init Called");
+    mRobotLogger.log("Auto Init Called " + autoMode);
 
     // Start background looper
     // collections information periodically
@@ -258,7 +258,7 @@ public class Robot extends TimedRobot {
     mStorage.preloadBalls(3);
 
     mAutoPath =
-        Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
+        Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
     mShooterIsStopped = false;
     IntakeSegment.resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency stop?)
     ShootSegment.resetState();
