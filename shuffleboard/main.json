@@ -2,7 +2,7 @@
   "tabPane": [
     {
       "title": "Competition Layout",
-      "autoPopulate": true,
+      "autoPopulate": false,
       "autoPopulatePrefix": "SmartDashboard/",
       "widgetPane": {
         "gridSize": 64.0,
@@ -104,19 +104,6 @@
               "Visuals/Show text": true
             }
           },
-          "20,0": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///FMSInfo/IsRedAlliance",
-              "_title": "Alliance",
-              "Colors/Color when true": "#FF0000FF",
-              "Colors/Color when false": "#0000FFFF"
-            }
-          },
           "22,5": {
             "size": [
               4,
@@ -126,19 +113,6 @@
               "_type": "Text View",
               "_source0": "network_table:///LiveWindow/Ungrouped/Relay[0]/Value",
               "_title": "Light Relay"
-            }
-          },
-          "18,0": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Intake Spinning Up",
-              "_title": "Intake Spinning Up",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
             }
           },
           "8,0": {
@@ -156,8 +130,8 @@
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
-              "imageWidth": -1,
-              "imageHeight": -1
+              "imageWidth": 0,
+              "imageHeight": 0
             }
           },
           "0,6": {
@@ -278,6 +252,28 @@
               "Slider Settings/Max": 4.0,
               "Slider Settings/Block increment": 1.0
             }
+          },
+          "20,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Shot Countdown",
+              "_title": "Shot Countdown"
+            }
+          },
+          "19,4": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Intake Current",
+              "_title": "Intake Current"
+            }
           }
         }
       }
@@ -387,7 +383,7 @@
                 {
                   "_type": "Boolean Box",
                   "_source0": "network_table:///LiveWindow/Ungrouped/DigitalInput[1]/Value",
-                  "_title": "LiveWindow/Ungrouped/DigitalInput[1]/Value",
+                  "_title": "DigitalInput[1]/Value",
                   "Colors/Color when true": "#7CFC00FF",
                   "Colors/Color when false": "#8B0000FF"
                 },
@@ -396,6 +392,16 @@
                   "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [11]",
                   "_title": "Talon SRX [11]",
                   "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "PID Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/PIDController[1]",
+                  "_title": "PIDController[1]"
+                },
+                {
+                  "_type": "PID Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/PIDController[2]",
+                  "_title": "PIDController[2]"
                 }
               ]
             }
@@ -1291,9 +1297,9 @@
         "hgap": 16.0,
         "vgap": 16.0,
         "tiles": {
-          "9,0": {
+          "6,0": {
             "size": [
-              7,
+              8,
               1
             ],
             "content": {
@@ -1302,7 +1308,7 @@
               "_title": "Test State"
             }
           },
-          "3,7": {
+          "0,4": {
             "size": [
               3,
               2
@@ -1313,10 +1319,10 @@
               "_title": "Test shooter speed"
             }
           },
-          "3,3": {
+          "0,2": {
             "size": [
               3,
-              2
+              1
             ],
             "content": {
               "_type": "Text View",
@@ -1324,10 +1330,10 @@
               "_title": "Storage Forwards Test Delta"
             }
           },
-          "3,5": {
+          "0,3": {
             "size": [
               3,
-              2
+              1
             ],
             "content": {
               "_type": "Text View",
@@ -1335,10 +1341,10 @@
               "_title": "Storage Backwards Test Delta"
             }
           },
-          "6,5": {
+          "3,3": {
             "size": [
               3,
-              2
+              1
             ],
             "content": {
               "_type": "Text View",
@@ -1346,10 +1352,10 @@
               "_title": "Storage Backwards Test Error"
             }
           },
-          "6,3": {
+          "3,2": {
             "size": [
               3,
-              2
+              1
             ],
             "content": {
               "_type": "Text View",
@@ -1357,10 +1363,10 @@
               "_title": "Storage Forwards Test Error"
             }
           },
-          "13,3": {
+          "10,2": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1370,10 +1376,10 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "9,3": {
+          "6,2": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1383,10 +1389,10 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "9,1": {
+          "6,1": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1396,10 +1402,10 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "13,1": {
+          "10,1": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1409,10 +1415,10 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "13,5": {
+          "10,3": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1422,10 +1428,10 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "9,5": {
+          "6,3": {
             "size": [
               4,
-              2
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1500,10 +1506,10 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "9,7": {
+          "6,4": {
             "size": [
-              8,
-              2
+              4,
+              1
             ],
             "content": {
               "_type": "Boolean Box",
@@ -1586,15 +1592,80 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "10,6": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drive Right Back Passed",
+              "_title": "SmartDashboard/Drive Right Back Passed",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "10,5": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drive Right Front Passed",
+              "_title": "SmartDashboard/Drive Right Front Passed",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "6,5": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drive Left Front Passed",
+              "_title": "SmartDashboard/Drive Left Front Passed",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "6,6": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Drive Left Back Passed",
+              "_title": "SmartDashboard/Drive Left Back Passed",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "10,4": {
+            "size": [
+              4,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Shooter Speed Test Passed",
+              "_title": "SmartDashboard/Shooter Speed Test Passed",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
           }
         }
       }
     }
   ],
   "windowGeometry": {
-    "x": -7.0,
-    "y": 0.0,
-    "width": 1386.0,
-    "height": 788.0
+    "x": -8.0,
+    "y": -8.0,
+    "width": 1382.0,
+    "height": 744.0
   }
 }
