@@ -173,6 +173,9 @@ public class Robot extends TimedRobot {
   }
 
   private void updateSmartDashboard() {
+
+    mClimber.updateSmartDashboard();
+
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
 
@@ -354,6 +357,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString("Test State", mTestState.toString());
     SmartDashboard.putBoolean("Driver Cameras", mCameraManager.getCameraStatus());
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
+    SmartDashboard.putNumber("Climber Position", mClimber.getEncoderPosition());
 
     switch (mTestState) {
       case START:
@@ -610,6 +614,11 @@ public class Robot extends TimedRobot {
         }
         break;
       case MANUAL:
+        if (mOperatorInterface.isClimberTest()) {
+          mClimber.jog(mOperatorInterface.getClimberJogSpeed() * Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED_FACTOR));
+        } else {
+          mClimber.stop();
+        }
         // Intake roller ON while button held
         if (mOperatorInterface.isIntakeRollerTest()) {
           mIntake.setOutput(mOperatorInterface.getOperatorThrottle());
@@ -676,12 +685,6 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Unknown test state " + mTestState.toString());
         break;
       
-    }
-
-    if (mOperatorInterface.isClimberTest()) {
-      mClimber.jog(mOperatorInterface.getClimberJogSpeed() * Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED_FACTOR));
-    } else {
-      mClimber.stop();
     }
   }
 
@@ -1016,18 +1019,6 @@ public class Robot extends TimedRobot {
     }
   }
 
-  private boolean checkTransitionToIntake() {
-    if (mOperatorInterface.climbStart()) {
-      mState = State.INTAKE;
-
-      mIntakeState = IntakeState.READY_TO_INTAKE;
-
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
@@ -1107,8 +1098,7 @@ public class Robot extends TimedRobot {
         if (mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.EXTENDING;
         }
-
-        checkTransitionToIntake();
+        break;
       case EXTENDING:
         //TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
@@ -1121,6 +1111,7 @@ public class Robot extends TimedRobot {
         if (mClimber.isExtended()) {
           mClimbingState = ClimbingState.EXTENDING_COMPLETE;
         }
+        break;
       case EXTENDING_COMPLETE:
         mClimber.stop();
 
@@ -1128,6 +1119,7 @@ public class Robot extends TimedRobot {
         if (mOperatorInterface.climbDown()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
+        break;
       case HOLD:
         mClimber.stop();
 
@@ -1138,6 +1130,7 @@ public class Robot extends TimedRobot {
         if (mOperatorInterface.climbDown()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
+        break;
       case RETRACTING:
         mClimber.retract();
 
@@ -1149,6 +1142,7 @@ public class Robot extends TimedRobot {
         if (mClimber.isRetracted()) {
           mClimbingState = ClimbingState.WAIT;
         }
+        break;
       default:
         mRobotLogger.error("Invalid Climbing State");
         break;

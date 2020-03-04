@@ -5,6 +5,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Logger;
 
@@ -13,8 +15,8 @@ public class Climber extends Subsystem {
   private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER__MOTOR);
 
   //TODO: Tune these values
-  private final double HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
-  private final double RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
+  private final int HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
+  private final int RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
   private final double HOMING_SPEED_PERCENT = Config.getInstance().getDouble(Config.Key.CLIMBER__HOME_SPEED);
 
   /** Talon SRX/ Victor SPX will support multiple (cascaded) PID loops. For now we just want the primary one. */
@@ -60,7 +62,7 @@ public class Climber extends Subsystem {
 
     mMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, PIDLoopIndex, TimeoutMS);
     mMotor.setSensorPhase(false);
-    mMotor.configClosedLoopPeakOutput(0, 0.3);
+    mMotor.configClosedLoopPeakOutput(0, 1);
 
     /* set the allowable closed-loop error,
      * Closed-Loop output will be neutral within this range.
@@ -78,6 +80,9 @@ public class Climber extends Subsystem {
 
     // Integral control only applies when the error is small; this avoids integral windup
     mMotor.config_IntegralZone(0, 200, TimeoutMS);
+
+    mMotor.setSelectedSensorPosition(0);
+    mMotor.setInverted(true);
   }
 
   public void extend() {
@@ -98,19 +103,30 @@ public class Climber extends Subsystem {
 
   /** Return true if extended */
   public boolean isExtended() {
-    mMotor.getSelectedSensorPosition();
-    return true;
+    int encoderPosition = mMotor.getSelectedSensorPosition();
+    return (encoderPosition >= HEIGHT_IN_ENCODER_TICKS - 100) && (encoderPosition <= HEIGHT_IN_ENCODER_TICKS + 100);
   }
 
   /** Returns true if retracted */
   public boolean isRetracted() {
-    return true;
+    int encoderPosition = mMotor.getSelectedSensorPosition();
+    return (encoderPosition >= RETRACTED_HEIGHT_IN_ENCODER_TICKS - 100) && (encoderPosition <= RETRACTED_HEIGHT_IN_ENCODER_TICKS + 100);
   }
 
   /** Jogs the climber */
   public void jog(double speed) {
+    //mLogger.verbose("Jogging climber " + speed);
     mMotor.set(ControlMode.PercentOutput, speed);
   }
+
+  public void updateSmartDashboard() {
+    SmartDashboard.putNumber("Climber Position", mMotor.getSelectedSensorPosition());
+  }
+
+  public int getEncoderPosition() {
+    return mMotor.getSelectedSensorPosition();
+  }
+
 
   public void zeroSensors() {}
 

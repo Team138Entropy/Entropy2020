@@ -66,7 +66,7 @@ public class OperatorInterface {
   }
 
   public boolean climbStart() {
-    boolean buttonValue = DriverController.getButton(XboxController.Button.START);
+    boolean buttonValue = DriverController.getButton(XboxController.Button.BACK);
     return mClimbStartWasPressed.update(buttonValue);
   }
   
@@ -209,7 +209,7 @@ public class OperatorInterface {
   }
 
   public boolean isClimberTest() {
-    return OperatorController.getButton(NykoController.Button.LEFT_BUMPER);
+    return OperatorController.getButton(NykoController.Button.RIGHT_BUMPER);
   }
 
   public boolean getFunctional() {
