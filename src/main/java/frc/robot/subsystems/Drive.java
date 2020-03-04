@@ -217,8 +217,6 @@ public class Drive extends Subsystem {
 
     double accelSpeedWhenTurningFactor = 1 - differenceBetweenSides;
 
-    System.out.println(differenceBetweenSides);
-
     // This is where the actual accel limiting logic begins
     if (velocityForwards) {
       if (acceleratingForward) {
