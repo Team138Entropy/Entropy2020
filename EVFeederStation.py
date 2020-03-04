@@ -329,10 +329,10 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
         #Blocking out parts of the robot
-        rect1 = cv2.rectangle(img, (0, 300), (640, 480), (0,0,0), -1)
         
         
-        value_array = findTape(contours, rect1, centerX, centerY)
+        
+        value_array = findTape(contours, image, centerX, centerY)
     else:
         # No Contours!
         pass
