@@ -275,15 +275,20 @@ public class Drive extends Subsystem {
     } else if (leftOutput < 0) {
       velocityReverse = true;
     }
+    
+    // this is [0, 1)
+    double differenceBetweenSides = Math.abs(Math.abs(signal.getLeft()) - Math.abs(signal.getRight()));
+
+    double accelSpeedWhenTurningFactor = 1 - differenceBetweenSides;
 
     // This is where the actual accel limiting logic begins
     if (velocityForwards) {
       if (acceleratingForward) {
-        setOpenloopRamp(accelSpeed);
+        setOpenloopRamp(accelSpeed * accelSpeedWhenTurningFactor);
       }
     } else if (velocityReverse) {
       if (acceleratingForward) {
-        setOpenloopRamp(brakeSpeed);
+        setOpenloopRamp(brakeSpeed * accelSpeedWhenTurningFactor);
       }
     } else if (stationary) {
       setOpenloopRamp(0);
@@ -345,8 +350,7 @@ public class Drive extends Subsystem {
     DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
 
     // Either the bigger of the two drive signals or 1, whichever is bigger.
-    double scaling_factor =
-        Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
+    double scaling_factor = Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));// / (1 + (differenceBetweenSides * 6));
     if (quickTurn) {
       setOpenLoop(
           new DriveSignal(
