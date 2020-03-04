@@ -18,9 +18,9 @@ import frc.robot.Logger;
 
 // camera subsystem
 public class CameraManager extends Subsystem {
-  private static UsbCamera frontCamera;
-  private static UsbCamera backCamera;
+  private static UsbCamera mCamera;
   private static CameraManager sInstance;
+  private boolean mIsClimbingCamera = false;
 
   Logger mLogger = new Logger("cameraManager");
 
@@ -34,24 +34,35 @@ public class CameraManager extends Subsystem {
 
   private CameraManager() {}
 
-  public void init() {
+  private void setupCamera(int id){
     try {
       // front camera
-      frontCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", 0);
+      mCamera = CameraServer.getInstance().startAutomaticCapture("frontCamera", id);
       // resolution set
-      frontCamera.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
-
-      // // back camera
-      // backCamera = CameraServer.getInstance().startAutomaticCapture("backCamera", 1);
-      // // another resolution set
-      // backCamera.setVideoMode(PixelFormat.kMJPEG, 640, 480, 30);
+      mCamera.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
     } catch (Exception exception) {
       mLogger.error("Camera Initialization failed");
     }
   }
 
+  public void init() {
+    setupCamera(0);
+  }
+
+  public void setWhichCamera(boolean wantsClimbingCamera){
+    mCamera.close();
+    if(wantsClimbingCamera && !mIsClimbingCamera){
+      setupCamera(1);
+    }else if(mIsClimbingCamera){
+      setupCamera(0);
+    }
+
+    // update whether we currently have a climbing camera
+    mIsClimbingCamera = wantsClimbingCamera;
+  }
+
   public boolean getCameraStatus(){
-    return frontCamera.isConnected() && frontCamera.isEnabled() && frontCamera.isValid();
+    return mCamera.isConnected() && mCamera.isEnabled() && mCamera.isValid();
   }
 
   @Override
@@ -59,18 +70,11 @@ public class CameraManager extends Subsystem {
 
   @Override
   public void checkSubsystem() {
-    if (frontCamera.isEnabled()) {
+    if (mCamera.isEnabled()) {
       mLogger.info("Front camera ready");
     } else {
       mLogger.warn(
-          "Front camera not enabled " + frontCamera.isConnected() + " " + frontCamera.isValid());
+          "Front camera not enabled " + mCamera.isConnected() + " " + mCamera.isValid());
     }
-
-    // if (backCamera.isEnabled()) {
-    //   mLogger.info("Back camera ready");
-    // } else {
-    //   mLogger.warn(
-    //       "Back camera not enabled " + backCamera.isConnected() + " " + backCamera.isValid());
-    // }
   }
 }

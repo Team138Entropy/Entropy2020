@@ -859,6 +859,7 @@ public class Robot extends TimedRobot {
   private void executeRobotStateMachine() {
     switch (mState) {
       case IDLE:
+        mCameraManager.setWhichCamera(false);
         SmartDashboard.putString("RobotState", mState.name());
         SmartDashboard.putString("IntakeState", mIntakeState.name());
         SmartDashboard.putString("ShootingState", mShootingState.name());
@@ -869,12 +870,15 @@ public class Robot extends TimedRobot {
         mClimber.stop();
         break;
       case INTAKE:
+        mCameraManager.setWhichCamera(false);
         executeIntakeStateMachine();
         break;
       case SHOOTING:
+        mCameraManager.setWhichCamera(false);
         executeShootingStateMachine();
         break;
       case CLIMBING:
+        mCameraManager.setWhichCamera(true);
         executeClimbingStateMachine();
         break;
       default:
