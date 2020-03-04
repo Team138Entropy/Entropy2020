@@ -60,7 +60,7 @@ class PIDRoller {
   }
 
   void setPercentOutput(double output){
-   System.out.println(getVelocity() + " velocity at output " + output);
+  // System.out.println(getVelocity() + " velocity at output " + output);
     mTalon.set(ControlMode.PercentOutput, - output);
   }
 

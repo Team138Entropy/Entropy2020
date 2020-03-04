@@ -14,7 +14,7 @@ public class Shooter extends Subsystem {
   // private static final double SPEED_DEADBAND = 20;
   private final double SPEED_DEADBAND = 5;
   private final double DROP_DEADBAND = 250;
-  private final int SPEED_DEADBAND_DELAY = 10;
+  private final int SPEED_DEADBAND_DELAY = 15;
   private final double FEEDFORWARD = 1023d / MAX_SPEED;
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
@@ -62,7 +62,7 @@ public class Shooter extends Subsystem {
   /** Starts the roller. */
   public void start() {
   //  mRoller.setSpeed(getAdjustedVelocitySetpoint());
-     mRoller.setPercentOutput(.97);
+     mRoller.setPercentOutput(.975);
 
 
     SmartDashboard.putNumber("ShooterCurrent", mRoller.getCurrent());
@@ -154,6 +154,10 @@ public class Shooter extends Subsystem {
   public boolean isBallFired(){
     boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity;
+    if(ballFired){
+      System.out.println("BALL FIRED!");
+
+    }
     return ballFired;
   }
 
