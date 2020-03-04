@@ -6,7 +6,7 @@ public class EventWatcherThread extends Thread {
   // IMPORTANT: For IntakeSegment to work reliably, the delay between its event calls *must* be less than the robot loop period (~20ms)!
   // That means this value should be set considerably lower to account for delays caused by other events.
   // FIXME: Do this the right way so we don't have to restrict the timing
-  private static final int LOOP_PERIOD_MS = 10;
+  private static final int LOOP_PERIOD_MS = 5;
 
   private static EventWatcherThread instance;
 

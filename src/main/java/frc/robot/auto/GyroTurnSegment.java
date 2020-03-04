@@ -2,6 +2,8 @@ package frc.robot.auto;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -65,10 +67,14 @@ public class GyroTurnSegment extends Segment {
     if (controller.atSetpoint()) {
       logger.verbose("Angle in acceptable range for " + ++debounceCount + " tick(s)");
 
+      logger.info("Angle: " + angle);
+
       if (debounceCount >= Constants.AUTO_DEBOUNCE_TICKS) {
         done = true;
         drive.setOpenLoop(DriveSignal.BRAKE);
       }
+    } else {
+      debounceCount = 0;
     }
   }
 

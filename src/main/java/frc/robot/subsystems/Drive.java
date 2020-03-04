@@ -387,7 +387,7 @@ public class Drive extends Subsystem {
       }
     }
 
-    final double max = 0.5;
+    final double max = 0.7;
 
     setSimplePercentOutput(
         new DriveSignal(
