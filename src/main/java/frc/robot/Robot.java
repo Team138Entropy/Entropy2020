@@ -14,6 +14,7 @@ import frc.robot.auto.IntakeSegment;
 import frc.robot.auto.Path;
 import frc.robot.auto.Paths;
 import frc.robot.auto.ShootSegment;
+import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
 import frc.robot.util.loops.Looper;
@@ -252,13 +253,15 @@ public class Robot extends TimedRobot {
 
     mState = State.SHOOTING;
     mShootingState = ShootingState.IDLE;
+    mIntakeState = IntakeState.IDLE;
     //mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
-    mStorage.preloadBalls(0);
+    mStorage.preloadBalls(3);
 
     mAutoPath =
         Paths.find(Config.getInstance().getString(Key.AUTO__SELECTED_PATH)).orElse(Paths.NO_OP);
     mShooterIsStopped = false;
     IntakeSegment.resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency stop?)
+    ShootSegment.resetState();
   }
 
   @Override
@@ -299,7 +302,7 @@ public class Robot extends TimedRobot {
 
     Config.getInstance().reload();
 
-    mStorage.preloadBalls(0);
+    // mStorage.preloadBalls(3);
 
     mOperatorInterface.checkControllers();
 
@@ -323,6 +326,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    // mRobotLogger.info("Angle: " + sGyro.getAngle());
     try {
       RobotLoop();
     } catch (Exception e) {
@@ -764,6 +768,8 @@ public class Robot extends TimedRobot {
     visionLight.set(Relay.Value.kOff);
 
     Config.getInstance().reload();
+
+    mOperatorInterface.resetOverride();
   }
 
   @Override

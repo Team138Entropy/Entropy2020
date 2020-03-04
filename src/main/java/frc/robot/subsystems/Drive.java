@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Constants;
@@ -155,13 +156,45 @@ public class Drive extends Subsystem {
     mRightMaster.configMotionAcceleration(accel);
   }
 
+  public void configP(double p) {
+    mLeftMaster.config_kP(0, p);
+    mRightMaster.config_kP(0, p);
+  }
+  
+  public void configI(double i) {
+    mLeftMaster.config_kI(0, i);
+    mRightMaster.config_kI(0, i);
+  }
+
+  public void configD(double d) {
+    mLeftMaster.config_kD(0, d);
+    mRightMaster.config_kD(0, d);
+  }
+
+  public void resetPID() {
+    double P, I, D;
+
+    P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
+
+    configP(P);
+    configI(I);
+    configD(D);
+  }
+
   public void zeroSensors() {
     zeroEncoders();
   }
 
-  public void setTargetPosition(int left, int right) {
+  public void setMotionMagicTarget(int left, int right) {
     mLeftMaster.set(ControlMode.MotionMagic, left);
     mRightMaster.set(ControlMode.MotionMagic, -right);
+  }
+
+  public void setSimplePIDTarget(int left, int right) {
+    mLeftMaster.set(ControlMode.Position, left);
+    mRightMaster.set(ControlMode.Position, -right);
   }
 
   /** Configure talons for open loop control */
@@ -267,6 +300,13 @@ public class Drive extends Subsystem {
     mRightMaster.set(ControlMode.PercentOutput, rightOutput * -1);
   }
 
+  // Used for arcade turning during auto
+  public void setSimplePercentOutput(DriveSignal signal) {
+    setOpenloopRamp(0); // Just in case
+    mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
+    mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
+  }
+
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
     wheel = wheel * -1; // invert wheel
 
@@ -355,6 +395,63 @@ public class Drive extends Subsystem {
   public void setOpenloopRamp(double speed) {
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
+  }
+
+  /**
+   * WPILib's arcade drive. We need this for auto turning because it allows us to set a rotation
+   * speed. Note that the deadband functionality has been removed, since we don't have to worry
+   * about driver error during auto. If we were using WPILib's {@link
+   * edu.wpi.first.wpilibj.drive.DifferentialDrive DifferentialDrive} we wouldn't need to copy this
+   * over. The output is also clamped so that we don't lose control.
+   *
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *     positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   */
+  public void arcadeHack(double xSpeed, double zRotation, boolean squareInputs) {
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+
+    // Square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power.
+    if (squareInputs) {
+      xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+      zRotation = Math.copySign(zRotation * zRotation, zRotation);
+    }
+
+    double leftMotorOutput;
+    double rightMotorOutput;
+
+    double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
+
+    if (xSpeed >= 0.0) {
+      // First quadrant, else second quadrant
+      if (zRotation >= 0.0) {
+        leftMotorOutput = maxInput;
+        rightMotorOutput = xSpeed - zRotation;
+      } else {
+        leftMotorOutput = xSpeed + zRotation;
+        rightMotorOutput = maxInput;
+      }
+    } else {
+      // Third quadrant, else fourth quadrant
+      if (zRotation >= 0.0) {
+        leftMotorOutput = xSpeed + zRotation;
+        rightMotorOutput = maxInput;
+      } else {
+        leftMotorOutput = maxInput;
+        rightMotorOutput = xSpeed - zRotation;
+      }
+    }
+
+    final double max = 0.5;
+
+    setSimplePercentOutput(
+        new DriveSignal(
+            MathUtil.clamp(leftMotorOutput, -max, max),
+            MathUtil.clamp(rightMotorOutput, -max, max)));
   }
 
   /*

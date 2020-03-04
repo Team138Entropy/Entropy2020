@@ -32,8 +32,14 @@ public class IntakeSegment extends Segment {
 
         EventWatcherThread.getInstance().registerEvent(new Event(){
 
+            private int debugCount = 0;
+
             @Override
             public boolean predicate() {
+                // if (++debugCount >= 20) {
+                //     logger.info("Running predicate");
+                // }
+
                 return Storage.getInstance().getBallCount() == ballsToGet;
             }
             

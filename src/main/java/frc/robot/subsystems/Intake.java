@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Logger;
+import frc.robot.Robot;
 
 /** Add your docs here. */
 public class Intake extends Subsystem {

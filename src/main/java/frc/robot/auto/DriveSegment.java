@@ -50,7 +50,7 @@ public class DriveSegment extends Segment {
     logger.info("Cruise: " + cruise);
     logger.info("Accel: " + accel);
 
-    drive.setTargetPosition(targetPosition, targetPosition);
+    drive.setMotionMagicTarget(targetPosition, targetPosition);
   }
 
   @Override

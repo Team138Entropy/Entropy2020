@@ -3,15 +3,21 @@ package frc.robot.auto;
 import java.util.HashMap;
 import java.util.Optional;
 
+import frc.robot.subsystems.Drive;
+
 public class Paths {
   private static HashMap<String, Path> paths = new HashMap<>();
   public static final Path NO_OP = new Path();
 
   static {
     paths.put("test", new Path()
-      .append(new IntakeSegment(3))
-      .append(new DriveSegment(4, 250, 125))
       .append(new ShootSegment())
+      .append(new IntakeSegment(3))
+      .append(new DriveSegment(6, 250, 125))
+      .append(new AsyncShootSegment())
+      .append(new DriveSegment(-6, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL))
+      // .append(new GyroTurnSegment(180))
+      // .append(new GyroTurnSegment(180))
     );
   }
 
