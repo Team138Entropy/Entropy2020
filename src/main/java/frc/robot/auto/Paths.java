@@ -10,7 +10,7 @@ public class Paths {
   public static final Path NO_OP = new Path();
 
   static {
-    paths.put("comp1", new Path().append(new GyroTurnSegment(180)));
+    paths.put("comp1", new Path().append(new DriveSegment(3, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)));
     // .append(new ShootSegment())
       // .append(new IntakeSegment(3))
       // .append(new DriveSegment(6, 250, 125))
@@ -19,13 +19,9 @@ public class Paths {
       // .append(new GyroTurnSegment(180))
       // .append(new GyroTurnSegment(180))
 
-    paths.put("comp2", new Path().append(new GyroTurnSegment(90)));
+    paths.put("comp2", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)));
 
-    paths.put("comp3", new Path().append(new DriveSegment(-1, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)));
-
-    paths.put("comp4", new Path().append(new DriveSegment(1, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)));
-
-    paths.put("comp5", new Path().append(new IntakeSegment(1)));
+    paths.put("comp4", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)).append(new ShootSegment()).append(new IntakeSegment(3)));
   }
 
   /**

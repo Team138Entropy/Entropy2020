@@ -1263,4 +1263,12 @@ public class Robot extends TimedRobot {
   public static boolean isAuto() {
     return mAuto;
   }
+
+  public boolean getSpinningUp(){
+    return mIsSpinningUp;
+  }
+
+  public boolean setSpinningUp(boolean value){
+    mIsSpinningUp = value;
+  }
 }
