@@ -145,6 +145,12 @@ public class Drive extends Subsystem {
 
       mRightMaster.configPeakOutputForward(peakOutput, 0);
       mRightMaster.configPeakOutputReverse(-peakOutput, 0);
+    } else {
+      mLeftMaster.configPeakOutputForward(1, 0);
+      mLeftMaster.configPeakOutputReverse(-1, 0);
+
+      mRightMaster.configPeakOutputForward(1, 0);
+      mRightMaster.configPeakOutputReverse(-1, 0);
     }
 
     // A lot of the space in this function is taken up by local copies of stuff
