@@ -1,6 +1,7 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
+import frc.robot.OI.NykoController.Axis;
 import frc.robot.OI.NykoController.DPad;
 import frc.robot.OI.XboxController.Button;
 import frc.robot.OI.XboxController.Side;
@@ -69,7 +70,7 @@ public class OperatorInterface {
   }
 
   public boolean climbStart() {
-    boolean buttonValue = DriverController.getButton(XboxController.Button.START);
+    boolean buttonValue = DriverController.getButton(XboxController.Button.BACK);
     return mClimbStartWasPressed.update(buttonValue);
   }
   
@@ -155,15 +156,8 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
 
-  // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
-  public boolean getTurretAdjustLeft() {
-    // return OperatorController.getDPad() == DPad.LEFT;
-    return false;
-  }
-
-  public boolean getTurretAdjustRight() {
-    // return OperatorController.getDPad() == DPad.RIGHT;
-    return false;
+  public double getTurretAdjust() {
+    return OperatorController.getJoystick(NykoController.Side.LEFT, Axis.X);
   }
 
   public boolean getShooterVelocityTrimUp() {
@@ -221,11 +215,7 @@ public class OperatorInterface {
   }
 
   public boolean isClimberTest() {
-    return OperatorController.getButton(NykoController.Button.LEFT_BUMPER);
-  }
-
-  public boolean isHomeClimber() {
-    return OperatorController.getButton(NykoController.Button.MIDDLE_11);
+    return OperatorController.getButton(NykoController.Button.RIGHT_BUMPER);
   }
 
   public boolean getFunctional() {
