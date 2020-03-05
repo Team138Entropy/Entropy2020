@@ -1,6 +1,7 @@
 package frc.robot.OI;
 
 import frc.robot.Constants;
+import frc.robot.OI.NykoController.Axis;
 import frc.robot.OI.NykoController.DPad;
 import frc.robot.OI.XboxController.Button;
 import frc.robot.OI.XboxController.Side;
@@ -143,15 +144,8 @@ public class OperatorInterface {
     return OperatorController.getDPad() == DPad.RIGHT;
   }
 
-  // TODO: use the joystick for this. we really don't want all-or-nothing on the turret
-  public boolean getTurretAdjustLeft() {
-    // return OperatorController.getDPad() == DPad.LEFT;
-    return false;
-  }
-
-  public boolean getTurretAdjustRight() {
-    // return OperatorController.getDPad() == DPad.RIGHT;
-    return false;
+  public double getTurretAdjust() {
+    return OperatorController.getJoystick(NykoController.Side.LEFT, Axis.X);
   }
 
   public boolean getShooterVelocityTrimUp() {
