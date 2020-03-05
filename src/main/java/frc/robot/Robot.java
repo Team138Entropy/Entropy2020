@@ -719,14 +719,9 @@ public class Robot extends TimedRobot {
           //No Results, Don't Rotate
           //System.out.println("NO TRACK!");
         }
-    }else{
+    } else {
       //Command the Turret Manually
-        // Operator Controls
-        if (mOperatorInterface.getTurretAdjustLeft()) {
-          // manual turret aim
-        } else if (mOperatorInterface.getTurretAdjustRight()) {
-          // manual turret aim
-        }
+      mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
     }
   }
 
