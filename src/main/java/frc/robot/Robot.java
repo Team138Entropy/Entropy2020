@@ -14,6 +14,7 @@ import frc.robot.auto.IntakeSegment;
 import frc.robot.auto.Path;
 import frc.robot.auto.Paths;
 import frc.robot.auto.ShootSegment;
+import frc.robot.auto.SyncIntakeSegment;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
@@ -105,7 +106,7 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private final Climber mClimber = Climber.getInstance();
-  private final Turret mTurret = Turret.getInstance();
+  // private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
 
   private static final DigitalInput practiceInput = new DigitalInput(
@@ -138,7 +139,7 @@ public class Robot extends TimedRobot {
   private LatchedBoolean HarvestAim = new LatchedBoolean();
   static NetworkTable mTable;
 
-  private boolean mIsSpinningUp = false;
+  private static boolean sIsSpinningUp = false;
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
@@ -213,7 +214,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
 
-    SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
+    SmartDashboard.putBoolean("Manual Spin-up", sIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     /*
      * SmartDashboard.putBoolean("Has Vision", result.HasResult); if
@@ -243,7 +244,7 @@ public class Robot extends TimedRobot {
     int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 1));
 
     mAuto = true;
-    mIsSpinningUp = false;
+    sIsSpinningUp = false;
     mOperatorInterface.checkControllers();
 
     mRobotLogger.log("Auto Init Called " + autoMode);
@@ -282,8 +283,14 @@ public class Robot extends TimedRobot {
       mStorage.stop();
     }
 
-    if (IntakeSegment.isActive()) {
+    if (IntakeSegment.isActive() || SyncIntakeSegment.isActive()) {
       executeIntakeStateMachine();
+    }
+
+    if (sIsSpinningUp) {
+      mShooter.start();
+    } else if (mState != State.SHOOTING) {
+      mShooter.stop();
     }
 
     executeShootingStateMachine();
@@ -295,7 +302,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     visionLight.set(Relay.Value.kOff);
     mAuto = false;
-    mIsSpinningUp = false;
+    sIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
 
     // Start background looper
@@ -772,14 +779,14 @@ public class Robot extends TimedRobot {
           //We have Target Information
           LastDistance = dis;
          // System.out.println("DISTANCE: " + LastDistance);
-          mTurret.SetAimError(result.turret_error.getDegrees());
+          //mTurret.SetAimError(result.turret_error.getDegrees());
         }else{
           //No Results, Don't Rotate
           //System.out.println("NO TRACK!");
         }
     } else {
       //Command the Turret Manually
-      mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
+      //mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
     }
   }
 
@@ -887,10 +894,10 @@ public class Robot extends TimedRobot {
     updateSmartDashboard();
 
     if (mOperatorInterface.getSpinUp()) {
-      mIsSpinningUp = !mIsSpinningUp;
+      sIsSpinningUp = !sIsSpinningUp;
     }
 
-    if (mIsSpinningUp) {
+    if (sIsSpinningUp) {
       mShooter.start();
     } else if (mState != State.SHOOTING) {
       mShooter.stop();
@@ -1104,7 +1111,7 @@ public class Robot extends TimedRobot {
 
         /* Starts roller */
         mShooter.start();
-        mIsSpinningUp = false;
+        sIsSpinningUp = false;
 
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
@@ -1248,11 +1255,11 @@ public class Robot extends TimedRobot {
     return mAuto;
   }
 
-  public boolean getSpinningUp(){
-    return mIsSpinningUp;
+  public static boolean getSpinningUp(){
+    return sIsSpinningUp;
   }
 
-  public void setSpinningUp(boolean value){
-    mIsSpinningUp = value;
+  public static void setSpinningUp(boolean value){
+    sIsSpinningUp = value;
   }
 }

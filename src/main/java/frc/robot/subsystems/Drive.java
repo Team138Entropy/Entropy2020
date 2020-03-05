@@ -458,7 +458,7 @@ public class Drive extends Subsystem {
     mPeriodicDriveData.climbingSpeed = climbing;
   }
 
-  public synchronized double getLeftEncoderDistance() {
+  public synchronized int getLeftEncoderDistance() {
     return mLeftMaster.getSelectedSensorPosition();
   }
 
