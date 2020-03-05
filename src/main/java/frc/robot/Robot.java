@@ -446,12 +446,7 @@ public class Robot extends TimedRobot {
         mTestTimer.start();
         break;
       case INTAKE_FORWARD:
-        if(runMotorTest(new MotorWithEncoder(){
-          @Override
-          public void percentOutput(double output) {
-            mIntake.setOutput(output);
-          }
-        }, "Intake Forwards", false, 0, 0, timePerTest)){
+        if(runMotorTest(mIntake::setOutput, "Intake Forwards", false, 0, 0, timePerTest)){
           mTestState = TestState.INTAKE_BACKWARD;
         }
         break;
