@@ -1268,7 +1268,7 @@ public class Robot extends TimedRobot {
     return mIsSpinningUp;
   }
 
-  public boolean setSpinningUp(boolean value){
+  public void setSpinningUp(boolean value){
     mIsSpinningUp = value;
   }
 }
