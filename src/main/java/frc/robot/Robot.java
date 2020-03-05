@@ -764,15 +764,6 @@ public class Robot extends TimedRobot {
         }else{
           mTurret.SetManualOutput(0);
         }
-
-        /*
-        if (mOperatorInterface.getTurretAdjustLeft()) {
-          // manual turret aim
-          mTurret.
-        } else if (mOperatorInterface.getTurretAdjustRight()) {
-          // manual turret aim
-        }
-        */
     }
   }
 
