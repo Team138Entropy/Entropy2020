@@ -122,7 +122,7 @@ public class Shooter extends Subsystem {
      boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 50) >= 0);
     // return isAtVelocity;
     
-    SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
+    //SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
