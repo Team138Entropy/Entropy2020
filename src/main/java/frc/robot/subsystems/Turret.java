@@ -19,7 +19,7 @@ public class Turret extends Subsystem {
 
   //Home Position of Turret
   //  as vision is disabled, goes to homing to get back home
-  private final double HomePosition = 14000.0;
+  private final double HomePosition = 0;
 
   //How Close the Turret can be
   private final double AutoAimDeadband = 0.7;
@@ -102,6 +102,13 @@ public class Turret extends Subsystem {
     }else if(mCurrentState == TurretState.HOME){
      //going to home position
       mTurretTalon.set(ControlMode.Position, HomePosition);
+      
+      //if at home position go to manual
+      if(Math.abs(HomePosition - Math.abs(mPeriodicIO.CurrentPosition)) <= 550){
+       //Home enough.. go to manual
+        mCurrentState = TurretState.MANUAL_AIM;
+      }
+      
     }else if(mCurrentState == TurretState.SEARCHING){
       //searching for a track
       //TODO
@@ -124,6 +131,15 @@ public class Turret extends Subsystem {
 
   //Operator Driven Manual Control
   public synchronized void SetManualOutput(double value){
+    //detect change from Auto to Manual
+    //this indicates that we rotate home
+    if(mCurrentState == TurretState.AUTO_AIM){
+     //set to home 
+      ReturnHome();
+      return;
+    }
+
+    //buisness as usual..
     mPeriodicIO.demand = value;
     //Force correct control mode
     if(mCurrentState != TurretState.MANUAL_AIM){
