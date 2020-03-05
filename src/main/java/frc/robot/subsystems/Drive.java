@@ -223,9 +223,12 @@ public class Drive extends Subsystem {
         setOpenloopRamp(accelSpeed * accelSpeedWhenTurningFactor);
       }
     } else if (velocityReverse) {
-      if (acceleratingForward) {
-        setOpenloopRamp(brakeSpeed * accelSpeedWhenTurningFactor);
-      }
+      // if (acceleratingForward) {
+      //   setOpenloopRamp(brakeSpeed * accelSpeedWhenTurningFactor);
+      // }
+
+      // PittDrive mode - symmetry between forward and reverse accel
+      setOpenloopRamp(brakeSpeed * accelSpeedWhenTurningFactor);
     } else if (stationary) {
       setOpenloopRamp(0);
     } else if (quickturn) {
