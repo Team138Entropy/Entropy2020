@@ -65,6 +65,9 @@ public class Storage extends Subsystem {
     mTopRoller.configContinuousCurrentLimit(7);
     mTopRoller.configPeakCurrentLimit(7);
 
+    mBottomRoller.configContinuousCurrentLimit(7);
+    mBottomRoller.configPeakCurrentLimit(7);
+
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
     
     if (Robot.getIsPracticeBot()) {

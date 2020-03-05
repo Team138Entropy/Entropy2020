@@ -713,6 +713,12 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     visionLight.set(Relay.Value.kOff);
 
+    //zero the encoder 
+    mTurret.zeroSensors();
+
+    //zero turret sensor
+    //this assumes the turret is aligned
+
     Config.getInstance().reload();
   }
 
@@ -723,7 +729,7 @@ public class Robot extends TimedRobot {
 
   //turret loop
   //constantly commands the turret with vision or manual controls
-  public void turretLoop() {
+  public synchronized void turretLoop() {
 
     if(mTurretState == TurretState.AUTO_AIM){
       //Command the Turret with vision set points
@@ -736,7 +742,7 @@ public class Robot extends TimedRobot {
 
           //verify we haven't already commanded this packet!
           if(vp.ID != LastTurretVisionID){
-            mTurret.SetAimError(vp.Error_Angle);
+            mTurret.SetAimError(vp.Error_Angle + Constants.kTurretAngleOffset);
             LastTurretVisionID = vp.ID;
           }
 
@@ -749,9 +755,9 @@ public class Robot extends TimedRobot {
         // Operator Controls
         double ManualTurn = mOperatorInterface.getTurretAdjust();
         if(ManualTurn > .6){
-          mTurret.SetManualOutput(-1.0);
+          mTurret.SetManualOutput(-.85);
         }else if(ManualTurn < -.6){
-          mTurret.SetManualOutput(1.0);
+          mTurret.SetManualOutput(.85);
         }else{
           mTurret.SetManualOutput(0);
         }
@@ -893,8 +899,10 @@ public class Robot extends TimedRobot {
       mIsSpinningUp = !mIsSpinningUp;
     }
 
+
+    //spin up shooter if commanded
     if(mIsSpinningUp){
-      mShooter.start();
+      mShooter.start(false);
     }else if(mState != State.SHOOTING){
       mShooter.stop();
     }
@@ -1104,13 +1112,13 @@ public class Robot extends TimedRobot {
         mStorage.stop();
 
         /* Starts roller */
-        mShooter.start();
+        mShooter.start(false);
         mIsSpinningUp = false;
 
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
           mShootingState = ShootingState.SHOOT_BALL;
-          mFireTimer.start();
+          //mFireTimer.start();
         }
 
         if(mOperatorInterface.getShoot()){
@@ -1121,8 +1129,10 @@ public class Robot extends TimedRobot {
       case SHOOT_BALL:
         mStorage.ejectBall();
 
-        mShooter.start();
+        mShooter.start(true);
 
+
+        //turn off shooting
         if(mOperatorInterface.getShoot()){
           mShootingState = ShootingState.SHOOTING_COMPLETE;
           mStorage.stop();

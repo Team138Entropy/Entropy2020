@@ -144,13 +144,8 @@ public class RobotTracker{
 
     //For Turret
     public void UpdateTurretVision(double timestamp, TargetInfo ti){
-        Rotation2d angle = getCameraToVisionAngle(ti, true);
-        System.out.println("Initial Angle: " + angle.getDegrees());
-        //translate by the camera offset
-        Pose2d pose = new Pose2d(new Translation2d(0, 0), angle);
-        pose.transformBy(new Pose2d(new Translation2d(0, 50), Rotation2d.identity()));
-        Rotation2d NewAngle = pose.getRotation();
-        System.out.println("Second Angle: " + NewAngle.getDegrees());
+        Rotation2d NewAngle = getCameraToVisionAngle(ti, true);
+        System.out.println("NOT NULL!");
 
         //Check for heavy leighers before updating
         //angle isn't too big, vision makes sense..
@@ -159,28 +154,37 @@ public class RobotTracker{
             //Outleigher! don't store this
             return;
         }
+        System.out.println("NOT NULL! 1");
 
         double DistCheck = ti.getDistance();
         if(DistCheck > 65 || DistCheck < -5){
             return;
         }
+        System.out.println("NOT NULL! 2 ");
 
         VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
+       
+        System.out.println("NOT NULL! 3 ");
+
         int previousID = 0;
         synchronized(Turret_Vision_Packet_Error){
             //store previous ID if it exists
             if(TurretError == null){
                 //first id
                 vp.setID(1);
+                System.out.println("NOT NULL 4");
             }else{
                 //not first id, incriment unless we reach limit
                 previousID = Turret_Vision.ID;
                 if(previousID == 10000){
                     //rollover
                     vp.setID(1);
+                    System.out.println("NOT NULL 4.1");
+
                 }else{
                     //incriment
                     vp.setID(previousID + 1);
+                    System.out.println("NOT NULL 4.2");
                 }
             }
             //now update!

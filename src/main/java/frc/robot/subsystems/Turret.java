@@ -101,7 +101,7 @@ public class Turret extends Subsystem {
 
     }else if(mCurrentState == TurretState.HOME){
      //going to home position
-      mTurretTalon.set(ControlMode.MotionMagic, HomePosition);
+      mTurretTalon.set(ControlMode.Position, HomePosition);
     }else if(mCurrentState == TurretState.SEARCHING){
       //searching for a track
       //TODO
@@ -158,8 +158,9 @@ public class Turret extends Subsystem {
   }
 
 
-
-  public void zeroSensors() {
+  //zero sensors
+  public synchronized void zeroSensors() {
+    mTurretTalon.setSelectedSensorPosition(0);
   }
 
     /*

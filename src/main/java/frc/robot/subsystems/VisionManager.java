@@ -142,11 +142,21 @@ public class VisionManager extends Subsystem {
                  //  mRobotTracker.UpdateTurretError(ti);
 
                 //Call update function based on target
-                if(ti.IsHighGoal() == true){
-                  mRobotTracker.UpdateTurretVision(Timer.getFPGATimestamp(), ti);
-                }else if(ti.IsBall() == true){
-                  mRobotTracker.UpdateDriveVision(Timer.getFPGATimestamp(), ti);
+
+                try{
+                  if(ti.IsHighGoal() == true){
+                    mRobotTracker.UpdateTurretVision(Timer.getFPGATimestamp(), ti);
+                  }else if(ti.IsBall() == true){
+                    mRobotTracker.UpdateDriveVision(Timer.getFPGATimestamp(), ti);
+                  }
+                }catch(Exception e){
+                  System.out.println("CATCH EXCEPTION!");
+                  System.out.println(e.getMessage());
+                  System.out.println("PRINTING STACK TRACE");
+                  e.printStackTrace();
+                  int stop = 0;
                 }
+
 
               }
             });

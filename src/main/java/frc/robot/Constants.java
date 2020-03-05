@@ -70,9 +70,12 @@ public class Constants {
     public static final double kCameraHorizontalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraHorizontalAspect / kCameraDiagonalView)) * 2;
     public static final double kCameraVerticalView = Math.atan(Math.tan(kCameraDiagonalView / 2) * (kCameraVerticalAspect / kCameraDiagonalView)) * 2;
     public static final Rotation2d kShooterCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(0); //Shooter should sit pretty flat
-    public static final Rotation2d kBallCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(-5); //camera is angled downards
+    public static final Rotation2d kBallCameraHorizontalPlaneToLens = Rotation2d.fromDegrees(0); //camera is angled downards
     public static final double kShooterCameraHeight = 40; //shooter camera height on robot (inches)
     public static final double kBallCameraHeight = 12; //ball camera height
+
+    //angle offset.. account for offset camera
+    public static final double kTurretAngleOffset = 2.0;
     
     //Offsets from our center point
     public static final Pose2d kTurrentToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 

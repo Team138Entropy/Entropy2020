@@ -10,7 +10,7 @@ import frc.robot.Constants;
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private final double MAX_SPEED = 3700.0;
+  private final double MAX_SPEED = 3600.0;
   // private static final double SPEED_DEADBAND = 20;
   private final double SPEED_DEADBAND = 5;
   private final double DROP_DEADBAND = 250;
@@ -60,11 +60,14 @@ public class Shooter extends Subsystem {
 
 
   /** Starts the roller. */
-  public void start() {
-  //  mRoller.setSpeed(getAdjustedVelocitySetpoint());
-     mRoller.setPercentOutput(.975);
+  public void start(boolean speedBump) {
 
+    int add = 0;
+    if(speedBump == true){
+      add = 0;
+    }
 
+    mRoller.setSpeed(getAdjustedVelocitySetpoint() + add);
     SmartDashboard.putNumber("ShooterCurrent", mRoller.getCurrent());
   }
 
@@ -116,7 +119,7 @@ public class Shooter extends Subsystem {
     //New Concept: Velocity FLOOR
     //our velocity setpoint will be slightly higher than it needs to be
     // allow velocity to be sliughtly lower, but operate as a floor
-     boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint()/* - 15*/) >= 0);
+     boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 50) >= 0);
     // return isAtVelocity;
     
     SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
