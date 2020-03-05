@@ -1012,6 +1012,9 @@ public class Robot extends TimedRobot {
 
       /** Sets the climbing state to idle if it's not already */
       mState = State.CLIMBING;
+
+      mDrive.setClimbingSpeed(true);
+
       if (mClimbingState == ClimbingState.IDLE) {
         mClimbingState = ClimbingState.WAIT;
       }
@@ -1026,6 +1029,8 @@ public class Robot extends TimedRobot {
       mState = State.INTAKE;
 
       mIntakeState = IntakeState.READY_TO_INTAKE;
+
+      mDrive.setClimbingSpeed(false);
 
       return true;
     } else {

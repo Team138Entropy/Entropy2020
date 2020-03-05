@@ -46,6 +46,7 @@ public class Drive extends Subsystem {
     public int right_velocity_ticks_per_100ms;
     public Rotation2d gyro_heading = Rotation2d.identity();
     public Pose2d error = Pose2d.identity();
+    public boolean climbingSpeed = false;
 
     // OUTPUTS
     public double left_demand;
@@ -135,6 +136,17 @@ public class Drive extends Subsystem {
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
+    // Slow down climbing if the climber is extended so we can't rip it off (as easily)
+    double peakOutput = Config.getInstance().getDouble(Key.DRIVE__PEAK_OUTPUT_CLIMBING);
+
+    if (mPeriodicDriveData.climbingSpeed) {
+      mLeftMaster.configPeakOutputForward(peakOutput, 0);
+      mLeftMaster.configPeakOutputReverse(-peakOutput, 0);
+
+      mRightMaster.configPeakOutputForward(peakOutput, 0);
+      mRightMaster.configPeakOutputReverse(-peakOutput, 0);
+    }
+
     // A lot of the space in this function is taken up by local copies of stuff
     double accelSpeed = Config.getInstance().getDouble(Key.DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS);
     double brakeSpeed = Config.getInstance().getDouble(Key.DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS);
@@ -332,6 +344,10 @@ public class Drive extends Subsystem {
       Test all Sensors in the Subsystem
   */
   public void checkSubsystem() {}
+
+  public synchronized void setClimbingSpeed(boolean climbing) {
+    mPeriodicDriveData.climbingSpeed = climbing;
+  }
 
   public synchronized double getLeftEncoderDistance() {
     return mLeftMaster.getSelectedSensorPosition();

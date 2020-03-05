@@ -10,6 +10,7 @@ public class Config {
 
   public enum Key {
     // Motors
+    DRIVE__PEAK_OUTPUT_CLIMBING(0.3),
     DRIVE__LEFT_BACK_PORT(1),
     DRIVE__LEFT_FRONT_PORT(2),
     DRIVE__RIGHT_BACK_PORT(3),
