@@ -75,7 +75,7 @@ public class Constants {
     public static final double kBallCameraHeight = 12; //ball camera height
 
     //angle offset.. account for offset camera
-    public static final double kTurretAngleOffset = 2.0;
+    public static final double kTurretAngleOffset = -2.5;
     
     //Offsets from our center point
     public static final Pose2d kTurrentToLens = new Pose2d(new Translation2d(0, 0.0), Rotation2d.fromDegrees(0.0)); 
