@@ -693,6 +693,8 @@ public class Robot extends TimedRobot {
     visionLight.set(Relay.Value.kOff);
 
     Config.getInstance().reload();
+
+    mClimber.resetEncoder();
   }
 
   @Override
@@ -1019,6 +1021,18 @@ public class Robot extends TimedRobot {
     }
   }
 
+  private boolean checkEscapeClimbHold() {
+    if (mOperatorInterface.climbStart()) {
+      mState = State.INTAKE;
+
+      mIntakeState = IntakeState.READY_TO_INTAKE;
+
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
@@ -1130,6 +1144,9 @@ public class Robot extends TimedRobot {
         if (mOperatorInterface.climbDown()) {
           mClimbingState = ClimbingState.RETRACTING;
         }
+
+        checkEscapeClimbHold();
+
         break;
       case RETRACTING:
         mClimber.retract();

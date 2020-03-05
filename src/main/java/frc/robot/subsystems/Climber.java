@@ -9,13 +9,15 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Logger;
+import frc.robot.Config.Key;
 
 
 public class Climber extends Subsystem {
   private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER__MOTOR);
 
   //TODO: Tune these values
-  private final int HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
+  private final int DETECT_BAND = Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND);
+  private final int EXTENDED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__EXTENDED_HEIGHT_IN_ENCODER_TICKS);
   private final int RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
   private final double HOMING_SPEED_PERCENT = Config.getInstance().getDouble(Config.Key.CLIMBER__HOME_SPEED);
 
@@ -80,14 +82,12 @@ public class Climber extends Subsystem {
 
     // Integral control only applies when the error is small; this avoids integral windup
     mMotor.config_IntegralZone(0, 200, TimeoutMS);
-
-    mMotor.setSelectedSensorPosition(0);
     mMotor.setInverted(true);
   }
 
   public void extend() {
-    mLogger.verbose("Extending climber to " + HEIGHT_IN_ENCODER_TICKS);
-    mMotor.set(ControlMode.Position, HEIGHT_IN_ENCODER_TICKS);
+    mLogger.verbose("Extending climber to " + EXTENDED_HEIGHT_IN_ENCODER_TICKS);
+    mMotor.set(ControlMode.Position, EXTENDED_HEIGHT_IN_ENCODER_TICKS);
   }
 
   public void retract() {
@@ -104,13 +104,13 @@ public class Climber extends Subsystem {
   /** Return true if extended */
   public boolean isExtended() {
     int encoderPosition = mMotor.getSelectedSensorPosition();
-    return (encoderPosition >= HEIGHT_IN_ENCODER_TICKS - 100) && (encoderPosition <= HEIGHT_IN_ENCODER_TICKS + 100);
+    return (encoderPosition >= EXTENDED_HEIGHT_IN_ENCODER_TICKS - DETECT_BAND) && (encoderPosition <= EXTENDED_HEIGHT_IN_ENCODER_TICKS + DETECT_BAND);
   }
 
   /** Returns true if retracted */
   public boolean isRetracted() {
     int encoderPosition = mMotor.getSelectedSensorPosition();
-    return (encoderPosition >= RETRACTED_HEIGHT_IN_ENCODER_TICKS - 100) && (encoderPosition <= RETRACTED_HEIGHT_IN_ENCODER_TICKS + 100);
+    return (encoderPosition >= RETRACTED_HEIGHT_IN_ENCODER_TICKS - Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND)) && (encoderPosition <= RETRACTED_HEIGHT_IN_ENCODER_TICKS + Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND));
   }
 
   /** Jogs the climber */
@@ -127,6 +127,9 @@ public class Climber extends Subsystem {
     return mMotor.getSelectedSensorPosition();
   }
 
+  public void resetEncoder() {
+    mMotor.setSelectedSensorPosition(0);
+  }
 
   public void zeroSensors() {}
 
