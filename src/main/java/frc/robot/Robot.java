@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     Sharpshooter,
     Rebounder,
     Climber
-  };
+  }
 
   // State variables
   public enum State {
@@ -254,8 +254,7 @@ public class Robot extends TimedRobot {
     mState = State.SHOOTING;
     mShootingState = ShootingState.IDLE;
     mIntakeState = IntakeState.IDLE;
-    //mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
-    mStorage.preloadBalls(3);
+    mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
     mAutoPath =
         Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
@@ -302,8 +301,6 @@ public class Robot extends TimedRobot {
 
     Config.getInstance().reload();
 
-    // mStorage.preloadBalls(3);
-
     mOperatorInterface.checkControllers();
 
     // Set the initial Robot State
@@ -326,7 +323,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // mRobotLogger.info("Angle: " + sGyro.getAngle());
     try {
       RobotLoop();
     } catch (Exception e) {
@@ -804,12 +800,6 @@ public class Robot extends TimedRobot {
   }
 
   public void driveTrainLoop() {
-
-    // Hack
-    if (mAuto) {
-      return;
-    }
-
     // TODO: Cache whether or not the robot has a drivetrain. We shouldn't be calling the config
     // system every tick.
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
@@ -963,7 +953,6 @@ public class Robot extends TimedRobot {
     switch (mIntakeState) {
       // TODO: Make this not a transitionary state
       case IDLE:
-        // mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
         mShooter.stop();

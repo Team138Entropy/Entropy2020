@@ -7,8 +7,6 @@ import frc.robot.util.DriveSignal;
 
 /** A type of {@link Segment} for driving straight. */
 public class DriveSegment extends Segment {
-  private final int acceptableError = 50;
-
   private double feet; // For cloning
   private int cruise;
   private int accel;
@@ -22,6 +20,8 @@ public class DriveSegment extends Segment {
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
+  @SuppressWarnings("FieldCanBeLocal")
+  private final int LOGGING_COUNT_MODULUS = 5;
 
   // The number of ticks for which we've been within the acceptable range
   private int debounceCount = 0;
@@ -30,6 +30,7 @@ public class DriveSegment extends Segment {
     this.feet = feet;
     this.drive = Drive.getInstance();
     this.targetPosition = drive.feetToTicks(feet);
+    int acceptableError = 50;
     this.min = targetPosition - acceptableError;
     this.max = targetPosition + acceptableError;
 
@@ -46,7 +47,6 @@ public class DriveSegment extends Segment {
     drive.zeroEncoders();
     drive.setCruiseAndAcceleration(cruise, accel);
 
-    if (test) logger.info("Hello!");
     logger.info("Cruise: " + cruise);
     logger.info("Accel: " + accel);
 
@@ -59,7 +59,7 @@ public class DriveSegment extends Segment {
     int left = drive.getLeftEncoderDistance();
     int right = -drive.getRightEncoderDistance();
 
-    if (++loggingCount > 5) {
+    if (++loggingCount > LOGGING_COUNT_MODULUS) {
       logger.info(
           "Encoder distances: ("
               + drive.getLeftEncoderDistance()

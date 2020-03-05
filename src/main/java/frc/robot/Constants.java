@@ -16,6 +16,9 @@ public class Constants {
   // PWM
   public static final int kCameraRingId = 0;
 
+  // Talon config
+  public static int CONFIG_TIMEOUT_MS = 250;
+
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
   // Oracle's official constant convention. Don't @ me.
@@ -24,6 +27,8 @@ public class Constants {
 
   // Auto Constants
   public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds
+  public static final int DEFAULT_ACCEL = 750;
+  public static final int DEFAULT_CRUISE_VELOCITY = 900;
 
   // 22 is too low, 100 is too high
   public static final double kDriveWheelTrackWidthInches = 50;

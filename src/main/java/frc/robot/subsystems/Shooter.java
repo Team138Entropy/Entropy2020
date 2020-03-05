@@ -70,6 +70,8 @@ public class Shooter extends Subsystem {
 
   /** Stops the roller. */
   public void stop() {
+
+    // We want to keep the roller spun up during auto to save time.
     if (!Robot.isAuto()) mRoller.setSpeed(0);
   }
 

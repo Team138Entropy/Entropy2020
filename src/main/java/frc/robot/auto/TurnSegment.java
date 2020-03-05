@@ -20,6 +20,8 @@ public class TurnSegment extends Segment {
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
+  @SuppressWarnings("FieldCanBeLocal")
+  private final int LOGGING_COUNT_MODULUS = 5;
 
   // The number of ticks for which we've been within the acceptable range
   private int debounceCount = 0;
@@ -55,7 +57,7 @@ public class TurnSegment extends Segment {
 
     double out = controller.calculate(angle);
     
-    if (++loggingCount > 5) {
+    if (++loggingCount > LOGGING_COUNT_MODULUS) {
       logger.info("Angle: " + angle);
       loggingCount = 0;
     }

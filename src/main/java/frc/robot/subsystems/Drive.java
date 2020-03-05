@@ -12,8 +12,6 @@ import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
-import frc.robot.util.motion.SetpointGenerator;
-import frc.robot.vision.AimingParameters;
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
@@ -23,9 +21,6 @@ public class Drive extends Subsystem {
 
   // Drive is plummed to default to high gear
   private boolean mHighGear = true;
-
-  public static final int DEFAULT_ACCEL = 750;
-  public static final int DEFAULT_CRUISE_VELOCITY = 900;
 
   public enum DriveControlState {
     OPEN_LOOP, // open loop voltage control
@@ -131,21 +126,14 @@ public class Drive extends Subsystem {
     talon.config_kI(0, I);
     talon.config_kD(0, D);
     talon.config_kF(0, 0);
-    // talon.configClosedloopRamp(0.5, 0);
-    // talon.configClosedLoopPeakOutput(0, 0.5);
-    // talon.configPeakCurrentDuration(3000);
-    // talon.configPeakCurrentLimit(30);
-    // talon.configContinuousCurrentLimit(15);
     talon.configClosedLoopPeriod(0, 10);
 
     talon.configMotionCruiseVelocity(900);
     talon.configMotionAcceleration(750);
-
-    // talon.configClosedloopRamp(1);
   }
 
   public void resetCruiseAndAccel() {
-    setCruiseAndAcceleration(DEFAULT_CRUISE_VELOCITY, DEFAULT_ACCEL);
+    setCruiseAndAcceleration(Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL);
   }
 
   public void setCruiseAndAcceleration(int cruise, int accel) {
@@ -362,24 +350,6 @@ public class Drive extends Subsystem {
     }
   }
 
-  /*
-      Auto Steer functionality
-      passed in parameters to the goal to aim at
-      allows driver to control throttle
-      this will be called with the ball as a target
-  */
-  // public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
-  //   double timestamp = Timer.getFPGATimestamp();
-  //   final double kAutosteerAlignmentPointOffset = 15.0; //
-  //   /*
-  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle *
-  // (reverse ? -1.0 : 1.0))));
-  //   setBrakeMode(true);
-  //   */
-
-  // }
-
-
   //Auto Steer functionality to the goal
   //driver only controls the throttle
   //'we may want to set a speed floor/speed minimum'
@@ -476,8 +446,8 @@ public class Drive extends Subsystem {
   }
 
   public void zeroEncoders() {
-    mLeftMaster.getSensorCollection().setQuadraturePosition(0, 250);
-    mRightMaster.getSensorCollection().setQuadraturePosition(0, 250);
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0, Constants.CONFIG_TIMEOUT_MS);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0, Constants.CONFIG_TIMEOUT_MS);
   }
 
   // Used only in TEST mode

@@ -3,14 +3,14 @@ package frc.robot.auto;
 import java.util.HashMap;
 import java.util.Optional;
 
-import frc.robot.subsystems.Drive;
+import frc.robot.Constants;
 
 public class Paths {
   private static HashMap<String, Path> paths = new HashMap<>();
   public static final Path NO_OP = new Path();
 
   static {
-    paths.put("comp1", new Path().append(new DriveSegment(3, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)));
+    paths.put("comp1", new Path().append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
     // .append(new ShootSegment())
       // .append(new IntakeSegment(3))
       // .append(new DriveSegment(6, 250, 125))
@@ -19,9 +19,9 @@ public class Paths {
       // .append(new GyroTurnSegment(180))
       // .append(new GyroTurnSegment(180))
 
-    paths.put("comp2", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)));
+    paths.put("comp2", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
 
-    paths.put("comp4", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL)).append(new ShootSegment()).append(new IntakeSegment(3)));
+    paths.put("comp4", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)).append(new ShootSegment()).append(new IntakeSegment(3)));
   }
 
   /**

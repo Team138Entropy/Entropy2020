@@ -36,10 +36,6 @@ public class IntakeSegment extends Segment {
 
             @Override
             public boolean predicate() {
-                // if (++debugCount >= 20) {
-                //     logger.info("Running predicate");
-                // }
-
                 return Storage.getInstance().getBallCount() == ballsToGet;
             }
             
