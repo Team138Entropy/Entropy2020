@@ -10,6 +10,7 @@ public class EventWatcherThread extends Thread {
 
   private static EventWatcherThread instance;
 
+  private final Object queueLock = new Object();
   private ArrayList<Event> queue;
   private ArrayList<Event> pruneList; // Needed to avoid ConcurrentModificationException!
 
@@ -53,28 +54,20 @@ public class EventWatcherThread extends Thread {
   }
 
   public void registerEvent(Event e) {
-    synchronized (queue) {
+    synchronized (queueLock) {
       queue.add(e);
     }
   }
 
   public void unRegisterEvent(Event e) {
-    synchronized (queue) {
-      if (queue.contains(e)) {
-        queue.remove(e);
-      }
+    synchronized (queueLock) {
+      queue.remove(e);
     }
     
   }
 
-  public ArrayList<Event> getQueue() {
-    synchronized (queue) {
-      return (ArrayList<Event>) queue.clone();
-    }
-  }
-
   public void resetQueue() {
-    synchronized (queue) {
+    synchronized (queueLock) {
       queue.clear();
     }
   }
