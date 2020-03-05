@@ -71,6 +71,9 @@ public class Robot extends TimedRobot {
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
 
+  private final int ShotCooldown = 10; //each loop is 20 secs.. 200 ms cooldown
+  private int mCurrentCooldown = ShotCooldown;
+
   private State mState = State.IDLE;
   private IntakeState mIntakeState = IntakeState.IDLE;
   private ShootingState mShootingState = ShootingState.IDLE;
@@ -1115,10 +1118,20 @@ public class Robot extends TimedRobot {
         mShooter.start(false);
         mIsSpinningUp = false;
 
+        //make robot pass though cooldown timer
+        //should help between shots and solve low velocity issue
+        if(mCurrentCooldown > 0){
+            mCurrentCooldown--;
+            return; //skip the rest of this loop
+        }
+
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
           mShootingState = ShootingState.SHOOT_BALL;
           //mFireTimer.start();
+
+          //reset cooldown timer
+          mCurrentCooldown = ShotCooldown;
         }
 
         if(mOperatorInterface.getShoot()){
