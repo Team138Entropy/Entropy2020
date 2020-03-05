@@ -145,46 +145,37 @@ public class RobotTracker{
     //For Turret
     public void UpdateTurretVision(double timestamp, TargetInfo ti){
         Rotation2d NewAngle = getCameraToVisionAngle(ti, true);
-        System.out.println("NOT NULL!");
-
+        
         //Check for heavy leighers before updating
         //angle isn't too big, vision makes sense..
         double DegreeCheck = Math.abs(NewAngle.getDegrees());
-        if(DegreeCheck > 82){
+        if(DegreeCheck >= 82){
             //Outleigher! don't store this
             return;
         }
-        System.out.println("NOT NULL! 1");
-
+        
+        //Distance Check
         double DistCheck = ti.getDistance();
         if(DistCheck > 65 || DistCheck < -5){
             return;
         }
-        System.out.println("NOT NULL! 2 ");
 
         VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
-       
-        System.out.println("NOT NULL! 3 ");
-
         int previousID = 0;
         synchronized(Turret_Vision_Packet_Error){
             //store previous ID if it exists
-            if(TurretError == null){
+            if(Turret_Vision == null){
                 //first id
                 vp.setID(1);
-                System.out.println("NOT NULL 4");
             }else{
                 //not first id, incriment unless we reach limit
                 previousID = Turret_Vision.ID;
                 if(previousID == 10000){
                     //rollover
                     vp.setID(1);
-                    System.out.println("NOT NULL 4.1");
-
                 }else{
                     //incriment
                     vp.setID(previousID + 1);
-                    System.out.println("NOT NULL 4.2");
                 }
             }
             //now update!
@@ -194,7 +185,43 @@ public class RobotTracker{
 
 
     public void UpdateDriveVision(double timestamp, TargetInfo ti){
+        Rotation2d NewAngle = getCameraToVisionAngle(ti, true);
+        
+        //Check for heavy leighers before updating
+        //angle isn't too big, vision makes sense..
+        double DegreeCheck = Math.abs(NewAngle.getDegrees());
+        if(DegreeCheck >= 82){
+            //Outleigher! don't store this
+            return;
+        }
+        
+        //Distance Check
+        double DistCheck = ti.getDistance();
+        if(DistCheck > 65 || DistCheck < -15){
+            return;
+        }
 
+        VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
+        int previousID = 0;
+        synchronized(Drive_Vision_Packet_Error){
+            //store previous ID if it exists
+            if(Drive_Vision == null){
+                //first id
+                vp.setID(1);
+            }else{
+                //not first id, incriment unless we reach limit
+                previousID = Drive_Vision.ID;
+                if(previousID == 10000){
+                    //rollover
+                    vp.setID(1);
+                }else{
+                    //incriment
+                    vp.setID(previousID + 1);
+                }
+            }
+            //now update!
+            Drive_Vision = vp;
+        }
     }
 
     public VisionPacket GetTurretVisionPacket(double timestamp){
