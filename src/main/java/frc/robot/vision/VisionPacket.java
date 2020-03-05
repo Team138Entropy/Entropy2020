@@ -17,7 +17,7 @@ public class VisionPacket {
     public final double Timestamp;
     public final double Error_Angle;
     public final boolean HasValue;
-    public int ID;
+    public int ID = 0;
 
     public VisionPacket(
         double TS,
