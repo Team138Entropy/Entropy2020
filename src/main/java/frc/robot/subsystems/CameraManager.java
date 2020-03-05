@@ -49,7 +49,7 @@ public class CameraManager extends Subsystem {
     setupCamera(0);
   }
 
-  public void setWhichCamera(boolean wantsClimbingCamera){
+  public void setClimbingCamera(boolean wantsClimbingCamera){
     mCamera.close();
     if(wantsClimbingCamera && !mIsClimbingCamera){
       setupCamera(1);
