@@ -18,16 +18,15 @@ public class Paths {
                     40.0 / 12.0, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL))
             .append(new VisionToggleSegment()));
 
-    paths
-        .put(
-            "comp2",
-            new Path()
-                .append(new VisionToggleSegment())
-                .append(new SpinUpSegment())
-                .append(
-                    new DriveSegment(
-                        40.0 / 12.0, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)))
-        .append(new ShootSegment());
+    paths.put(
+        "comp2",
+        new Path()
+            .append(new VisionToggleSegment())
+            .append(new SpinUpSegment())
+            .append(
+                new DriveSegment(
+                    40.0 / 12.0, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL))
+            .append(new ShootSegment()));
 
     // paths.put(
     //     "comp3",
