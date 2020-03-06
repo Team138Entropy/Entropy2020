@@ -23,7 +23,7 @@ public class Paths {
     
     // paths.put("comp2", new Path().append(new VisionToggleSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)).append(new VisionToggleSegment()));
 
-    paths.put("comp3", new Path().append(new DriveSegment(10, 300, Constants.DEFAULT_ACCEL)));
+    paths.put("comp3", new Path().append(new DriveSegment(10, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
 
     paths.put("comp4", new Path()
     .append(new SpinUpSegment())
