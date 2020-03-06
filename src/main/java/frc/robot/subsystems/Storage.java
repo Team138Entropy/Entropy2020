@@ -67,8 +67,7 @@ public class Storage extends Subsystem {
     mBottomRoller.configContinuousCurrentLimit(Constants.STORAGE_CURRENT_LIMIT);
     mBottomRoller.configPeakCurrentLimit(Constants.STORAGE_CURRENT_LIMIT);
 
-    mIntakeSensor =
-     new DigitalInput(INTAKE_SENSOR_PORT);
+    mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
 
     if (Robot.getIsPracticeBot()) {
       BALL_DISTANCE_IN_ENCODER_TICKS =
