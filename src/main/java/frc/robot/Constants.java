@@ -5,7 +5,22 @@ import frc.robot.util.geometry.Rotation2d;
 import frc.robot.util.geometry.Translation2d;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
-public class Constants {
+public class Constants {    
+  //Talons Ports
+  //ALL TALON PORTS DEFINED HERE
+  public static final int Talon_LeftDrive1_Master = 1;
+  public static final int Talon_LeftDrive2_Slave = 2;
+  public static final int Talon_RightDrive1_Master = 3;
+  public static final int Talon_RightDrive2_Slave = 4;
+  public static final int Talon_Storage_Top = 5;
+  public static final int Talon_Shooter_Master = 6;
+  public static final int Talon_Shooter_Slave = 7;
+  public static final int Talon_Storage_Bottom = 8;
+  public static final int Talon_Turret = 9;
+  public static final int Talon_IntakeRoller = 10;
+  public static final int Talon_Climber = 11;
+  //ALL TALON PORTS DEFINED HERE
+
 
   // Controller Ports
   public static final int DriverControllerPort = 0;

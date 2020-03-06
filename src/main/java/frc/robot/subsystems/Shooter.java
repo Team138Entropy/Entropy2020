@@ -56,14 +56,9 @@ public class Shooter extends Subsystem {
   }
 
   /** Starts the roller. */
-  public void start(boolean speedBump) {
+  public void start() {
 
-    int add = 0;
-    if (speedBump == true) {
-      add = 0;
-    }
-
-    mRoller.setSpeed(getAdjustedVelocitySetpoint() + add);
+    mRoller.setSpeed(getAdjustedVelocitySetpoint());
     SmartDashboard.putNumber("ShooterCurrent", mRoller.getCurrent());
   }
 
