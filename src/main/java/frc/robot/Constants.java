@@ -37,6 +37,8 @@ public class Constants {
   // Talon config
   public static int CONFIG_TIMEOUT_MS = 250;
 
+  public static int TURRET_AIM_MAX_VELOCITY = 80;
+
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
   // Oracle's official constant convention. Don't @ me.

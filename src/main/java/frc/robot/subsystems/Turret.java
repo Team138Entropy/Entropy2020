@@ -146,7 +146,7 @@ public class Turret extends Subsystem {
     velocity = Math.abs(velocity);
 
     // Shooter is offset
-    if (velocity <= 80) {
+    if (velocity <= Constants.TURRET_AIM_MAX_VELOCITY) {
       mPeriodicIO.angle = angle;
       double setpoint = mPeriodicIO.CurrentPosition - (angle * TicksPerDegree);
       mPeriodicIO.demand = setpoint;
