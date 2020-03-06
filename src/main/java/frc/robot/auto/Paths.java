@@ -15,32 +15,48 @@ public class Paths {
             .append(
                 new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
     // .append(new ShootSegment())
-      // .append(new IntakeSegment(3))
-      // .append(new DriveSegment(6, 250, 125))
-      // .append(new AsyncShootSegment())
-      // .append(new DriveSegment(-6, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL))
-      // .append(new GyroTurnSegment(180))
-      // .append(new GyroTurnSegment(180))
+    // .append(new IntakeSegment(3))
+    // .append(new DriveSegment(6, 250, 125))
+    // .append(new AsyncShootSegment())
+    // .append(new DriveSegment(-6, Drive.DEFAULT_CRUISE_VELOCITY, Drive.DEFAULT_ACCEL))
+    // .append(new GyroTurnSegment(180))
+    // .append(new GyroTurnSegment(180))
 
-    paths.put("comp2", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
-    
-    // paths.put("comp2", new Path().append(new VisionToggleSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)).append(new VisionToggleSegment()));
+    paths.put(
+        "comp2",
+        new Path()
+            .append(new AsyncShootSegment())
+            .append(
+                new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
 
-    paths.put("comp3", new Path().append(new DriveSegment(10, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
+    // paths.put("comp2", new Path().append(new VisionToggleSegment()).append(new DriveSegment(3,
+    // Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)).append(new
+    // VisionToggleSegment()));
 
-    paths.put("comp4", new Path()
-    .append(new SpinUpSegment())
-    .append(new DriveSegment(13.5/12, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL))
-    .append(new VisionToggleSegment())
-    .append(new ShootSegment())
-    .append(new VisionToggleSegment())
-    .append(new IntakeSegment(3))
-    .append(new DriveSegment(86.63/12, 300, Constants.DEFAULT_ACCEL))
-    .append(new SyncIntakeSegment())
-    .append(new VisionToggleSegment())
-    .append(new ShootSegment())
-    .append(new VisionToggleSegment())
-    .append(new DriveSegment(1, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
+    paths.put(
+        "comp3",
+        new Path()
+            .append(
+                new DriveSegment(10, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
+
+    paths.put(
+        "comp4",
+        new Path()
+            .append(new SpinUpSegment())
+            .append(
+                new DriveSegment(
+                    13.5 / 12, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL))
+            .append(new VisionToggleSegment())
+            .append(new ShootSegment())
+            .append(new VisionToggleSegment())
+            .append(new IntakeSegment(3))
+            .append(new DriveSegment(86.63 / 12, 300, Constants.DEFAULT_ACCEL))
+            .append(new SyncIntakeSegment())
+            .append(new VisionToggleSegment())
+            .append(new ShootSegment())
+            .append(new VisionToggleSegment())
+            .append(
+                new DriveSegment(1, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
   }
 
   /**

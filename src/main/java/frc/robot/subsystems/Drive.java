@@ -67,9 +67,9 @@ public class Drive extends Subsystem {
 
   public int feetToTicks(double feet) {
     double ticks;
-    if(Robot.getIsPracticeBot()){
+    if (Robot.getIsPracticeBot()) {
       ticks = Constants.TICKS_PER_FOOT;
-    }else{
+    } else {
       ticks = Constants.COMP_TICKS_PER_FOOT;
     }
     long roundedVal = Math.round(feet * ticks);
