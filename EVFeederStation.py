@@ -68,17 +68,15 @@ rat_high = 1
 
 #Solitity compares the hull vs contour, and looks at the difference in filled area
 #Works on a system of %
-solidity_low = .80
-solidity_high = 1.00
+solidity_low = .8
+solidity_high = 1
 
 #Vertices is acts as "length"
 minArea = 40
 minWidth = 10
-maxWidth = 75
+maxWidth = 150
 minHeight = 10
-#150
 maxHeight = 150
-#
 maxVertices = 100
 minVertices = 5
 
@@ -129,67 +127,7 @@ class SocketWorker(threading.Thread):
                     print("Socket Exception " + str(e))
             except Exception as e1:
                 pass
-
-
-# Class to examine Frames per second of camera stream. Currently not used.
-class FPS:
-    def __init__(self):
-        # store the start time, end time, and total number of frames
-        # that were examined between the start and end intervals
-        self._start = None
-        self._end = None
-        self._numFrames = 0
-
-    def start(self):
-        # start the timer
-        self._start = datetime.datetime.now()
-        return self
-
-    def stop(self):
-        # stop the timer
-        self._end = datetime.datetime.now()
-
-    def update(self):
-        # increment the total number of frames examined during the
-        # start and end intervals
-        self._numFrames += 1
-
-    def elapsed(self):
-        # return the total number of seconds between the start and
-        # end interval
-        return (self._end - self._start).total_seconds()
-
-    def fps(self):
-        # compute the (approximate) frames per second
-        return self._numFrames / self.elapsed()
-
-
-# class that runs separate thread for showing video,
-class VideoShow:
-    """
-    Class that continuously shows a frame using a dedicated thread.
-    """
-
-    def __init__(self, imgWidth, imgHeight, cameraServer, frame=None, name='stream'):
-        self.outputStream = cameraServer.putVideo(name, imgWidth, imgHeight)
-        self.frame = frame
-        self.stopped = False
-
-    def start(self):
-        Thread(target=self.show, args=()).start()
-        return self
-
-    def show(self):
-        while not self.stopped:
-            self.outputStream.putFrame(self.frame)
-
-    def stop(self):
-        self.stopped = True
-
-    def notifyError(self, error):
-        self.outputStream.notifyError(error)
-
-
+            
 class WebcamVideoStream:
     def __init__(self, camera, cameraServer, frameWidth, frameHeight, name="WebcamVideoStream"):
         # initialize the video camera stream and read the first frame
@@ -250,6 +188,9 @@ class WebcamVideoStream:
 
     def getError(self):
         return self.stream.getError()
+
+
+
 
 
 ###################### PROCESSING OPENCV ################################
@@ -329,7 +270,7 @@ def findTargets(frame, mask, value_array, centerX, centerY):
     # Processes the contours, takes in (contours, output_image, (centerOfImage)
     if len(contours) != 0:
         #Blocking out parts of the robot
-        
+        #rect1 = cv2.rectangle(img, (0, 300), (640, 480), (0,0,0), -1)
         
         
         value_array = findTape(contours, image, centerX, centerY)
@@ -413,6 +354,7 @@ def findBall(contours, image, centerX, centerY):
                         biggestCargo.append([cx, cy])
 
         # Check if there are cargo seen
+        '''
         if (len(biggestCargo) > 0):
             # Sorts targets based on x coords to break any angle tie
             biggestCargo.sort(key=lambda x: math.fabs(x[0]))
@@ -427,6 +369,7 @@ def findBall(contours, image, centerX, centerY):
             cv2.line(image, (int(xCoord), screenHeight), (int(xCoord), 0), (255, 0, 0), 2)
 
             currentAngleError = finalTarget
+        '''
 
         cv2.line(image, (int(centerX), screenHeight), (int(centerX), 0), (255, 255, 255), 2)
 
@@ -443,7 +386,7 @@ def findTape(contours, image, centerX, centerY):
     screenHeight, screenWidth, channels = image.shape;
     # Seen vision targets (correct angle, adjacent to each other)
     targets = []
-    if len(contours) >= 2:
+    if len(contours) >= 1:
         # Sort contours by area size (biggest to smallest)
         cntsSorted = sorted(contours, key=lambda x: cv2.contourArea(x), reverse=True)
         biggestCnts = []
@@ -465,13 +408,13 @@ def findTape(contours, image, centerX, centerY):
             x, y, w, h = cv2.boundingRect(cnt)
             ratio = float(w) / h
             # Filters contours based off of size
-            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (w > minWidth) and (w < maxWidth) and (h > minHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
+            if (cntArea > minArea) and (mySolidity > solidity_low) and (mySolidity < solidity_high) and (w > minWidth) and (w < maxWidth) and (h > minHeight) and (h < maxHeight) and (checkContours(cntArea, hullArea, ratio, cnt)):
                 # Next three lines are for debugging the contouring
                 contimage = cv2.drawContours(image, cnt, -1, (0, 255, 0), 3)
                 
-                cv2.imwrite("1drawncontours.jpg", contimage)
-                time.sleep(1)
-                print("writing image")
+                #cv2.imwrite("1feederstation.jpg", contimage)
+                #time.sleep(1)
+                #print("writing image")
                 
                 ### MOSTLY DRAWING CODE, BUT CALCULATES IMPORTANT INFO ###
                 # Gets the centeroids of contour
@@ -479,7 +422,8 @@ def findTape(contours, image, centerX, centerY):
                     cx = int(M["m10"] / M["m00"])
                     cy = int(M["m01"] / M["m00"])
                     distCY = 540 - cy
-                    myDistFeet = (calculateDistanceFeet(w))
+                    myDistFeet = abs((calculateDistanceFeet(w)))
+                    
 
                     ###### New code that has an averaged shooting distance to avoid outliers
 
@@ -519,7 +463,7 @@ def findTape(contours, image, centerX, centerY):
                     sendValues[0] = cx
                     sendValues[1] = cy
                     sendValues[3] = myDistFeet
-                    print(sendValues[3])
+                    
                     
                 else:
                     cx, cy = 0, 0
@@ -569,6 +513,7 @@ def findTape(contours, image, centerX, centerY):
                 elif [centerOfTarget, yawToTarget] not in targets:
                     targets.append([centerOfTarget, yawToTarget])
     # Check if there are targets seen
+    '''
     if len(targets) > 0:
         # Sorts targets based on x coords to break any angle tie
         targets.sort(key=lambda x: math.fabs(x[0]))
@@ -578,9 +523,9 @@ def findTape(contours, image, centerX, centerY):
         # Draws yaw of target + line where center of target is
         cv2.putText(image, "Yaw: " + str(finalTarget[1]), (40, 40), cv2.FONT_HERSHEY_COMPLEX, .6,
                     (255, 255, 255))
-
-        currentAngleError = finalTarget[1]
-
+    '''
+        
+    currentAngleError = 0
     # print("TapeYaw: " + str(currentAngleError))
 
     cv2.line(image, (round(centerX), screenHeight), (round(centerX), 0), (255, 255, 255), 2)
@@ -592,7 +537,7 @@ def findTape(contours, image, centerX, centerY):
 
 # Checks if tape contours are worthy based off of contour area and (not currently) hull area
 def checkContours(cntSize, hullSize, aspRatio, contour):
-    return cntSize > (image_width / 6) and (len(contour) > minVertices) and (len(contour) < maxVertices) and not (aspRatio < rat_low or aspRatio > rat_high)
+    return cntSize > (image_width / 6) and (len(contour) > minVertices) and (len(contour) < maxVertices) and (aspRatio > rat_low) and (aspRatio < rat_high)
 
 # Checks if ball contours are worthy based off of contour area and (not currently) hull area
 def checkBall(cntSize, cntAspectRatio):
@@ -617,7 +562,7 @@ def calculateDistanceFeet(targetPixelWidth):
     # Unsure as to what measurement distEst is producing in the above line, but multiplying it by .32 will return your distance in feet
     distEstFeet = distEst * .32
     #distEstInches = distEstFeet *.32*12
-    return (abs(distEstFeet))
+    return (distEstFeet)
 
 
 # Uses trig and focal length of camera to find yaw.
@@ -741,8 +686,7 @@ def ProcessFrame(frame, tape):
     if (tape == True):
         threshold = threshold_video(lower_green, upper_green, frame)
         processedValues = findTargets(frame, threshold, vals_to_send, centerX, centerY)
-        if processedValues[3] != None:
-            print(processedValues[3])
+        
 
 
         highGoal = {}
@@ -752,9 +696,10 @@ def ProcessFrame(frame, tape):
         if processedValues[3] != None:
             processedValues[3] = abs(round(processedValues[3], 2))
         highGoal['dis'] = processedValues[3]
-        highGoal['targid'] = 1
+        highGoal['targid'] = 0
 
-        if processedValues[3] != None:
+        if processedValues[3] != None and processedValues[3] < 19:
+            print(processedValues[3])
             PacketQueue.put_nowait(highGoal)
 
 
@@ -969,7 +914,7 @@ if __name__ == "__main__":
 
     # cap.autoExpose=True;
     tape = False
-    # fps = FPS().start()
+
     # TOTAL_FRAMES = 200;
     # loop forever
     while True:
@@ -979,9 +924,3 @@ if __name__ == "__main__":
 
         Tape = True
         frame = ProcessFrame(img, Tape)
-
-    # Doesn't do anything at the moment. You can easily get this working by indenting these three lines
-    # and setting while loop to: while fps._numFrames < TOTAL_FRAMES
-    # fps.stop()
-    print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
