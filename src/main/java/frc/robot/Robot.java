@@ -2,15 +2,24 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config.Key;
 import frc.robot.OI.OperatorInterface;
+import frc.robot.auto.IntakeSegment;
+import frc.robot.auto.Path;
+import frc.robot.auto.Paths;
+import frc.robot.auto.ShootSegment;
+import frc.robot.auto.SyncIntakeSegment;
+import frc.robot.auto.VisionToggleSegment;
+import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
+import frc.robot.util.loops.Looper;
 import frc.robot.vision.AimingParameters;
 
 import java.io.IOException;
@@ -20,7 +29,18 @@ import java.util.Optional;
 import frc.robot.util.loops.Looper;
 import frc.robot.util.Util;
 
+/**
+ * The VM is configured to automatically run this class. If you change the name of this class or the
+ * package after creating this project, you must also update the build.gradle file in the project.
+ */
 public class Robot extends TimedRobot {
+
+  // Modes
+  public enum Mode {
+    Sharpshooter,
+    Rebounder,
+    Climber
+  }
 
   // State variables
   public enum State {
@@ -70,6 +90,11 @@ public class Robot extends TimedRobot {
   private TurretState mTurretState = TurretState.MANUAL;
   private TestState mTestState;
 
+  // Auto stuff
+  private static boolean mAuto = false;
+  private boolean mShooterIsStopped = false;
+  private Path mAutoPath = Paths.NO_OP;
+
   // Controller Reference
   private final OperatorInterface mOperatorInterface = OperatorInterface.getInstance();
 
@@ -82,7 +107,7 @@ public class Robot extends TimedRobot {
   private final Intake mIntake = Intake.getInstance();
   private final Storage mStorage = Storage.getInstance();
   private final Climber mClimber = Climber.getInstance();
-  private final Turret mTurret = Turret.getInstance();
+  // private final Turret mTurret = Turret.getInstance();
   private final Drive mDrive = Drive.getInstance();
 
   private static final DigitalInput practiceInput = new DigitalInput(
@@ -100,6 +125,14 @@ public class Robot extends TimedRobot {
   private final RobotTracker mRobotTracker = RobotTracker.getInstance();
   private final RobotTrackerUpdater mRobotTrackerUpdater = RobotTrackerUpdater.getInstance();
 
+  /**
+   * The robot's gyro. Don't use this for absolute measurements. See {@link #getGyro()} for more
+   * details.
+   *
+   * @see #getGyro()
+   */
+  private static ADXRS450_Gyro sGyro = new ADXRS450_Gyro();
+
   public Relay visionLight = new Relay(0);
 
   // Control Variables
@@ -107,11 +140,12 @@ public class Robot extends TimedRobot {
   private LatchedBoolean HarvestAim = new LatchedBoolean();
   static NetworkTable mTable;
 
-  private boolean mIsSpinningUp = false;
+  private static boolean sIsSpinningUp = false;
 
   // Fire timer for shooter
   private Timer mFireTimer = new Timer();
   private Timer mBarfTimer = new Timer();
+
   Logger mRobotLogger = new Logger("robot");
 
   // Shooter velocity trim state
@@ -165,6 +199,8 @@ public class Robot extends TimedRobot {
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_LEDS)) {
       mBallIndicator = BallIndicator.getInstance();
     }
+
+    sGyro.calibrate();
   }
 
   @Override
@@ -179,7 +215,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
 
-    SmartDashboard.putBoolean("Manual Spin-up", mIsSpinningUp);
+    SmartDashboard.putBoolean("Manual Spin-up", sIsSpinningUp);
     SmartDashboard.putBoolean("Correct Controllers", mOperatorInterface.checkControllers());
     /*
      * SmartDashboard.putBoolean("Has Vision", result.HasResult); if
@@ -208,12 +244,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 0));
+    mShooter.stop();
+    int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 1));
 
-    mIsSpinningUp = false;
+    mAuto = true;
+    sIsSpinningUp = false;
     mOperatorInterface.checkControllers();
 
-    mRobotLogger.log("Auto Init Called");
+    mRobotLogger.log("Auto Init Called " + autoMode);
 
     // Start background looper
     // collections information periodically
@@ -222,19 +260,59 @@ public class Robot extends TimedRobot {
     Config.getInstance().reload();
 
     mState = State.SHOOTING;
-    mShootingState = ShootingState.PREPARE_TO_SHOOT;
+    mShootingState = ShootingState.IDLE;
+    mIntakeState = IntakeState.IDLE;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
+
+    mAutoPath =
+        Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
+    mShooterIsStopped = false;
+    IntakeSegment.resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency stop?)
+    ShootSegment.resetState();
   }
 
   @Override
   public void autonomousPeriodic() {
+    mAutoPath.tick();
+
+    if (ShootSegment.shouldStartShooting()) {
+      mRobotLogger.info("Setting shooting state to prepare to shoot");
+      mShootingState = ShootingState.PREPARE_TO_SHOOT;
+    }
+
+    if (mStorage.isEmpty() && !mShooterIsStopped) {
+      mShooterIsStopped =  true;
+      mRobotLogger.info("Setting shooting state to complete");
+      mShootingState = ShootingState.SHOOTING_COMPLETE;
+      mStorage.stop();
+    }
+
+    if (IntakeSegment.isActive() || SyncIntakeSegment.isActive()) {
+      executeIntakeStateMachine();
+    }
+
+    if(VisionToggleSegment.getToggle()){
+      toggleVision();
+    }
+
+    if (sIsSpinningUp) {
+      mShooter.start();
+    } else if (mState != State.SHOOTING) {
+      mShooter.stop();
+    }
+
+    executeShootingStateMachine();
+
     updateSmartDashboard();
+
+    turretLoop();
   }
 
   @Override
   public void teleopInit() {
     visionLight.set(Relay.Value.kOff);
-    mIsSpinningUp = false;
+    mAuto = false;
+    sIsSpinningUp = false;
     mRobotLogger.log("Teleop Init!");
 
     // Start background looper
@@ -243,8 +321,6 @@ public class Robot extends TimedRobot {
 
     Config.getInstance().reload();
 
-    mStorage.preloadBalls(0);
-
     mOperatorInterface.checkControllers();
 
     // Set the initial Robot State
@@ -252,6 +328,8 @@ public class Robot extends TimedRobot {
     mIntakeState = IntakeState.IDLE;
     mClimbingState = ClimbingState.IDLE;
     mShootingState = ShootingState.IDLE;
+
+    mDrive.zeroEncoders();
 
     // updated in Intake.java
     SmartDashboard.putBoolean("Intake Spinning Up", false);
@@ -277,6 +355,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    mAuto = false;
     mRobotLogger.log("Entropy 138: Test Init");
     mTestState = TestState.MANUAL;
 
@@ -388,12 +467,7 @@ public class Robot extends TimedRobot {
         mTestTimer.start();
         break;
       case INTAKE_FORWARD:
-        if(runMotorTest(new MotorWithEncoder(){
-          @Override
-          public void percentOutput(double output) {
-            mIntake.setOutput(output);
-          }
-        }, "Intake Forwards", false, 0, 0, timePerTest)){
+        if(runMotorTest(mIntake::setOutput, "Intake Forwards", false, 0, 0, timePerTest)){
           mTestState = TestState.INTAKE_BACKWARD;
         }
         break;
@@ -696,16 +770,15 @@ public class Robot extends TimedRobot {
 
     Config.getInstance().reload();
 
+    mOperatorInterface.resetOverride();
     mClimber.resetEncoder();
   }
 
   @Override
-  public void disabledPeriodic() {
+  public void disabledPeriodic() {}
 
-  }
-
-  //turret loop
-  //constantly commands the turret with vision or manual controls
+  // turret loop
+  // constantly commands the turret with vision or manual controls
   public void turretLoop() {
 
     if(mTurretState == TurretState.AUTO_AIM){
@@ -716,18 +789,21 @@ public class Robot extends TimedRobot {
           //We have Target Information
           LastDistance = dis;
          // System.out.println("DISTANCE: " + LastDistance);
-          mTurret.SetAimError(result.turret_error.getDegrees());
+          //mTurret.SetAimError(result.turret_error.getDegrees());
         }else{
           //No Results, Don't Rotate
           //System.out.println("NO TRACK!");
         }
     } else {
       //Command the Turret Manually
-      mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
+      //mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
     }
   }
 
   public void driveTrainLoop() {
+    // TODO: Cache whether or not the robot has a drivetrain. We shouldn't be calling the config
+    // system every tick.
+    if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
       double driveThrottle = mOperatorInterface.getDriveThrottle();
       double driveTurn = mOperatorInterface.getDriveTurn();
@@ -747,6 +823,21 @@ public class Robot extends TimedRobot {
         // Standard Manual Drive
         mDrive.setDrive(driveThrottle, driveTurn, false);
       }
+    }
+  }
+
+  public void toggleVision(){
+    if(mTurretState == TurretState.AUTO_AIM){
+      //Turn off Auto Aiming
+      visionLight.set(Relay.Value.kOff);
+      mTurretState = TurretState.MANUAL;
+    }else if(mTurretState == TurretState.MANUAL){
+      //Turn on Auto Aiming
+      mTurretState = TurretState.AUTO_AIM;
+
+      //Enable Light
+      visionLight.set(Relay.Value.kForward);
+    }
   }
 
   /*
@@ -754,18 +845,7 @@ public class Robot extends TimedRobot {
   */
   public void RobotLoop() {
     if(mOperatorInterface.getVisionToggle()){
-
-      if(mTurretState == TurretState.AUTO_AIM){
-        //Turn off Auto Aiming
-        visionLight.set(Relay.Value.kOff);
-        mTurretState = TurretState.MANUAL;
-      }else if(mTurretState == TurretState.MANUAL){
-        //Turn on Auto Aiming
-        mTurretState = TurretState.AUTO_AIM;
-
-        //Enable Light
-        visionLight.set(Relay.Value.kForward);
-      }
+      toggleVision();
     }
 
     mShooter.updateDistance(LastDistance);
@@ -826,17 +906,15 @@ public class Robot extends TimedRobot {
 
     updateSmartDashboard();
 
-
-    if(mOperatorInterface.getSpinUp()){
-      mIsSpinningUp = !mIsSpinningUp;
+    if (mOperatorInterface.getSpinUp()) {
+      sIsSpinningUp = !sIsSpinningUp;
     }
 
-    if(mIsSpinningUp){
+    if (sIsSpinningUp) {
       mShooter.start();
-    }else if(mState != State.SHOOTING){
+    } else if (mState != State.SHOOTING) {
       mShooter.stop();
     }
- 
 
     // Shooter velocity trim
     if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
@@ -879,7 +957,6 @@ public class Robot extends TimedRobot {
     switch (mIntakeState) {
       // TODO: Make this not a transitionary state
       case IDLE:
-        mRobotLogger.warn("Intake state is idle");
         mIntake.stop();
         mStorage.stop();
         mShooter.stop();
@@ -909,7 +986,7 @@ public class Robot extends TimedRobot {
 
           // If a ball is detected, store it
           if (mStorage.isBallDetected()) {
-            if(mStorage.getBallCount() == mStorage.getCapacity() + 1){
+            if (mStorage.getBallCount() == mStorage.getCapacity() + 1) {
               mIntakeState = IntakeState.STORAGE_COMPLETE;
             }
             mStorage.updateEncoderPosition();
@@ -931,7 +1008,7 @@ public class Robot extends TimedRobot {
         }
 
         break;
-      // we just stored a ball
+        // we just stored a ball
       case STORAGE_COMPLETE:
         mStorage.addBall();
         mStorage.stop();
@@ -1047,7 +1124,7 @@ public class Robot extends TimedRobot {
 
         /* Starts roller */
         mShooter.start();
-        mIsSpinningUp = false;
+        sIsSpinningUp = false;
 
         /* If rollers are spun up, changes to next state */
         if (mShooter.isAtVelocity() /* TODO: && Target Acquired */) {
@@ -1055,7 +1132,7 @@ public class Robot extends TimedRobot {
           mFireTimer.start();
         }
 
-        if(mOperatorInterface.getShoot()){
+        if (mOperatorInterface.getShoot()) {
           mShootingState = ShootingState.SHOOTING_COMPLETE;
           mStorage.stop();
         }
@@ -1065,7 +1142,7 @@ public class Robot extends TimedRobot {
 
         mShooter.start();
 
-        if(mOperatorInterface.getShoot()){
+        if (mOperatorInterface.getShoot() || mStorage.isEmpty()) {
           mShootingState = ShootingState.SHOOTING_COMPLETE;
           mStorage.stop();
         }
@@ -1079,7 +1156,7 @@ public class Robot extends TimedRobot {
         /* Decrements storage */
         mStorage.removeBall();
 
-        // We are gonna continue shooting until 
+        // We are gonna continue shooting until
         // /* Goes to complete if storage is empty, otherwise fires again */
         // if (mStorage.isEmpty()) {
         //   mShootingState = ShootingState.SHOOTING_COMPLETE;
@@ -1087,7 +1164,6 @@ public class Robot extends TimedRobot {
         //   mShootingState = ShootingState.PREPARE_TO_SHOOT;
         // }
 
-        
         // shooting is a toggle
         mShootingState = ShootingState.PREPARE_TO_SHOOT;
         break;
@@ -1175,5 +1251,28 @@ public class Robot extends TimedRobot {
 
   public static boolean getIsPracticeBot() {
     return isPracticeBot;
+  }
+
+  /**
+   * Returns the robot's gyro. It should be noted that this gyro object's reported heading will
+   * often <bold>not</bold> reflect the actual heading of the robot. This is because it is reset at
+   * the beginning of every autonomous turn segment in order to allow relative turning.
+   *
+   * @return the gyro
+   */
+  public static Gyro getGyro() {
+    return sGyro;
+  }
+
+  public static boolean isAuto() {
+    return mAuto;
+  }
+
+  public static boolean getSpinningUp(){
+    return sIsSpinningUp;
+  }
+
+  public static void setSpinningUp(boolean value){
+    sIsSpinningUp = value;
   }
 }
