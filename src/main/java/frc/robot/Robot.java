@@ -16,10 +16,8 @@ import frc.robot.auto.Paths;
 import frc.robot.auto.ShootSegment;
 import frc.robot.auto.SyncIntakeSegment;
 import frc.robot.auto.VisionToggleSegment;
-import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
-import frc.robot.util.loops.Looper;
 import frc.robot.util.loops.Looper;
 import frc.robot.vision.VisionPacket;
 import java.io.IOException;
@@ -302,10 +300,11 @@ public class Robot extends TimedRobot {
     mIntakeState = IntakeState.IDLE;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
-    mAutoPath =
-        Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
+    mAutoPath = Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
     mShooterIsStopped = false;
-    IntakeSegment.resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency stop?)
+    IntakeSegment
+        .resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency
+    // stop?)
     ShootSegment.resetState();
   }
 
@@ -319,7 +318,7 @@ public class Robot extends TimedRobot {
     }
 
     if (mStorage.isEmpty() && !mShooterIsStopped) {
-      mShooterIsStopped =  true;
+      mShooterIsStopped = true;
       mRobotLogger.info("Setting shooting state to complete");
       mShootingState = ShootingState.SHOOTING_COMPLETE;
       mStorage.stop();
@@ -329,7 +328,7 @@ public class Robot extends TimedRobot {
       executeIntakeStateMachine();
     }
 
-    if(VisionToggleSegment.getToggle()){
+    if (VisionToggleSegment.getToggle()) {
       toggleVision();
     }
 
@@ -518,14 +517,7 @@ public class Robot extends TimedRobot {
         mTestTimer.start();
         break;
       case INTAKE_FORWARD:
-        if (runMotorTest(
-
-                mIntake::setOutput,
-            "Intake Forwards",
-            false,
-            0,
-            0,
-            timePerTest)) {
+        if (runMotorTest(mIntake::setOutput, "Intake Forwards", false, 0, 0, timePerTest)) {
           mTestState = TestState.INTAKE_BACKWARD;
         }
         break;
@@ -813,7 +805,9 @@ public class Robot extends TimedRobot {
         break;
       case MANUAL:
         if (mOperatorInterface.isClimberTest()) {
-          mClimber.jog(mOperatorInterface.getClimberJogSpeed() * Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED_FACTOR));
+          mClimber.jog(
+              mOperatorInterface.getClimberJogSpeed()
+                  * Config.getInstance().getDouble(Key.CLIMBER__JOG_SPEED_FACTOR));
         } else {
           mClimber.stop();
         }
@@ -882,7 +876,6 @@ public class Robot extends TimedRobot {
       default:
         mRobotLogger.error("Unknown test state " + mTestState.toString());
         break;
-
     }
   }
 
@@ -948,40 +941,41 @@ public class Robot extends TimedRobot {
     // system every tick.
     if (Config.getInstance().getBoolean(Key.ROBOT__HAS_DRIVETRAIN)) {
       // Check User Inputs
-    double driveThrottle = mOperatorInterface.getDriveThrottle();
-    double driveTurn = mOperatorInterface.getDriveTurn();
+      double driveThrottle = mOperatorInterface.getDriveThrottle();
+      double driveTurn = mOperatorInterface.getDriveTurn();
 
-    boolean WantsAutoAim = mOperatorInterface.getFeederSteer();
+      boolean WantsAutoAim = mOperatorInterface.getFeederSteer();
 
-    // Continue Driving
-    if (WantsAutoAim == true) {
-      // Harvest Mode - AutoSteer Functionality
-      // Used for tracking a ball
-      // we may want to limit the speed?
-      // RobotTracker.RobotTrackerResult DriveResult =
-      // mRobotTracker.GetFeederStationError(Timer.getFPGATimestamp());
-      mDriveState = DriveState.AUTO_DRIVE;
+      // Continue Driving
+      if (WantsAutoAim == true) {
+        // Harvest Mode - AutoSteer Functionality
+        // Used for tracking a ball
+        // we may want to limit the speed?
+        // RobotTracker.RobotTrackerResult DriveResult =
+        // mRobotTracker.GetFeederStationError(Timer.getFPGATimestamp());
+        mDriveState = DriveState.AUTO_DRIVE;
 
-      VisionPacket vp = mRobotTracker.GetTurretVisionPacket(Timer.getFPGATimestamp());
-      // mDrive.autoSteerFeederStation(driveThrottle, vp.Error_Angle);
-    } else {
-      // Standard Manual Drive
-      mDrive.setDrive(driveThrottle, driveTurn, false);
+        VisionPacket vp = mRobotTracker.GetTurretVisionPacket(Timer.getFPGATimestamp());
+        // mDrive.autoSteerFeederStation(driveThrottle, vp.Error_Angle);
+      } else {
+        // Standard Manual Drive
+        mDrive.setDrive(driveThrottle, driveTurn, false);
 
-      // if we were previously in auto drive.. turn it off
-      if (mDriveState == DriveState.AUTO_DRIVE) {
-        mDriveState = DriveState.MANUAL;
+        // if we were previously in auto drive.. turn it off
+        if (mDriveState == DriveState.AUTO_DRIVE) {
+          mDriveState = DriveState.MANUAL;
+        }
       }
     }
   }
 
-  public void toggleVision(){
-    if(mTurretState == TurretState.AUTO_AIM){
-      //Turn off Auto Aiming
+  public void toggleVision() {
+    if (mTurretState == TurretState.AUTO_AIM) {
+      // Turn off Auto Aiming
       visionLight.set(Relay.Value.kOff);
       mTurretState = TurretState.MANUAL;
-    }else if(mTurretState == TurretState.MANUAL){
-      //Turn on Auto Aiming
+    } else if (mTurretState == TurretState.MANUAL) {
+      // Turn on Auto Aiming
       mTurretState = TurretState.AUTO_AIM;
 
       // Enable Light
@@ -993,7 +987,7 @@ public class Robot extends TimedRobot {
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop() {
-    if(mOperatorInterface.getVisionToggle()){
+    if (mOperatorInterface.getVisionToggle()) {
       toggleVision();
     }
 
@@ -1356,7 +1350,7 @@ public class Robot extends TimedRobot {
         }
         break;
       case EXTENDING:
-        //TODO: Decide if climb and retract should be the same button
+        // TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
         if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.HOLD;
@@ -1432,11 +1426,11 @@ public class Robot extends TimedRobot {
     return mAuto;
   }
 
-  public static boolean getSpinningUp(){
+  public static boolean getSpinningUp() {
     return sIsSpinningUp;
   }
 
-  public static void setSpinningUp(boolean value){
+  public static void setSpinningUp(boolean value) {
     sIsSpinningUp = value;
   }
 }
