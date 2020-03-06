@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
   private double LastDistance = -1;
   private int LastTurretVisionID = -1; // use IDs to filter out bad ideas
   private int LastFeederStationVisionID = -1;
-  
+
   private double mTurretAdjust = 0;
 
   public enum TestState {
