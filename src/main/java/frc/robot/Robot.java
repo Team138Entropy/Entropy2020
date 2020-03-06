@@ -492,6 +492,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Driver Cameras", mCameraManager.getCameraStatus());
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
     SmartDashboard.putNumber("Climber Position", mClimber.getEncoderPosition());
+    SmartDashboard.putNumber("Storage encoder", mStorage.getEncoder());
 
     switch (mTestState) {
       case START:
