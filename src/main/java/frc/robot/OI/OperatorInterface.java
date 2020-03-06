@@ -3,7 +3,6 @@ package frc.robot.OI;
 import frc.robot.Constants;
 import frc.robot.OI.NykoController.Axis;
 import frc.robot.OI.NykoController.DPad;
-import frc.robot.OI.XboxController.Button;
 import frc.robot.OI.XboxController.Side;
 import frc.robot.Robot;
 import frc.robot.util.LatchedBoolean;
@@ -73,7 +72,7 @@ public class OperatorInterface {
     boolean buttonValue = DriverController.getButton(XboxController.Button.BACK);
     return mClimbStartWasPressed.update(buttonValue);
   }
-  
+
   public boolean startIntake() {
     if (Robot.isAuto()) {
       if (autoIntakeOverride) {
@@ -102,9 +101,9 @@ public class OperatorInterface {
     return mBarfLatch.update(DriverController.getButton(XboxController.Button.START));
   }
 
-  //if we are auto steering
-  //WHILE held
-  public boolean getFeederSteer(){
+  // if we are auto steering
+  // WHILE held
+  public boolean getFeederSteer() {
     return DriverController.getTrigger(Side.RIGHT) || DriverController.getTrigger(Side.LEFT);
   }
 
@@ -130,7 +129,7 @@ public class OperatorInterface {
   }
 
   // Operator
-  public boolean getVisionToggle(){
+  public boolean getVisionToggle() {
     return mVisionToggle.update(OperatorController.getButton(NykoController.Button.BUTTON_3));
   }
 
@@ -147,7 +146,7 @@ public class OperatorInterface {
   }
 
   // Operator trims, etc.
-  
+
   public boolean getBallCounterAdjustDown() {
     return OperatorController.getDPad() == DPad.LEFT;
   }
@@ -209,7 +208,7 @@ public class OperatorInterface {
     return OperatorController.getButton(NykoController.Button.BUTTON_3);
   }
 
-  //TODO: Decide on climber jog and home buttons
+  // TODO: Decide on climber jog and home buttons
   public double getClimberJogSpeed() {
     return OperatorController.getJoystick(NykoController.Side.LEFT, NykoController.Axis.Y);
   }
@@ -223,8 +222,8 @@ public class OperatorInterface {
   }
 
   /**
-   * Tells {@link #startIntake()} to return true the next time it's called. This is a hack to make auto
-   * shooting work. Please don't use it anywhere else. Please.
+   * Tells {@link #startIntake()} to return true the next time it's called. This is a hack to make
+   * auto shooting work. Please don't use it anywhere else. Please.
    */
   public void overrideIntake() {
     autoIntakeOverride = true;

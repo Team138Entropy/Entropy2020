@@ -20,6 +20,7 @@ public class DriveSegment extends Segment {
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
+
   @SuppressWarnings("FieldCanBeLocal")
   private final int LOGGING_COUNT_MODULUS = 5;
 

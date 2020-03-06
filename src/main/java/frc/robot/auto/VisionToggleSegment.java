@@ -2,8 +2,7 @@ package frc.robot.auto;
 
 public class VisionToggleSegment extends Segment {
 
-  public VisionToggleSegment() {
-  }
+  public VisionToggleSegment() {}
 
   private static boolean enabled = false;
 
@@ -13,13 +12,12 @@ public class VisionToggleSegment extends Segment {
   }
 
   @Override
-  public void tick() {
-  }
+  public void tick() {}
 
-  public static boolean getToggle(){
-    if(enabled){
-        enabled = false;
-        return true;
+  public static boolean getToggle() {
+    if (enabled) {
+      enabled = false;
+      return true;
     }
     return false;
   }

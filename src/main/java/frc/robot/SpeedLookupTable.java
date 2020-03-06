@@ -21,10 +21,10 @@ public class SpeedLookupTable {
 
   double[][] mProductionLookupTable = {
     // {distance in meters, speed in whatever our system uses}
-    {10d, 550d},
-    {20d, 550d},
-    {30d, 550d},
-    {40d, 550d}
+    {10d, 3040d},
+    {20d, 3040d},
+    {30d, 3040d},
+    {40d, 3040d}
   };
 
   SpeedLookupTable() {}
@@ -48,7 +48,7 @@ public class SpeedLookupTable {
     double upperBoundDistance = 0;
     double upperBoundSpeed = 0;
 
-    if(distance == -1){
+    if (distance != -1) {
       for (int i = 0; i < ourTable.length; i++) {
         double thisDistance = ourTable[i][0];
         double thisSpeed = ourTable[i][1];
@@ -61,7 +61,6 @@ public class SpeedLookupTable {
         lowerBoundSpeed = upperBoundSpeed;
         upperBoundDistance = thisDistance;
         upperBoundSpeed = thisSpeed;
-
 
         if (distance > lowerBoundDistance && distance < upperBoundDistance) {
           return linearInterpolate(

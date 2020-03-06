@@ -5,8 +5,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 import frc.robot.Logger;
-import frc.robot.Robot;
 
 /** Add your docs here. */
 public class Intake extends Subsystem {
@@ -16,11 +16,10 @@ public class Intake extends Subsystem {
   // initial cooldown because our startup of the roller induces a countdown
   private int mOverCurrentCountdown = 30;
 
-  private final int ROLLER_PORT = Config.getInstance().getInt(Key.INTAKE__ROLLER);
+  private final int ROLLER_PORT = Constants.Talon_IntakeRoller;
 
   // TODO: Tune these values
-  private final double ROLLER_SPEED =
-      Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
+  private final double ROLLER_SPEED = Config.getInstance().getDouble(Key.INTAKE__ROLLER_SPEED);
 
   private final WPI_TalonSRX mRoller;
 

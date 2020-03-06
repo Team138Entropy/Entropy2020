@@ -53,9 +53,9 @@ public class Path {
           segment.init();
           uninitializedSegments.remove(segment);
         }
-  
+
         segment.tick();
-  
+
         if (segment.finished()) {
           logger.info("Segment finished");
           segments.removeFirst();

@@ -67,9 +67,9 @@ public class Drive extends Subsystem {
 
   public int feetToTicks(double feet) {
     double ticks;
-    if(Robot.getIsPracticeBot()){
+    if (Robot.getIsPracticeBot()) {
       ticks = Constants.TICKS_PER_FOOT;
-    }else{
+    } else {
       ticks = Constants.COMP_TICKS_PER_FOOT;
     }
     long roundedVal = Math.round(feet * ticks);
@@ -84,16 +84,16 @@ public class Drive extends Subsystem {
   private Drive() {
     mDriveLogger = new Logger("drive");
 
-    mLeftMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_BACK_PORT));
+    mLeftMaster = new WPI_TalonSRX(Constants.Talon_LeftDrive1_Master);
     // configureSpark(mLeftMaster, true, true);
 
-    mLeftSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__LEFT_FRONT_PORT));
+    mLeftSlave = new WPI_TalonSRX(Constants.Talon_LeftDrive2_Slave);
     // configureSpark(mLeftSlave, true, false);
 
-    mRightMaster = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_BACK_PORT));
+    mRightMaster = new WPI_TalonSRX(Constants.Talon_RightDrive1_Master);
     // configureSpark(mRightMaster, false, true);
 
-    mRightSlave = new WPI_TalonSRX(Config.getInstance().getInt(Key.DRIVE__RIGHT_FRONT_PORT));
+    mRightSlave = new WPI_TalonSRX(Constants.Talon_RightDrive2_Slave);
     // configureSpark(mRightSlave, false, false);
 
     configTalon(mLeftMaster);
@@ -156,7 +156,7 @@ public class Drive extends Subsystem {
     mLeftMaster.config_kP(0, p);
     mRightMaster.config_kP(0, p);
   }
-  
+
   public void configI(double i) {
     mLeftMaster.config_kI(0, i);
     mRightMaster.config_kI(0, i);
@@ -237,7 +237,7 @@ public class Drive extends Subsystem {
     if (leftStationary && rightStationary) {
       stationary = true;
     }
-    
+
     // Don't know why this is here but I'm not gonna remove it
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
       // setBrakeMode(true);
@@ -245,11 +245,13 @@ public class Drive extends Subsystem {
       mDriveControlState = DriveControlState.OPEN_LOOP;
     }
 
-    // Cache our signals for more readable code. right is backwards because reasons out of our control
+    // Cache our signals for more readable code. right is backwards because reasons out of our
+    // control
     double leftOutput = signal.getLeft();
     double rightOutput = signal.getRight();
 
-    // Ramping is calculated through a series of "abstractions", calculating the acceleration directions
+    // Ramping is calculated through a series of "abstractions", calculating the acceleration
+    // directions
     // of hierarchical components in the drivetrain.
     boolean leftAcceleratingForward = false;
     boolean leftAcceleratingBackwards = false;
@@ -288,9 +290,10 @@ public class Drive extends Subsystem {
     } else if (leftOutput < 0) {
       velocityReverse = true;
     }
-    
+
     // this is [0, 1)
-    double differenceBetweenSides = Math.abs(Math.abs(signal.getLeft()) - Math.abs(signal.getRight()));
+    double differenceBetweenSides =
+        Math.abs(Math.abs(signal.getLeft()) - Math.abs(signal.getRight()));
 
     double accelSpeedWhenTurningFactor = 1 - differenceBetweenSides;
 
@@ -316,7 +319,8 @@ public class Drive extends Subsystem {
     mPeriodicDriveData.left_old = leftOutput;
     mPeriodicDriveData.right_old = rightOutput;
 
-    // then we set our master talons, remembering that the physical right of the drivetrain is backwards
+    // then we set our master talons, remembering that the physical right of the drivetrain is
+    // backwards
     mLeftMaster.set(ControlMode.PercentOutput, leftOutput);
     mRightMaster.set(ControlMode.PercentOutput, rightOutput * -1);
   }
@@ -366,7 +370,12 @@ public class Drive extends Subsystem {
     DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
 
     // Either the bigger of the two drive signals or 1, whichever is bigger.
-    double scaling_factor = Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));// / (1 + (differenceBetweenSides * 6));
+    double scaling_factor =
+        Math.max(
+            1.0,
+            Math.max(
+                Math.abs(signal.getLeft()),
+                Math.abs(signal.getRight()))); // / (1 + (differenceBetweenSides * 6));
     if (quickTurn) {
       setOpenLoop(
           new DriveSignal(
@@ -377,22 +386,6 @@ public class Drive extends Subsystem {
           new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
     }
   }
-
-  //Auto Steer functionality to the goal
-  //driver only controls the throttle
-  //'we may want to set a speed floor/speed minimum'
-  public synchronized void autoSteerFeederStation(double throttle, double angle){
-    //double heading_error_rad = vehicle_to_alignment_point_bearing.getRadians();
-    double radians = (0.0174533) * angle;
-    double heading_error_rad = radians;
-    final double kAutosteerKp = 0.05;
-    boolean towards_goal = true;
-    boolean reverse = false;
-    double curvature = (towards_goal ? 1.0 : 0.0) * heading_error_rad * kAutosteerKp;
-    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    //setBrakeMode(true);
-  }
-
 
   public void setOpenloopRamp(double speed) {
     mLeftMaster.configOpenloopRamp(speed);

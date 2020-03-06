@@ -1,28 +1,30 @@
 package frc.robot.subsystems;
 
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
-import frc.robot.Logger;
 import frc.robot.Config.Key;
-
+import frc.robot.Logger;
 
 public class Climber extends Subsystem {
   private final int PORT_NUMBER = Config.getInstance().getInt(Config.Key.CLIMBER__MOTOR);
 
-  //TODO: Tune these values
+  // TODO: Tune these values
   private final int DETECT_BAND = Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND);
-  private final int EXTENDED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__EXTENDED_HEIGHT_IN_ENCODER_TICKS);
-  private final int RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getInt(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
-  private final double HOMING_SPEED_PERCENT = Config.getInstance().getDouble(Config.Key.CLIMBER__HOME_SPEED);
+  private final int EXTENDED_HEIGHT_IN_ENCODER_TICKS =
+      Config.getInstance().getInt(Config.Key.CLIMBER__EXTENDED_HEIGHT_IN_ENCODER_TICKS);
+  private final int RETRACTED_HEIGHT_IN_ENCODER_TICKS =
+      Config.getInstance().getInt(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
+  private final double HOMING_SPEED_PERCENT =
+      Config.getInstance().getDouble(Config.Key.CLIMBER__HOME_SPEED);
 
-  /** Talon SRX/ Victor SPX will support multiple (cascaded) PID loops. For now we just want the primary one. */
-
+  /**
+   * Talon SRX/ Victor SPX will support multiple (cascaded) PID loops. For now we just want the
+   * primary one.
+   */
   private final int PIDLoopIndex = Config.getInstance().getInt(Config.Key.CLIMBER__PID_LOOP_INDEX);
 
   /** Climber motion command timeout */
@@ -30,12 +32,14 @@ public class Climber extends Subsystem {
 
   /** Servo loop gains */
   private final double mMotorKF = Config.getInstance().getDouble(Config.Key.CLIMBER__KF);
+
   private final double mMotorKP = Config.getInstance().getDouble(Config.Key.CLIMBER__KP);
   private final double mMotorKI = Config.getInstance().getDouble(Config.Key.CLIMBER__KI);
   private final double mMotorKD = Config.getInstance().getDouble(Config.Key.CLIMBER__KD);
 
   /** Aggregation */
   private static Climber sInstance;
+
   private WPI_TalonSRX mMotor;
   private Logger mLogger;
   private boolean mIsHoming;
@@ -104,18 +108,24 @@ public class Climber extends Subsystem {
   /** Return true if extended */
   public boolean isExtended() {
     int encoderPosition = mMotor.getSelectedSensorPosition();
-    return (encoderPosition >= EXTENDED_HEIGHT_IN_ENCODER_TICKS - DETECT_BAND) && (encoderPosition <= EXTENDED_HEIGHT_IN_ENCODER_TICKS + DETECT_BAND);
+    return (encoderPosition >= EXTENDED_HEIGHT_IN_ENCODER_TICKS - DETECT_BAND)
+        && (encoderPosition <= EXTENDED_HEIGHT_IN_ENCODER_TICKS + DETECT_BAND);
   }
 
   /** Returns true if retracted */
   public boolean isRetracted() {
     int encoderPosition = mMotor.getSelectedSensorPosition();
-    return (encoderPosition >= RETRACTED_HEIGHT_IN_ENCODER_TICKS - Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND)) && (encoderPosition <= RETRACTED_HEIGHT_IN_ENCODER_TICKS + Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND));
+    return (encoderPosition
+            >= RETRACTED_HEIGHT_IN_ENCODER_TICKS
+                - Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND))
+        && (encoderPosition
+            <= RETRACTED_HEIGHT_IN_ENCODER_TICKS
+                + Config.getInstance().getInt(Key.CLIMBER__DETECT_BAND));
   }
 
   /** Jogs the climber */
   public void jog(double speed) {
-    //mLogger.verbose("Jogging climber " + speed);
+    // mLogger.verbose("Jogging climber " + speed);
     mMotor.set(ControlMode.PercentOutput, speed);
   }
 

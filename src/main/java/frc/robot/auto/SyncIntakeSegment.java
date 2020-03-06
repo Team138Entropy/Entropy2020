@@ -1,20 +1,16 @@
 package frc.robot.auto;
 
-import frc.robot.OI.OperatorInterface;
-import frc.robot.subsystems.Storage;
-
 public class SyncIntakeSegment extends Segment {
-  public SyncIntakeSegment(){
-  }
+  public SyncIntakeSegment() {}
 
   private static boolean active = false;
 
   public static boolean isActive() {
-      return active;
+    return active;
   }
 
   public static void resetActivatedState() {
-      active = false;
+    active = false;
   }
 
   private boolean done = false;

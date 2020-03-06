@@ -20,6 +20,7 @@ public class TurnSegment extends Segment {
 
   // This allows us to only log the encoder positions once every five ticks
   private int loggingCount = 0;
+
   @SuppressWarnings("FieldCanBeLocal")
   private final int LOGGING_COUNT_MODULUS = 5;
 
@@ -29,7 +30,7 @@ public class TurnSegment extends Segment {
 
   public TurnSegment(double degrees) {
     this.drive = Drive.getInstance();
-    
+
     degrees = degrees % 360;
     this.degrees = degrees;
 
@@ -56,12 +57,12 @@ public class TurnSegment extends Segment {
     double angle = gyro.getAngle();
 
     double out = controller.calculate(angle);
-    
+
     if (++loggingCount > LOGGING_COUNT_MODULUS) {
       logger.info("Angle: " + angle);
       loggingCount = 0;
     }
-    
+
     drive.arcadeHack(0, out, true);
 
     if (controller.atSetpoint()) {

@@ -1,29 +1,25 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
-import frc.robot.Logger;
-import frc.robot.Robot;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 import frc.robot.SpeedLookupTable;
 
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
-  private final double MAX_SPEED = 2550d;
-  private static final Logger mLogger = new Logger("Shooter");
-
+  private final double MAX_SPEED = 3600.0;
   // private static final double SPEED_DEADBAND = 20;
-  private final double SPEED_DEADBAND = 75;
+  private final double SPEED_DEADBAND = 5;
   private final double DROP_DEADBAND = 250;
-  private final int SPEED_DEADBAND_DELAY = 10;
+  private final int SPEED_DEADBAND_DELAY = 15;
   private final double FEEDFORWARD = 1023d / MAX_SPEED;
   // private static final double P = (.3 * 1023) / 50;
   // private static final double I = 0.2;
   // private static final double D = 0.1;
-  private final double P = 0;
+  private final double P = .4;
   private final double I = 0;
   private final double D = 0;
 
@@ -33,12 +29,11 @@ public class Shooter extends Subsystem {
 
   // TODO: Integrate with other subsystems for real
   // TEMPORARY STUFF BEGINS HERE
-  private final int ROLLER_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER);
-  private final int ROLLER_SLAVE_PORT = Config.getInstance().getInt(Key.SHOOTER__ROLLER_SLAVE);
+  private final int ROLLER_PORT = Constants.Talon_Shooter_Master;
+  private final int ROLLER_SLAVE_PORT = Constants.Talon_Shooter_Slave;
 
   // TODO: Tune these values
-  private final int DEFAULT_ROLLER_SPEED =
-      2000; // Encoder ticks per 100ms, change this value
+  private final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
   private final int VELOCITY_ADJUSTMENT_BUMP =
       Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
@@ -51,7 +46,6 @@ public class Shooter extends Subsystem {
   private double mDistance = 0;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
 
-
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
   }
@@ -61,21 +55,19 @@ public class Shooter extends Subsystem {
     return instance;
   }
 
-
   /** Starts the roller. */
   public void start() {
+
     mRoller.setSpeed(getAdjustedVelocitySetpoint());
-    // mRoller.setPercentOutput(1);
+    SmartDashboard.putNumber("ShooterCurrent", mRoller.getCurrent());
   }
 
   /** Stops the roller. */
   public void stop() {
-
-    // We want to keep the roller spun up during auto to save time.
-    if (!Robot.isAuto()) mRoller.setSpeed(0);
+    mRoller.setSpeed(0);
   }
 
-  public void updateDistance(double dist){
+  public void updateDistance(double dist) {
     mDistance = dist;
   }
 
@@ -84,14 +76,10 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
-    double distance = mDistance; //for now
-    
-    int speed =
-        (int)
-            Math.round(
-                SpeedLookupTable.getInstance()
-                    .getSpeedFromDistance(distance));
-    
+    double distance = mDistance; // for now
+
+    int speed = (int) Math.round(SpeedLookupTable.getInstance().getSpeedFromDistance(distance));
+
     return speed + mVelocityAdjustment;
   }
 
@@ -112,18 +100,13 @@ public class Shooter extends Subsystem {
   }
 
   /** Returns whether roller is at full speed. */
+  // UPDATE:
   public boolean isAtVelocity() {
-    SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
-    // determine if we're at the target velocity by looking at the difference between the actual and
-    // expected
-    // and if that difference is less than SPEED_DEADBAND, we are at the velocity
-    boolean isAtVelocity =
-        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
-    // here's the problem:
-    // the velocity we get often bounces around, causing breif moments when we think we aren't there
-    // add a "delay" where we still consider ourselves to be at the velocity if we were there in the
-    // last SPEED_DEADBAND_DELAY ticks
+    // New Concept: Velocity FLOOR
+    // our velocity setpoint will be slightly higher than it needs to be
+    // allow velocity to be sliughtly lower, but operate as a floor
+    boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 50) >= 0);
 
     SmartDashboard.putNumber("Velocity Countdown", mTimeSinceWeWereAtVelocity);
     SmartDashboard.putBoolean("Has Had Current Drop", mHasHadCurrentDrop);
@@ -139,12 +122,17 @@ public class Shooter extends Subsystem {
     boolean isAtVelocityDebounced = mTimeSinceWeWereAtVelocity <= 0;
 
     return isAtVelocityDebounced;
+
+    // return false;
   }
 
   public boolean isBallFired() {
     boolean didDropVelocity =
         Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity;
+    if (ballFired) {
+      System.out.println("BALL FIRED!");
+    }
     return ballFired;
   }
 

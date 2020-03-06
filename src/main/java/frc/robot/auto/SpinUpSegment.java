@@ -1,14 +1,13 @@
 package frc.robot.auto;
+
 import frc.robot.Robot;
 
 public class SpinUpSegment extends Segment {
 
-  public SpinUpSegment() {
-  }
+  public SpinUpSegment() {}
 
   @Override
-  public void init() {
-  }
+  public void init() {}
 
   @Override
   public void tick() {

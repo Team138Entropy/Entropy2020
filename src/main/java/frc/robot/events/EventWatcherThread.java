@@ -3,8 +3,10 @@ package frc.robot.events;
 import java.util.ArrayList;
 
 public class EventWatcherThread extends Thread {
-  // IMPORTANT: For IntakeSegment to work reliably, the delay between its event calls *must* be less than the robot loop period (~20ms)!
-  // That means this value should be set considerably lower to account for delays caused by other events.
+  // IMPORTANT: For IntakeSegment to work reliably, the delay between its event calls *must* be less
+  // than the robot loop period (~20ms)!
+  // That means this value should be set considerably lower to account for delays caused by other
+  // events.
   // FIXME: Do this the right way so we don't have to restrict the timing
   private static final int LOOP_PERIOD_MS = 5;
 
@@ -35,7 +37,7 @@ public class EventWatcherThread extends Thread {
         for (Event e : queue) {
           if (e.predicate()) {
             e.run();
-          
+
             if (e.pruneMe()) {
               pruneList.add(e);
             }
@@ -63,7 +65,6 @@ public class EventWatcherThread extends Thread {
     synchronized (queueLock) {
       queue.remove(e);
     }
-    
   }
 
   public void resetQueue() {
