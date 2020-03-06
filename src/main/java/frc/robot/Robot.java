@@ -904,6 +904,7 @@ public class Robot extends TimedRobot {
   // turret loop
   // constantly commands the turret with vision or manual controls
   public synchronized void turretLoop() {
+    SmartDashboard.putNumber("Vision Turret Adjust", mTurretAdjust);
     if (mTurretState == TurretState.AUTO_AIM) {
       double turretAdjust = mOperatorInterface.getTurretAdjust();
       mTurretAdjust += turretAdjust * Constants.TURRET_MANUAL_ADJUST_FACTOR;
