@@ -153,7 +153,6 @@ public class Shooter extends Subsystem {
   // Used in TEST mode only
   public void setOutput(double output) {
     mRoller.setPercentOutput(output);
-    mRoller.getVelocity();
   }
 
   @Override
