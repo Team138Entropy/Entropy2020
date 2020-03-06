@@ -1341,7 +1341,7 @@ public class Robot extends TimedRobot {
         // set Home?
         break;
       case EXTENDING:
-        //TODO: Decide if climb and retract should be the same button
+        // TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
         if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.HOLD;
