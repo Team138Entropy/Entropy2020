@@ -33,8 +33,6 @@ class PIDRoller {
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
     mTalon.setSensorPhase(!Robot.getIsPracticeBot());
 
-    mTalon.configVoltageCompSaturation(
-        11); // "full output" will now scale to 11 Volts for all control modes when enabled.
     mTalon.enableVoltageCompensation(true); // turn on/off feature
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 50, TIMEOUT_MS);
 
