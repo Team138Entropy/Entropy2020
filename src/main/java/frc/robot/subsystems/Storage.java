@@ -13,8 +13,7 @@ import frc.robot.Config.Key;
 /** Add your docs here. */
 public class Storage extends Subsystem {
 
-  private final int ROLLER_BOTTOM_PORT =
-      Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
+  private final int ROLLER_BOTTOM_PORT = Config.getInstance().getInt(Key.STORAGE__BOTTOM_ROLLER);
   private final int ROLLER_TOP_PORT = Config.getInstance().getInt(Key.STORAGE__TOP_ROLLER);
 
   private final int STORAGE_CAPICTY = 5;
@@ -37,7 +36,6 @@ public class Storage extends Subsystem {
   private final WPI_TalonSRX mTopRoller;
 
   private int mBallCount = 0;
-  
 
   private static Storage sInstance;
 
@@ -48,7 +46,7 @@ public class Storage extends Subsystem {
     return sInstance;
   }
 
-  public int getCapacity(){
+  public int getCapacity() {
     return STORAGE_CAPICTY;
   }
 

@@ -47,9 +47,9 @@ class PIDRoller {
     return -mTalon.getSelectedSensorVelocity();
   }
 
-  void setPercentOutput(double output){
+  void setPercentOutput(double output) {
     System.out.println(getVelocity() + " velocity at output " + output);
-    mTalon.set(ControlMode.PercentOutput, - output);
+    mTalon.set(ControlMode.PercentOutput, -output);
   }
 
   void setSpeed(int posPer100Ms) {

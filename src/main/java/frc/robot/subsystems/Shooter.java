@@ -1,9 +1,10 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
+import frc.robot.Logger;
+import frc.robot.Robot;
 import frc.robot.Config.Key;
 import frc.robot.SpeedLookupTable;
 
@@ -12,6 +13,8 @@ public class Shooter extends Subsystem {
   private final SpeedLookupTable mLookupTable = SpeedLookupTable.getInstance();
 
   private final double MAX_SPEED = 2550d;
+  private static final Logger mLogger = new Logger("Shooter");
+
   // private static final double SPEED_DEADBAND = 20;
   private final double SPEED_DEADBAND = 75;
   private final double DROP_DEADBAND = 250;
@@ -67,7 +70,9 @@ public class Shooter extends Subsystem {
 
   /** Stops the roller. */
   public void stop() {
-    mRoller.setSpeed(0);
+
+    // We want to keep the roller spun up during auto to save time.
+    if (!Robot.isAuto()) mRoller.setSpeed(0);
   }
 
   public void updateDistance(double dist){
@@ -136,8 +141,9 @@ public class Shooter extends Subsystem {
     return isAtVelocityDebounced;
   }
 
-  public boolean isBallFired(){
-    boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
+  public boolean isBallFired() {
+    boolean didDropVelocity =
+        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity;
     return ballFired;
   }

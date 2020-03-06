@@ -1,13 +1,10 @@
 package frc.robot.subsystems;
 
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
-
 
 public class Turret extends Subsystem {
   private static Turret sInstance;
@@ -26,24 +23,23 @@ public class Turret extends Subsystem {
     MANUAL_AIM
   };
 
-  //Default to Aiming State
-  //this turret state should remain local to the turret class
+  // Default to Aiming State
+  // this turret state should remain local to the turret class
   private TurretState mCurrentState = TurretState.AUTO_AIM;
 
   protected PeriodicIO mPeriodicIO = new PeriodicIO();
-  
-  //Class of values that are periodically updated
+
+  // Class of values that are periodically updated
   public static class PeriodicIO {
-    //Inputs
+    // Inputs
     public double timestamp;
     public double CurrentPosition;
 
-    //Outputs
-    public double demand; //motor output, could be a position, or percent
+    // Outputs
+    public double demand; // motor output, could be a position, or percent
     public double angle;
     public double feedforward;
   };
-
 
   public static Turret getInstance() {
     if (sInstance == null) {
@@ -66,18 +62,14 @@ public class Turret extends Subsystem {
    mTurretTalon.setNeutralMode(NeutralMode.Brake);
   }
 
-
-
-  //peridocally read inputs
+  // peridocally read inputs
   @Override
   public synchronized void readPeriodicInputs() {
-    //store current encoder position
+    // store current encoder position
     mPeriodicIO.CurrentPosition = mTurretTalon.getSelectedSensorPosition();
-
-
   }
 
-  //periodically write outputs
+  // periodically write outputs
   @Override
   public synchronized void writePeriodicOutputs() {
     //Control Turret Based on State
@@ -112,40 +104,33 @@ public class Turret extends Subsystem {
   //Operator Driven Manual Control
   public synchronized void SetManualOutput(double value){
     mPeriodicIO.demand = value;
-    //Force correct control mode
-    if(mCurrentState != TurretState.MANUAL_AIM){
-      //change pid slot if needed
+    // Force correct control mode
+    if (mCurrentState != TurretState.MANUAL_AIM) {
+      // change pid slot if needed
       mCurrentState = TurretState.MANUAL_AIM;
     }
   }
 
-
-  //Vision Aim System
-  public synchronized void SetAimError(double angle){
+  // Vision Aim System
+  public synchronized void SetAimError(double angle) {
     mPeriodicIO.angle = angle;
     double setpoint = mPeriodicIO.CurrentPosition + (angle * TicksPerDegree);
     mPeriodicIO.demand = setpoint;
     mPeriodicIO.feedforward = 0;
 
-    if(mCurrentState != TurretState.AUTO_AIM){
-      //change pid slot if needed
+    if (mCurrentState != TurretState.AUTO_AIM) {
+      // change pid slot if needed
       mCurrentState = TurretState.AUTO_AIM;
     }
   }
 
+  public void zeroSensors() {}
 
-
-  public void zeroSensors() {
-  }
-
-    /*
+  /*
       Test all Sensors in the Subsystem
   */
-  public void checkSubsystem() {
-
-  }
+  public void checkSubsystem() {}
 
   @Override
-  public void stopSubsytem(){}
- 
+  public void stopSubsytem() {}
 }
