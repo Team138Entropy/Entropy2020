@@ -380,6 +380,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    
+    int left = mDrive.getLeftEncoderDistance();
+    int right = -mDrive.getRightEncoderDistance();
+    SmartDashboard.putNumber("Left", left);
+    SmartDashboard.putNumber("Right", right);
+
     try {
       RobotLoop();
     } catch (Exception e) {

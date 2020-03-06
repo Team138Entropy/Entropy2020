@@ -10,6 +10,7 @@ import frc.robot.Config.Key;
 import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
+import frc.robot.Robot;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
 
@@ -65,7 +66,13 @@ public class Drive extends Subsystem {
   }
 
   public int feetToTicks(double feet) {
-    long roundedVal = Math.round(feet * Constants.TICKS_PER_FOOT);
+    double ticks;
+    if(Robot.getIsPracticeBot()){
+      ticks = Constants.TICKS_PER_FOOT;
+    }else{
+      ticks = Constants.COMP_TICKS_PER_FOOT;
+    }
+    long roundedVal = Math.round(feet * ticks);
     if (roundedVal > Integer.MAX_VALUE) {
       mDriveLogger.warn(
           "Integer overflow when converting feet to ticks! Something is likely VERY WRONG!");

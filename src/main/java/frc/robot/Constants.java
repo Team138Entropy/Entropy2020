@@ -42,6 +42,15 @@ public class Constants {
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
   // Oracle's official constant convention. Don't @ me.
+
+  // ticks = (19711 + 19582) / 2
+  // distance in feet = 89.5/12
+  // ticks per foot = ticks / feet
+
+  private static double COMP_TICKS = (19711.0 + 19582.0) / 2.0;
+  private static double COMP_DISTANCE = 89.5 / 12.0;
+  public static double COMP_TICKS_PER_FOOT = COMP_TICKS / COMP_DISTANCE;
+
   public static final double TICKS_PER_FOOT = 1228.615;
   public static final double REAL_TRACK_WIDTH = 1.916;
 
