@@ -78,7 +78,6 @@ public class Turret extends Subsystem {
     // store current encoder position
     mPeriodicIO.CurrentPosition = mTurretTalon.getSelectedSensorPosition();
     mPeriodicIO.Velocity = mTurretTalon.getSelectedSensorVelocity();
-    // System.out.println("Turret Error: " + mPeriodicIO.CurrentPosition);
   }
 
   // periodically write outputs
@@ -149,8 +148,6 @@ public class Turret extends Subsystem {
     // Shooter is offset
     if (velocity <= 80) {
       mPeriodicIO.angle = angle;
-      // System.out.println("COMMANDED ANGLE: " + angle);
-
       double setpoint = mPeriodicIO.CurrentPosition - (angle * TicksPerDegree);
       mPeriodicIO.demand = setpoint;
       mPeriodicIO.feedforward = 0;
