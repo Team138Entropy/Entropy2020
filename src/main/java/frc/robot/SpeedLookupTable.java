@@ -60,7 +60,6 @@ public class SpeedLookupTable {
       upperBoundDistance = thisDistance;
       upperBoundSpeed = thisSpeed;
 
-
       if (distance > lowerBoundDistance && distance < upperBoundDistance) {
         return linearInterpolate(
             distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);

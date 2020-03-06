@@ -5,7 +5,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import frc.robot.Robot;
 
 class PIDRoller {
@@ -34,7 +33,8 @@ class PIDRoller {
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
     mTalon.setSensorPhase(!Robot.getIsPracticeBot());
 
-    mTalon.configVoltageCompSaturation(11); // "full output" will now scale to 11 Volts for all control modes when enabled.
+    mTalon.configVoltageCompSaturation(
+        11); // "full output" will now scale to 11 Volts for all control modes when enabled.
     mTalon.enableVoltageCompensation(true); // turn on/off feature
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 50, TIMEOUT_MS);
 
@@ -47,30 +47,30 @@ class PIDRoller {
 
     mTalon.config_IntegralZone(PID_LOOP_INDEX, 200, TIMEOUT_MS);
 
-    if(!Robot.getIsPracticeBot()) mTalon.setInverted(true);
+    if (!Robot.getIsPracticeBot()) mTalon.setInverted(true);
 
-    //Set to Slave Mode
+    // Set to Slave Mode
     mTalonSlave.follow(mTalon);
   }
 
   public int getVelocity() {
-    return - mTalon.getSelectedSensorVelocity();
+    return -mTalon.getSelectedSensorVelocity();
   }
 
   public double getCurrent() {
     return mTalon.getStatorCurrent();
   }
 
-  void setPercentOutput(double output){
-  // System.out.println(getVelocity() + " velocity at output " + output);
-    mTalon.set(ControlMode.PercentOutput, - output);
+  void setPercentOutput(double output) {
+    // System.out.println(getVelocity() + " velocity at output " + output);
+    mTalon.set(ControlMode.PercentOutput, -output);
   }
 
   void setSpeed(int posPer100Ms) {
     if (posPer100Ms == 0) {
       mTalon.set(ControlMode.PercentOutput, 0);
     } else {
-      mTalon.set(ControlMode.Velocity, - posPer100Ms);
+      mTalon.set(ControlMode.Velocity, -posPer100Ms);
     }
   }
 }

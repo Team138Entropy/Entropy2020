@@ -138,26 +138,24 @@ public class VisionManager extends Subsystem {
               public void run() {
                 // If we made it to this point we had all the required keys!
                 // Now we need to update RobotState with our new values!
-               // mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
-                 //  mRobotTracker.UpdateTurretError(ti);
+                // mRobotTracker.addVisionUpdate(Timer.getFPGATimestamp(), ti);
+                //  mRobotTracker.UpdateTurretError(ti);
 
-                //Call update function based on target
+                // Call update function based on target
 
-                try{
-                  if(ti.IsHighGoal() == true){
+                try {
+                  if (ti.IsHighGoal() == true) {
                     mRobotTracker.UpdateTurretVision(Timer.getFPGATimestamp(), ti);
-                  }else if(ti.IsBall() == true){
+                  } else if (ti.IsBall() == true) {
                     mRobotTracker.UpdateDriveVision(Timer.getFPGATimestamp(), ti);
                   }
-                }catch(Exception e){
+                } catch (Exception e) {
                   System.out.println("CATCH EXCEPTION!");
                   System.out.println(e.getMessage());
                   System.out.println("PRINTING STACK TRACE");
                   e.printStackTrace();
                   int stop = 0;
                 }
-
-
               }
             });
 

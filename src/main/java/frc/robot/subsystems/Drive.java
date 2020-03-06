@@ -4,16 +4,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Config;
 import frc.robot.Config.Key;
+import frc.robot.Constants;
 import frc.robot.Kinematics;
 import frc.robot.Logger;
 import frc.robot.util.*;
 import frc.robot.util.geometry.*;
-import frc.robot.util.motion.SetpointGenerator;
-import frc.robot.vision.AimingParameters;
-import frc.robot.Constants;
 
 public class Drive extends Subsystem {
   private static Drive mInstance;
@@ -161,7 +158,7 @@ public class Drive extends Subsystem {
     if (leftStationary && rightStationary) {
       stationary = true;
     }
-    
+
     // Don't know why this is here but I'm not gonna remove it
     if (mDriveControlState != DriveControlState.OPEN_LOOP) {
       // setBrakeMode(true);
@@ -169,11 +166,13 @@ public class Drive extends Subsystem {
       mDriveControlState = DriveControlState.OPEN_LOOP;
     }
 
-    // Cache our signals for more readable code. right is backwards because reasons out of our control
+    // Cache our signals for more readable code. right is backwards because reasons out of our
+    // control
     double leftOutput = signal.getLeft();
     double rightOutput = signal.getRight();
 
-    // Ramping is calculated through a series of "abstractions", calculating the acceleration directions
+    // Ramping is calculated through a series of "abstractions", calculating the acceleration
+    // directions
     // of hierarchical components in the drivetrain.
     boolean leftAcceleratingForward = false;
     boolean leftAcceleratingBackwards = false;
@@ -232,7 +231,8 @@ public class Drive extends Subsystem {
     mPeriodicDriveData.left_old = leftOutput;
     mPeriodicDriveData.right_old = rightOutput;
 
-    // then we set our master talons, remembering that the physical right of the drivetrain is backwards
+    // then we set our master talons, remembering that the physical right of the drivetrain is
+    // backwards
     mLeftMaster.set(ControlMode.PercentOutput, leftOutput);
     mRightMaster.set(ControlMode.PercentOutput, rightOutput * -1);
   }
@@ -280,7 +280,8 @@ public class Drive extends Subsystem {
     if (quickTurn) {
       setOpenLoop(
           new DriveSignal(
-              (signal.getLeft() / scaling_factor) / 1.5, (signal.getRight() / scaling_factor) / 1.5));
+              (signal.getLeft() / scaling_factor) / 1.5,
+              (signal.getRight() / scaling_factor) / 1.5));
     } else {
       setOpenLoop(
           new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
@@ -297,28 +298,29 @@ public class Drive extends Subsystem {
   //   double timestamp = Timer.getFPGATimestamp();
   //   final double kAutosteerAlignmentPointOffset = 15.0; //
   //   /*
-  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle *
+  // (reverse ? -1.0 : 1.0))));
   //   setBrakeMode(true);
   //   */
 
   // }
 
-
-  //Auto Steer functionality to the goal
-  //driver only controls the throttle
-  //'we may want to set a speed floor/speed minimum'
-  public synchronized void autoSteerFeederStation(double throttle, double angle){
-    //double heading_error_rad = vehicle_to_alignment_point_bearing.getRadians();
+  // Auto Steer functionality to the goal
+  // driver only controls the throttle
+  // 'we may want to set a speed floor/speed minimum'
+  public synchronized void autoSteerFeederStation(double throttle, double angle) {
+    // double heading_error_rad = vehicle_to_alignment_point_bearing.getRadians();
     double radians = (0.0174533) * angle;
     double heading_error_rad = radians;
     final double kAutosteerKp = 0.05;
     boolean towards_goal = true;
     boolean reverse = false;
     double curvature = (towards_goal ? 1.0 : 0.0) * heading_error_rad * kAutosteerKp;
-    setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    //setBrakeMode(true);
+    setOpenLoop(
+        Kinematics.inverseKinematics(
+            new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
+    // setBrakeMode(true);
   }
-
 
   public void setOpenloopRamp(double speed) {
     mLeftMaster.configOpenloopRamp(speed);

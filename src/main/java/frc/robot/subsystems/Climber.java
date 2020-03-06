@@ -1,25 +1,28 @@
 package frc.robot.subsystems;
 
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Config;
-import frc.robot.Logger;
 import frc.robot.Constants;
-
+import frc.robot.Logger;
 
 public class Climber extends Subsystem {
   private final int PORT_NUMBER = Constants.Talon_Climber;
 
-  //TODO: Tune these values
-  private final double HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
-  private final double RETRACTED_HEIGHT_IN_ENCODER_TICKS = Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
-  private final double HOMING_SPEED_PERCENT = Config.getInstance().getDouble(Config.Key.CLIMBER__HOME_SPEED);
+  // TODO: Tune these values
+  private final double HEIGHT_IN_ENCODER_TICKS =
+      Config.getInstance().getDouble(Config.Key.CLIMBER__HEIGHT_IN_ENCODER_TICKS);
+  private final double RETRACTED_HEIGHT_IN_ENCODER_TICKS =
+      Config.getInstance().getDouble(Config.Key.CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS);
+  private final double HOMING_SPEED_PERCENT =
+      Config.getInstance().getDouble(Config.Key.CLIMBER__HOME_SPEED);
 
-  /** Talon SRX/ Victor SPX will support multiple (cascaded) PID loops. For now we just want the primary one. */
-
+  /**
+   * Talon SRX/ Victor SPX will support multiple (cascaded) PID loops. For now we just want the
+   * primary one.
+   */
   private final int PIDLoopIndex = Config.getInstance().getInt(Config.Key.CLIMBER__PID_LOOP_INDEX);
 
   /** Climber motion command timeout */
@@ -27,12 +30,14 @@ public class Climber extends Subsystem {
 
   /** Servo loop gains */
   private final double mMotorKF = Config.getInstance().getDouble(Config.Key.CLIMBER__KF);
+
   private final double mMotorKP = Config.getInstance().getDouble(Config.Key.CLIMBER__KP);
   private final double mMotorKI = Config.getInstance().getDouble(Config.Key.CLIMBER__KI);
   private final double mMotorKD = Config.getInstance().getDouble(Config.Key.CLIMBER__KD);
 
   /** Aggregation */
   private static Climber sInstance;
+
   private WPI_TalonSRX mMotor;
   private Logger mLogger;
   private boolean mIsHoming;
@@ -95,7 +100,7 @@ public class Climber extends Subsystem {
     mLogger.verbose("Stopping the climber");
     if (mIsHoming) {
       stopHoming();
-    }else {
+    } else {
       mMotor.stopMotor();
     }
   }
@@ -122,7 +127,7 @@ public class Climber extends Subsystem {
     mIsHoming = true;
   }
 
-  /** Stops the  */
+  /** Stops the */
   private void stopHoming() {
     mMotor.stopMotor();
     setHome();

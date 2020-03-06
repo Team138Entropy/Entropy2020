@@ -7,9 +7,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
-import frc.robot.Robot;
 import frc.robot.Config.Key;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 /** Add your docs here. */
 public class Storage extends Subsystem {
@@ -37,7 +37,6 @@ public class Storage extends Subsystem {
   private final WPI_TalonSRX mTopRoller;
 
   private int mBallCount = 0;
-  
 
   private static Storage sInstance;
 
@@ -48,7 +47,7 @@ public class Storage extends Subsystem {
     return sInstance;
   }
 
-  public int getCapacity(){
+  public int getCapacity() {
     return STORAGE_CAPICTY;
   }
 
@@ -69,13 +68,15 @@ public class Storage extends Subsystem {
     mBottomRoller.configPeakCurrentLimit(7);
 
     mIntakeSensor = new DigitalInput(INTAKE_SENSOR_PORT);
-    
+
     if (Robot.getIsPracticeBot()) {
-      BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRACTICE);
+      BALL_DISTANCE_IN_ENCODER_TICKS =
+          Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRACTICE);
       mBottomRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
       mBottomRoller.setSensorPhase(false);
     } else {
-      BALL_DISTANCE_IN_ENCODER_TICKS = Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRODUCTION);
+      BALL_DISTANCE_IN_ENCODER_TICKS =
+          Config.getInstance().getDouble(Key.STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRODUCTION);
       mTopRoller.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
       mTopRoller.setSensorPhase(false);
       mTopRoller.setInverted(true);

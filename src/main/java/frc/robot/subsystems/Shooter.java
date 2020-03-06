@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Config;
 import frc.robot.Config.Key;
-import frc.robot.SpeedLookupTable;
 import frc.robot.Constants;
+import frc.robot.SpeedLookupTable;
 
 /** Singleton that represents the shooter mechanism. */
 public class Shooter extends Subsystem {
@@ -33,8 +33,7 @@ public class Shooter extends Subsystem {
   private final int ROLLER_SLAVE_PORT = Constants.Talon_Shooter_Slave;
 
   // TODO: Tune these values
-  private final int DEFAULT_ROLLER_SPEED =
-      2000; // Encoder ticks per 100ms, change this value
+  private final int DEFAULT_ROLLER_SPEED = 2000; // Encoder ticks per 100ms, change this value
   private int mVelocityAdjustment = 0;
   private final int VELOCITY_ADJUSTMENT_BUMP =
       Config.getInstance().getInt(Key.SHOOTER__VELOCITY_ADJUSTMENT);
@@ -47,10 +46,8 @@ public class Shooter extends Subsystem {
   private double mDistance = 0;
   private int mTimeSinceWeWereAtVelocity = SPEED_DEADBAND_DELAY;
 
-
   private Shooter() {
     mRoller = new PIDRoller(ROLLER_PORT, ROLLER_SLAVE_PORT, P, I, D, FEEDFORWARD);
-
   }
 
   public static synchronized Shooter getInstance() {
@@ -58,12 +55,11 @@ public class Shooter extends Subsystem {
     return instance;
   }
 
-
   /** Starts the roller. */
   public void start(boolean speedBump) {
 
     int add = 0;
-    if(speedBump == true){
+    if (speedBump == true) {
       add = 0;
     }
 
@@ -76,7 +72,7 @@ public class Shooter extends Subsystem {
     mRoller.setSpeed(0);
   }
 
-  public void updateDistance(double dist){
+  public void updateDistance(double dist) {
     mDistance = dist;
   }
 
@@ -85,14 +81,10 @@ public class Shooter extends Subsystem {
   }
 
   private int getAdjustedVelocitySetpoint() {
-    double distance = mDistance; //for now
-    
-    int speed =
-        (int)
-            Math.round(
-                SpeedLookupTable.getInstance()
-                    .getSpeedFromDistance(distance));
-    
+    double distance = mDistance; // for now
+
+    int speed = (int) Math.round(SpeedLookupTable.getInstance().getSpeedFromDistance(distance));
+
     return speed + mVelocityAdjustment;
   }
 
@@ -113,22 +105,22 @@ public class Shooter extends Subsystem {
   }
 
   /** Returns whether roller is at full speed. */
-  //UPDATE: 
+  // UPDATE:
   public boolean isAtVelocity() {
 
-    //New Concept: Velocity FLOOR
-    //our velocity setpoint will be slightly higher than it needs to be
+    // New Concept: Velocity FLOOR
+    // our velocity setpoint will be slightly higher than it needs to be
     // allow velocity to be sliughtly lower, but operate as a floor
-     boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 50) >= 0);
+    boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 50) >= 0);
     // return isAtVelocity;
-    
-    //SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
+
+    // SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
     // determine if we're at the target velocity by looking at the difference between the actual and
     // expected
     // and if that difference is less than SPEED_DEADBAND, we are at the velocity
 
-    //boolean isAtVelocity =
-        // Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
+    // boolean isAtVelocity =
+    // Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
 
     // here's the problem:
     // the velocity we get often bounces around, causing breif moments when we think we aren't there
@@ -147,19 +139,18 @@ public class Shooter extends Subsystem {
     }
     // if the time is at least 0, we are "at velocity"
     boolean isAtVelocityDebounced = mTimeSinceWeWereAtVelocity <= 0;
-    
 
     return isAtVelocityDebounced;
 
-    //return false;
+    // return false;
   }
 
-  public boolean isBallFired(){
-    boolean didDropVelocity = Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
+  public boolean isBallFired() {
+    boolean didDropVelocity =
+        Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) >= (DROP_DEADBAND);
     boolean ballFired = didDropVelocity;
-    if(ballFired){
+    if (ballFired) {
       System.out.println("BALL FIRED!");
-
     }
     return ballFired;
   }
