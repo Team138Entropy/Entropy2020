@@ -19,11 +19,11 @@ public class Paths {
       // .append(new GyroTurnSegment(180))
       // .append(new GyroTurnSegment(180))
 
-    // paths.put("comp2", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
+    paths.put("comp2", new Path().append(new AsyncShootSegment()).append(new DriveSegment(3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
     
-    paths.put("comp2", new Path().append(new ShootSegment()));
+    // paths.put("comp2", new Path().append(new ShootSegment()));
 
-    paths.put("comp3", new Path().append(new SyncIntakeSegment()).append(new DriveSegment(-3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
+    // paths.put("comp3", new Path().append(new SyncIntakeSegment()).append(new DriveSegment(-3, Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL)));
 
     paths.put("comp4", new Path() 
     .append(new SpinUpSegment())
