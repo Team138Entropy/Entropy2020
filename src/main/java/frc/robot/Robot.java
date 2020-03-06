@@ -1053,7 +1053,7 @@ public class Robot extends TimedRobot {
 
     // spin up shooter if commanded
     if (sIsSpinningUp) {
-      mShooter.start(false);
+      mShooter.start();
     } else if (mState != State.SHOOTING) {
       mShooter.stop();
     }
@@ -1264,7 +1264,7 @@ public class Robot extends TimedRobot {
         mStorage.stop();
 
         /* Starts roller */
-        mShooter.start(false);
+        mShooter.start();
         sIsSpinningUp = false;
 
         // make robot pass though cooldown timer
@@ -1291,7 +1291,7 @@ public class Robot extends TimedRobot {
       case SHOOT_BALL:
         mStorage.ejectBall();
 
-        mShooter.start(true);
+        mShooter.start();
 
         // turn off shooting
         if (mOperatorInterface.getShoot() || mStorage.isEmpty()) {
@@ -1341,16 +1341,7 @@ public class Robot extends TimedRobot {
         // set Home?
         break;
       case EXTENDING:
-        // This will run constantly once in climbing mode
-        // While Operator Holds the Button, you can extend
-        // Constantly check if the operator has completed the extension period
-
-        if (mOperatorInterface.climbUp()) {
-          mClimbingState = ClimbingState.EXTENDING;
-        }
-        break;
-      case EXTENDING:
-        // TODO: Decide if climb and retract should be the same button
+        //TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
         if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.HOLD;
