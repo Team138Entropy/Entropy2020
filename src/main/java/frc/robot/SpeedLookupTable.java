@@ -47,23 +47,26 @@ public class SpeedLookupTable {
     double lowerBoundSpeed = 0;
     double upperBoundDistance = 0;
     double upperBoundSpeed = 0;
-    for (int i = 0; i < ourTable.length; i++) {
-      double thisDistance = ourTable[i][0];
-      double thisSpeed = ourTable[i][1];
 
-      if (thisDistance == distance) {
-        return thisSpeed;
-      }
+    if(distance == -1){
+      for (int i = 0; i < ourTable.length; i++) {
+        double thisDistance = ourTable[i][0];
+        double thisSpeed = ourTable[i][1];
 
-      lowerBoundDistance = upperBoundDistance;
-      lowerBoundSpeed = upperBoundSpeed;
-      upperBoundDistance = thisDistance;
-      upperBoundSpeed = thisSpeed;
+        if (thisDistance == distance) {
+          return thisSpeed;
+        }
+
+        lowerBoundDistance = upperBoundDistance;
+        lowerBoundSpeed = upperBoundSpeed;
+        upperBoundDistance = thisDistance;
+        upperBoundSpeed = thisSpeed;
 
 
-      if (distance > lowerBoundDistance && distance < upperBoundDistance) {
-        return linearInterpolate(
-            distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
+        if (distance > lowerBoundDistance && distance < upperBoundDistance) {
+          return linearInterpolate(
+              distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
+        }
       }
     }
 
