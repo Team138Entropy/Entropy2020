@@ -107,20 +107,6 @@ public class Shooter extends Subsystem {
     // our velocity setpoint will be slightly higher than it needs to be
     // allow velocity to be sliughtly lower, but operate as a floor
     boolean isAtVelocity = (mRoller.getVelocity() - (getAdjustedVelocitySetpoint() - 50) >= 0);
-    // return isAtVelocity;
-
-    // SmartDashboard.putNumber("Shot Countdown", mShotCountdown);
-    // determine if we're at the target velocity by looking at the difference between the actual and
-    // expected
-    // and if that difference is less than SPEED_DEADBAND, we are at the velocity
-
-    // boolean isAtVelocity =
-    // Math.abs(mRoller.getVelocity() - getAdjustedVelocitySetpoint()) < SPEED_DEADBAND;
-
-    // here's the problem:
-    // the velocity we get often bounces around, causing breif moments when we think we aren't there
-    // add a "delay" where we still consider ourselves to be at the velocity if we were there in the
-    // last SPEED_DEADBAND_DELAY ticks
 
     SmartDashboard.putNumber("Velocity Countdown", mTimeSinceWeWereAtVelocity);
     SmartDashboard.putBoolean("Has Had Current Drop", mHasHadCurrentDrop);
