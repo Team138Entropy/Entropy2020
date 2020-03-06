@@ -472,11 +472,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    if (1 == 1) {
-      mShooter.setOutput(1.0);
-      return;
-    }
-
     double timePerTest = Config.getInstance().getDouble(Key.TESTMODE__TIME_PER_TEST);
     int expectedStorageDistance =
         Config.getInstance().getInt(Key.TESTMODE__EXPECTED_STORAGE_DISTANCE);
