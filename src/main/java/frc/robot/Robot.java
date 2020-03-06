@@ -1082,6 +1082,7 @@ public class Robot extends TimedRobot {
         executeShootingStateMachine();
         break;
       case CLIMBING:
+        executeClimbingStateMachine();
         break;
       default:
         mRobotLogger.error("Invalid Robot State");
@@ -1332,11 +1333,14 @@ public class Robot extends TimedRobot {
       case IDLE:
         mClimber.stop();
         mRobotLogger.warn("Climbing state is idle");
-        // mClimbingState = ClimbingState.Extending;
-        // set Home?
+        break;
+      case WAIT:
+        if (mOperatorInterface.climbUp()) {
+          mClimbingState = ClimbingState.EXTENDING;
+        }
         break;
       case EXTENDING:
-        // TODO: Decide if climb and retract should be the same button
+        //TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
         if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.HOLD;
