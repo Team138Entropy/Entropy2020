@@ -4,10 +4,7 @@ import frc.robot.OI.OperatorInterface;
 import frc.robot.subsystems.Storage;
 
 public class SyncIntakeSegment extends Segment {
-  private int mBallsToGet;
-
-  public SyncIntakeSegment(int balls){
-    mBallsToGet = balls;
+  public SyncIntakeSegment(){
   }
 
   private static boolean active = false;
@@ -26,22 +23,16 @@ public class SyncIntakeSegment extends Segment {
   public void init() {
     active = true;
     logger.info("Initializing sync intake segment");
-
-    OperatorInterface.getInstance().overrideIntake(); 
   }
 
   @Override
   public void tick() {
-    if (Storage.getInstance().getBallCount() == mBallsToGet) {
-      done = true;
-    }
+    done = !IntakeSegment.isActive();
   }
 
   @Override
   public boolean finished() {
     if (done) {
-      logger.info("Intake segment finished");
-      OperatorInterface.getInstance().overrideIntake();
       active = false;
     }
 
@@ -50,6 +41,6 @@ public class SyncIntakeSegment extends Segment {
 
   @Override
   public Segment copy() {
-    return new SyncIntakeSegment(mBallsToGet);
+    return new SyncIntakeSegment();
   }
 }

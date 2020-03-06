@@ -36,7 +36,6 @@ public class IntakeSegment extends Segment {
 
             @Override
             public boolean predicate() {
-                logger.info("Ball count: " + Storage.getInstance().getBallCount());
                 return Storage.getInstance().getBallCount() == ballsToGet;
             }
             

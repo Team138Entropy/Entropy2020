@@ -241,6 +241,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    mShooter.stop();
     int autoMode = (int) Math.round(SmartDashboard.getNumber("Auto Layout", 1));
 
     mAuto = true;

@@ -1,6 +1,7 @@
 package frc.robot.auto;
 
 import frc.robot.OI.OperatorInterface;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Storage;
 
 public class ShootSegment extends Segment {
