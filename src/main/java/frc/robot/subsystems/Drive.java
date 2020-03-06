@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Config;
 import frc.robot.Config.Key;
 import frc.robot.Constants;
@@ -44,6 +45,7 @@ public class Drive extends Subsystem {
     public int right_velocity_ticks_per_100ms;
     public Rotation2d gyro_heading = Rotation2d.identity();
     public Pose2d error = Pose2d.identity();
+    public boolean climbingSpeed = false;
 
     // OUTPUTS
     public double left_demand;
@@ -62,6 +64,16 @@ public class Drive extends Subsystem {
     return mInstance;
   }
 
+  public int feetToTicks(double feet) {
+    long roundedVal = Math.round(feet * Constants.TICKS_PER_FOOT);
+    if (roundedVal > Integer.MAX_VALUE) {
+      mDriveLogger.warn(
+          "Integer overflow when converting feet to ticks! Something is likely VERY WRONG!");
+    }
+
+    return (int) roundedVal;
+  }
+
   private Drive() {
     mDriveLogger = new Logger("drive");
 
@@ -77,49 +89,11 @@ public class Drive extends Subsystem {
     mRightSlave = new WPI_TalonSRX(Constants.Talon_RightDrive2_Slave);
     // configureSpark(mRightSlave, false, false);
 
-    mLeftMaster.configFactoryDefault();
-    mLeftMaster.configNominalOutputForward(0., 0);
-    mLeftMaster.configNominalOutputReverse(0., 0);
-    mLeftMaster.configPeakOutputForward(1, 0);
-    mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.configOpenloopRamp(0);
-
-    mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    mLeftMaster.setSensorPhase(true);
-    mLeftMaster.configNominalOutputForward(0., 0);
-    mLeftMaster.configNominalOutputReverse(-0., 0);
-    mLeftMaster.configPeakOutputForward(1, 0);
-    mLeftMaster.configPeakOutputReverse(-1, 0);
-    mLeftMaster.setNeutralMode(NeutralMode.Brake);
+    configTalon(mLeftMaster);
     mLeftSlave.setNeutralMode(NeutralMode.Brake);
 
-    mRightMaster.configFactoryDefault();
-    mRightMaster.configNominalOutputForward(0., 0);
-    mRightMaster.configNominalOutputReverse(0., 0);
-    mRightMaster.configPeakOutputForward(1, 0);
-    mRightMaster.configPeakOutputReverse(-1, 0);
-    mRightMaster.configOpenloopRamp(0);
-
-    mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-    mRightMaster.setSensorPhase(true);
-    mRightMaster.configNominalOutputForward(0., 0);
-    mRightMaster.configNominalOutputReverse(-0., 0);
-    mRightMaster.configPeakOutputForward(1, 0);
-    mRightMaster.configPeakOutputReverse(-1, 0);
-    mRightMaster.setNeutralMode(NeutralMode.Brake);
+    configTalon(mRightMaster);
     mRightSlave.setNeutralMode(NeutralMode.Brake);
-
-    // Configure Talon gains
-    /*
-    mLeftMaster.config_kF(0, Drive_Kf,0);
-    mLeftMaster.config_kP(0, Drive_Kp,0);
-    mLeftMaster.config_kI(0, Drive_Ki,0);
-    mLeftMaster.config_kD(0, Drive_Kd,0);
-    mRightMaster.config_kF(0, Drive_Kf,0);
-    mRightMaster.config_kP(0, Drive_Kp,0);
-    mRightMaster.config_kI(0, Drive_Ki,0);
-    mRightMaster.config_kD(0, Drive_Kd,0);
-          */
 
     // Configure slave Talons to follow masters
     mLeftSlave.follow(mLeftMaster);
@@ -129,10 +103,108 @@ public class Drive extends Subsystem {
     setOpenLoop(DriveSignal.NEUTRAL);
   }
 
-  public void zeroSensors() {}
+  private void configTalon(WPI_TalonSRX talon) {
+    talon.configFactoryDefault();
+    talon.configNominalOutputForward(0., 0);
+    talon.configNominalOutputReverse(0., 0);
+    talon.configPeakOutputForward(1, 0);
+    talon.configPeakOutputReverse(-1, 0);
+    talon.configOpenloopRamp(0);
+    talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    talon.setSensorPhase(true);
+    talon.setNeutralMode(NeutralMode.Brake);
+
+    // Configure Talon gains
+    double P, I, D;
+
+    P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
+
+    mDriveLogger.info("PID values: " + P + ", " + I + ", " + D);
+
+    talon.config_kP(0, P);
+    talon.config_kI(0, I);
+    talon.config_kD(0, D);
+    talon.config_kF(0, 0);
+    talon.configClosedLoopPeriod(0, 10);
+
+    talon.configMotionCruiseVelocity(900);
+    talon.configMotionAcceleration(750);
+  }
+
+  public void resetCruiseAndAccel() {
+    setCruiseAndAcceleration(Constants.DEFAULT_CRUISE_VELOCITY, Constants.DEFAULT_ACCEL);
+  }
+
+  public void setCruiseAndAcceleration(int cruise, int accel) {
+    mLeftMaster.configMotionCruiseVelocity(cruise);
+    mRightMaster.configMotionCruiseVelocity(cruise);
+
+    mLeftMaster.configMotionAcceleration(accel);
+    mRightMaster.configMotionAcceleration(accel);
+  }
+
+  public void configP(double p) {
+    mLeftMaster.config_kP(0, p);
+    mRightMaster.config_kP(0, p);
+  }
+
+  public void configI(double i) {
+    mLeftMaster.config_kI(0, i);
+    mRightMaster.config_kI(0, i);
+  }
+
+  public void configD(double d) {
+    mLeftMaster.config_kD(0, d);
+    mRightMaster.config_kD(0, d);
+  }
+
+  public void resetPID() {
+    double P, I, D;
+
+    P = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_P);
+    I = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_I);
+    D = Config.getInstance().getDouble(Config.Key.AUTO__DRIVE_PID_D);
+
+    configP(P);
+    configI(I);
+    configD(D);
+  }
+
+  public void zeroSensors() {
+    zeroEncoders();
+  }
+
+  public void setMotionMagicTarget(int left, int right) {
+    mLeftMaster.set(ControlMode.MotionMagic, left);
+    mRightMaster.set(ControlMode.MotionMagic, -right);
+  }
+
+  public void setSimplePIDTarget(int left, int right) {
+    mLeftMaster.set(ControlMode.Position, left);
+    mRightMaster.set(ControlMode.Position, -right);
+  }
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
+    // Slow down climbing if the climber is extended so we can't rip it off (as easily)
+    double peakOutput = Config.getInstance().getDouble(Key.DRIVE__PEAK_OUTPUT_CLIMBING);
+
+    if (mPeriodicDriveData.climbingSpeed) {
+      mLeftMaster.configPeakOutputForward(peakOutput, 0);
+      mLeftMaster.configPeakOutputReverse(-peakOutput, 0);
+
+      mRightMaster.configPeakOutputForward(peakOutput, 0);
+      mRightMaster.configPeakOutputReverse(-peakOutput, 0);
+    } else {
+      mLeftMaster.configPeakOutputForward(1, 0);
+      mLeftMaster.configPeakOutputReverse(-1, 0);
+
+      mRightMaster.configPeakOutputForward(1, 0);
+      mRightMaster.configPeakOutputReverse(-1, 0);
+    }
+
     // A lot of the space in this function is taken up by local copies of stuff
     double accelSpeed = Config.getInstance().getDouble(Key.DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS);
     double brakeSpeed = Config.getInstance().getDouble(Key.DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS);
@@ -212,15 +284,24 @@ public class Drive extends Subsystem {
       velocityReverse = true;
     }
 
+    // this is [0, 1)
+    double differenceBetweenSides =
+        Math.abs(Math.abs(signal.getLeft()) - Math.abs(signal.getRight()));
+
+    double accelSpeedWhenTurningFactor = 1 - differenceBetweenSides;
+
     // This is where the actual accel limiting logic begins
     if (velocityForwards) {
       if (acceleratingForward) {
-        setOpenloopRamp(accelSpeed);
+        setOpenloopRamp(accelSpeed * accelSpeedWhenTurningFactor);
       }
     } else if (velocityReverse) {
-      if (acceleratingForward) {
-        setOpenloopRamp(brakeSpeed);
-      }
+      // if (acceleratingForward) {
+      //   setOpenloopRamp(brakeSpeed * accelSpeedWhenTurningFactor);
+      // }
+
+      // PittDrive mode - symmetry between forward and reverse accel
+      setOpenloopRamp(brakeSpeed * accelSpeedWhenTurningFactor);
     } else if (stationary) {
       setOpenloopRamp(0);
     } else if (quickturn) {
@@ -235,6 +316,13 @@ public class Drive extends Subsystem {
     // backwards
     mLeftMaster.set(ControlMode.PercentOutput, leftOutput);
     mRightMaster.set(ControlMode.PercentOutput, rightOutput * -1);
+  }
+
+  // Used for arcade turning during auto
+  public void setSimplePercentOutput(DriveSignal signal) {
+    setOpenloopRamp(0); // Just in case
+    mLeftMaster.set(ControlMode.PercentOutput, signal.getLeft());
+    mRightMaster.set(ControlMode.PercentOutput, signal.getRight() * -1);
   }
 
   public synchronized void setDrive(double throttle, double wheel, boolean quickTurn) {
@@ -276,7 +364,11 @@ public class Drive extends Subsystem {
 
     // Either the bigger of the two drive signals or 1, whichever is bigger.
     double scaling_factor =
-        Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
+        Math.max(
+            1.0,
+            Math.max(
+                Math.abs(signal.getLeft()),
+                Math.abs(signal.getRight()))); // / (1 + (differenceBetweenSides * 6));
     if (quickTurn) {
       setOpenLoop(
           new DriveSignal(
@@ -288,43 +380,66 @@ public class Drive extends Subsystem {
     }
   }
 
-  /*
-      Auto Steer functionality
-      passed in parameters to the goal to aim at
-      allows driver to control throttle
-      this will be called with the ball as a target
-  */
-  // public synchronized void autoSteerBall(double throttle, AimingParameters aim_params) {
-  //   double timestamp = Timer.getFPGATimestamp();
-  //   final double kAutosteerAlignmentPointOffset = 15.0; //
-  //   /*
-  //   setOpenLoop(Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, curvature * throttle *
-  // (reverse ? -1.0 : 1.0))));
-  //   setBrakeMode(true);
-  //   */
-
-  // }
-
-  // Auto Steer functionality to the goal
-  // driver only controls the throttle
-  // 'we may want to set a speed floor/speed minimum'
-  public synchronized void autoSteerFeederStation(double throttle, double angle) {
-    // double heading_error_rad = vehicle_to_alignment_point_bearing.getRadians();
-    double radians = (0.0174533) * angle;
-    double heading_error_rad = radians;
-    final double kAutosteerKp = 0.05;
-    boolean towards_goal = true;
-    boolean reverse = false;
-    double curvature = (towards_goal ? 1.0 : 0.0) * heading_error_rad * kAutosteerKp;
-    setOpenLoop(
-        Kinematics.inverseKinematics(
-            new Twist2d(throttle, 0.0, curvature * throttle * (reverse ? -1.0 : 1.0))));
-    // setBrakeMode(true);
-  }
-
   public void setOpenloopRamp(double speed) {
     mLeftMaster.configOpenloopRamp(speed);
     mRightMaster.configOpenloopRamp(speed);
+  }
+
+  /**
+   * WPILib's arcade drive. We need this for auto turning because it allows us to set a rotation
+   * speed. Note that the deadband functionality has been removed, since we don't have to worry
+   * about driver error during auto. If we were using WPILib's {@link
+   * edu.wpi.first.wpilibj.drive.DifferentialDrive DifferentialDrive} we wouldn't need to copy this
+   * over. The output is also clamped so that we don't lose control.
+   *
+   * @param xSpeed The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *     positive.
+   * @param squareInputs If set, decreases the input sensitivity at low speeds.
+   */
+  public void arcadeHack(double xSpeed, double zRotation, boolean squareInputs) {
+    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+
+    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+
+    // Square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power.
+    if (squareInputs) {
+      xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+      zRotation = Math.copySign(zRotation * zRotation, zRotation);
+    }
+
+    double leftMotorOutput;
+    double rightMotorOutput;
+
+    double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
+
+    if (xSpeed >= 0.0) {
+      // First quadrant, else second quadrant
+      if (zRotation >= 0.0) {
+        leftMotorOutput = maxInput;
+        rightMotorOutput = xSpeed - zRotation;
+      } else {
+        leftMotorOutput = xSpeed + zRotation;
+        rightMotorOutput = maxInput;
+      }
+    } else {
+      // Third quadrant, else fourth quadrant
+      if (zRotation >= 0.0) {
+        leftMotorOutput = xSpeed + zRotation;
+        rightMotorOutput = maxInput;
+      } else {
+        leftMotorOutput = maxInput;
+        rightMotorOutput = xSpeed - zRotation;
+      }
+    }
+
+    final double max = 0.7;
+
+    setSimplePercentOutput(
+        new DriveSignal(
+            MathUtil.clamp(leftMotorOutput, -max, max),
+            MathUtil.clamp(rightMotorOutput, -max, max)));
   }
 
   /*
@@ -332,16 +447,25 @@ public class Drive extends Subsystem {
   */
   public void checkSubsystem() {}
 
-  public synchronized double getLeftEncoderDistance() {
+  public synchronized void setClimbingSpeed(boolean climbing) {
+    mPeriodicDriveData.climbingSpeed = climbing;
+  }
+
+  public synchronized int getLeftEncoderDistance() {
     return mLeftMaster.getSelectedSensorPosition();
   }
 
-  public synchronized double getRightEncoderDistance() {
+  public synchronized int getRightEncoderDistance() {
     return mRightMaster.getSelectedSensorPosition();
   }
 
   public synchronized Rotation2d getRotation() {
     return null;
+  }
+
+  public void zeroEncoders() {
+    mLeftMaster.getSensorCollection().setQuadraturePosition(0, Constants.CONFIG_TIMEOUT_MS);
+    mRightMaster.getSensorCollection().setQuadraturePosition(0, Constants.CONFIG_TIMEOUT_MS);
   }
 
   // Used only in TEST mode

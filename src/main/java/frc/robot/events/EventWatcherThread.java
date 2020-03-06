@@ -1,52 +1,75 @@
 package frc.robot.events;
 
-import edu.wpi.first.wpilibj.command.Scheduler;
-import frc.robot.Logger;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
-/** Singleton thread for monitoring things. */
 public class EventWatcherThread extends Thread {
-  Logger mLogger = new Logger("eventWatcherThread");
+  // IMPORTANT: For IntakeSegment to work reliably, the delay between its event calls *must* be less
+  // than the robot loop period (~20ms)!
+  // That means this value should be set considerably lower to account for delays caused by other
+  // events.
+  // FIXME: Do this the right way so we don't have to restrict the timing
+  private static final int LOOP_PERIOD_MS = 5;
 
-  private ArrayList<Event> queue = new ArrayList<>();
-  private LinkedHashMap<Event, Boolean> lastStateCache = new LinkedHashMap<>();
+  private static EventWatcherThread instance;
 
-  private static EventWatcherThread thread = new EventWatcherThread();
+  private final Object queueLock = new Object();
+  private ArrayList<Event> queue;
+  private ArrayList<Event> pruneList; // Needed to avoid ConcurrentModificationException!
 
-  public static EventWatcherThread getInstance() {
-    return thread;
+  public static synchronized EventWatcherThread getInstance() {
+    if (instance == null) {
+      instance = new EventWatcherThread();
+      instance.start();
+    }
+
+    return instance;
+  }
+
+  private EventWatcherThread() {
+    queue = new ArrayList<>();
+    pruneList = new ArrayList<>();
   }
 
   @Override
   public void run() {
+    while (!Thread.currentThread().isInterrupted()) {
+      try {
+        for (Event e : queue) {
+          if (e.predicate()) {
+            e.run();
 
-    //noinspection InfiniteLoopStatement
-    while (true) {
-      for (Event e : queue) {
-
-        // We have to store this because e.check() might change
-        boolean savedState = e.check();
-
-        // Add the event to the cache if it wasn't already there
-        if (!lastStateCache.containsKey(e)) {
-          lastStateCache.put(e, savedState);
+            if (e.pruneMe()) {
+              pruneList.add(e);
+            }
+          }
         }
 
-        // Add the command to the scheduler only if the state of the event changed
-        if (savedState && !lastStateCache.get(e)) {
-          Scheduler.getInstance().add(e.getCommand());
+        for (Event e : pruneList) {
+          queue.remove(e);
         }
 
-        lastStateCache.replace(e, savedState);
+        Thread.sleep(LOOP_PERIOD_MS);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
       }
     }
   }
 
-  public void addEvent(Event e) {
-    if (!queue.contains(e)) {
+  public void registerEvent(Event e) {
+    synchronized (queueLock) {
       queue.add(e);
-      mLogger.info("Event added (" + queue.size() + " total)");
+    }
+  }
+
+  public void unRegisterEvent(Event e) {
+    synchronized (queueLock) {
+      queue.remove(e);
+    }
+  }
+
+  public void resetQueue() {
+    synchronized (queueLock) {
+      queue.clear();
     }
   }
 }

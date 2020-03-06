@@ -6,20 +6,6 @@ import frc.robot.util.geometry.Translation2d;
 
 // Any Sort of Constant or 'Magic Number' should be defined here
 public class Constants {
-  // Talons Ports
-  // ALL TALON PORTS DEFINED HERE
-  public static final int Talon_LeftDrive1_Master = 1;
-  public static final int Talon_LeftDrive2_Slave = 2;
-  public static final int Talon_RightDrive1_Master = 3;
-  public static final int Talon_RightDrive2_Slave = 4;
-  public static final int Talon_Storage_Top = 5;
-  public static final int Talon_Shooter_Master = 6;
-  public static final int Talon_Shooter_Slave = 7;
-  public static final int Talon_Storage_Bottom = 8;
-  public static final int Talon_Turret = 9;
-  public static final int Talon_IntakeRoller = 10;
-  public static final int Talon_Climber = 11;
-  // ALL TALON PORTS DEFINED HERE
 
   // Controller Ports
   public static final int DriverControllerPort = 0;
@@ -30,8 +16,19 @@ public class Constants {
   // PWM
   public static final int kCameraRingId = 0;
 
+  // Talon config
+  public static int CONFIG_TIMEOUT_MS = 250;
+
   // Drive Constants
   public static final double kJoystickThreshold = 0.15;
+  // Oracle's official constant convention. Don't @ me.
+  public static final double TICKS_PER_FOOT = 1228.615;
+  public static final double REAL_TRACK_WIDTH = 1.916;
+
+  // Auto Constants
+  public static final int AUTO_DEBOUNCE_TICKS = 10; // ~0.2 seconds
+  public static final int DEFAULT_ACCEL = 750;
+  public static final int DEFAULT_CRUISE_VELOCITY = 900;
 
   // 22 is too low, 100 is too high
   public static final double kDriveWheelTrackWidthInches = 50;
@@ -57,7 +54,7 @@ public class Constants {
   public static final double kMaxGoalTrackSmoothingTime = 0.5;
   public static final double kTrackStabilityWeight = 0.0;
   public static final double kTrackAgeWeight = 10.0;
-  public static final double kTrackSwitchingWeight = 60.0;
+  public static final double kTrackSwitchingWeight = 100.0;
   public static final double kCameraFrameRate = 90.0; // fps
 
   // Camera Specific Information
@@ -75,12 +72,9 @@ public class Constants {
   public static final Rotation2d kShooterCameraHorizontalPlaneToLens =
       Rotation2d.fromDegrees(0); // Shooter should sit pretty flat
   public static final Rotation2d kBallCameraHorizontalPlaneToLens =
-      Rotation2d.fromDegrees(0); // camera is angled downards
+      Rotation2d.fromDegrees(-5); // camera is angled downards
   public static final double kShooterCameraHeight = 40; // shooter camera height on robot (inches)
   public static final double kBallCameraHeight = 12; // ball camera height
-
-  // angle offset.. account for offset camera
-  public static final double kTurretAngleOffset = -2.5;
 
   // Offsets from our center point
   public static final Pose2d kTurrentToLens =
@@ -94,13 +88,14 @@ public class Constants {
 
   // Looper System
   // period at which the looper runs at
-  public static final double kLooperDt = 0.02;
+  public static final double kLooperDt = 0.01;
 
   // Constants for Server Motor System
   public static final int kCANTimeoutMs = 10; // use for important on the fly updates
   public static final int kLongCANTimeoutMs = 100; // use for constructor
 
   // Turret
+  public static final int kTurretTalonMotorPort = 20;
   public static final double kTurretAimAngleDeadband = 1.5;
   public static final double kTicksPerDegee = 140;
 }

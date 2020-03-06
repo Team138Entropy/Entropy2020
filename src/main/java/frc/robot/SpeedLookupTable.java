@@ -13,10 +13,10 @@ public class SpeedLookupTable {
   // note: This MUST be sorted by lowest distance first
   double[][] mPracticeLookupTable = {
     // {distance in meters, speed in whatever our system uses}
-    {10d, 2600d},
-    {20d, 2600d},
-    {30d, 2600d},
-    {40d, 2600d}
+    {10d, 1150d},
+    {20d, 1150d},
+    {30d, 1150d},
+    {40d, 1150d}
   };
 
   double[][] mProductionLookupTable = {
@@ -47,22 +47,25 @@ public class SpeedLookupTable {
     double lowerBoundSpeed = 0;
     double upperBoundDistance = 0;
     double upperBoundSpeed = 0;
-    for (int i = 0; i < ourTable.length; i++) {
-      double thisDistance = ourTable[i][0];
-      double thisSpeed = ourTable[i][1];
 
-      if (thisDistance == distance) {
-        return thisSpeed;
-      }
+    if (distance != -1) {
+      for (int i = 0; i < ourTable.length; i++) {
+        double thisDistance = ourTable[i][0];
+        double thisSpeed = ourTable[i][1];
 
-      lowerBoundDistance = upperBoundDistance;
-      lowerBoundSpeed = upperBoundSpeed;
-      upperBoundDistance = thisDistance;
-      upperBoundSpeed = thisSpeed;
+        if (thisDistance == distance) {
+          return thisSpeed;
+        }
 
-      if (distance > lowerBoundDistance && distance < upperBoundDistance) {
-        return linearInterpolate(
-            distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
+        lowerBoundDistance = upperBoundDistance;
+        lowerBoundSpeed = upperBoundSpeed;
+        upperBoundDistance = thisDistance;
+        upperBoundSpeed = thisSpeed;
+
+        if (distance > lowerBoundDistance && distance < upperBoundDistance) {
+          return linearInterpolate(
+              distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
+        }
       }
     }
 

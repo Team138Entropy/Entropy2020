@@ -177,7 +177,6 @@ public class Storage extends Subsystem {
   public synchronized void ejectBall() {
     mBottomRoller.set(ControlMode.PercentOutput, EJECT_SPEED * BOTTOM_SPEED_FACTOR);
     mTopRoller.set(ControlMode.PercentOutput, EJECT_SPEED);
-    SmartDashboard.putNumber("Storage Current", mTopRoller.getSupplyCurrent());
   }
 
   public synchronized void setBottomOutput(double output) {

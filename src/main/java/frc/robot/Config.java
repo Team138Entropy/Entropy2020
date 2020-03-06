@@ -6,10 +6,17 @@ package frc.robot;
 // @Deprecated
 // public class Constants {
 
+// TODO: Address performance concerns by profiling execution time and trimming calls
 public class Config {
 
   public enum Key {
-    // Motors
+    DRIVE__PEAK_OUTPUT_CLIMBING(0.3),
+
+    // Physical qualities of robot
+    ROBOT__REAL_TRACK_WIDTH(0.58d), // Meters, 0.58 is about 23"
+    DRIVE__TICKS_PER_METER(640),
+
+    // Motors,
     DRIVE__LEFT_BACK_PORT(1),
     DRIVE__LEFT_FRONT_PORT(2),
     DRIVE__RIGHT_BACK_PORT(3),
@@ -20,6 +27,9 @@ public class Config {
     SHOOTER__ROLLER(6),
     SHOOTER__ROLLER_SLAVE(5),
     CLIMBER__MOTOR(11),
+
+    // Sensors
+    INTAKE__SENSOR(1),
 
     // Speeds
     INTAKE__ROLLER_SPEED(1d),
@@ -32,14 +42,31 @@ public class Config {
     CLIMBER__HOME_SPEED(.5d),
     DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS(1d),
     DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS(1d),
+    CLIMBER__JOG_SPEED_FACTOR(1.0d),
 
-    CLIMBER__ENABLED(false),
+    CLIMBER__ENABLED(true),
 
+    // Auto config (temporary)
+    AUTO__SELECTED_PATH("test"),
+
+    // PID Stuff
     OI__VISION__POT__MIN(0),
     OI__VISION__POT__MAX(100d),
     OI__VISION__PID__P(0.3d),
     OI__VISION__PID__I(0.003d),
     OI__VISION__PID__D(0),
+
+    AUTO__DRIVE_PID_P(1),
+    AUTO__DRIVE_PID_I(0),
+    AUTO__DRIVE_PID_D(0),
+    AUTO__DRIVE_PID_ACCEPTABLE_ERROR(0.5),
+    AUTO__DRIVE_PID_RAMP(0.2),
+
+    AUTO__TURN_PID_P(0.4d),
+    AUTO__TURN_PID_I(0d),
+    AUTO__TURN_PID_D(0d),
+    AUTO__TURN_PID_ACCEPTABLE_ERROR(5d),
+    AUTO__TURN_PID_MAX(0.5),
 
     ROBOT__HAS_DRIVETRAIN(true),
     ROBOT__HAS_TURRET(false),
@@ -58,8 +85,9 @@ public class Config {
     CLIMBER__OVERCURRENT_COUNTDOWN_LENGTH(30d),
     SHOOTER__VELOCITY_ADJUSTMENT(100),
 
-    CLIMBER__HEIGHT_IN_ENCODER_TICKS(2000d),
-    CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS(0d),
+    CLIMBER__DETECT_BAND(100),
+    CLIMBER__EXTENDED_HEIGHT_IN_ENCODER_TICKS(70000),
+    CLIMBER__RETRACTED_HEIGHT_IN_ENCODER_TICKS(40000),
     STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRACTICE(2000d),
     STORAGE__BALL_DISTANCE_IN_ENCODER_TICKS_PRODUCTION(2000d),
 
@@ -67,8 +95,8 @@ public class Config {
 
     CLIMBER__PID_LOOP_INDEX(0),
     CLIMBER__TIMEOUT_MS(10),
-    CLIMBER__KF(1d),
-    CLIMBER__KP(0d),
+    CLIMBER__KF(0),
+    CLIMBER__KP(.3d),
     CLIMBER__KI(0d),
     CLIMBER__KD(0d),
 
