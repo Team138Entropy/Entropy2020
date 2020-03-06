@@ -86,6 +86,8 @@ public class Robot extends TimedRobot {
   private double LastDistance = -1;
   private int LastTurretVisionID = -1; // use IDs to filter out bad ideas
   private int LastFeederStationVisionID = -1;
+  
+  private double mTurretAdjust = 0;
 
   public enum TestState {
     START,
@@ -902,8 +904,10 @@ public class Robot extends TimedRobot {
   // turret loop
   // constantly commands the turret with vision or manual controls
   public synchronized void turretLoop() {
-
     if (mTurretState == TurretState.AUTO_AIM) {
+      double turretAdjust = mOperatorInterface.getTurretAdjust();
+      mTurretAdjust += turretAdjust * Constants.TURRET_MANUAL_ADJUST_FACTOR;
+
       // Command the Turret with vision set points
       // RobotTracker.RobotTrackerResult result =
       // mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
@@ -915,7 +919,7 @@ public class Robot extends TimedRobot {
 
         // verify we haven't already commanded this packet!
         if (vp.ID != LastTurretVisionID) {
-          mTurret.SetAimError(vp.Error_Angle + Constants.kTurretAngleOffset);
+          mTurret.SetAimError(vp.Error_Angle + Constants.kTurretAngleOffset + mTurretAdjust);
           LastTurretVisionID = vp.ID;
         }
 
