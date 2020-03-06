@@ -15,6 +15,7 @@ import frc.robot.auto.Path;
 import frc.robot.auto.Paths;
 import frc.robot.auto.ShootSegment;
 import frc.robot.auto.SyncIntakeSegment;
+import frc.robot.auto.VisionToggleSegment;
 import frc.robot.events.EventWatcherThread;
 import frc.robot.subsystems.*;
 import frc.robot.util.LatchedBoolean;
@@ -290,6 +291,10 @@ public class Robot extends TimedRobot {
       executeIntakeStateMachine();
     }
 
+    if(VisionToggleSegment.getToggle()){
+      toggleVision();
+    }
+
     if (sIsSpinningUp) {
       mShooter.start();
     } else if (mState != State.SHOOTING) {
@@ -299,6 +304,8 @@ public class Robot extends TimedRobot {
     executeShootingStateMachine();
 
     updateSmartDashboard();
+
+    turretLoop();
   }
 
   @Override
@@ -819,23 +826,26 @@ public class Robot extends TimedRobot {
     }
   }
 
+  public void toggleVision(){
+    if(mTurretState == TurretState.AUTO_AIM){
+      //Turn off Auto Aiming
+      visionLight.set(Relay.Value.kOff);
+      mTurretState = TurretState.MANUAL;
+    }else if(mTurretState == TurretState.MANUAL){
+      //Turn on Auto Aiming
+      mTurretState = TurretState.AUTO_AIM;
+
+      //Enable Light
+      visionLight.set(Relay.Value.kForward);
+    }
+  }
+
   /*
     Called constantly, houses the main functionality of robot
   */
   public void RobotLoop() {
     if(mOperatorInterface.getVisionToggle()){
-
-      if(mTurretState == TurretState.AUTO_AIM){
-        //Turn off Auto Aiming
-        visionLight.set(Relay.Value.kOff);
-        mTurretState = TurretState.MANUAL;
-      }else if(mTurretState == TurretState.MANUAL){
-        //Turn on Auto Aiming
-        mTurretState = TurretState.AUTO_AIM;
-
-        //Enable Light
-        visionLight.set(Relay.Value.kForward);
-      }
+      toggleVision();
     }
 
     mShooter.updateDistance(LastDistance);
