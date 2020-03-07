@@ -65,7 +65,7 @@ public class Turret extends Subsystem {
         LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyClosed, 10);
     mTurretTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
     mTurretTalon.config_kF(0, 0); // MUST BE 0 in Position mode
-    mTurretTalon.config_kP(0, .1);
+    mTurretTalon.config_kP(0, .3);
     mTurretTalon.config_kI(0, 0);
     mTurretTalon.config_kD(0, 0);
     mTurretTalon.config_IntegralZone(0, 50);
