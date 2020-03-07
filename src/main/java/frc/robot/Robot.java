@@ -1071,9 +1071,9 @@ public class Robot extends TimedRobot {
 
     // Shooter velocity trim
     if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
-      mShooter.decreaseVelocity();
+      // mShooter.decreaseVelocity();
     } else if (mShooterVelocityTrimUp.update(mOperatorInterface.getShooterVelocityTrimUp())) {
-      mShooter.increaseVelocity();
+      // mShooter.increaseVelocity();
     } else if (mOperatorInterface.getResetVelocityTrim()) {
       mShooter.resetVelocity();
     }
