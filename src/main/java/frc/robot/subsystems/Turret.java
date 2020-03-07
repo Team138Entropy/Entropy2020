@@ -19,7 +19,7 @@ public class Turret extends Subsystem {
   private final double HomePosition = 0;
 
   // How Close the Turret can be
-  private final double AutoAimDeadband = 0.7;
+  private final double AutoAimDeadband = 0.4;
 
   enum TurretState {
     AUTO_AIM,
