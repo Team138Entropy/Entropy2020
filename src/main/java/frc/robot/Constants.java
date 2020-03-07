@@ -128,5 +128,5 @@ public class Constants {
   // Turret
   public static final int kTurretTalonMotorPort = 20;
   public static final double kTurretAimAngleDeadband = .5;
-  public static final double kTicksPerDegee = 140;
+  public static final double kTicksPerDegee = 120;
 }
