@@ -407,7 +407,6 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mAuto = false;
-    mRobotLogger.log("Entropy 138: Test Init");
     mTestState = TestState.MANUAL;
 
     Config.getInstance().reload();
@@ -899,6 +898,7 @@ public class Robot extends TimedRobot {
 
     // zero turret sensor
     // this assumes the turret is aligned
+
 
     Config.getInstance().reload();
 
