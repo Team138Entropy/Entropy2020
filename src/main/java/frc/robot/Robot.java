@@ -927,7 +927,7 @@ public class Robot extends TimedRobot {
 
         // verify we haven't already commanded this packet!
         if (vp.ID != LastTurretVisionID) {
-          mTurret.SetAimError(vp.Error_Angle/* + (vp.getTurretOffset()* -1)*/ + mTurretAdjust);
+          mTurret.SetAimError(vp.Error_Angle + (vp.getTurretOffset()* -1) + mTurretAdjust);
           LastTurretVisionID = vp.ID;
         }
 
