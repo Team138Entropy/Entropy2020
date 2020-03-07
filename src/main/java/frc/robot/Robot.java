@@ -923,11 +923,9 @@ public class Robot extends TimedRobot {
         // We have Target Information
         LastDistance = vp.Distance;
 
-        System.out.println(vp.Error_Angle);
-
         // verify we haven't already commanded this packet!
         if (vp.ID != LastTurretVisionID) {
-          mTurret.SetAimError(vp.Error_Angle/* + vp.getTurretOffset()*/ + mTurretAdjust);
+          mTurret.SetAimError(vp.Error_Angle + vp.getTurretOffset() + mTurretAdjust);
           LastTurretVisionID = vp.ID;
         }
 
@@ -939,10 +937,8 @@ public class Robot extends TimedRobot {
       // Command the Turret Manually
       // Operator Controls
       double ManualTurn = mOperatorInterface.getTurretAdjust();
-      if (ManualTurn > .6) {
-        mTurret.SetManualOutput(-.85);
-      } else if (ManualTurn < -.6) {
-        mTurret.SetManualOutput(.85);
+      if (Math.abs(ManualTurn) > .2) {
+        mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
       } else {
         mTurret.SetManualOutput(0);
       }

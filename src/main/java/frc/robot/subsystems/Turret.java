@@ -77,6 +77,7 @@ public class Turret extends Subsystem {
   public synchronized void readPeriodicInputs() {
     // store current encoder position
     mPeriodicIO.CurrentPosition = mTurretTalon.getSelectedSensorPosition();
+    System.out.println(mPeriodicIO.CurrentPosition);
     mPeriodicIO.Velocity = mTurretTalon.getSelectedSensorVelocity();
   }
 

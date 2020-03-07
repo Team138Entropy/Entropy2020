@@ -21,7 +21,7 @@ public class Constants {
   public static final int Talon_Climber = 11;
   // ALL TALON PORTS DEFINED HERE
 
-  public static final double TURRET_MANUAL_ADJUST_FACTOR = .1;
+  public static final double TURRET_MANUAL_ADJUST_FACTOR = .2;
 
   public static final int STORAGE_CURRENT_LIMIT = 7;
 

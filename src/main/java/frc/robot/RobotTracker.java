@@ -131,7 +131,7 @@ public class RobotTracker {
   private final double mLowerBound_Distance = 10.0;
   private final double mLowerBound_OffsetAngle = 5.0;
   private final double mUpperBound_Distance = 35.0;
-  private final double mUpperBound_OffsetAngle = 2.8;
+  private final double mUpperBound_OffsetAngle = 2;
 
 
   // Reset the Robot. This is our zero point!
