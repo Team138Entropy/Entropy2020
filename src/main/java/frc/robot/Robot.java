@@ -887,6 +887,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Unknown test state " + mTestState.toString());
         break;
     }
+    System.out.println("climber position " + mClimber.getEncoderPosition()
   }
 
   @Override
