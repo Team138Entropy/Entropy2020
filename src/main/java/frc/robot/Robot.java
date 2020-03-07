@@ -250,6 +250,8 @@ public class Robot extends TimedRobot {
 
     mClimber.updateSmartDashboard();
 
+    SmartDashboard.putBoolean("Climbing Mode", mState == State.CLIMBING);
+
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
 
@@ -349,6 +351,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    mClimber.resetEncoder();
+
     visionLight.set(Relay.Value.kOff);
     mAuto = false;
     sIsSpinningUp = false;
@@ -1344,12 +1348,14 @@ public class Robot extends TimedRobot {
     switch (mClimbingState) {
       case IDLE:
         mClimber.stop();
-        mRobotLogger.warn("Climbing state is idle");
+        // mRobotLogger.warn("Climbing state is idle");
         break;
       case WAIT:
         if (mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.EXTENDING;
         }
+
+        checkEscapeClimbHold();
         break;
       case EXTENDING:
         // TODO: Decide if climb and retract should be the same button
