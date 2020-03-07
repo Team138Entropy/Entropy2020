@@ -64,7 +64,7 @@ public class OperatorInterface {
   }
 
   public boolean climbDown() {
-    boolean buttonValue = DriverController.getButton(XboxController.Button.B);
+    boolean buttonValue = DriverController.getButton(XboxController.Button.A);
     return mClimbDownWasPressed.update(buttonValue);
   }
 
