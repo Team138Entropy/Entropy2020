@@ -47,8 +47,6 @@ public class VisionPacket {
   }
 
   public double getTurretOffset(){
-    return Angle_Offset;
+    return Math.toDegrees(Math.atan(.5 / Distance));
   }
-
-
 }

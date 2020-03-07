@@ -129,7 +129,7 @@ public class RobotTracker {
 
   //Vision Camera Offsets
   private final double mLowerBound_Distance = 10.0;
-  private final double mLowerBound_OffsetAngle = 7.0;
+  private final double mLowerBound_OffsetAngle = 6.5;
   private final double mUpperBound_Distance = 35.0;
   private final double mUpperBound_OffsetAngle = 2;
 

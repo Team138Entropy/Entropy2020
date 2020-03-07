@@ -117,7 +117,7 @@ public class Robot extends TimedRobot {
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
 
-  private final int ShotCooldown = 10; // each loop is 20 secs.. 200 ms cooldown
+  private final int ShotCooldown = 15; // each loop is 20 secs.. 200 ms cooldown
   private int mCurrentCooldown = ShotCooldown;
 
   private State mState = State.IDLE;
@@ -250,9 +250,9 @@ public class Robot extends TimedRobot {
 
     mClimber.updateSmartDashboard();
 
-    SmartDashboard.putBoolean("Intake Mode", mState == State.INTAKE);
+    SmartDashboard.putBoolean("Intake Mode", mState == State.INTAKE&& mIntakeState != IntakeState.IDLE && mIntakeState != IntakeState.READY_TO_INTAKE);
     SmartDashboard.putBoolean("Shooting Mode", mState == State.SHOOTING);
-    SmartDashboard.putBoolean("Climbing Mode", mState == State.INTAKE && mIntakeState != IntakeState.IDLE);
+    SmartDashboard.putBoolean("Climbing Mode", mState == State.CLIMBING);
 
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
