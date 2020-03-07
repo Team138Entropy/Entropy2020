@@ -306,7 +306,7 @@ public class Robot extends TimedRobot {
     mIntakeState = IntakeState.IDLE;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
-    mAutoPath = Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
+    mAutoPath = Paths.find("comp4").orElse(Paths.NO_OP);
     mShooterIsStopped = false;
     IntakeSegment
         .resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency
