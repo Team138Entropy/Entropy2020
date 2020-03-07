@@ -250,7 +250,9 @@ public class Robot extends TimedRobot {
 
     mClimber.updateSmartDashboard();
 
-    SmartDashboard.putBoolean("Climbing Mode", mState == State.CLIMBING);
+    SmartDashboard.putBoolean("Intake Mode", mState == State.INTAKE);
+    SmartDashboard.putBoolean("Shooting Mode", mState == State.SHOOTING);
+    SmartDashboard.putBoolean("Climbing Mode", mState == State.INTAKE && mIntakeState != IntakeState.IDLE);
 
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
@@ -925,7 +927,7 @@ public class Robot extends TimedRobot {
 
         // verify we haven't already commanded this packet!
         if (vp.ID != LastTurretVisionID) {
-          mTurret.SetAimError(vp.Error_Angle + vp.getTurretOffset() + mTurretAdjust);
+          mTurret.SetAimError(vp.Error_Angle + (vp.getTurretOffset() * -1) + mTurretAdjust);
           LastTurretVisionID = vp.ID;
         }
 
