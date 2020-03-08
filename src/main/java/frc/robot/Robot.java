@@ -1091,12 +1091,15 @@ public class Robot extends TimedRobot {
         mStorage.stop();
         mShooter.stop();
         mClimber.stop();
+        checkTransitionToClimbing();
         break;
       case INTAKE:
         executeIntakeStateMachine();
+        checkTransitionToClimbing();
         break;
       case SHOOTING:
         executeShootingStateMachine();
+        checkTransitionToClimbing();
         break;
       case CLIMBING:
         executeClimbingStateMachine();
@@ -1115,10 +1118,8 @@ public class Robot extends TimedRobot {
         mStorage.stop();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
-        checkTransitionToClimbing();
         break;
       case READY_TO_INTAKE:
-        checkTransitionToClimbing();
 
         // If the operator issues the intake command, start intake
         if (mOperatorInterface.startIntake()) {
@@ -1269,7 +1270,6 @@ public class Robot extends TimedRobot {
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
-        checkTransitionToClimbing();
         mRobotLogger.warn("Shooting state is idle");
         mShooter.stop();
         break;
