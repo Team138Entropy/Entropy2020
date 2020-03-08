@@ -388,6 +388,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
     int left = mDrive.getLeftEncoderDistance();
     int right = -mDrive.getRightEncoderDistance();
     SmartDashboard.putNumber("Left", left);
@@ -927,7 +928,7 @@ public class Robot extends TimedRobot {
 
         // verify we haven't already commanded this packet!
         if (vp.ID != LastTurretVisionID) {
-          mTurret.SetAimError(vp.Error_Angle/* + (vp.getTurretOffset()* -1)*/ + mTurretAdjust);
+          mTurret.SetAimError(vp.Error_Angle + (vp.getTurretOffset()* -1) + mTurretAdjust);
           LastTurretVisionID = vp.ID;
         }
 
@@ -1360,10 +1361,11 @@ public class Robot extends TimedRobot {
       case EXTENDING:
         // TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
-        if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
+        if (mOperatorInterface.climbUp()) {
+          mClimber.extend();
+        }else{
           mClimbingState = ClimbingState.HOLD;
         }
-        mClimber.extend();
 
         /** Checks the encoder position to see if it's done climbing */
         if (mClimber.isExtended()) {
@@ -1395,7 +1397,9 @@ public class Robot extends TimedRobot {
       case RETRACTING:
         mClimber.retract();
 
-        if (mOperatorInterface.climbUp() || mOperatorInterface.climbDown()) {
+        if (mOperatorInterface.climbDown()) {
+          mClimber.retract();
+        }else{
           mClimbingState = ClimbingState.HOLD;
         }
 
@@ -1408,6 +1412,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Invalid Climbing State");
         break;
     }
+    System.out.println(mClimber.getEncoderPosition());
   }
 
   private static void readIsPracticeBot() {
