@@ -1346,6 +1346,10 @@ public class Robot extends TimedRobot {
   }
 
   private void executeClimbingStateMachine() {
+    if(mClimbingState != ClimbingState.IDLE){
+      SmartDashboard.putNumber("Climber pos", mClimber.getEncoderPosition());
+    }
+
     switch (mClimbingState) {
       case IDLE:
         mClimber.stop();
