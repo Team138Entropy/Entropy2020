@@ -1,4 +1,4 @@
-  /*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -13,7 +13,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.io.*;
 
 /**
@@ -25,7 +24,7 @@ public class Robot extends TimedRobot {
   WPI_TalonSRX mTalonSlave = new WPI_TalonSRX(5);
 
   WPI_TalonSRX mTalonTop = new WPI_TalonSRX(7);
-  WPI_TalonSRX mTalonBottom= new WPI_TalonSRX(8);
+  WPI_TalonSRX mTalonBottom = new WPI_TalonSRX(8);
 
   XboxController mController = new XboxController(0);
 
@@ -56,7 +55,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit(){
+  public void teleopInit() {
     mTalonMaster.set(ControlMode.PercentOutput, -1.0f);
   }
 
@@ -68,15 +67,14 @@ public class Robot extends TimedRobot {
             + Double.toString(mTalonMaster.getSupplyCurrent()));
 
     SmartDashboard.putNumber("Shooter Speed", -mTalonMaster.getSelectedSensorVelocity());
-    
-    if(-mTalonMaster.getSelectedSensorVelocity() > 2150){
+
+    if (-mTalonMaster.getSelectedSensorVelocity() > 2150) {
       mTalonTop.set(ControlMode.PercentOutput, .8f);
       mTalonBottom.set(ControlMode.PercentOutput, .8f);
-    }else{
+    } else {
       mTalonTop.set(ControlMode.PercentOutput, 0);
       mTalonBottom.set(ControlMode.PercentOutput, 0);
     }
-
 
     try {
       writer.append("\n");
