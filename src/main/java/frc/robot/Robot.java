@@ -87,6 +87,8 @@ public class Robot extends TimedRobot {
   private int LastTurretVisionID = -1; // use IDs to filter out bad ideas
   private int LastFeederStationVisionID = -1;
 
+  private double mTurretAdjust = 0;
+
   public enum TestState {
     START,
     TEST_PI,
@@ -115,7 +117,7 @@ public class Robot extends TimedRobot {
   private final double FIRE_DURATION_SECONDS = 0.3;
   private final int BARF_TIMER_DURATION = 3;
 
-  private final int ShotCooldown = 10; // each loop is 20 secs.. 200 ms cooldown
+  private final int ShotCooldown = 15; // each loop is 20 secs.. 200 ms cooldown
   private int mCurrentCooldown = ShotCooldown;
 
   private State mState = State.IDLE;
@@ -248,6 +250,10 @@ public class Robot extends TimedRobot {
 
     mClimber.updateSmartDashboard();
 
+    SmartDashboard.putBoolean("Intake Mode", mState == State.INTAKE&& mIntakeState != IntakeState.IDLE && mIntakeState != IntakeState.READY_TO_INTAKE);
+    SmartDashboard.putBoolean("Shooting Mode", mState == State.SHOOTING);
+    SmartDashboard.putBoolean("Climbing Mode", mState == State.CLIMBING);
+
     SmartDashboard.putBoolean("Practice Bot", getIsPracticeBot());
     SmartDashboard.putString("Turret State", mTurretState.toString());
 
@@ -300,7 +306,7 @@ public class Robot extends TimedRobot {
     mIntakeState = IntakeState.IDLE;
     mStorage.preloadBalls(AUTONOMOUS_BALL_COUNT);
 
-    mAutoPath = Paths.find("comp" + autoMode).orElse(Paths.NO_OP);
+    mAutoPath = Paths.find("comp4").orElse(Paths.NO_OP);
     mShooterIsStopped = false;
     IntakeSegment
         .resetActivatedState(); // In case we didn't cleanly finish for some reason (emergency
@@ -347,6 +353,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    mClimber.resetEncoder();
+
     visionLight.set(Relay.Value.kOff);
     mAuto = false;
     sIsSpinningUp = false;
@@ -399,7 +407,6 @@ public class Robot extends TimedRobot {
   @Override
   public void testInit() {
     mAuto = false;
-    mRobotLogger.log("Entropy 138: Test Init");
     mTestState = TestState.MANUAL;
 
     Config.getInstance().reload();
@@ -490,6 +497,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Driver Cameras", mCameraManager.getCameraStatus());
     SmartDashboard.putBoolean("Garage Door", mStorage.getIntakeSensor());
     SmartDashboard.putNumber("Climber Position", mClimber.getEncoderPosition());
+    SmartDashboard.putNumber("Storage encoder", mStorage.getEncoder());
 
     switch (mTestState) {
       case START:
@@ -878,6 +886,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Unknown test state " + mTestState.toString());
         break;
     }
+    System.out.println("climber position " + mClimber.getEncoderPosition());
   }
 
   @Override
@@ -889,6 +898,7 @@ public class Robot extends TimedRobot {
 
     // zero turret sensor
     // this assumes the turret is aligned
+
 
     Config.getInstance().reload();
 
@@ -902,8 +912,11 @@ public class Robot extends TimedRobot {
   // turret loop
   // constantly commands the turret with vision or manual controls
   public synchronized void turretLoop() {
-
+    SmartDashboard.putNumber("Vision Turret Adjust", mTurretAdjust);
     if (mTurretState == TurretState.AUTO_AIM) {
+      double turretAdjust = mOperatorInterface.getTurretAdjust();
+      mTurretAdjust += turretAdjust * Constants.TURRET_MANUAL_ADJUST_FACTOR;
+
       // Command the Turret with vision set points
       // RobotTracker.RobotTrackerResult result =
       // mRobotTracker.GetTurretError(Timer.getFPGATimestamp());
@@ -915,7 +928,7 @@ public class Robot extends TimedRobot {
 
         // verify we haven't already commanded this packet!
         if (vp.ID != LastTurretVisionID) {
-          mTurret.SetAimError(vp.Error_Angle + Constants.kTurretAngleOffset);
+          mTurret.SetAimError(vp.Error_Angle + (vp.getTurretOffset()* -1) + mTurretAdjust);
           LastTurretVisionID = vp.ID;
         }
 
@@ -927,10 +940,8 @@ public class Robot extends TimedRobot {
       // Command the Turret Manually
       // Operator Controls
       double ManualTurn = mOperatorInterface.getTurretAdjust();
-      if (ManualTurn > .6) {
-        mTurret.SetManualOutput(-.85);
-      } else if (ManualTurn < -.6) {
-        mTurret.SetManualOutput(.85);
+      if (Math.abs(ManualTurn) > .2) {
+        mTurret.SetManualOutput(mOperatorInterface.getTurretAdjust());
       } else {
         mTurret.SetManualOutput(0);
       }
@@ -1061,9 +1072,9 @@ public class Robot extends TimedRobot {
 
     // Shooter velocity trim
     if (mShooterVelocityTrimDown.update(mOperatorInterface.getShooterVelocityTrimDown())) {
-      mShooter.decreaseVelocity();
+      // mShooter.decreaseVelocity();
     } else if (mShooterVelocityTrimUp.update(mOperatorInterface.getShooterVelocityTrimUp())) {
-      mShooter.increaseVelocity();
+      // mShooter.increaseVelocity();
     } else if (mOperatorInterface.getResetVelocityTrim()) {
       mShooter.resetVelocity();
     }
@@ -1080,12 +1091,15 @@ public class Robot extends TimedRobot {
         mStorage.stop();
         mShooter.stop();
         mClimber.stop();
+        checkTransitionToClimbing();
         break;
       case INTAKE:
         executeIntakeStateMachine();
+        checkTransitionToClimbing();
         break;
       case SHOOTING:
         executeShootingStateMachine();
+        checkTransitionToClimbing();
         break;
       case CLIMBING:
         executeClimbingStateMachine();
@@ -1104,10 +1118,8 @@ public class Robot extends TimedRobot {
         mStorage.stop();
         mShooter.stop();
         mIntakeState = IntakeState.READY_TO_INTAKE;
-        checkTransitionToClimbing();
         break;
       case READY_TO_INTAKE:
-        checkTransitionToClimbing();
 
         // If the operator issues the intake command, start intake
         if (mOperatorInterface.startIntake()) {
@@ -1258,7 +1270,6 @@ public class Robot extends TimedRobot {
   private void executeShootingStateMachine() {
     switch (mShootingState) {
       case IDLE:
-        checkTransitionToClimbing();
         mRobotLogger.warn("Shooting state is idle");
         mShooter.stop();
         break;
@@ -1335,23 +1346,30 @@ public class Robot extends TimedRobot {
   }
 
   private void executeClimbingStateMachine() {
+    if(mClimbingState != ClimbingState.IDLE){
+      SmartDashboard.putNumber("Climber pos", mClimber.getEncoderPosition());
+    }
+
     switch (mClimbingState) {
       case IDLE:
         mClimber.stop();
-        mRobotLogger.warn("Climbing state is idle");
+        // mRobotLogger.warn("Climbing state is idle");
         break;
       case WAIT:
         if (mOperatorInterface.climbUp()) {
           mClimbingState = ClimbingState.EXTENDING;
         }
+
+        checkEscapeClimbHold();
         break;
       case EXTENDING:
         // TODO: Decide if climb and retract should be the same button
         /** Checks if the climb button has been hit again, signalling it to retract */
-        if (mOperatorInterface.climbDown() || mOperatorInterface.climbUp()) {
+        if (mOperatorInterface.climbUp()) {
+          mClimber.extend();
+        }else{
           mClimbingState = ClimbingState.HOLD;
         }
-        mClimber.extend();
 
         /** Checks the encoder position to see if it's done climbing */
         if (mClimber.isExtended()) {
@@ -1383,7 +1401,9 @@ public class Robot extends TimedRobot {
       case RETRACTING:
         mClimber.retract();
 
-        if (mOperatorInterface.climbUp() || mOperatorInterface.climbDown()) {
+        if (mOperatorInterface.climbDown()) {
+          mClimber.retract();
+        }else{
           mClimbingState = ClimbingState.HOLD;
         }
 
@@ -1396,6 +1416,7 @@ public class Robot extends TimedRobot {
         mRobotLogger.error("Invalid Climbing State");
         break;
     }
+    System.out.println(mClimber.getEncoderPosition());
   }
 
   private static void readIsPracticeBot() {

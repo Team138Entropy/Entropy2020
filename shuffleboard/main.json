@@ -13,7 +13,7 @@
           "0,4": {
             "size": [
               4,
-              2
+              3
             ],
             "content": {
               "_type": "Boolean Box",
@@ -25,7 +25,7 @@
           },
           "0,0": {
             "size": [
-              6,
+              8,
               2
             ],
             "content": {
@@ -39,10 +39,10 @@
               "Visuals/Show text": true
             }
           },
-          "22,0": {
+          "18,0": {
             "size": [
               4,
-              5
+              6
             ],
             "content": {
               "_type": "Subsystem Layout",
@@ -88,7 +88,7 @@
               "Visuals/Show text": true
             }
           },
-          "2,6": {
+          "2,7": {
             "size": [
               3,
               2
@@ -104,7 +104,7 @@
               "Visuals/Show text": true
             }
           },
-          "22,5": {
+          "22,6": {
             "size": [
               4,
               1
@@ -118,7 +118,7 @@
           "8,0": {
             "size": [
               10,
-              7
+              10
             ],
             "content": {
               "_type": "Camera Stream",
@@ -134,7 +134,7 @@
               "imageHeight": 0
             }
           },
-          "0,6": {
+          "0,7": {
             "size": [
               2,
               2
@@ -147,33 +147,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "6,0": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Garage Door",
-              "_title": "Garage Door",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "20,3": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Has Had Current Drop",
-              "_title": "Has Had Current Drop",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "22,6": {
+          "22,7": {
             "size": [
               4,
               1
@@ -184,9 +158,9 @@
               "_title": "Shooter Speed"
             }
           },
-          "20,5": {
+          "18,6": {
             "size": [
-              2,
+              4,
               2
             ],
             "content": {
@@ -200,7 +174,7 @@
           "4,4": {
             "size": [
               4,
-              2
+              3
             ],
             "content": {
               "_type": "Boolean Box",
@@ -210,7 +184,7 @@
               "Colors/Color when false": "#8B0000FF"
             }
           },
-          "5,6": {
+          "5,7": {
             "size": [
               3,
               2
@@ -226,23 +200,10 @@
               "Visuals/Show text": true
             }
           },
-          "22,7": {
+          "22,8": {
             "size": [
               4,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Practice Bot",
-              "_title": "Practice Bot",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
-          "20,7": {
-            "size": [
-              2,
-              2
+              4
             ],
             "content": {
               "_type": "Number Slider",
@@ -253,26 +214,43 @@
               "Slider Settings/Block increment": 1.0
             }
           },
-          "20,2": {
+          "22,4": {
             "size": [
-              1,
-              1
+              4,
+              2
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Shot Countdown",
-              "_title": "Shot Countdown"
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Climbing Mode",
+              "_title": "Climbing Mode",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           },
-          "19,4": {
+          "22,0": {
             "size": [
-              1,
-              1
+              4,
+              2
             ],
             "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Intake Current",
-              "_title": "Intake Current"
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Intake Mode",
+              "_title": "Intake Mode",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "22,2": {
+            "size": [
+              4,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Shooting Mode",
+              "_title": "Shooting Mode",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
             }
           }
         }
@@ -402,6 +380,12 @@
                   "_type": "PID Controller",
                   "_source0": "network_table:///LiveWindow/Ungrouped/PIDController[2]",
                   "_title": "PIDController[2]"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [9]",
+                  "_title": "Talon SRX [9]",
+                  "Visuals/Orientation": "HORIZONTAL"
                 }
               ]
             }
@@ -1200,6 +1184,85 @@
               "Colors/Color when true": "#7CFC00FF",
               "Colors/Color when false": "#8B0000FF"
             }
+          },
+          "17,10": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Left",
+              "_title": "Left"
+            }
+          },
+          "18,10": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/Climbing Mode",
+              "_title": "Climbing Mode",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "22,10": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Right",
+              "_title": "Right"
+            }
+          },
+          "23,10": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Climber Position",
+              "_title": "Climber Position"
+            }
+          },
+          "24,10": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Vision Turret Adjust",
+              "_title": "Vision Turret Adjust"
+            }
+          },
+          "25,10": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Garage As Number",
+              "_title": "Garage As Number"
+            }
+          },
+          "4,11": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/ShooterCurrent",
+              "_title": "ShooterCurrent"
+            }
           }
         }
       }
@@ -1667,7 +1730,7 @@
   "windowGeometry": {
     "x": -8.0,
     "y": -8.0,
-    "width": 1382.0,
-    "height": 744.0
+    "width": 1936.0,
+    "height": 1056.0
   }
 }

@@ -18,6 +18,8 @@ public class VisionPacket {
   public final boolean HasValue;
   public int ID = 0;
 
+  private double Angle_Offset = 0;
+
   public VisionPacket(double TS, double Angle, double Dis) {
     Distance = Dis;
     Timestamp = TS;
@@ -38,5 +40,13 @@ public class VisionPacket {
 
   public int getID() {
     return ID;
+  }
+
+  public void setTurretOffset(double angle){
+    Angle_Offset = angle;
+  }
+
+  public double getTurretOffset(){
+    return Math.toDegrees(Math.atan(.4 / Distance));
   }
 }

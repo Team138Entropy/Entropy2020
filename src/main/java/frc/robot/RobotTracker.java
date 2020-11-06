@@ -127,15 +127,32 @@ public class RobotTracker {
   private final Object Turret_Vision_Packet_Error = new Object();
   private final Object Drive_Vision_Packet_Error = new Object();
 
+  //Vision Camera Offsets
+  private final double mLowerBound_Distance = 10.0;
+  private final double mLowerBound_OffsetAngle = 6.5;
+  private final double mUpperBound_Distance = 35.0;
+  private final double mUpperBound_OffsetAngle = 2;
+
+
   // Reset the Robot. This is our zero point!
   private RobotTracker() {
     // Resets are called with everything at 0
     reset(0.0, Pose2d.identity(), Rotation2d.identity());
   }
 
+  //function for performing linear interpolation
+  public double linearInterpolate(double x, double x0, double y0, double x1, double y1) {
+    return (y0 * (x1 - x) + y1 * (x - x0)) / (x1 - x0);
+  }
+
+
   // For Turret
   public void UpdateTurretVision(double timestamp, TargetInfo ti) {
     Rotation2d NewAngle = getCameraToVisionAngle(ti, true);
+
+    //shooter offset from camera
+    double offsetAngle = linearInterpolate(ti.getDistance(), mLowerBound_Distance, mLowerBound_OffsetAngle, mUpperBound_Distance, mUpperBound_OffsetAngle);
+    offsetAngle = offsetAngle * -1;
 
     // Check for heavy leighers before updating
     // angle isn't too big, vision makes sense..
@@ -152,6 +169,7 @@ public class RobotTracker {
     }
 
     VisionPacket vp = new VisionPacket(timestamp, NewAngle.getDegrees(), ti.getDistance());
+    vp.setTurretOffset(offsetAngle);
     int previousID = 0;
     synchronized (Turret_Vision_Packet_Error) {
       // store previous ID if it exists

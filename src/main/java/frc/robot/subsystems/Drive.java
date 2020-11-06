@@ -195,10 +195,14 @@ public class Drive extends Subsystem {
 
   /** Configure talons for open loop control */
   public synchronized void setOpenLoop(DriveSignal signal) {
+    // are we quickturning?
+    boolean quickturn = mPeriodicDriveData.isQuickturning;
+
+
     // Slow down climbing if the climber is extended so we can't rip it off (as easily)
     double peakOutput = Config.getInstance().getDouble(Key.DRIVE__PEAK_OUTPUT_CLIMBING);
 
-    if (mPeriodicDriveData.climbingSpeed) {
+    if (mPeriodicDriveData.climbingSpeed && !quickturn) {
       mLeftMaster.configPeakOutputForward(peakOutput, 0);
       mLeftMaster.configPeakOutputReverse(-peakOutput, 0);
 
@@ -216,8 +220,6 @@ public class Drive extends Subsystem {
     double accelSpeed = Config.getInstance().getDouble(Key.DRIVE__FORWARD_ACCEL_RAMP_TIME_SECONDS);
     double brakeSpeed = Config.getInstance().getDouble(Key.DRIVE__REVERSE_BRAKE_RAMP_TIME_SECONDS);
 
-    // are we quickturning?
-    boolean quickturn = mPeriodicDriveData.isQuickturning;
 
     // Segments are started by the variables they will need
     boolean leftStationary = false;

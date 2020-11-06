@@ -21,10 +21,10 @@ public class SpeedLookupTable {
 
   double[][] mProductionLookupTable = {
     // {distance in meters, speed in whatever our system uses}
-    {10d, 3040d},
-    {20d, 3040d},
-    {30d, 3040d},
-    {40d, 3040d}
+    {10d, 3250d},
+    {20d, 3250d},
+    {30d, 3250d},
+    {40d, 3250d}
   };
 
   SpeedLookupTable() {}
@@ -67,6 +67,8 @@ public class SpeedLookupTable {
               distance, lowerBoundDistance, lowerBoundSpeed, upperBoundDistance, upperBoundSpeed);
         }
       }
+    }else{
+      return ourTable[ourTable.length - 1][1];
     }
 
     // we ran out of keys to loop through

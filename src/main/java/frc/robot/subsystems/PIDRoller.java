@@ -33,7 +33,7 @@ class PIDRoller {
     mTalon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
     mTalon.setSensorPhase(!Robot.getIsPracticeBot());
 
-    mTalon.enableVoltageCompensation(true); // turn on/off feature
+    // mTalon.enableVoltageCompensation(true); // turn on/off feature
     mTalon.configAllowableClosedloopError(PID_LOOP_INDEX, 50, TIMEOUT_MS);
 
     mTalon.config_kP(PID_LOOP_INDEX, p);
